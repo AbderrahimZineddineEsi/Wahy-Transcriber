@@ -5,7 +5,7 @@
 // =============================================================================
 
 function switchMainSection(sectionName) {
-  const validSections = ["input", "display", "editor", "datasets"];
+  const validSections = ["input", "display", "editor", "datasets", "ai_logs"];
   const target = validSections.includes(sectionName) ? sectionName : "display";
   currentState.activeSection = target;
 
@@ -43,6 +43,8 @@ function switchMainSection(sectionName) {
   } else if (target === "display") {
     renderFormattedLectureView();
     updateVideoCaptionOverlay(currentState.currentTime);
+  } else if (target === "ai_logs") {
+    renderAiLogsSection();
   }
 }
 
@@ -105,6 +107,8 @@ function renderKpiSummaryBar() {
   setEl("kpiEngineTimeMs", `${currentState.lastElapsedMs || "1.2"} ms`);
   setEl("navBadgeFindingsCount", dets.length);
   setEl("navBadgeAdhkarCount", (typeof RAW_ADHKAR_DATA !== "undefined" && Array.isArray(RAW_ADHKAR_DATA)) ? RAW_ADHKAR_DATA.length : 0);
+  const verifiedCnt = dets.filter(d => d.aiVerification && d.aiVerification.status === "VERIFIED").length;
+  setEl("navBadgeAiVerifiedCount", verifiedCnt);
 
   const titleEl = document.getElementById("displayLectureTitleLabel");
   if (titleEl) titleEl.textContent = currentState.lectureTitle || "محاضرة علمية";
@@ -144,16 +148,64 @@ function buildLectureHtmlContent(isEditorMode = false) {
     if (findingStartMap.has(i)) {
       const { det, dIdx } = findingStartMap.get(i);
       const endW = Math.min(words.length - 1, Math.max(i, det.wordEndIdx));
+
+      // AI Verdict Filter check (freely toggleable by user)
+      const visFilter = (typeof currentState === "object" && currentState.aiVerification && currentState.aiVerification.visibilityFilter)
+        ? currentState.aiVerification.visibilityFilter
+        : { showCorrect: true, showNotSure: true, showFalse: false, showUnverified: true };
+
+      const v = det.aiVerification?.verdict;
+      let shouldRenderAsCitation = true;
+      if (v === "CORRECT" && visFilter.showCorrect === false) shouldRenderAsCitation = false;
+      else if (v === "NOT_SURE" && visFilter.showNotSure === false) shouldRenderAsCitation = false;
+      else if (v === "FALSE" && !visFilter.showFalse) shouldRenderAsCitation = false;
+      else if (!v && visFilter.showUnverified === false) shouldRenderAsCitation = false;
+
+      // In Display view, if excluded by AI filter, demote to normal speech tokens
+      if (!shouldRenderAsCitation && !isEditorMode) {
+        for (let k = i; k <= endW; k++) {
+          const wObj = words[k];
+          const isHitSearch = searchQ && wObj.word.includes(searchQ);
+          const searchHighlight = isHitSearch ? "bg-sky-500/30 text-sky-200 ring-1 ring-sky-400" : "";
+          const tokCls = `lecture-word-token ${searchHighlight}`;
+          const tip = `انقر للانتقال إلى التوقيت [${formatSecondsToShortTime(wObj.start)}]`;
+          currentParaParts.push(
+            `<span class="${tokCls}" data-word-idx="${k}" data-raw-tok-idx="${k}" data-start-time="${wObj.start}" title="${tip}">${escapeHtml(wObj.word)}</span>`
+          );
+        }
+        i = endW + 1;
+        continue;
+      }
+
       const fType = det.type || sourceTypeToCategorySlug(det.sourceType);
       const brackets = getBracketsForCategory(fType, prefs);
       const isSelected = currentState.selectedPredIndex === dIdx;
 
-      const catClass = fType === "ayah"
+      let catClass = fType === "ayah"
         ? "citation-ayah"
         : (fType === "hadith" ? "citation-hadith" : "citation-dhikr");
 
+      if (v === "FALSE") {
+        catClass += " ai-marked-false";
+      }
+
       const selectedClass = isSelected ? "citation-selected-ring" : "";
       const dimmedClass = (filterCat !== "ALL" && filterCat !== fType) ? "opacity-35" : "";
+
+      // AI micro-badge
+      let aiBadgeHtml = "";
+      if (det.aiVerification && det.aiVerification.status === "VERIFIED") {
+        const confPct = Math.round((det.aiVerification.confidence || 0.88) * 100);
+        if (v === "CORRECT") {
+          aiBadgeHtml = `<span class="ai-badge ai-badge-correct" title="تدقيق الذكاء الاصطناعي: اقتباس مؤكد (${confPct}%)">🟢 ${confPct}%</span>`;
+        } else if (v === "NOT_SURE") {
+          aiBadgeHtml = `<span class="ai-badge ai-badge-not-sure" title="تدقيق الذكاء الاصطناعي: شبه اقتباس غير مؤكد (${confPct}%)">🟡 ${confPct}%</span>`;
+        } else if (v === "FALSE") {
+          aiBadgeHtml = `<span class="ai-badge ai-badge-false" title="تدقيق الذكاء الاصطناعي: مستبعد / كلام عادي (${confPct}%)">🔴 كلام عادي</span>`;
+        }
+      } else if (det.aiVerification && det.aiVerification.status === "PENDING") {
+        aiBadgeHtml = `<span class="ai-badge ai-badge-pending" title="جاري التدقيق بالذكاء الاصطناعي...">⏳ فحص...</span>`;
+      }
 
       let innerWordsHtml = "";
       if (!isEditorMode && det.snappedToCanonical && det.canonicalText) {
@@ -191,6 +243,7 @@ function buildLectureHtmlContent(isEditorMode = false) {
               data-finding-idx="${dIdx}"
               data-start-time="${det.startTime || words[i].start}"
               title="انقر لفحص وتعديل المقتبس [${escapeHtml(refText)}]">
+          ${aiBadgeHtml}
           <span class="opacity-85 select-none">${escapeHtml(brackets.open)}</span>${innerWordsHtml}<span class="opacity-85 select-none">${escapeHtml(brackets.close)}</span>
           ${(refText && showBadge) ? `<span class="inline-flex items-center gap-1 px-2 py-0.5 mr-1 rounded-md text-[11px] font-sans font-bold border ${badgeColor}">📖 ${escapeHtml(refText)} <span class="font-mono text-[10px] opacity-75" dir="ltr">${timeTag}</span></span>` : ""}
         </span>
@@ -460,6 +513,62 @@ function renderFindingInspector() {
         </div>
         <div class="text-xs font-quran-text text-slate-200 bg-slate-950/70 p-2 rounded-lg border border-slate-800/80 leading-relaxed">${escapeHtml(det.canonicalText || det.matchedText || "")}</div>
       </div>
+
+      <!-- AI Verification & Human Gold Override Card -->
+      <div class="rounded-xl bg-slate-950/90 border border-sky-500/30 p-3.5 space-y-3">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div class="font-bold text-sky-300 flex items-center gap-1.5">
+            <span>🤖</span>
+            <span>تدقيق الذكاء الاصطناعي والتصحيح البشري اليدوي</span>
+          </div>
+          ${det.aiVerification?.status === "VERIFIED"
+            ? (det.aiVerification.verdict === "CORRECT"
+                ? '<span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-bold">🟢 مقبول / اقتباس مؤكد</span>'
+                : (det.aiVerification.verdict === "FALSE"
+                    ? '<span class="px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 text-[10px] font-bold">🔴 مستبعد / كلام عادي</span>'
+                    : '<span class="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-[10px] font-bold">🟡 غير متأكد</span>'))
+            : (det.aiVerification?.status === "PENDING"
+                ? '<span class="px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-300 text-[10px] font-bold animate-pulse">⏳ جاري الفحص...</span>'
+                : '<span class="px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 text-[10px]">⚪ غير مفحوص بعد</span>')}
+        </div>
+
+        ${det.aiVerification?.status === "VERIFIED" ? `
+          <div class="p-2.5 rounded-lg bg-slate-900 border border-slate-800 text-xs space-y-1.5">
+            <div class="flex items-center justify-between text-[11px]">
+              <span class="text-slate-400">النموذج: <strong class="text-slate-200 font-mono">${escapeHtml(det.aiVerification.modelUsed || det.aiVerification.provider || "")}</strong></span>
+              <span class="text-slate-400">نسبة الثقة: <strong class="text-emerald-400 font-mono">${Math.round((det.aiVerification.confidence || 0.88) * 100)}%</strong></span>
+            </div>
+            ${det.aiVerification.probabilities ? `
+              <div class="text-[10px] font-mono text-slate-400 flex items-center justify-between pt-1 border-t border-slate-800/80">
+                <span>P(صحيح): ${(det.aiVerification.probabilities.CORRECT || 0).toFixed(2)}</span>
+                <span>P(خاطئ): ${(det.aiVerification.probabilities.FALSE || 0).toFixed(2)}</span>
+                <span>P(غير متأكد): ${(det.aiVerification.probabilities.NOT_SURE || 0).toFixed(2)}</span>
+              </div>
+            ` : ""}
+            ${det.aiVerification.reason ? `
+              <div class="text-[11px] text-slate-300 pt-1 text-justify border-t border-slate-800/60 leading-relaxed">
+                ${escapeHtml(det.aiVerification.reason)}
+              </div>
+            ` : ""}
+          </div>
+        ` : ""}
+
+        <!-- 1-Click Human Override Buttons -->
+        <div class="space-y-1.5 pt-1">
+          <div class="text-[11px] text-slate-400 font-medium">تصحيح / تأكيد الحكم يدوياً (حفظ كبيانات تدريب ذهبية لـ Laya):</div>
+          <div class="grid grid-cols-3 gap-1.5">
+            <button type="button" id="btnOverrideCorrect" class="px-2 py-1.5 rounded-lg font-bold text-xs bg-emerald-600/20 hover:bg-emerald-600/35 text-emerald-300 border border-emerald-500/40 transition">
+              🟢 صحيح
+            </button>
+            <button type="button" id="btnOverrideFalse" class="px-2 py-1.5 rounded-lg font-bold text-xs bg-rose-600/20 hover:bg-rose-600/35 text-rose-300 border border-rose-500/40 transition">
+              🔴 كلام عادي
+            </button>
+            <button type="button" id="btnOverrideNotSure" class="px-2 py-1.5 rounded-lg font-bold text-xs bg-amber-600/20 hover:bg-amber-600/35 text-amber-300 border border-amber-500/40 transition">
+              🟡 غير متأكد
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   `;
 
@@ -480,6 +589,22 @@ function renderFindingInspector() {
   panel.querySelector("#btnEndWordMinus")?.addEventListener("click", () => adjustFindingWordBoundary(idx, "end", -1));
   panel.querySelector("#btnEndWordPlus")?.addEventListener("click", () => adjustFindingWordBoundary(idx, "end", 1));
   panel.querySelector("#btnInspectorSnapCanonical")?.addEventListener("click", () => toggleSnapFindingToCanonical(idx));
+
+  panel.querySelector("#btnOverrideCorrect")?.addEventListener("click", () => {
+    if (typeof WahyAiVerifier === "object" && typeof WahyAiVerifier.setHumanOverrideVerdict === "function") {
+      WahyAiVerifier.setHumanOverrideVerdict(det.id, "CORRECT");
+    }
+  });
+  panel.querySelector("#btnOverrideFalse")?.addEventListener("click", () => {
+    if (typeof WahyAiVerifier === "object" && typeof WahyAiVerifier.setHumanOverrideVerdict === "function") {
+      WahyAiVerifier.setHumanOverrideVerdict(det.id, "FALSE");
+    }
+  });
+  panel.querySelector("#btnOverrideNotSure")?.addEventListener("click", () => {
+    if (typeof WahyAiVerifier === "object" && typeof WahyAiVerifier.setHumanOverrideVerdict === "function") {
+      WahyAiVerifier.setHumanOverrideVerdict(det.id, "NOT_SURE");
+    }
+  });
 }
 
 /**
@@ -1240,6 +1365,242 @@ function exportLectureAsPrintSheet() {
   setTimeout(() => window.print(), 150);
 }
 
+// =============================================================================
+// AI Verification, Request Telemetry & Laya Studio Renderers
+// =============================================================================
+
+function updateAiMetricsUI() {
+  const m = currentState.aiVerification.metrics || {};
+  const setEl = (id, val) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = String(val);
+  };
+
+  setEl("aiMetricEngineTime", `${m.engineDetectionTimeMs || 0} ms`);
+  setEl("aiMetricTotalReq", `${m.successfulRequests || 0} / ${m.totalRequests || 0} طلب`);
+  setEl("aiMetricFullTime", `${((m.requestsFullTimeMs || 0) / 1000).toFixed(2)} s`);
+  setEl("aiMetricAvgTime", `${m.avgRequestTimeMs || 0} ms`);
+  setEl("aiMetricTotalTokens", `${(m.totalContextTokens || 0).toLocaleString()} توكن (${(m.totalContextChars || 0).toLocaleString()} حرف)`);
+  setEl("aiMetricAvgContext", `${m.avgContextTokensPerRequest || 0} توكن/طلب`);
+  setEl("aiMetricVerdicts", `🟢 ${m.verdictCounts?.CORRECT || 0} | 🔴 ${m.verdictCounts?.FALSE || 0} | 🟡 ${m.verdictCounts?.NOT_SURE || 0}`);
+  setEl("aiMetricCost", `$${Number(m.estimatedTotalCostUsd || 0).toFixed(5)}`);
+
+  const badgeCount = document.getElementById("navBadgeAiVerifiedCount");
+  if (badgeCount) {
+    const verifiedDets = (currentState.detections || []).filter(d => d.aiVerification && d.aiVerification.status === "VERIFIED").length;
+    badgeCount.textContent = String(verifiedDets);
+  }
+}
+
+function renderLayaDatasetBankStats() {
+  const records = currentState.aiVerification.trainingDatasetRecords || [];
+  const setEl = (id, val) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = String(val);
+  };
+
+  let cCorrect = 0;
+  let cFalse = 0;
+  let cNotSure = 0;
+  let cHuman = 0;
+  let cAi = 0;
+
+  records.forEach(r => {
+    const v = r.answers?.verdict?.choice || r.verdict;
+    if (v === "CORRECT") cCorrect++;
+    else if (v === "FALSE") cFalse++;
+    else if (v === "NOT_SURE") cNotSure++;
+
+    if (r.meta?.human_verified || r.humanOverride) cHuman++;
+    else cAi++;
+  });
+
+  setEl("lblLayaTotalRecords", records.length);
+  setEl("lblLayaCorrectCount", cCorrect);
+  setEl("lblLayaFalseCount", cFalse);
+  setEl("lblLayaNotSureCount", cNotSure);
+  setEl("lblLayaHumanCount", cHuman);
+  setEl("lblLayaAiCount", cAi);
+}
+
+async function checkAndUpdateLayaBackendStatus() {
+  const statusBadge = document.getElementById("lblLayaEngineStatus");
+  const vramLabel = document.getElementById("lblGpuVramSummary");
+
+  try {
+    const res = await fetch("/api/laya/status");
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    currentState.aiVerification.layaBackendReady = true;
+
+    if (statusBadge) {
+      if (data.loaded) {
+        statusBadge.textContent = data.device === "cuda" ? "⚡ مُحمّل على CUDA (FP16)" : "💻 مُحمّل على CPU";
+        statusBadge.className = "px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 text-[10px] font-bold";
+      } else {
+        statusBadge.textContent = "جاهز في الخادم (غير محمل)";
+        statusBadge.className = "px-2 py-0.5 rounded-md bg-slate-800 text-slate-300 text-[10px]";
+      }
+    }
+
+    if (vramLabel) {
+      if (data.vram?.cuda_available) {
+        vramLabel.textContent = `${data.vram.free_mb} MB متاح / ${data.vram.total_mb} MB (${data.vram.gpu_name || "GTX 1050"})`;
+      } else {
+        vramLabel.textContent = "معالج مركزي CPU فقط";
+      }
+    }
+  } catch (_) {
+    currentState.aiVerification.layaBackendReady = false;
+    if (statusBadge) {
+      statusBadge.textContent = "الخادم الخلفي غير متصل";
+      statusBadge.className = "px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 text-[10px]";
+    }
+    if (vramLabel) {
+      vramLabel.textContent = "يتطلب تشغيل backend/app.py";
+    }
+  }
+}
+
+function renderAiRequestLogsTable() {
+  const tbody = document.getElementById("tbodyAiRequestLogs");
+  if (!tbody) return;
+
+  const logs = currentState.aiVerification.requestLogs || [];
+  if (!logs.length) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="8" class="text-center py-8 text-slate-500">لا توجد طلبات تدقيق مسجلة حتى الآن. انقر على «بدء التدقيق الذكي» لبدء الفحص.</td>
+      </tr>
+    `;
+    return;
+  }
+
+  const rowsHtml = logs.map((log, idx) => {
+    const provBadge = log.provider === "gemini"
+      ? '<span class="px-1.5 py-0.5 rounded bg-sky-500/20 text-sky-300 text-[10px] font-bold">✨ Gemini</span>'
+      : (log.provider === "openrouter_jev"
+        ? '<span class="px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300 text-[10px] font-bold">🎯 JEV</span>'
+        : (log.provider === "local_laya"
+          ? '<span class="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-bold">🖥️ Laya</span>'
+          : '<span class="px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 text-[10px] font-bold">💬 OpenRouter</span>'));
+
+    const isSuccess = log.status === "SUCCESS";
+    const statusDot = isSuccess ? "🟢" : "🔴";
+
+    // Verdict badges & overrides
+    const verdictsHtml = (log.verdicts || []).map((v, vIdx) => {
+      const vColor = v === "CORRECT"
+        ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/40"
+        : (v === "FALSE" ? "bg-rose-500/20 text-rose-300 border-rose-500/40" : "bg-amber-500/20 text-amber-300 border-amber-500/40");
+      const vLabel = v === "CORRECT" ? "صحيح ✓" : (v === "FALSE" ? "خاطئ ✕" : "غير متأكد ؟");
+      return `<span class="px-2 py-0.5 rounded border text-[10px] font-bold ${vColor}">${vLabel}</span>`;
+    }).join(" ");
+
+    return `
+      <tr class="hover:bg-slate-900/60 transition">
+        <td class="py-2.5 px-3 text-center font-mono text-slate-400">${idx + 1}</td>
+        <td class="py-2.5 px-3">
+          <div class="flex items-center gap-1.5">
+            <span>${statusDot}</span>
+            <span class="font-mono text-slate-300">${escapeHtml(log.timestamp || "")}</span>
+          </div>
+          <div class="mt-0.5">${provBadge} <span class="font-mono text-[10px] text-slate-400">${escapeHtml(log.model || "")}</span></div>
+        </td>
+        <td class="py-2.5 px-3">
+          <div class="font-semibold text-slate-200 line-clamp-2" title="${escapeHtml(log.findingsSummary || "")}">
+            ${escapeHtml(log.findingsSummary || "—")}
+          </div>
+          <span class="text-[10px] text-slate-400">${log.findingsCount || 1} مقتبس</span>
+        </td>
+        <td class="py-2.5 px-3 text-center">
+          <div class="flex items-center justify-center gap-1 flex-wrap">
+            ${verdictsHtml}
+          </div>
+        </td>
+        <td class="py-2.5 px-3 text-center font-mono text-slate-300 text-[11px]">
+          <div>In: ${log.inputTokens || 0}</div>
+          <div class="text-[10px] text-slate-400">Out: ${log.outputTokens || 0}</div>
+        </td>
+        <td class="py-2.5 px-3 text-center font-mono text-slate-300">
+          ${log.latencyMs ? `${log.latencyMs} ms` : "—"}
+        </td>
+        <td class="py-2.5 px-3 text-center font-mono text-emerald-400">
+          $${Number(log.costUsd || 0).toFixed(6)}
+        </td>
+        <td class="py-2.5 px-3 text-center">
+          <button type="button" class="btn-inspect-payload px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 text-[10px] font-bold" data-log-idx="${idx}">
+            🔍 عرض
+          </button>
+        </td>
+      </tr>
+    `;
+  }).join("");
+
+  tbody.innerHTML = rowsHtml;
+
+  // Bind inspector payload buttons
+  tbody.querySelectorAll(".btn-inspect-payload").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const logIdx = parseInt(btn.getAttribute("data-log-idx"), 10);
+      const logItem = logs[logIdx];
+      if (!logItem) return;
+
+      const modal = document.getElementById("aiPayloadModal");
+      const summaryEl = document.getElementById("aiPayloadSummaryText");
+      const reqPre = document.getElementById("preAiPayloadRequest");
+      const respPre = document.getElementById("preAiPayloadResponse");
+
+      if (summaryEl) {
+        summaryEl.textContent = `${logItem.model} • ${logItem.provider} • زمن: ${logItem.latencyMs || 0}ms • تكلفة: $${Number(logItem.costUsd || 0).toFixed(6)}`;
+      }
+      if (reqPre) {
+        reqPre.textContent = JSON.stringify(logItem.requestPayload || {}, null, 2);
+      }
+      if (respPre) {
+        respPre.textContent = JSON.stringify(logItem.rawResponse || {}, null, 2);
+      }
+      if (modal) {
+        modal.classList.remove("hidden");
+        modal.classList.add("flex");
+      }
+    });
+  });
+}
+
+function renderAiLogsSection() {
+  updateAiMetricsUI();
+  renderAiRequestLogsTable();
+  renderLayaDatasetBankStats();
+  checkAndUpdateLayaBackendStatus();
+
+  // Populate config inputs from state
+  const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val; };
+  setVal("inpGeminiApiKey", currentState.aiVerification.geminiApiKey || "");
+  setVal("selGeminiModel", currentState.aiVerification.geminiModel || "gemini-3.5-flash-lite");
+  const chkFree = document.getElementById("chkGeminiFreeTierMode");
+  if (chkFree) chkFree.checked = Boolean(currentState.aiVerification.geminiFreeTierMode);
+  setVal("inpGeminiRpmLimit", currentState.aiVerification.geminiRpmLimit || 12);
+  setVal("inpGeminiBatchSize", currentState.aiVerification.geminiBatchSize || 5);
+
+  setVal("inpOpenRouterApiKey", currentState.aiVerification.openRouterApiKey || "");
+  setVal("selOpenRouterJevModel", currentState.aiVerification.openRouterJevModel || "typesafe/jev-1.14");
+  const selectedModelLabel = document.getElementById("lblOpenRouterSelectedModelDisplay");
+  if (selectedModelLabel) {
+    selectedModelLabel.textContent = currentState.aiVerification.openRouterSelectedModel || "deepseek/deepseek-chat";
+  }
+
+  // Pre-fetch catalog in background if empty
+  if (typeof WahyAiVerifier === "object" && typeof WahyAiVerifier.fetchOpenRouterModelsCatalog === "function") {
+    WahyAiVerifier.fetchOpenRouterModelsCatalog().catch(() => {});
+  }
+}
+
+window.updateAiMetricsUI = updateAiMetricsUI;
+window.renderAiRequestLogsTable = renderAiRequestLogsTable;
+window.renderLayaDatasetBankStats = renderLayaDatasetBankStats;
+window.renderAiLogsSection = renderAiLogsSection;
+
 window.WahyRenderer = {
   switchMainSection,
   switchEditorSubMode,
@@ -1249,6 +1610,10 @@ window.WahyRenderer = {
   renderFindingInspector,
   renderCaptionTimeline,
   renderDatasetsSection,
+  renderAiLogsSection,
+  renderAiRequestLogsTable,
+  updateAiMetricsUI,
+  renderLayaDatasetBankStats,
   updateVideoCaptionOverlay,
   seekToMediaTimestamp,
   toggleSimulatedPlayback,

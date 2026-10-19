@@ -139,10 +139,23 @@ function splitLongCitationWords(citationWords) {
 function buildSmartCaptions(words, detections, prefs = null) {
   if (!Array.isArray(words) || !words.length) return [];
 
-  // Map word indices to findings
+  const visFilter = (typeof currentState === "object" && currentState.aiVerification && currentState.aiVerification.visibilityFilter)
+    ? currentState.aiVerification.visibilityFilter
+    : { showCorrect: true, showNotSure: true, showFalse: false, showUnverified: true };
+
+  const isFindingVisible = (d) => {
+    if (!d) return false;
+    const v = d.aiVerification?.verdict;
+    if (v === "CORRECT") return visFilter.showCorrect !== false;
+    if (v === "NOT_SURE") return visFilter.showNotSure !== false;
+    if (v === "FALSE") return Boolean(visFilter.showFalse);
+    return visFilter.showUnverified !== false;
+  };
+
+  // Map word indices to findings (respecting visibility filter)
   const sortedFindings = (Array.isArray(detections) ? detections : [])
     .slice()
-    .filter(d => typeof d.wordStartIdx === "number" && typeof d.wordEndIdx === "number")
+    .filter(d => typeof d.wordStartIdx === "number" && typeof d.wordEndIdx === "number" && isFindingVisible(d))
     .sort((a, b) => a.wordStartIdx - b.wordStartIdx);
 
   const findingByStartWord = new Map();
