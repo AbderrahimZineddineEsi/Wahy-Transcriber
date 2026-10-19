@@ -382,12 +382,17 @@
       response = null;
     }
 
-    if (!response || response.status === 404) {
-      response = await fetch("https://openrouter.ai/api/alpha/decisions", {
-        method: "POST",
-        headers: headers,
-        body: JSON.stringify(payload)
-      });
+    if (!response || response.status === 404 || response.status === 502 || response.status === 504) {
+      try {
+        const directResp = await fetch("https://openrouter.ai/api/alpha/decisions", {
+          method: "POST",
+          headers: headers,
+          body: JSON.stringify(payload)
+        });
+        if (directResp) response = directResp;
+      } catch (_) {
+        // Direct fetch failed (e.g. CORS), keep proxy response to report original message
+      }
     }
 
     const elapsedMs = Math.round(performance.now() - t0);
