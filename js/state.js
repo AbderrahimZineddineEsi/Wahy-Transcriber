@@ -201,7 +201,8 @@ let currentState = {
       showCorrect: true,
       showNotSure: true,
       showFalse: false,
-      showUnverified: true
+      showUnverified: true,
+      showClippedOnly: false
     },
 
     // Metrics Summary
@@ -211,6 +212,7 @@ let currentState = {
       successfulRequests: 0,
       failedOrRateLimitedRequests: 0,
       totalFindingsEvaluated: 0,
+      clippedCount: 0,
       verdictCounts: { CORRECT: 0, FALSE: 0, NOT_SURE: 0 },
       requestsFullTimeMs: 0,
       avgRequestTimeMs: 0,

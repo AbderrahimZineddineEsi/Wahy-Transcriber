@@ -1093,30 +1093,44 @@ window.addEventListener("DOMContentLoaded", () => {
     });
 
     document.getElementById("btnFilterPreset_ALL")?.addEventListener("click", () => {
-      currentState.aiVerification.visibilityFilter = { showCorrect: true, showNotSure: true, showFalse: true, showUnverified: true };
+      currentState.aiVerification.visibilityFilter = { showCorrect: true, showNotSure: true, showFalse: true, showUnverified: true, showClippedOnly: false };
       syncFilterPillUI();
       saveAiConfigToStorage();
       renderFormattedLectureView();
       recalculateCaptionsFromCurrentFindings();
+      if (typeof updateAiMetricsUI === "function") updateAiMetricsUI();
       showToast("عرض كل المقتبسات (الصحيح وغير المتأكد والمستبعد)");
     });
 
     document.getElementById("btnFilterPreset_CORRECT_ONLY")?.addEventListener("click", () => {
-      currentState.aiVerification.visibilityFilter = { showCorrect: true, showNotSure: false, showFalse: false, showUnverified: false };
+      currentState.aiVerification.visibilityFilter = { showCorrect: true, showNotSure: false, showFalse: false, showUnverified: false, showClippedOnly: false };
       syncFilterPillUI();
       saveAiConfigToStorage();
       renderFormattedLectureView();
       recalculateCaptionsFromCurrentFindings();
+      if (typeof updateAiMetricsUI === "function") updateAiMetricsUI();
       showToast("عرض المقتبسات الصحيحة المؤكدة فقط");
     });
 
     document.getElementById("btnFilterPreset_FALSE_ONLY")?.addEventListener("click", () => {
-      currentState.aiVerification.visibilityFilter = { showCorrect: false, showNotSure: false, showFalse: true, showUnverified: false };
+      currentState.aiVerification.visibilityFilter = { showCorrect: false, showNotSure: false, showFalse: true, showUnverified: false, showClippedOnly: false };
       syncFilterPillUI();
       saveAiConfigToStorage();
       renderFormattedLectureView();
       recalculateCaptionsFromCurrentFindings();
+      if (typeof updateAiMetricsUI === "function") updateAiMetricsUI();
       showToast("عرض المقتبسات المستبعدة (الكلام العادي) للمراجعة");
+    });
+
+    document.getElementById("btnFilterOnlyClipped")?.addEventListener("click", () => {
+      currentState.aiVerification.visibilityFilter.showClippedOnly = !currentState.aiVerification.visibilityFilter.showClippedOnly;
+      const isClippedOnly = currentState.aiVerification.visibilityFilter.showClippedOnly;
+      const btn = document.getElementById("btnFilterOnlyClipped");
+      if (btn) btn.classList.toggle("btn-filter-clipped-active", isClippedOnly);
+      saveAiConfigToStorage();
+      renderFormattedLectureView();
+      recalculateCaptionsFromCurrentFindings();
+      showToast(isClippedOnly ? "✂️ تصفية المقتبسات ناقصة الحدود فقط" : "إلغاء تصفية المقتبسات ناقصة الحدود");
     });
 
     // Gemini Settings Save

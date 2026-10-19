@@ -106,6 +106,24 @@ def convert_single_record_to_laya_format(
             }
         }
 
+    if "boundary_status" not in questions:
+        questions["boundary_status"] = {
+            "type": "choice",
+            "instructions": (
+                "Compare `immediate_transcript_before` against `unmatched_corpus_prefix_words`, "
+                "and `immediate_transcript_after` against `unmatched_corpus_suffix_words`. "
+                "Determine whether the speaker actually uttered additional words of this quote at the beginning or end "
+                "that were accidentally cut off from `matched_span_in_lecture`. "
+                "If the speaker intentionally stopped quoting and resumed normal commentary, select COMPLETE_SPAN."
+            ),
+            "criteria": {
+                "COMPLETE_SPAN": "The detected span captures all words of the quote that the speaker actually uttered.",
+                "MISSING_START": "Words from unmatched_corpus_prefix_words appear in immediate_transcript_before.",
+                "MISSING_END": "Words from unmatched_corpus_suffix_words appear in immediate_transcript_after.",
+                "MISSING_BOTH": "Words were cut off from BOTH beginning and end."
+            }
+        }
+
     # Determine verdict and probabilities
     is_human = bool(record.get("humanOverride") or record.get("human_verified") or record.get("provider") == "human_override")
     raw_verdict = str(
@@ -139,11 +157,32 @@ def convert_single_record_to_laya_format(
     else:
         probabilities = sanitize_probabilities(probabilities, fallback_choice=raw_verdict, confidence=confidence)
 
+    # Determine boundary status & probabilities
+    canonical_b_choices = ["COMPLETE_SPAN", "MISSING_START", "MISSING_END", "MISSING_BOTH"]
+    raw_boundary = str(
+        record.get("boundaryStatus") or
+        record.get("boundary_status") or
+        "COMPLETE_SPAN"
+    ).upper().strip()
+    if raw_boundary not in canonical_b_choices:
+        raw_boundary = "COMPLETE_SPAN"
+
+    b_probs = record.get("boundaryProbabilities") or record.get("boundary_probabilities")
+    if not isinstance(b_probs, dict) or not all(k in b_probs for k in canonical_b_choices):
+        b_conf = float(record.get("boundaryConfidence") or record.get("boundary_confidence") or 0.95)
+        rem_b = round((1.0 - b_conf) / 3.0, 4)
+        b_probs = {k: (round(b_conf, 4) if k == raw_boundary else rem_b) for k in canonical_b_choices}
+
     answers = {
         "verdict": {
             "type": "choice",
             "choice": raw_verdict,
             "probabilities": probabilities
+        },
+        "boundary_status": {
+            "type": "choice",
+            "choice": raw_boundary,
+            "probabilities": b_probs
         }
     }
 

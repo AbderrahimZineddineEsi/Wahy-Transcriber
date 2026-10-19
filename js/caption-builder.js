@@ -146,6 +146,10 @@ function buildSmartCaptions(words, detections, prefs = null) {
   const isFindingVisible = (d) => {
     if (!d) return false;
     const v = d.aiVerification?.verdict;
+    if (visFilter.showClippedOnly) {
+      const isClipped = Boolean(d.aiVerification?.boundaryStatus && d.aiVerification.boundaryStatus !== "COMPLETE_SPAN" && v !== "FALSE");
+      if (!isClipped) return false;
+    }
     if (v === "CORRECT") return visFilter.showCorrect !== false;
     if (v === "NOT_SURE") return visFilter.showNotSure !== false;
     if (v === "FALSE") return Boolean(visFilter.showFalse);
