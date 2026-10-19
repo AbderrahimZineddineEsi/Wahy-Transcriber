@@ -45,6 +45,32 @@
       : (det.matchedText || det.canonicalText || "");
     const contextAfter = words && words.length ? words.slice(eIdx + 1, afterEnd).map(w => w.word).join(" ") : "";
 
+    // 8 words immediately before and after the detection boundary in the transcript
+    const immediateBefore = words && words.length ? words.slice(Math.max(0, sIdx - 8), sIdx).map(w => w.word).join(" ") : "";
+    const immediateAfter = words && words.length ? words.slice(eIdx + 1, Math.min(words.length, eIdx + 9)).map(w => w.word).join(" ") : "";
+
+    // Extract unmatched canonical prefix & suffix from the linked corpus unit
+    let unmatchedPrefix = "";
+    let unmatchedSuffix = "";
+    const unit = (typeof activeMatcher === "object" && activeMatcher?.units && det.unitId)
+      ? activeMatcher.units.get(det.unitId)
+      : null;
+
+    if (unit && Array.isArray(unit.vocalizedWords) && unit.vocalizedWords.length) {
+      const qSegs = (Array.isArray(det.qSegments) && det.qSegments.length)
+        ? det.qSegments
+        : [[0, unit.vocalizedWords.length]];
+      const qStart = Math.max(0, qSegs[0][0]);
+      const qEnd = Math.min(unit.vocalizedWords.length, qSegs[qSegs.length - 1][1]);
+
+      if (qStart > 0) {
+        unmatchedPrefix = unit.vocalizedWords.slice(Math.max(0, qStart - 10), qStart).join(" ");
+      }
+      if (qEnd < unit.vocalizedWords.length) {
+        unmatchedSuffix = unit.vocalizedWords.slice(qEnd, Math.min(unit.vocalizedWords.length, qEnd + 10)).join(" ");
+      }
+    }
+
     const canonicalState = {
       source_type: det.sourceType || "HADITH", // "QURAN" | "HADITH" | "ADHKAR"
       candidate_reference: det.displayRef || det.reference || "",
@@ -52,6 +78,10 @@
       context_before: contextBefore,
       matched_span_in_lecture: matchedTranscriptSpan,
       context_after: contextAfter,
+      unmatched_corpus_prefix_words: unmatchedPrefix,
+      immediate_transcript_before: immediateBefore,
+      unmatched_corpus_suffix_words: unmatchedSuffix,
+      immediate_transcript_after: immediateAfter,
       engine_confidence_band: det.confidenceBand || "CANDIDATE",
       engine_score: Number((det.totalScore || 0).toFixed(2)),
       has_citation_cue: Boolean(det.hasCitationCue)
@@ -70,10 +100,40 @@
           NOT_SURE:
             "Ambiguous or partial paraphrase/meaning-only allusion where it is borderline whether the speaker intended a direct quotation."
         }
+      },
+      boundary_status: {
+        type: "choice",
+        instructions:
+          "Compare `immediate_transcript_before` against `unmatched_corpus_prefix_words`, and `immediate_transcript_after` against `unmatched_corpus_suffix_words`. Determine whether the speaker actually uttered additional words of this quote at the beginning or end (even with minor ASR spelling errors) that were accidentally cut off from `matched_span_in_lecture`. If the speaker intentionally stopped quoting and resumed normal commentary, select COMPLETE_SPAN.",
+        criteria: {
+          COMPLETE_SPAN:
+            "The detected span captures all words of the quote that the speaker actually uttered in this segment (no words of the quote were cut off in the adjacent transcript).",
+          MISSING_START:
+            "Words from `unmatched_corpus_prefix_words` appear inside `immediate_transcript_before` and were cut off from the beginning of the detection.",
+          MISSING_END:
+            "Words from `unmatched_corpus_suffix_words` appear inside `immediate_transcript_after` and were cut off from the end of the detection.",
+          MISSING_BOTH:
+            "Words of the quote were cut off from BOTH the beginning (`immediate_transcript_before`) and the end (`immediate_transcript_after`)."
+        }
       }
     };
 
     return { state: canonicalState, questions: canonicalQuestions };
+  }
+
+  function normalizeBoundaryVerdict(verdict, bStatus, state) {
+    if (verdict === "FALSE") return "COMPLETE_SPAN";
+    let s = bStatus || "COMPLETE_SPAN";
+    const hasPrefix = Boolean(state?.unmatched_corpus_prefix_words && String(state.unmatched_corpus_prefix_words).trim().length > 0);
+    const hasSuffix = Boolean(state?.unmatched_corpus_suffix_words && String(state.unmatched_corpus_suffix_words).trim().length > 0);
+
+    if (!hasPrefix && (s === "MISSING_START" || s === "MISSING_BOTH")) {
+      s = (s === "MISSING_BOTH") ? "MISSING_END" : "COMPLETE_SPAN";
+    }
+    if (!hasSuffix && (s === "MISSING_END" || s === "MISSING_BOTH")) {
+      s = (s === "MISSING_BOTH") ? "MISSING_START" : "COMPLETE_SPAN";
+    }
+    return s;
   }
 
   // ---------------------------------------------------------------------------
@@ -176,9 +236,14 @@
                 },
                 required: ["CORRECT", "FALSE", "NOT_SURE"]
               },
+              boundary_status: {
+                type: "STRING",
+                enum: ["COMPLETE_SPAN", "MISSING_START", "MISSING_END", "MISSING_BOTH"]
+              },
+              boundary_confidence: { type: "NUMBER" },
               reason: { type: "STRING" }
             },
-            required: ["finding_id", "verdict", "confidence", "probabilities", "reason"]
+            required: ["finding_id", "verdict", "confidence", "probabilities", "boundary_status", "reason"]
           }
         }
       }
@@ -342,6 +407,12 @@
       NOT_SURE: choice === "NOT_SURE" ? confidence : 0.05
     };
 
+    const bAns = data?.answers?.boundary_status || {};
+    const rawBStatus = bAns.choice || "COMPLETE_SPAN";
+    const bConf = typeof bAns.confidence === "number" ? bAns.confidence : 0.85;
+    const bProbs = bAns.probabilities || null;
+    const finalBStatus = normalizeBoundaryVerdict(choice, rawBStatus, payload.state);
+
     const usage = data.usage || {};
     const inTokens = usage.input_tokens || Math.max(20, Math.round(JSON.stringify(payload.state).length / 3));
     const outTokens = usage.output_tokens || 0;
@@ -353,6 +424,9 @@
         verdict: choice,
         confidence: confidence,
         probabilities: probabilities,
+        boundary_status: finalBStatus,
+        boundary_confidence: bConf,
+        boundary_probabilities: bProbs,
         reason: "قرار System-1 من نموذج JEV المصاغ بالاحتمالات المعايرة."
       }],
       latencyMs: elapsedMs,
@@ -440,8 +514,8 @@
           role: "system",
           content:
             "You are an expert Arabic Islamic text verifier. " +
-            "Given the JSON `state` and `questions`, determine whether `matched_span_in_lecture` is a genuine quotation or ordinary speech. " +
-            "Return ONLY a valid JSON object with keys: {\"verdict\": \"CORRECT\" | \"FALSE\" | \"NOT_SURE\", \"confidence\": 0.0-1.0, \"probabilities\": {\"CORRECT\": p1, \"FALSE\": p2, \"NOT_SURE\": p3}, \"reason\": \"concise Arabic explanation\"}."
+            "Given the JSON `state` and `questions`, determine whether `matched_span_in_lecture` is a genuine quotation or ordinary speech, and determine boundary status. " +
+            "Return ONLY a valid JSON object with keys: {\"verdict\": \"CORRECT\" | \"FALSE\" | \"NOT_SURE\", \"confidence\": 0.0-1.0, \"probabilities\": {\"CORRECT\": p1, \"FALSE\": p2, \"NOT_SURE\": p3}, \"boundary_status\": \"COMPLETE_SPAN\" | \"MISSING_START\" | \"MISSING_END\" | \"MISSING_BOTH\", \"boundary_confidence\": 0.0-1.0, \"reason\": \"concise Arabic explanation\"}."
         },
         {
           role: "user",
@@ -488,6 +562,10 @@
       NOT_SURE: verdict === "NOT_SURE" ? conf : (1 - conf) / 2
     };
 
+    const rawBStatus = parsed.boundary_status || "COMPLETE_SPAN";
+    const bConf = typeof parsed.boundary_confidence === "number" ? parsed.boundary_confidence : 0.85;
+    const finalBStatus = normalizeBoundaryVerdict(verdict, rawBStatus, item.envelope.state);
+
     const usage = data.usage || {};
     const inTokens = usage.prompt_tokens || 0;
     const outTokens = usage.completion_tokens || 0;
@@ -509,6 +587,8 @@
         verdict: verdict,
         confidence: conf,
         probabilities: probs,
+        boundary_status: finalBStatus,
+        boundary_confidence: bConf,
         reason: parsed.reason || "تدقيق بواسطة نموذج OpenRouter."
       }],
       latencyMs: elapsedMs,
@@ -574,11 +654,21 @@
         FALSE: choice === "FALSE" ? confidence : 0.05,
         NOT_SURE: choice === "NOT_SURE" ? confidence : 0.05
       };
+
+      const bAns = data.answers?.boundary_status || {};
+      const rawBStatus = bAns.choice || "COMPLETE_SPAN";
+      const bConf = typeof bAns.confidence === "number" ? bAns.confidence : 0.85;
+      const bProbs = bAns.probabilities || null;
+      const finalBStatus = normalizeBoundaryVerdict(choice, rawBStatus, items[0].envelope.state);
+
       results.push({
         finding_id: items[0].det.id || items[0].det._uniqueKey || `f_${items[0].index}`,
         verdict: choice,
         confidence: confidence,
         probabilities: probabilities,
+        boundary_status: finalBStatus,
+        boundary_confidence: bConf,
+        boundary_probabilities: bProbs,
         reason: `استدلال محلي فائق السرعة عبر Laya-Multilingual (${data.device || "GPU"}).`
       });
     } else {
@@ -591,11 +681,22 @@
           FALSE: choice === "FALSE" ? confidence : 0.05,
           NOT_SURE: choice === "NOT_SURE" ? confidence : 0.05
         };
+
+        const bAns = itemRes.answers?.boundary_status || {};
+        const rawBStatus = bAns.choice || "COMPLETE_SPAN";
+        const bConf = typeof bAns.confidence === "number" ? bAns.confidence : 0.85;
+        const bProbs = bAns.probabilities || null;
+        const targetState = items.find(it => (it.det.id || it.det._uniqueKey || `f_${it.index}`) === itemRes.finding_id)?.envelope?.state;
+        const finalBStatus = normalizeBoundaryVerdict(choice, rawBStatus, targetState);
+
         results.push({
           finding_id: itemRes.finding_id,
           verdict: choice,
           confidence: confidence,
           probabilities: probabilities,
+          boundary_status: finalBStatus,
+          boundary_confidence: bConf,
+          boundary_probabilities: bProbs,
           reason: `استدلال محلي فائق السرعة عبر Laya-Multilingual (${itemRes.device || "GPU"}).`
         });
       }
@@ -648,12 +749,16 @@
 
     const verdicts = { CORRECT: 0, FALSE: 0, NOT_SURE: 0 };
     let evaluatedCount = 0;
+    let clippedCount = 0;
 
     detections.forEach(det => {
       if (det.aiVerification && det.aiVerification.status === "VERIFIED") {
         evaluatedCount++;
         const v = det.aiVerification.verdict;
         if (verdicts[v] !== undefined) verdicts[v]++;
+        if (det.aiVerification.boundaryStatus && det.aiVerification.boundaryStatus !== "COMPLETE_SPAN" && v !== "FALSE") {
+          clippedCount++;
+        }
       }
     });
 
@@ -667,6 +772,7 @@
       successfulRequests: successReq,
       failedOrRateLimitedRequests: failedReq,
       totalFindingsEvaluated: evaluatedCount,
+      clippedCount: clippedCount,
       verdictCounts: verdicts,
       requestsFullTimeMs: cumulativeLatency,
       avgRequestTimeMs: avgReqTime,
@@ -799,11 +905,26 @@
               const verdictChoice = (evalResult.verdict || "NOT_SURE").toUpperCase();
               const conf = typeof evalResult.confidence === "number" ? evalResult.confidence : 0.85;
 
+              const rawB = evalResult.boundary_status || "COMPLETE_SPAN";
+              const bStatus = normalizeBoundaryVerdict(verdictChoice, rawB, item.envelope.state);
+              const bConf = typeof evalResult.boundary_confidence === "number" ? evalResult.boundary_confidence : 1.0;
+              const bProbs = evalResult.boundary_probabilities || {
+                COMPLETE_SPAN: bStatus === "COMPLETE_SPAN" ? bConf : (1 - bConf) / 3,
+                MISSING_START: bStatus === "MISSING_START" ? bConf : (1 - bConf) / 3,
+                MISSING_END: bStatus === "MISSING_END" ? bConf : (1 - bConf) / 3,
+                MISSING_BOTH: bStatus === "MISSING_BOTH" ? bConf : (1 - bConf) / 3
+              };
+
               item.det.aiVerification = {
                 status: "VERIFIED",
                 verdict: verdictChoice,
                 confidence: conf,
                 probabilities: evalResult.probabilities || null,
+                boundaryStatus: bStatus,
+                boundaryConfidence: bConf,
+                boundaryProbabilities: bProbs,
+                unmatchedPrefixPreview: item.envelope.state.unmatched_corpus_prefix_words || "",
+                unmatchedSuffixPreview: item.envelope.state.unmatched_corpus_suffix_words || "",
                 reason: evalResult.reason || "",
                 modelUsed: providerResult.model,
                 provider: providerResult.provider,
@@ -986,6 +1107,19 @@
       };
     }
 
+    const bStatus = det.aiVerification?.boundaryStatus || "COMPLETE_SPAN";
+    const bConf = typeof det.aiVerification?.boundaryConfidence === "number" ? det.aiVerification.boundaryConfidence : 0.95;
+    let bProbs = det.aiVerification?.boundaryProbabilities;
+    if (!bProbs) {
+      const remB = parseFloat(((1.0 - bConf) / 3.0).toFixed(4));
+      bProbs = {
+        COMPLETE_SPAN: bStatus === "COMPLETE_SPAN" ? bConf : remB,
+        MISSING_START: bStatus === "MISSING_START" ? bConf : remB,
+        MISSING_END: bStatus === "MISSING_END" ? bConf : remB,
+        MISSING_BOTH: bStatus === "MISSING_BOTH" ? bConf : remB
+      };
+    }
+
     return {
       id: recId,
       state: env.state,
@@ -995,6 +1129,11 @@
           type: "choice",
           choice: rawVerdict,
           probabilities: probs
+        },
+        boundary_status: {
+          type: "choice",
+          choice: bStatus,
+          probabilities: bProbs
         }
       },
       meta: {
@@ -1003,6 +1142,46 @@
         lecture_title: currentState.lectureTitle || "Wahy Islamic Lecture",
         converted_at: ts
       }
+    };
+  }
+
+  function convertVerificationRecordsToLayaJsonl(records, options = {}) {
+    const list = Array.isArray(records) ? records : [];
+    const lines = [];
+    const stats = {
+      total_input: list.length,
+      total_converted: 0,
+      by_verdict: { CORRECT: 0, FALSE: 0, NOT_SURE: 0 },
+      human_verified_count: 0,
+      ai_count: 0
+    };
+
+    list.forEach((rec, idx) => {
+      if (!rec) return;
+      if (rec.state && rec.questions && rec.answers) {
+        lines.push(JSON.stringify(rec));
+        stats.total_converted++;
+        const v = rec.answers?.verdict?.choice || "CORRECT";
+        if (stats.by_verdict[v] !== undefined) stats.by_verdict[v]++;
+        if (rec.meta?.human_verified) stats.human_verified_count++;
+        else stats.ai_count++;
+        return;
+      }
+      const converted = convertRecordToLayaTrainingEnvelope(rec, rec.envelope || null, Math.floor(Date.now() / 1000) + idx);
+      if (converted) {
+        lines.push(JSON.stringify(converted));
+        stats.total_converted++;
+        const v = converted.answers?.verdict?.choice || "CORRECT";
+        if (stats.by_verdict[v] !== undefined) stats.by_verdict[v]++;
+        if (converted.meta?.human_verified) stats.human_verified_count++;
+        else stats.ai_count++;
+      }
+    });
+
+    return {
+      jsonl: lines.join("\n") + (lines.length ? "\n" : ""),
+      lines,
+      stats
     };
   }
 
@@ -1015,9 +1194,8 @@
       return;
     }
 
-    const lines = records.map(r => JSON.stringify(r));
-    const jsonlContent = lines.join("\n") + "\n";
-    const blob = new Blob([jsonlContent], { type: "application/x-jsonlines;charset=utf-8" });
+    const { jsonl, lines } = convertVerificationRecordsToLayaJsonl(records);
+    const blob = new Blob([jsonl], { type: "application/x-jsonlines;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -1028,7 +1206,7 @@
     URL.revokeObjectURL(url);
 
     if (typeof showToast === "function") {
-      showToast(`تم تصدير ${records.length} سجل تدريب بصيغة Laya .jsonl بنجاح!`);
+      showToast(`تم تصدير ${lines.length} سجل تدريب بصيغة Laya .jsonl بنجاح!`);
     }
   }
 
@@ -1046,7 +1224,9 @@
     cancelAiVerification,
     setHumanOverrideVerdict,
     updateAiVerificationMetrics,
+    convertVerificationRecordsToLayaJsonl,
     exportLayaFineTuningJsonl
   };
 
 })(window);
+

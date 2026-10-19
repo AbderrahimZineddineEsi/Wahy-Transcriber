@@ -720,6 +720,108 @@ function adjustFindingWordBoundary(findingIdx, edge, deltaWords) {
   showToast(`✅ تم تحديث حدود الكلمات [${det.wordStartIdx + 1} → ${det.wordEndIdx + 1}] وإعادة بناء الترجمة الذكية`);
 }
 
+/**
+ * Automatically scan adjacent transcript tokens against the unmatched prefix/suffix
+ * of the linked corpus unit and expand wordStartIdx / wordEndIdx to heal clipped boundaries.
+ */
+function autoHealClippedBoundary(findingIdx) {
+  const det = currentState.detections[findingIdx];
+  if (!det || !currentState.words.length) return;
+
+  const unit = activeMatcher?.units?.get(det.unitId);
+  if (!unit || !Array.isArray(unit.normWords) || !unit.normWords.length) {
+    if (typeof showToast === "function") {
+      showToast("⚠️ هذا المقتبس غير مرتبط بوحدة قياسية في القاعدة — استخدم أزرار -1W / +1W للتوسيع اليدوي.");
+    }
+    return;
+  }
+
+  pushUndoSnapshot("توسيع تلقائي للحدود الناقصة (Auto-Heal Boundary)");
+
+  const words = currentState.words;
+  const qSegs = (Array.isArray(det.qSegments) && det.qSegments.length)
+    ? det.qSegments
+    : [[0, unit.normWords.length]];
+  let qStart = Math.max(0, qSegs[0][0]);
+  let qEnd = Math.min(unit.normWords.length, qSegs[qSegs.length - 1][1]);
+
+  let newWordStart = det.wordStartIdx;
+  let newWordEnd = det.wordEndIdx;
+
+  const bStatus = det.aiVerification?.boundaryStatus || "MISSING_BOTH";
+
+  const normFn = typeof normalizeArabic === "function" ? normalizeArabic : (s => s);
+  const matchQualFn = typeof wordMatchQuality === "function" ? wordMatchQuality : ((a, b) => (a === b ? 1.0 : 0.0));
+  const isnadCheckFn = typeof isCitationOrIsnadWord === "function" ? isCitationOrIsnadWord : (_ => false);
+
+  // 1. Heal Prefix (Expand Left) if MISSING_START or MISSING_BOTH
+  if ((bStatus === "MISSING_START" || bStatus === "MISSING_BOTH") && qStart > 0) {
+    const maxLookback = Math.min(10, qStart, det.wordStartIdx);
+    let bestLeftShift = 0;
+    for (let step = 1; step <= maxLookback; step++) {
+      const prevWordObj = words[det.wordStartIdx - step];
+      if (!prevWordObj) break;
+      const tWordNorm = normFn(prevWordObj.word);
+      // Check against unmatched prefix window in unit.normWords
+      const qWindow = unit.normWords.slice(Math.max(0, qStart - maxLookback - 2), qStart);
+      const isMatch = qWindow.some(qw => qw === tWordNorm || matchQualFn(tWordNorm, qw) >= 0.72);
+      if (isMatch && !isnadCheckFn(tWordNorm)) {
+        bestLeftShift = step;
+      } else if (isnadCheckFn(tWordNorm)) {
+        // Stop before "قال رسول الله..." citation cues
+        break;
+      }
+    }
+    if (bestLeftShift > 0) {
+      newWordStart = Math.max(0, det.wordStartIdx - bestLeftShift);
+    }
+  }
+
+  // 2. Heal Suffix (Expand Right) if MISSING_END or MISSING_BOTH
+  if ((bStatus === "MISSING_END" || bStatus === "MISSING_BOTH") && qEnd < unit.normWords.length) {
+    const remainingCorpusWords = unit.normWords.length - qEnd;
+    const maxLookahead = Math.min(10, remainingCorpusWords, words.length - 1 - det.wordEndIdx);
+    let bestRightShift = 0;
+    for (let step = 1; step <= maxLookahead; step++) {
+      const nextWordObj = words[det.wordEndIdx + step];
+      if (!nextWordObj) break;
+      const tWordNorm = normFn(nextWordObj.word);
+      const qWindow = unit.normWords.slice(qEnd, Math.min(unit.normWords.length, qEnd + maxLookahead + 2));
+      const isMatch = qWindow.some(qw => qw === tWordNorm || matchQualFn(tWordNorm, qw) >= 0.72);
+      if (isMatch) {
+        bestRightShift = step;
+      }
+    }
+    if (bestRightShift > 0) {
+      newWordEnd = Math.min(words.length - 1, det.wordEndIdx + bestRightShift);
+    }
+  }
+
+  det.wordStartIdx = newWordStart;
+  det.wordEndIdx = newWordEnd;
+  det.segments = [[newWordStart, newWordEnd + 1]];
+
+  const rawTokens = tokenizeText(currentState.rawTranscript);
+  if (rawTokens.length && newWordEnd < rawTokens.length) {
+    recomputeCanonicalForDetection(det, rawTokens);
+  }
+
+  if (det.aiVerification) {
+    det.aiVerification.boundaryStatus = "COMPLETE_SPAN";
+    det.aiVerification.humanOverride = true;
+  }
+
+  recalculateCaptionsFromCurrentFindings();
+  if (typeof renderAllViews === "function") {
+    renderAllViews();
+  } else {
+    if (typeof renderFindingInspector === "function") renderFindingInspector();
+    if (typeof renderFormattedLectureView === "function") renderFormattedLectureView();
+    if (typeof renderCaptionTimelineTable === "function") renderCaptionTimelineTable();
+  }
+  showToast(`🪄 تم استكمال حدود المقتبس تلقائياً [${newWordStart + 1} → ${newWordEnd + 1}] وتحديث الكابشن!`);
+}
+
 function toggleSnapFindingToCanonical(findingIdx, forceState = null) {
   const det = currentState.detections[findingIdx];
   if (!det) return;

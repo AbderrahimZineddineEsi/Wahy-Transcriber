@@ -156,6 +156,10 @@ function buildLectureHtmlContent(isEditorMode = false) {
 
       const v = det.aiVerification?.verdict;
       let shouldRenderAsCitation = true;
+      if (visFilter.showClippedOnly) {
+        const isClipped = Boolean(det.aiVerification?.boundaryStatus && det.aiVerification.boundaryStatus !== "COMPLETE_SPAN" && v !== "FALSE");
+        if (!isClipped) shouldRenderAsCitation = false;
+      }
       if (v === "CORRECT" && visFilter.showCorrect === false) shouldRenderAsCitation = false;
       else if (v === "NOT_SURE" && visFilter.showNotSure === false) shouldRenderAsCitation = false;
       else if (v === "FALSE" && !visFilter.showFalse) shouldRenderAsCitation = false;
@@ -207,6 +211,19 @@ function buildLectureHtmlContent(isEditorMode = false) {
         aiBadgeHtml = `<span class="ai-badge ai-badge-pending" title="جاري التدقيق بالذكاء الاصطناعي...">⏳ فحص...</span>`;
       }
 
+      // Boundary status warning badge
+      let boundaryBadgeHtml = "";
+      if (det.aiVerification && det.aiVerification.boundaryStatus && det.aiVerification.boundaryStatus !== "COMPLETE_SPAN" && v !== "FALSE") {
+        const bStatus = det.aiVerification.boundaryStatus;
+        if (bStatus === "MISSING_START") {
+          boundaryBadgeHtml = `<span class="px-1.5 py-0.5 rounded bg-orange-500/25 text-orange-200 border border-orange-400/50 text-[10px] font-bold inline-flex items-center gap-1" title="تنبيه الذكاء الاصطناعي: مقتبس ناقص من البداية">✂️ ناقص البداية</span>`;
+        } else if (bStatus === "MISSING_END") {
+          boundaryBadgeHtml = `<span class="px-1.5 py-0.5 rounded bg-orange-500/25 text-orange-200 border border-orange-400/50 text-[10px] font-bold inline-flex items-center gap-1" title="تنبيه الذكاء الاصطناعي: مقتبس ناقص من النهاية">✂️ ناقص النهاية</span>`;
+        } else if (bStatus === "MISSING_BOTH") {
+          boundaryBadgeHtml = `<span class="px-1.5 py-0.5 rounded bg-orange-500/25 text-orange-200 border border-orange-400/50 text-[10px] font-bold inline-flex items-center gap-1" title="تنبيه الذكاء الاصطناعي: مقتبس ناقص الطرفين">✂️ ناقص الطرفين</span>`;
+        }
+      }
+
       let innerWordsHtml = "";
       if (!isEditorMode && det.snappedToCanonical && det.canonicalText) {
         innerWordsHtml = `<span class="font-bold">${escapeHtml(det.canonicalText)}</span>`;
@@ -244,6 +261,7 @@ function buildLectureHtmlContent(isEditorMode = false) {
               data-start-time="${det.startTime || words[i].start}"
               title="انقر لفحص وتعديل المقتبس [${escapeHtml(refText)}]">
           ${aiBadgeHtml}
+          ${boundaryBadgeHtml}
           <span class="opacity-85 select-none">${escapeHtml(brackets.open)}</span>${innerWordsHtml}<span class="opacity-85 select-none">${escapeHtml(brackets.close)}</span>
           ${(refText && showBadge) ? `<span class="inline-flex items-center gap-1 px-2 py-0.5 mr-1 rounded-md text-[11px] font-sans font-bold border ${badgeColor}">📖 ${escapeHtml(refText)} <span class="font-mono text-[10px] opacity-75" dir="ltr">${timeTag}</span></span>` : ""}
         </span>
@@ -514,6 +532,24 @@ function renderFindingInspector() {
         <div class="text-xs font-quran-text text-slate-200 bg-slate-950/70 p-2 rounded-lg border border-slate-800/80 leading-relaxed">${escapeHtml(det.canonicalText || det.matchedText || "")}</div>
       </div>
 
+      ${(det.aiVerification?.boundaryStatus && det.aiVerification.boundaryStatus !== "COMPLETE_SPAN" && det.aiVerification.verdict !== "FALSE") ? `
+        <!-- Boundary Truncation Warning & 1-Click Auto-Heal Card -->
+        <div class="rounded-xl bg-orange-950/40 border border-orange-500/50 p-3 space-y-2 text-xs">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <span class="font-bold text-orange-300 flex items-center gap-1.5">
+              ✂️ تنبيه الذكاء الاصطناعي: المقتبس ناقص الكلمات من
+              ${det.aiVerification.boundaryStatus === "MISSING_START" ? "البداية" : (det.aiVerification.boundaryStatus === "MISSING_END" ? "النهاية" : "البداية والنهاية")}
+            </span>
+            <button type="button" id="btnInspectorAutoHealBoundary" class="px-3 py-1 rounded-lg bg-orange-500 hover:bg-orange-400 text-slate-950 font-bold text-xs shadow transition">
+              🪄 توسيع تلقائي للحدود الناقصة
+            </button>
+          </div>
+          <div class="text-[11px] text-slate-300 leading-relaxed">
+            الكلمات التكميلية في المصدر: <span class="font-quran-text text-orange-200">${escapeHtml(det.aiVerification.unmatchedPrefixPreview || "")} ... ${escapeHtml(det.aiVerification.unmatchedSuffixPreview || "")}</span>
+          </div>
+        </div>
+      ` : ""}
+
       <!-- AI Verification & Human Gold Override Card -->
       <div class="rounded-xl bg-slate-950/90 border border-sky-500/30 p-3.5 space-y-3">
         <div class="flex flex-wrap items-center justify-between gap-2">
@@ -589,6 +625,11 @@ function renderFindingInspector() {
   panel.querySelector("#btnEndWordMinus")?.addEventListener("click", () => adjustFindingWordBoundary(idx, "end", -1));
   panel.querySelector("#btnEndWordPlus")?.addEventListener("click", () => adjustFindingWordBoundary(idx, "end", 1));
   panel.querySelector("#btnInspectorSnapCanonical")?.addEventListener("click", () => toggleSnapFindingToCanonical(idx));
+  panel.querySelector("#btnInspectorAutoHealBoundary")?.addEventListener("click", () => {
+    if (typeof autoHealClippedBoundary === "function") {
+      autoHealClippedBoundary(idx);
+    }
+  });
 
   panel.querySelector("#btnOverrideCorrect")?.addEventListener("click", () => {
     if (typeof WahyAiVerifier === "object" && typeof WahyAiVerifier.setHumanOverrideVerdict === "function") {
@@ -1384,6 +1425,17 @@ function updateAiMetricsUI() {
   setEl("aiMetricAvgContext", `${m.avgContextTokensPerRequest || 0} توكن/طلب`);
   setEl("aiMetricVerdicts", `🟢 ${m.verdictCounts?.CORRECT || 0} | 🔴 ${m.verdictCounts?.FALSE || 0} | 🟡 ${m.verdictCounts?.NOT_SURE || 0}`);
   setEl("aiMetricCost", `$${Number(m.estimatedTotalCostUsd || 0).toFixed(5)}`);
+
+  const clippedCount = m.clippedCount || 0;
+  setEl("lblFilterClippedCount", `(${clippedCount})`);
+  const clippedBtn = document.getElementById("btnFilterOnlyClipped");
+  if (clippedBtn) {
+    if (currentState.aiVerification?.visibilityFilter?.showClippedOnly) {
+      clippedBtn.classList.add("btn-filter-clipped-active");
+    } else {
+      clippedBtn.classList.remove("btn-filter-clipped-active");
+    }
+  }
 
   const badgeCount = document.getElementById("navBadgeAiVerifiedCount");
   if (badgeCount) {
