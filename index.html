@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="dark">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>واحي ستوديو (Wahy Studio) — التفريغ الذكي للمحاضرات واكتشاف الآيات والأحاديث والأذكار</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"IBM Plex Sans Arabic"', 'Inter', 'sans-serif'],
+            quran: ['Amiri', 'serif'],
+            mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace']
+          }
+        }
+      }
+    };
+  </script>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+
+<body class="min-h-screen flex flex-col bg-slate-950 text-slate-100 antialiased selection:bg-emerald-500/30 selection:text-emerald-200">
+
+  <!-- ===================================================================== -->
+  <!-- COMPACT, UNCLUTTERED PUBLIC NAVBAR (56px)                             -->
+  <!-- ===================================================================== -->
+  <header class="border-b border-slate-800/80 bg-slate-900/90 backdrop-blur-md sticky top-0 z-40">
+    <div class="max-w-[1640px] mx-auto px-3 sm:px-5 h-14 flex items-center justify-between gap-2">
+
+      <!-- Brand & Subtle Status -->
+      <div class="flex items-center gap-2.5 shrink-0">
+        <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center shadow-md shadow-emerald-950/60 font-bold text-white text-sm">
+          ﴿﴾
+        </div>
+        <div class="flex items-center gap-2">
+          <h1 class="text-sm sm:text-base font-bold text-white tracking-tight">واحي ستوديو</h1>
+          <span class="hidden xl:inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-slate-950 border border-slate-800 text-[11px] text-slate-400">
+            <span id="backendStatusDot" class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            <span id="backendStatusBadge">جاهز</span>
+          </span>
+        </div>
+      </div>
+
+      <!-- Center: 4 Clean Primary Workspace Sections -->
+      <nav class="flex items-center gap-1 bg-slate-950/90 p-1 rounded-2xl border border-slate-800/90 overflow-x-auto no-scrollbar">
+        <button type="button" id="navBtn_input" class="main-nav-pill nav-inactive px-3 sm:px-4 py-1.5 text-xs flex items-center gap-1.5">
+          <span>📥</span>
+          <span>الإدخال والتفريغ</span>
+        </button>
+
+        <button type="button" id="navBtn_display" class="main-nav-pill nav-active px-3 sm:px-4 py-1.5 text-xs flex items-center gap-1.5">
+          <span>🎬</span>
+          <span>العرض والمتابعة</span>
+        </button>
+
+        <button type="button" id="navBtn_editor" class="main-nav-pill nav-inactive px-3 sm:px-4 py-1.5 text-xs flex items-center gap-1.5">
+          <span>✍️</span>
+          <span>التحرير و FN Studio</span>
+          <span id="navBadgeFindingsCount" class="px-1.5 py-0.2 rounded-full bg-emerald-500/20 text-emerald-300 font-mono text-[10px]">0</span>
+        </button>
+
+        <button type="button" id="navBtn_datasets" class="main-nav-pill nav-inactive px-3 sm:px-4 py-1.5 text-xs flex items-center gap-1.5">
+          <span>📿</span>
+          <span>القواعد والأذكار</span>
+          <span id="navBadgeAdhkarCount" class="px-1.5 py-0.2 rounded-full bg-violet-500/20 text-violet-300 font-mono text-[10px]">42</span>
+        </button>
+      </nav>
+
+      <!-- Left: Compact Utility Actions (Undo, Export Menu, Theme, Settings Menu) -->
+      <div class="flex items-center gap-1.5 shrink-0">
+        <button type="button" id="btnUndoAction" class="hidden px-2.5 py-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 text-xs font-bold transition" title="التراجع عن آخر تعديل">
+          ↩️ <span class="hidden sm:inline">تراجع</span>
+        </button>
+
+        <button type="button" id="btnOpenExportModal" class="px-3 py-1.5 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 text-xs font-bold flex items-center gap-1.5 transition" title="تصدير المحاضرة وملفات الترجمة وتنسيق الأقواس">
+          <span>📤</span>
+          <span class="hidden sm:inline">تصدير وتنسيق</span>
+        </button>
+
+        <button type="button" id="btnToggleTheme" class="w-8 h-8 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-200 border border-slate-700/80 text-xs flex items-center justify-center transition" title="تبديل الوضع الليلي / النهاري">
+          <span id="lblThemeToggle">☀️</span>
+        </button>
+
+        <button type="button" id="btnOpenSettingsModal" class="px-2.5 py-1.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-200 border border-slate-700/80 text-xs font-semibold flex items-center gap-1 transition" title="الإعدادات المتقدمة وحساسية المحرك ومصادر البيانات">
+          <span>⚙️</span>
+          <span class="hidden md:inline">الإعدادات</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Auto-Hiding Slim Corpus Loading Bar (Hidden once loaded) -->
+    <div id="corpusDownloadProgressWrap" class="hidden bg-slate-950/95 border-t border-slate-800/80 px-4 py-1.5">
+      <div class="max-w-[1640px] mx-auto flex items-center justify-between gap-3 text-[11px]">
+        <span id="corpusDownloadStatusLabel" class="text-emerald-300 font-medium truncate">جاري تهيئة القواعد...</span>
+        <div class="flex items-center gap-2 w-48 shrink-0">
+          <div class="flex-1 h-1.5 rounded-full bg-slate-800 overflow-hidden">
+            <div id="corpusDownloadProgressBar" class="h-full bg-gradient-to-l from-emerald-500 to-sky-400 transition-all duration-300" style="width: 0%"></div>
+          </div>
+          <span id="corpusDownloadPercentLabel" class="font-mono font-bold text-sky-400" dir="ltr">0%</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===================================================================== -->
+  <!-- MAIN WORKSPACE CONTAINER                                              -->
+  <!-- ===================================================================== -->
+  <main class="flex-1 max-w-[1640px] w-full mx-auto px-3 sm:px-5 py-4">
+
+    <!-- =================================================================== -->
+    <!-- SECTION 1: INPUT & TRANSCRIPTION STUDIO (#section_input)            -->
+    <!-- =================================================================== -->
+    <section id="section_input" class="hidden max-w-4xl mx-auto space-y-5 py-2">
+      <div class="rounded-3xl bg-slate-900/95 border border-slate-800/90 p-5 sm:p-7 shadow-2xl space-y-6">
+
+        <!-- Section Header -->
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-4">
+          <div>
+            <h2 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+              <span>📥 استوديو الإدخال والتفريغ الصوتي الذكي</span>
+            </h2>
+            <p class="text-xs text-slate-400 mt-0.5">اختر مصدر المحاضرة (نص جاهز، رابط يوتيوب، أو ملف صوتي/مرئي) ليقوم المحرك باكتشاف الآيات والأحاديث والأذكار وبناء الكابشن المتزامن.</p>
+          </div>
+          <button type="button" id="btnLoadDynamicDemoLecture" class="px-3.5 py-2 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/35 text-indigo-300 border border-indigo-500/40 text-xs font-bold transition flex items-center gap-1.5">
+            <span>✨ تجربة محاضرة نموذجية</span>
+          </button>
+        </div>
+
+        <!-- Lecture Title Input -->
+        <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
+          <label for="inpLectureTitle" class="sm:col-span-3 text-xs font-bold text-slate-300">عنوان المحاضرة أو الدرس:</label>
+          <input type="text" id="inpLectureTitle" value="محاضرة علمية — استوديو الوحيين"
+            placeholder="أدخل عنوان المحاضرة..."
+            class="sm:col-span-9 rounded-xl bg-slate-950 border border-slate-800 focus:border-emerald-500 focus:outline-none px-3.5 py-2 text-xs sm:text-sm text-slate-100" />
+        </div>
+
+        <!-- Input Source Tabs -->
+        <div class="flex flex-wrap items-center gap-2">
+          <button type="button" id="btnInputTab_text" class="px-4 py-2.5 rounded-xl text-xs font-bold bg-emerald-600/25 text-emerald-300 border border-emerald-500/50 flex items-center gap-2 shadow-sm transition">
+            <span>📝 نص مباشر أو ملف ترجمة (.txt / .srt / .vtt)</span>
+          </button>
+          <button type="button" id="btnInputTab_youtube" class="px-4 py-2.5 rounded-xl text-xs font-semibold bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 flex items-center gap-2 transition">
+            <span>▶️ رابط يوتيوب (YouTube)</span>
+          </button>
+          <button type="button" id="btnInputTab_media" class="px-4 py-2.5 rounded-xl text-xs font-semibold bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 flex items-center gap-2 transition">
+            <span>🎬 ملف فيديو أو صوت (.mp4 / .mp3 / .wav)</span>
+          </button>
+        </div>
+
+        <!-- Tab 1: Text / Subtitle Fast-Path -->
+        <div id="panelInput_text" class="space-y-3">
+          <textarea id="textareaFastPathInput" rows="7"
+            class="w-full rounded-2xl bg-slate-950 border border-slate-800 focus:border-emerald-500 focus:outline-none p-4 text-sm text-slate-100 leading-relaxed"
+            placeholder="الصق نص المحاضرة هنا أو محتوى ملف الترجمة (.SRT / .VTT)..."></textarea>
+
+          <div class="flex flex-wrap items-center justify-between gap-3 pt-1">
+            <label class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 text-xs font-bold cursor-pointer transition flex items-center gap-1.5">
+              <span>📂 استيراد ملف نصي أو ترجمة (.txt / .srt / .vtt)</span>
+              <input type="file" id="inpTextFileUpload" accept=".txt,.srt,.vtt" class="hidden" />
+            </label>
+
+            <button type="button" id="btnRunTextFastPath" class="px-6 py-2.5 rounded-xl bg-gradient-to-l from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs sm:text-sm font-bold shadow-lg shadow-emerald-950/60 transition flex items-center gap-2">
+              <span>⚡ تحليل النص والانتقال لشاشة العرض</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Tab 2: YouTube URL Input -->
+        <div id="panelInput_youtube" class="hidden space-y-3">
+          <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+            <input type="url" id="inpYoutubeUrl" dir="ltr"
+              placeholder="https://www.youtube.com/watch?v=..."
+              class="flex-1 rounded-xl bg-slate-950 border border-slate-800 focus:border-emerald-500 px-4 py-3 text-sm font-mono text-slate-100" />
+            <button type="button" id="btnTranscribeYoutube" class="px-6 py-3 rounded-xl bg-gradient-to-l from-rose-600 to-amber-600 hover:from-rose-500 hover:to-amber-500 text-white text-xs sm:text-sm font-bold shadow-lg transition shrink-0">
+              ▶️ جلب وتفريغ المحاضرة
+            </button>
+          </div>
+          <p class="text-xs text-slate-400">
+            يقوم الخادم المحلي بتحميل الفيديو واستخراج الصوت وتفريغه مع التوقيت الدقيق لكل كلمة ثم نقلك تلقائياً لشاشة العرض المتزامن.
+          </p>
+        </div>
+
+        <!-- Tab 3: Video / Audio File Upload -->
+        <div id="panelInput_media" class="hidden space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-3 p-5 rounded-2xl bg-slate-950 border border-dashed border-slate-700">
+            <input type="file" id="inpMediaFileUpload" accept=".mp4,.mkv,.webm,.mp3,.wav,.m4a"
+              class="text-xs text-slate-300 file:ml-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-emerald-600/25 file:text-emerald-300 hover:file:bg-emerald-600/40" />
+            <button type="button" id="btnTranscribeMediaFile" class="px-6 py-2.5 rounded-xl bg-gradient-to-l from-emerald-600 to-sky-600 hover:from-emerald-500 hover:to-sky-500 text-white text-xs sm:text-sm font-bold shadow-lg transition">
+              🎙️ رفع وتفريغ الملف
+            </button>
+          </div>
+        </div>
+
+        <!-- Audio Transcription Engine Configuration (Compact Bar) -->
+        <div class="rounded-2xl bg-slate-950/70 border border-slate-800/80 p-3.5 flex flex-wrap items-center justify-between gap-3 text-xs">
+          <div class="flex flex-wrap items-center gap-2">
+            <label for="selTranscriptionModel" class="font-bold text-slate-400">محرك التفريغ الصوتي:</label>
+            <select id="selTranscriptionModel" class="rounded-xl bg-slate-900 border border-slate-700 text-xs font-bold text-amber-300 px-3 py-1.5 focus:border-emerald-500 focus:outline-none" dir="ltr">
+              <option value="groq-whisper-large-v3-turbo">Groq Cloud (whisper-large-v3-turbo — سحابي سريع)</option>
+              <option value="local-turbo-int8">Local GPU — Whisper Turbo (int8 ~2.2GB VRAM)</option>
+              <option value="local-small-int8">Local GPU — Whisper Small (int8 ~800MB VRAM)</option>
+            </select>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2">
+            <input type="password" id="inpGroqApiKey" placeholder="مفتاح Groq API (gsk_...)" dir="ltr"
+              class="w-48 rounded-xl bg-slate-900 border border-slate-800 focus:border-sky-500 px-3 py-1.5 text-xs font-mono text-slate-200" />
+            <label class="inline-flex items-center gap-1.5 text-xs text-slate-300 cursor-pointer select-none bg-slate-900 px-3 py-1.5 rounded-xl border border-slate-800">
+              <input type="checkbox" id="chkAutoFallback" checked class="rounded text-emerald-500 focus:ring-0" />
+              <span>التحول التلقائي للمعالج المحلي عند الحاجة</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Transcription Busy Banner -->
+        <div id="transcriptionStatusBanner" class="hidden rounded-2xl bg-sky-950/60 border border-sky-500/40 px-4 py-3 flex items-center gap-3 text-xs text-sky-200">
+          <div class="w-4 h-4 rounded-full border-2 border-sky-400 border-t-transparent animate-spin shrink-0"></div>
+          <span id="transcriptionStatusText">جاري معالجة الوسائط وتفريغ الكلمات...</span>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- SECTION 2: SYNCHRONIZED DISPLAY & READING STUDIO (#section_display) -->
+    <!-- Side-by-side Video Player + Lecture with Word Progress Indicator    -->
+    <!-- =================================================================== -->
+    <section id="section_display" class="space-y-4">
+
+      <!-- Clean Top Summary & View Controls Ribbon -->
+      <div class="rounded-2xl bg-slate-900/90 border border-slate-800/90 px-4 py-2.5 flex flex-wrap items-center justify-between gap-3">
+        <!-- Lecture Title & KPI Pills -->
+        <div class="flex flex-wrap items-center gap-3 text-xs">
+          <span id="displayLectureTitleLabel" class="font-bold text-white text-sm ml-1">محاضرة علمية</span>
+          <span class="px-2.5 py-1 rounded-lg bg-slate-950 border border-slate-800 text-slate-300">
+            الكلمات: <strong id="kpiTotalWords" class="font-mono text-white">0</strong>
+          </span>
+          <span class="px-2.5 py-1 rounded-lg bg-emerald-950/40 border border-emerald-500/30 text-emerald-300">
+            ﴿ الآيات: <strong id="kpiAyatCount" class="font-mono">0</strong> ﴾
+          </span>
+          <span class="px-2.5 py-1 rounded-lg bg-amber-950/40 border border-amber-500/30 text-amber-300">
+            « الأحاديث: <strong id="kpiHadithCount" class="font-mono">0</strong> »
+          </span>
+          <span class="px-2.5 py-1 rounded-lg bg-violet-950/40 border border-violet-500/30 text-violet-300">
+            〖 الأذكار: <strong id="kpiDhikrCount" class="font-mono">0</strong> 〗
+          </span>
+          <span class="hidden sm:inline-flex px-2.5 py-1 rounded-lg bg-slate-950 border border-slate-800 text-slate-400">
+            الكابشن: <strong id="kpiCaptionsCount" class="font-mono text-sky-400">0</strong>
+          </span>
+        </div>
+
+        <!-- Layout & Quick Actions -->
+        <div class="flex flex-wrap items-center gap-1.5">
+          <button type="button" id="btnSnapAllToCanonical" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-950/70 hover:bg-emerald-900/80 text-emerald-300 border border-emerald-500/40 transition">
+            ✨ توحيد بالرسم القياسي
+          </button>
+          <button type="button" id="btnQuickGoToEditor" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-sky-600/20 hover:bg-sky-600/35 text-sky-300 border border-sky-500/40 transition" title="الانتقال إلى استوديو التحرير وإضافة المقتبسات المفقودة (FN Studio)">
+            ✍️ تحرير / إضافة مفقود (FN)
+          </button>
+          <div class="h-4 w-px bg-slate-800 mx-0.5 hidden sm:block"></div>
+          <button type="button" id="btnLayout_SPLIT" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-600 text-white shadow-sm border border-emerald-400/50 transition">
+            ◫ المحاضرة + الفيديو
+          </button>
+          <button type="button" id="btnLayout_LECTURE_ONLY" class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 transition">
+            📖 المحاضرة فقط
+          </button>
+          <button type="button" id="btnLayout_CAPTIONS_ONLY" class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 transition">
+            🎬 الفيديو فقط
+          </button>
+        </div>
+      </div>
+
+      <!-- Dual Display Grid: Lecture Next to Video Player -->
+      <div id="dualWorkspaceGrid" class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+
+        <!-- RIGHT COLUMN: Formatted Lecture View with Word Progress Indicator -->
+        <div id="rightLectureColumn" class="lg:col-span-7 flex flex-col gap-4">
+          <div class="rounded-2xl bg-slate-900/95 border border-slate-800/90 shadow-xl overflow-hidden flex flex-col">
+
+            <!-- Lecture Toolbar + Real-time Word Progress Bar -->
+            <div class="bg-slate-900 border-b border-slate-800 px-4 py-3 space-y-2.5">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <div class="flex items-center gap-2">
+                  <h2 class="text-sm font-bold text-white">📖 نص المحاضرة المتزامن</h2>
+                  <span class="text-[11px] text-slate-400 hidden sm:inline">• انقر على أي كلمة للانتقال لتوقيتها أو ظلّل نصاً لإضافته في FN Studio</span>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-2">
+                  <label class="inline-flex items-center gap-1.5 text-[11px] text-slate-300 cursor-pointer select-none bg-slate-950 px-2.5 py-1 rounded-lg border border-slate-800" title="التمرير التلقائي السلس مع الكلمة المنطوقة أثناء تشغيل الفيديو">
+                    <input type="checkbox" id="chkAutoFollowWord" checked class="rounded text-emerald-500 focus:ring-0" />
+                    <span>تتبع الكلمة تلقائياً</span>
+                  </label>
+
+                  <select id="selLectureCategoryFilter" class="rounded-lg bg-slate-950 border border-slate-800 text-xs text-slate-200 px-2.5 py-1">
+                    <option value="ALL">الكل</option>
+                    <option value="ayah">﴿ الآيات فقط ﴾</option>
+                    <option value="hadith">« الأحاديث فقط »</option>
+                    <option value="dhikr">〖 الأذكار فقط 〗</option>
+                  </select>
+
+                  <input type="search" id="inpLectureSearch" placeholder="🔍 بحث في المحاضرة..."
+                    class="w-36 sm:w-44 rounded-lg bg-slate-950 border border-slate-800 px-2.5 py-1 text-xs text-slate-200 focus:border-emerald-500 focus:outline-none" />
+                </div>
+              </div>
+
+              <!-- Word Progress Indicator Bar -->
+              <div class="flex items-center gap-3 text-[11px]">
+                <span class="text-slate-400 shrink-0">مؤشر تقدم القراءة:</span>
+                <div class="flex-1 h-1.5 rounded-full bg-slate-950 border border-slate-800/80 overflow-hidden">
+                  <div id="lectureWordProgressBar" class="h-full bg-gradient-to-l from-emerald-500 via-teal-400 to-sky-400 transition-all duration-150" style="width: 0%"></div>
+                </div>
+                <span id="lectureWordProgressLabel" class="font-mono text-emerald-300 font-semibold shrink-0" dir="ltr">0 / 0</span>
+              </div>
+            </div>
+
+            <!-- Formatted Lecture Rich Text Stage -->
+            <div id="formattedLectureStage" class="lecture-pane p-5 sm:p-6 max-h-[640px] overflow-y-auto bg-slate-950/50 text-slate-100 select-text"></div>
+          </div>
+        </div>
+
+        <!-- LEFT COLUMN: Sticky Video/Audio Player + Live Styled Caption Overlay -->
+        <div id="displayVideoColumn" class="lg:col-span-5 flex flex-col gap-4 lg:sticky lg:top-16">
+          <div class="rounded-2xl bg-slate-900/95 border border-slate-800/90 shadow-xl overflow-hidden p-4 space-y-3.5">
+            <div class="flex items-center justify-between gap-2">
+              <h2 class="text-sm font-bold text-white flex items-center gap-1.5">
+                <span>🎬 المشغل المتزامن وشاشة الكابشن</span>
+              </h2>
+              <label class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 text-[11px] font-bold cursor-pointer transition">
+                📹 ربط فيديو/صوت محلي
+                <input type="file" id="inpLocalPreviewMediaFile" accept="video/*,audio/*" class="hidden" />
+              </label>
+            </div>
+
+            <!-- Video Stage with Custom Styled Caption Overlay -->
+            <div class="video-stage-container min-h-[260px] flex flex-col items-center justify-center">
+              <video id="wahyVideoPlayer" controls class="hidden w-full max-h-[340px] bg-black"></video>
+
+              <!-- Interactive Stage Banner when playing in Text/Simulated Timer mode -->
+              <div id="videoPlaceholderBanner" class="p-6 text-center space-y-2.5">
+                <div class="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xl font-bold">
+                  ﴿﴾
+                </div>
+                <div class="text-xs font-bold text-slate-200">المعاينة الحية للكابشن الملون المتزامن</div>
+                <p class="text-[11px] text-slate-400 max-w-sm mx-auto leading-relaxed">
+                  اضغط تشغيل بالأسفل أو انقر على أي كلمة في المحاضرة لمشاهدة تزامن الكلمات وظهور الآيات والأحاديث والأذكار كاملة دون انقسام.
+                </p>
+              </div>
+
+              <!-- Custom Styled Caption Overlay rendered over the bottom of the player -->
+              <div id="videoCaptionOverlay" class="video-caption-overlay">
+                <div id="videoCaptionOverlayBox" class="overlay-caption-box opacity-0"></div>
+              </div>
+            </div>
+
+            <!-- Synchronized Playhead Transport Bar -->
+            <div class="rounded-xl bg-slate-950 border border-slate-800 px-3 py-2.5 flex flex-wrap items-center gap-2.5" dir="ltr">
+              <button type="button" id="btnTogglePlayPause" class="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition shrink-0" dir="rtl">
+                <span id="btnSimulatedPlayLabel">▶ تشغيل المتابعة</span>
+              </button>
+              <button type="button" id="btnPlayerBack5s" class="px-2 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 font-mono text-[11px]" title="رجوع 5 ثوانٍ">-5s</button>
+              <input type="range" id="playerTimelineSlider" min="0" max="100" step="0.1" value="0"
+                class="flex-1 accent-emerald-500 cursor-pointer" />
+              <button type="button" id="btnPlayerForward5s" class="px-2 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 font-mono text-[11px]" title="تقديم 5 ثوانٍ">+5s</button>
+              <span id="playerCurrentTimeLabel" class="font-mono text-xs text-sky-300 shrink-0">00:00.00 / 00:00.00</span>
+            </div>
+
+            <!-- Helpful Tip Box -->
+            <div class="rounded-xl bg-slate-950/60 border border-slate-800/80 px-3.5 py-2.5 flex items-center justify-between gap-2 text-[11px] text-slate-400">
+              <span>هل فات المحرك آية أو حديث أو ذكر؟ ظلّل النص بالماوس أو افتح <strong>استوديو FN</strong>.</span>
+              <button type="button" id="btnQuickGoToInput" class="text-emerald-400 hover:underline font-semibold shrink-0">تغيير المدخلات ←</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- SECTION 3: SMART DECOUPLED EDITOR & FN STUDIO (#section_editor)     -->
+    <!-- Designed so playback never jumps or fights the user while editing!  -->
+    <!-- =================================================================== -->
+    <section id="section_editor" class="hidden space-y-4">
+
+      <!-- Smart Editor Top Bar: Sub-Mode Tabs + Sticky Non-Intrusive Mini Audio Bar -->
+      <div class="rounded-2xl bg-slate-900/95 border border-slate-800 px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+        <!-- 3 Editor Sub-Modes -->
+        <div class="flex flex-wrap items-center gap-2">
+          <button type="button" id="btnEditorSubMode_fn_studio" class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-emerald-600 text-white shadow-sm border border-emerald-400/60 transition flex items-center gap-1.5">
+            <span>➕ تحديد المقتبسات و FN Studio</span>
+          </button>
+          <button type="button" id="btnEditorSubMode_text_edit" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 transition flex items-center gap-1.5">
+            <span>📝 تحرير النص الكامل</span>
+          </button>
+          <button type="button" id="btnEditorSubMode_captions_edit" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 transition flex items-center gap-1.5">
+            <span>⏱️ محرر مقاطع الكابشن والتوقيت</span>
+          </button>
+        </div>
+
+        <!-- Mini Non-Jumping Audio Control Bar + Return to Display -->
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="hidden xl:inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-950/40 border border-emerald-500/30 text-[11px] text-emerald-300">
+            🔒 التمرير التلقائي متوقف لراحة التحرير
+          </span>
+          <div class="flex items-center gap-1.5 bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1 text-xs" dir="ltr">
+            <button type="button" id="btnEditorMiniPlayPause" class="px-2.5 py-0.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[11px]" dir="rtl">
+              <span id="btnEditorMiniPlayLabel">▶ استماع</span>
+            </button>
+            <button type="button" id="btnEditorMiniBack2s" class="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 font-mono text-[11px]">-2s</button>
+            <button type="button" id="btnEditorMiniForward2s" class="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 font-mono text-[11px]">+2s</button>
+            <span id="editorMiniTimeLabel" class="font-mono text-[11px] text-sky-300 px-1">00:00.00 / 00:00.00</span>
+          </div>
+          <button type="button" id="btnQuickGoToDisplayFromEditor" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold transition">
+            🎬 العودة لشاشة العرض
+          </button>
+        </div>
+      </div>
+
+      <!-- ================================================================= -->
+      <!-- EDITOR PANE A: INTERACTIVE LECTURE SELECTOR + FN STUDIO / INSPECTOR-->
+      <!-- ================================================================= -->
+      <div id="editorPane_fn_studio" class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+
+        <!-- Right (7 cols): Interactive Word-Selectable Lecture Canvas -->
+        <div class="lg:col-span-7 rounded-2xl bg-slate-900/95 border border-slate-800 shadow-xl overflow-hidden flex flex-col">
+          <div class="bg-slate-900 border-b border-slate-800 px-4 py-3 flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <h3 class="text-sm font-bold text-white">🖱️ لوحة التحديد الذكي للكلمات والمقتبسات</h3>
+              <p class="text-[11px] text-slate-400">انقر على <strong>أول كلمة</strong> ثم <strong>آخر كلمة</strong> (أو اسحب بالماوس) لتظليل أي آية أو حديث أو ذكر مفقود وإضافته عبر FN Studio • نقر مزدوج لتعديل أي كلمة إملائياً</p>
+            </div>
+          </div>
+
+          <!-- Step Instruction Banner for FN Selection -->
+          <div class="px-4 pt-3 bg-slate-950/50">
+            <div id="lblFnStepInstruction" class="px-3 py-1.5 rounded-xl bg-sky-500/15 text-sky-200 border border-sky-500/30 text-xs font-medium">
+              💡 انقر على <strong>أول كلمة</strong> ثم <strong>آخر كلمة</strong> في نص المحاضرة أدناه لتظليل المدى وإضافته!
+            </div>
+          </div>
+
+          <div id="editorLectureStage" class="lecture-pane p-5 sm:p-6 max-h-[620px] overflow-y-auto bg-slate-950/50 text-slate-100 select-text"></div>
+        </div>
+
+        <!-- Left (5 cols): Sticky FN Studio & Finding Inspector Dock -->
+        <div class="lg:col-span-5 flex flex-col gap-3 lg:sticky lg:top-16">
+
+          <!-- Dock Switcher: FN Studio vs Finding Inspector -->
+          <div class="rounded-2xl bg-slate-950/90 border border-slate-800 p-1.5 flex items-center gap-1.5">
+            <button type="button" id="btnDockTabFnStudio" class="flex-1 px-3 py-2 rounded-xl text-xs font-bold bg-emerald-600/25 text-emerald-300 border border-emerald-500/40 flex items-center justify-center gap-1.5 shadow-sm transition">
+              <span>➕ إضافة مفقود (FN Studio)</span>
+            </button>
+            <button type="button" id="btnDockTabInspector" class="flex-1 px-3 py-2 rounded-xl text-xs font-semibold bg-slate-900 hover:bg-slate-800 text-slate-400 border border-slate-800 flex items-center justify-center gap-1.5 transition">
+              <span>🔍 فحص وتعديل المقتبس المحدد</span>
+            </button>
+          </div>
+
+          <!-- PORTED FN STUDIO PANEL (From Wahy-Finder) -->
+          <div id="panelAddFnStudio" class="rounded-2xl bg-slate-900/95 border border-emerald-500/40 p-4 shadow-xl space-y-3.5 text-xs">
+            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-2.5">
+              <div class="flex items-center gap-2">
+                <span class="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold">
+                  استوديو إضافة المفقود (FN Studio)
+                </span>
+              </div>
+              <button id="btnResetFnRangeSelection" type="button" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 font-semibold transition">
+                ↺ إعادة تحديد المدى
+              </button>
+            </div>
+
+            <!-- Range & Source Type Controls -->
+            <div class="grid grid-cols-2 sm:grid-cols-12 gap-2.5 items-end">
+              <div class="sm:col-span-3">
+                <label class="block text-[11px] text-slate-400 mb-1">من الكلمة (Start):</label>
+                <input id="inpFnStartIdx" type="number" min="0" value="0"
+                  class="w-full bg-slate-950 border border-slate-700 rounded-xl px-2.5 py-1.5 font-mono text-emerald-300 focus:border-emerald-500 focus:outline-none" />
+              </div>
+              <div class="sm:col-span-3">
+                <label class="block text-[11px] text-slate-400 mb-1">إلى الكلمة (End):</label>
+                <input id="inpFnEndIdx" type="number" min="1" value="5"
+                  class="w-full bg-slate-950 border border-slate-700 rounded-xl px-2.5 py-1.5 font-mono text-emerald-300 focus:border-emerald-500 focus:outline-none" />
+              </div>
+              <div class="col-span-2 sm:col-span-6">
+                <label class="block text-[11px] text-slate-400 mb-1">نوع النص المفقود:</label>
+                <select id="selFnSourceType" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-2.5 py-1.5 text-slate-100 font-bold focus:border-emerald-500 focus:outline-none">
+                  <option value="QURAN">﴿ آية قرآنية (QURAN) ﴾</option>
+                  <option value="HADITH">« حديث نبوي (HADITH) »</option>
+                  <option value="ADHKAR">〖 ذكر ودعاء مأثور (ADHKAR) 〗</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Corpus Search & Qira'ah Selector -->
+            <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5 items-end">
+              <div class="sm:col-span-7">
+                <label class="block text-[11px] text-slate-400 mb-1">بحث سريع في القاعدة (اختياري):</label>
+                <input id="inpFnCorpusSearch" type="text" placeholder="اكتب كلمة من الآية أو الحديث أو اسم السورة..."
+                  class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-1.5 text-slate-100 focus:border-emerald-500 focus:outline-none" />
+              </div>
+              <div id="wrapFnQiraahSelect" class="sm:col-span-5">
+                <label class="block text-[11px] text-slate-400 mb-1">الرواية المعتمدة:</label>
+                <select id="selFnQiraah" class="w-full bg-slate-950 border border-emerald-500/40 rounded-xl px-2.5 py-1.5 text-emerald-200 font-semibold focus:outline-none">
+                  <option value="hafs">1. رواية حفص عن عاصم</option>
+                  <option value="warsh">2. رواية ورش عن نافع</option>
+                  <option value="qaloon">3. رواية قالون عن نافع</option>
+                  <option value="doori">4. رواية الدوري عن أبي عمرو</option>
+                  <option value="shubah">5. رواية شعبة عن عاصم</option>
+                  <option value="khalaf">6. رواية خلف عن حمزة</option>
+                  <option value="soosi">7. رواية السوسي عن أبي عمرو</option>
+                  <option value="ibn_kathir">8. قراءة ابن كثير المكي</option>
+                  <option value="ibn_amir">9. قراءة ابن عامر الشامي</option>
+                  <option value="kisai">10. قراءة الكسائي الكوفي</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Selected Words Preview + Matched Corpus Unit Selector + Matn Preview -->
+            <div class="space-y-3 bg-slate-950/90 p-3.5 rounded-xl border border-slate-800">
+              <div>
+                <span class="text-[11px] text-slate-400 block mb-0.5">النص المحدد من المحاضرة:</span>
+                <div id="lblFnSelectedRawPreview" class="text-amber-300 font-semibold leading-relaxed"></div>
+              </div>
+
+              <div class="space-y-1">
+                <label class="block text-[11px] text-slate-400 font-semibold">أقرب المراجع المطابقة تلقائياً في القاعدة:</label>
+                <select id="selFnMatchedUnit" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-2 text-emerald-200 font-quran-text text-sm focus:border-emerald-500 focus:outline-none"></select>
+              </div>
+
+              <!-- Full Vocalized Matn Preview with Highlighted Matched Words -->
+              <div id="fnSelectedUnitPreviewBox" class="p-3 rounded-xl bg-slate-900/95 border border-emerald-500/30 space-y-1.5">
+                <div class="text-[11px] text-slate-400">معاينة المتن الكامل للمرجع المختار:</div>
+              </div>
+
+              <!-- Commit Actions (From Corpus, Outside Corpus, or Save to Adhkar DB) -->
+              <div class="pt-2 border-t border-slate-800 space-y-2">
+                <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                  <input id="inpFnCustomOutsideRef" type="text" placeholder="اسم المصدر أو التصنيف (لإدراج خارج القاعدة أو الأذكار)..."
+                    class="flex-1 bg-slate-900 border border-amber-500/40 rounded-xl px-3 py-1.5 text-xs text-amber-200 focus:outline-none" />
+                </div>
+
+                <div class="flex flex-wrap items-center justify-end gap-2">
+                  <button id="btnCommitOutsideCorpusFn" type="button" class="px-3 py-2 rounded-xl bg-amber-600/90 hover:bg-amber-500 text-white font-bold text-xs transition">
+                    📌 إدراج كـ «خارج القاعدة»
+                  </button>
+                  <button id="btnCommitDhikrToAdhkarDb" type="button" class="px-3 py-2 rounded-xl bg-violet-600 hover:bg-violet-500 text-white font-bold text-xs transition" title="إدراج النص المحدد كذكر وحفظه دائماً في قاعدة الأذكار">
+                    📿 حفظ في قاعدة الأذكار
+                  </button>
+                  <button id="btnCommitNewFnQuote" type="button" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-lg shadow-emerald-950/50 transition">
+                    ✓ إدراج الاقتباس المحدد
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- FINDING INSPECTOR PANEL (Shown when clicking an existing citation or switching dock tab) -->
+          <div id="findingInspectorPanel" class="hidden rounded-2xl bg-slate-900/95 border border-sky-500/40 shadow-xl overflow-hidden">
+            <div class="bg-slate-900 border-b border-slate-800 px-4 py-2.5 flex items-center justify-between">
+              <h3 class="text-xs font-bold text-sky-300">🔍 فاحص ومحرر المقتبس المحدد</h3>
+              <div class="flex items-center gap-1">
+                <button type="button" id="btnPrevFindingInsp" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px]">السابق</button>
+                <button type="button" id="btnNextFindingInsp" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px]">التالي</button>
+              </div>
+            </div>
+            <div id="findingInspectorBody" class="p-4"></div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ================================================================= -->
+      <!-- EDITOR PANE B: FULL LECTURE TEXT EDITOR (#editorPane_text_edit)   -->
+      <!-- ================================================================= -->
+      <div id="editorPane_text_edit" class="hidden max-w-5xl mx-auto">
+        <div class="rounded-2xl bg-slate-900/95 border border-slate-800 shadow-xl overflow-hidden p-5 space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-3">
+            <div>
+              <h3 class="text-sm font-bold text-white">📝 محرر نص المحاضرة الكامل (مع الحفاظ الذكي على التوقيت اللحظي للكلمات)</h3>
+              <p class="text-xs text-slate-400">عدّل الأخطاء الإملائية أو أضف/احذف كلمات بحرية؛ سيقوم خوارزم المحاذاة (LCS) بالحفاظ على التوقيت الدقيق للكلمات غير المعدلة.</p>
+            </div>
+            <span id="lectureEditorWordCount" class="px-3 py-1 rounded-xl bg-slate-950 border border-slate-800 font-mono text-xs text-emerald-300 font-bold">0 كلمة</span>
+          </div>
+
+          <textarea id="inpLectureFullEditor" rows="16"
+            class="w-full rounded-2xl bg-slate-950 border border-slate-800 focus:border-emerald-500 focus:outline-none p-4 text-base text-slate-100 leading-loose"
+            placeholder="نص المحاضرة..."></textarea>
+
+          <div class="flex items-center justify-end gap-2.5">
+            <button type="button" id="btnCancelLectureEdit" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition">
+              إلغاء
+            </button>
+            <button type="button" id="btnApplyLectureEdit" class="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-lg transition">
+              ✓ حفظ النص وإعادة فحص المقتبسات والكابشن
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================================================================= -->
+      <!-- EDITOR PANE C: INTERACTIVE CAPTION TIMELINE (#editorPane_captions_edit) -->
+      <!-- ================================================================= -->
+      <div id="editorPane_captions_edit" class="hidden max-w-5xl mx-auto">
+        <div class="rounded-2xl bg-slate-900/95 border border-slate-800 shadow-xl overflow-hidden flex flex-col">
+          <div class="bg-slate-900 border-b border-slate-800 px-5 py-3.5 flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <h3 class="text-sm font-bold text-white">⏱️ محرر مقاطع الكابشن والترجمة الزمنية</h3>
+              <p class="text-xs text-slate-400">قاعدة عدم بتر الآيات والأحاديث ($\le 22$ كلمة في مقطع واحد) • تقسيم عند المؤشر • دمج المقاطع • إزاحة $\pm 0.1\text{s}$</p>
+            </div>
+          </div>
+          <div id="captionTimelineContainer" class="p-4 space-y-3 max-h-[680px] overflow-y-auto"></div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- SECTION 4: DATASETS & ADHKAR MANAGEMENT STUDIO (#section_datasets)  -->
+    <!-- =================================================================== -->
+    <section id="section_datasets" class="hidden space-y-4">
+
+      <!-- Datasets Studio Header & Dataset Switcher Tabs -->
+      <div class="rounded-2xl bg-slate-900/95 border border-slate-800 p-4 sm:p-5 shadow-xl space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-4">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-2xl bg-violet-600/20 border border-violet-500/40 flex items-center justify-center text-lg">
+              📿
+            </div>
+            <div>
+              <h2 class="text-base font-bold text-white">استوديو إدارة القواعد والأذكار المأثورة</h2>
+              <p class="text-xs text-slate-400">إدارة شاملة لقاعدة بيانات الأذكار والأدعية (إضافة، تعديل مباشر، استيراد وتصدير JSON) مع تصفح قواعد القرآن والحديث.</p>
+            </div>
+          </div>
+
+          <!-- Dataset Sub-Tabs -->
+          <div class="flex flex-wrap items-center gap-2">
+            <button type="button" id="btnDsTab_ADHKAR" class="px-4 py-2 rounded-xl text-xs font-bold bg-violet-600 text-white shadow border border-violet-400/60 flex items-center gap-2 transition">
+              <span>📿 الأذكار والأدعية</span>
+              <span id="badgeDsAdhkarTotal" class="px-1.5 py-0.5 rounded bg-slate-950/60 text-violet-200 font-mono text-[10px]">42</span>
+            </button>
+            <button type="button" id="btnDsTab_OUTSIDE_CORPUS" class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-900 hover:bg-slate-800 text-cyan-300 border border-slate-800 flex items-center gap-2 transition">
+              <span>📌 مقتبسات خارج القاعدة</span>
+              <span id="badgeDsOutsideTotal" class="px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-200 font-mono text-[10px]">0</span>
+            </button>
+            <button type="button" id="btnDsTab_QURAN" class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-900 hover:bg-slate-800 text-emerald-300 border border-slate-800 flex items-center gap-2 transition">
+              <span>📖 القرآن الكريم</span>
+              <span id="badgeDsQuranTotal" class="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-200 font-mono text-[10px]">0</span>
+            </button>
+            <button type="button" id="btnDsTab_HADITH" class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-900 hover:bg-slate-800 text-amber-300 border border-slate-800 flex items-center gap-2 transition">
+              <span>📚 كتب الحديث</span>
+              <span id="badgeDsHadithTotal" class="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-200 font-mono text-[10px]">0</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- ADHKAR CRUD & IMPORT/EXPORT PANEL -->
+        <div id="dsAdhkarManagerPanel" class="space-y-3">
+          <div class="rounded-2xl bg-violet-950/20 border border-violet-500/35 p-4 space-y-3">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div class="flex flex-wrap items-center gap-3 text-xs">
+                <span class="font-bold text-violet-200">➕ إضافة ذكر أو دعاء جديد إلى القاعدة:</span>
+                <span class="text-slate-400">المضافات المخصصة: <strong id="badgeDsAdhkarCustom" class="font-mono text-cyan-300">0</strong></span>
+              </div>
+
+              <div class="flex flex-wrap items-center gap-2">
+                <label class="inline-flex items-center gap-1.5 text-xs text-violet-200 cursor-pointer select-none bg-slate-950/90 border border-violet-500/30 rounded-xl px-3 py-1 font-semibold">
+                  <input type="checkbox" id="chkToggleAdhkarEngine" checked class="rounded text-violet-500 focus:ring-0" />
+                  <span>تفعيل اكتشاف الأذكار في المحرك</span>
+                </label>
+                <button type="button" id="btnSyncRemoteAdhkar" class="px-3 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 text-xs font-semibold transition" title="دمج الأذكار الإضافية من المستودع السحابي">
+                  🔄 جلب أذكار السحابة
+                </button>
+                <button type="button" id="btnImportAdhkarJson" class="px-3 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-slate-700 text-xs font-semibold transition">
+                  📥 استيراد JSON
+                </button>
+                <input type="file" id="fileInputAdhkarJson" accept=".json" class="hidden" />
+                <button type="button" id="btnExportAdhkarJson" class="px-3 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 text-xs font-semibold transition">
+                  📤 تصدير JSON
+                </button>
+                <button type="button" id="btnResetDefaultAdhkar" class="px-3 py-1 rounded-xl bg-rose-950/50 hover:bg-rose-900/70 text-rose-300 border border-rose-500/30 text-xs font-semibold transition">
+                  ↺ استعادة الافتراضي (42)
+                </button>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-2.5">
+              <div class="md:col-span-7">
+                <input id="inpNewAdhkarText" type="text" placeholder="أدخل نص الذكر أو الدعاء هنا (مثال: سبحان الله وبحمده سبحان الله العظيم)..."
+                  class="w-full bg-slate-950 border border-violet-500/40 rounded-xl px-3.5 py-2 text-slate-100 font-quran-text text-sm focus:outline-none focus:border-violet-400" />
+              </div>
+              <div class="md:col-span-3">
+                <input id="inpNewAdhkarRef" type="text" placeholder="التصنيف أو المصدر (مثال: أذكار الصباح)..."
+                  class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-violet-200 text-xs focus:outline-none focus:border-violet-400" />
+              </div>
+              <div class="md:col-span-2">
+                <button id="btnAddAdhkarItem" type="button" class="w-full px-4 py-2 rounded-xl bg-violet-600 hover:bg-violet-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow transition">
+                  <span>➕ إضافة وحفظ</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- OUTSIDE CORPUS HADITH CRUD PANEL -->
+        <div id="dsOutsideManagerPanel" class="hidden rounded-2xl bg-cyan-950/20 border border-cyan-500/35 p-4 space-y-2.5">
+          <div class="flex flex-wrap items-center justify-between gap-2 text-xs">
+            <span class="font-bold text-cyan-300">📌 إضافة حديث أو أثر خارج القاعدة ليتم التعرف عليه تلقائياً:</span>
+            <span class="text-slate-400">أي مقتبس تدرجه كـ «خارج القاعدة» في FN Studio يُحفظ هنا تلقائياً.</span>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-12 gap-2.5">
+            <input id="inpNewOutsideHadithText" type="text" placeholder="أدخل متن الحديث أو الأثر..."
+              class="md:col-span-7 bg-slate-950 border border-cyan-500/40 rounded-xl px-3.5 py-2 text-slate-100 font-quran-text text-sm focus:outline-none" />
+            <input id="inpNewOutsideHadithRef" type="text" placeholder="المصدر أو العزو..."
+              class="md:col-span-3 bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-cyan-200 text-xs focus:outline-none" />
+            <button id="btnAddOutsideHadithItem" type="button" class="md:col-span-2 px-4 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs transition">
+              ➕ إضافة للقاعدة
+            </button>
+          </div>
+        </div>
+
+        <!-- READ-ONLY NOTICE FOR QURAN & HADITH -->
+        <div id="dsReadOnlyNotice" class="hidden px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-400 flex items-center justify-between">
+          <span>🔒 نصوص المصحف الشريف ودواوين السنة محمية للقراءة والاستعراض والنسخ المباشر.</span>
+        </div>
+
+        <!-- Search, Filter & Pagination Bar -->
+        <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5 items-center bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs">
+          <div class="sm:col-span-5">
+            <input id="inpDatasetBrowserSearch" type="search" placeholder="🔍 ابحث بكلمات النص أو التصنيف أو الرقم..."
+              class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-1.5 text-slate-100 focus:outline-none focus:border-violet-500" />
+          </div>
+
+          <div id="wrapDsAdhkarFilter" class="sm:col-span-3">
+            <select id="selDatasetAdhkarFilter" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-violet-200 font-semibold">
+              <option value="ALL">جميع الأذكار (الكل)</option>
+              <option value="CUSTOM">الأذكار المضافة / المخصصة فقط</option>
+              <option value="BUILTIN">الأذكار الأساسية فقط</option>
+            </select>
+          </div>
+
+          <div id="wrapDsSurahFilter" class="hidden sm:col-span-3">
+            <select id="selDatasetBrowserSurah" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-emerald-200 font-semibold">
+              <option value="ALL">كل السور (114 سورة)</option>
+            </select>
+          </div>
+
+          <div id="wrapDsBookFilter" class="hidden sm:col-span-3">
+            <select id="selDatasetBrowserBook" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-amber-200 font-semibold">
+              <option value="ALL">جميع كتب الحديث</option>
+            </select>
+          </div>
+
+          <div class="sm:col-span-4 flex items-center justify-end gap-2 mr-auto">
+            <button id="btnDatasetPrevPage" type="button" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-semibold">السابق</button>
+            <span id="lblDatasetPageInfo" class="px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 font-mono text-sky-300 font-bold text-center">صفحة 1 من 1</span>
+            <button id="btnDatasetNextPage" type="button" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-semibold">التالي</button>
+          </div>
+        </div>
+
+        <!-- Dataset Table -->
+        <div class="border border-slate-800 rounded-2xl overflow-hidden bg-slate-950/40 max-h-[540px] overflow-y-auto">
+          <table class="w-full text-right text-xs">
+            <thead class="bg-slate-950 text-slate-400 sticky top-0 border-b border-slate-800 z-10">
+              <tr>
+                <th class="py-3 px-3 text-center w-12 font-mono">#</th>
+                <th class="py-3 px-3 w-52">التصنيف / المرجع</th>
+                <th class="py-3 px-3">النص الكامل (قابل للتعديل المباشر في الأذكار وخارج القاعدة)</th>
+                <th class="py-3 px-3 text-center w-44">إجراءات</th>
+              </tr>
+            </thead>
+            <tbody id="tbodyDatasetBrowserRows" class="divide-y divide-slate-800/70"></tbody>
+          </table>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===================================================================== -->
+  <!-- FLOATING TEXT SELECTION TOOLBAR (Direct Jump to FN Studio)            -->
+  <!-- ===================================================================== -->
+  <div id="floatingSelectionToolbar" class="hidden fixed z-50 rounded-2xl bg-slate-900/95 border-2 border-emerald-500/70 shadow-2xl px-3 py-1.5 flex items-center gap-1.5 backdrop-blur-md">
+    <button type="button" id="btnFloatingOpenFnStudio" class="px-2.5 py-1 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition flex items-center gap-1">
+      <span>➕ فتح في FN Studio</span>
+    </button>
+    <span class="w-px h-4 bg-slate-700 mx-0.5"></span>
+    <button type="button" id="btnFloatingMarkAyah" class="px-2 py-1 rounded-lg bg-emerald-950 hover:bg-emerald-900 text-emerald-300 border border-emerald-500/40 text-xs font-bold transition">
+      + آية
+    </button>
+    <button type="button" id="btnFloatingMarkHadith" class="px-2 py-1 rounded-lg bg-amber-950 hover:bg-amber-900 text-amber-300 border border-amber-500/40 text-xs font-bold transition">
+      + حديث
+    </button>
+    <button type="button" id="btnFloatingMarkDhikr" class="px-2 py-1 rounded-lg bg-violet-950 hover:bg-violet-900 text-violet-300 border border-violet-500/40 text-xs font-bold transition">
+      + ذكر
+    </button>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- HIDDEN MODAL 1: EXPORT & FORMATTING MENU (#exportModal)               -->
+  <!-- ===================================================================== -->
+  <div id="exportModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4">
+    <div class="w-full max-w-2xl rounded-3xl bg-slate-900 border border-slate-700 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+      <div class="px-6 py-4 border-b border-slate-800 flex items-center justify-between">
+        <h3 class="text-sm sm:text-base font-bold text-white flex items-center gap-2">
+          <span>📤 تصدير المخرجات وتنسيق الأقواس</span>
+        </h3>
+        <button type="button" id="btnCloseExportModal" class="px-3 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold">إغلاق ✕</button>
+      </div>
+
+      <div class="p-6 space-y-6 overflow-y-auto text-xs">
+        <!-- Lecture Document Exports -->
+        <div class="space-y-2.5">
+          <h4 class="font-bold text-emerald-300 text-xs sm:text-sm">1. تصدير نص المحاضرة المنسق:</h4>
+          <div class="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
+            <button type="button" id="btnExportStyledHtml" class="p-3 rounded-2xl bg-emerald-600/15 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 font-bold flex flex-col items-center gap-1 transition">
+              <span class="text-base">🌐</span>
+              <span>صفحة HTML</span>
+            </button>
+            <button type="button" id="btnExportPrintPdf" class="p-3 rounded-2xl bg-sky-600/15 hover:bg-sky-600/30 text-sky-300 border border-sky-500/40 font-bold flex flex-col items-center gap-1 transition">
+              <span class="text-base">🖨️</span>
+              <span>طباعة / PDF</span>
+            </button>
+            <button type="button" id="btnExportMarkdown" class="p-3 rounded-2xl bg-amber-600/15 hover:bg-amber-600/30 text-amber-300 border border-amber-500/40 font-bold flex flex-col items-center gap-1 transition">
+              <span class="text-base">📝</span>
+              <span>Markdown (.md)</span>
+            </button>
+            <button type="button" id="btnExportPlainTxt" class="p-3 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-bold flex flex-col items-center gap-1 transition">
+              <span class="text-base">📄</span>
+              <span>نص صافي (.txt)</span>
+            </button>
+            <button type="button" id="btnExportJson" class="p-3 rounded-2xl bg-indigo-600/15 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/40 font-bold flex flex-col items-center gap-1 transition">
+              <span class="text-base">📦</span>
+              <span>بيانات JSON</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Video Subtitle Exports -->
+        <div class="space-y-2.5 pt-4 border-t border-slate-800">
+          <h4 class="font-bold text-sky-300 text-xs sm:text-sm">2. تصدير ملفات الترجمة والكابشن للفيديو (Subtitles):</h4>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5" dir="ltr">
+            <button type="button" id="btnExportSrt" class="p-3 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-mono font-bold flex flex-col items-center gap-1 transition">
+              <span>.SRT (Standard)</span>
+              <span class="text-[10px] text-slate-400 font-sans" dir="rtl">متوافق مع يوتيوب وجميع المشغلات</span>
+            </button>
+            <button type="button" id="btnExportVtt" class="p-3 rounded-2xl bg-emerald-600/15 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 font-mono font-bold flex flex-col items-center gap-1 transition">
+              <span>.VTT (Colored WebVTT)</span>
+              <span class="text-[10px] text-emerald-200/80 font-sans" dir="rtl">يحفظ ألوان الآيات والأحاديث للويب</span>
+            </button>
+            <button type="button" id="btnExportAss" class="p-3 rounded-2xl bg-amber-600/15 hover:bg-amber-600/30 text-amber-300 border border-amber-500/40 font-mono font-bold flex flex-col items-center gap-1 transition">
+              <span>.ASS (Styled Studio)</span>
+              <span class="text-[10px] text-amber-200/80 font-sans" dir="rtl">يحفظ الخطوط والألوان لبرامج المونتاج و VLC</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Brackets & Citation Badges Preferences -->
+        <div class="space-y-3 pt-4 border-t border-slate-800">
+          <h4 class="font-bold text-slate-200 text-xs sm:text-sm">3. تخصيص الأقواس وإظهار المراجع:</h4>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div class="p-3 rounded-2xl bg-slate-950 border border-slate-800 space-y-2">
+              <div class="font-bold text-emerald-300">أقواس الآيات القرآنية</div>
+              <div class="flex items-center gap-2">
+                <input type="text" id="inpPrefQuranOpen" value="﴿" class="w-full text-center rounded-lg bg-slate-900 border border-slate-700 py-1 font-quran-text text-base text-emerald-300" />
+                <input type="text" id="inpPrefQuranClose" value="﴾" class="w-full text-center rounded-lg bg-slate-900 border border-slate-700 py-1 font-quran-text text-base text-emerald-300" />
+              </div>
+              <label class="flex items-center gap-1.5 text-slate-300 cursor-pointer">
+                <input type="checkbox" id="chkPrefShowQuranRef" checked class="rounded text-emerald-500" />
+                <span>إظهار اسم السورة ورقم الآية</span>
+              </label>
+            </div>
+
+            <div class="p-3 rounded-2xl bg-slate-950 border border-slate-800 space-y-2">
+              <div class="font-bold text-amber-300">أقواس الأحاديث النبوية</div>
+              <div class="flex items-center gap-2">
+                <input type="text" id="inpPrefHadithOpen" value="«" class="w-full text-center rounded-lg bg-slate-900 border border-slate-700 py-1 text-sm text-amber-300" />
+                <input type="text" id="inpPrefHadithClose" value="»" class="w-full text-center rounded-lg bg-slate-900 border border-slate-700 py-1 text-sm text-amber-300" />
+              </div>
+              <label class="flex items-center gap-1.5 text-slate-300 cursor-pointer">
+                <input type="checkbox" id="chkPrefShowHadithRef" checked class="rounded text-amber-500" />
+                <span>إظهار مصدر الحديث</span>
+              </label>
+            </div>
+
+            <div class="p-3 rounded-2xl bg-slate-950 border border-slate-800 space-y-2">
+              <div class="font-bold text-violet-300">أقواس الأذكار والأدعية</div>
+              <div class="flex items-center gap-2">
+                <input type="text" id="inpPrefAdhkarOpen" value="〖" class="w-full text-center rounded-lg bg-slate-900 border border-slate-700 py-1 text-sm text-violet-300" />
+                <input type="text" id="inpPrefAdhkarClose" value="〗" class="w-full text-center rounded-lg bg-slate-900 border border-slate-700 py-1 text-sm text-violet-300" />
+              </div>
+              <label class="flex items-center gap-1.5 text-slate-300 cursor-pointer">
+                <input type="checkbox" id="chkPrefShowAdhkarRef" checked class="rounded text-violet-500" />
+                <span>إظهار وسم الذكر</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="flex justify-end pt-1">
+            <button type="button" id="btnSaveFormattingPrefs" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition">
+              💾 حفظ تفضيلات التنسيق
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- HIDDEN MODAL 2: ADVANCED SETTINGS & CORPUS CONFIG (#settingsModal)    -->
+  <!-- ===================================================================== -->
+  <div id="settingsModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4">
+    <div class="w-full max-w-2xl rounded-3xl bg-slate-900 border border-slate-700 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+      <div class="px-6 py-4 border-b border-slate-800 flex items-center justify-between">
+        <h3 class="text-sm sm:text-base font-bold text-white">⚙️ الإعدادات المتقدمة وحساسية المحرك ومصادر القواعد</h3>
+        <button type="button" id="btnCloseSettingsModal" class="px-3 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold">إغلاق ✕</button>
+      </div>
+
+      <div class="p-6 space-y-6 overflow-y-auto text-xs">
+        <!-- Corpus Status & Re-download -->
+        <div class="rounded-2xl bg-slate-950 border border-slate-800 p-4 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <div class="text-slate-400 text-[11px]">حالة القواعد المفهرسة في المتصفح (IndexedDB):</div>
+            <div id="corpusCountLabel" class="font-bold text-emerald-300 mt-0.5">القرآن: 0 | الحديث: 0 | الأذكار: 42</div>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <button type="button" id="btnForceUpdateCorpus" class="px-3 py-1.5 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/35 text-emerald-300 border border-emerald-500/40 font-bold transition">
+              🔄 إعادة تحميل القواعد من السحابة
+            </button>
+            <button type="button" id="btnTriggerDiagnosticReport" class="px-3 py-1.5 rounded-xl bg-rose-600/20 hover:bg-rose-600/35 text-rose-300 border border-rose-500/40 font-bold transition">
+              🩺 التقرير التشخيصي
+            </button>
+          </div>
+        </div>
+
+        <!-- Engine Sensitivity Parameters -->
+        <div class="space-y-3">
+          <div class="flex items-center justify-between">
+            <h4 class="font-bold text-slate-200">ضبط حساسية محرك المطابقة والقراءات العشر:</h4>
+            <span class="text-[11px] font-mono text-slate-400">زمن المطابقة الأخير: <strong id="kpiEngineTimeMs" class="text-emerald-300">0 ms</strong></span>
+          </div>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 bg-slate-950 p-4 rounded-2xl border border-slate-800">
+            <div>
+              <label class="block text-[11px] text-slate-400 mb-1">الرواية الافتراضية</label>
+              <select id="selDefaultQiraah" class="w-full rounded-lg bg-slate-900 border border-slate-700 px-2.5 py-1.5 text-xs text-emerald-300">
+                <option value="AUTO">تلقائي (حفص + القراءات العشر)</option>
+                <option value="hafs">رواية حفص عن عاصم</option>
+                <option value="warsh">رواية ورش عن نافع</option>
+                <option value="qaloon">رواية قالون عن نافع</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[11px] text-slate-400 mb-1">Min Island IDF</label>
+              <input type="number" id="rngMinIslandIdf" value="3.8" step="0.1" class="w-full rounded-lg bg-slate-900 border border-slate-700 px-2.5 py-1.5 font-mono text-slate-200" />
+            </div>
+            <div>
+              <label class="block text-[11px] text-slate-400 mb-1">Max Transcript Gap</label>
+              <input type="number" id="rngMaxTranscriptGap" value="10" step="1" class="w-full rounded-lg bg-slate-900 border border-slate-700 px-2.5 py-1.5 font-mono text-slate-200" />
+            </div>
+            <div>
+              <label class="block text-[11px] text-slate-400 mb-1">Max Verse Gap</label>
+              <input type="number" id="rngMaxVerseGap" value="2" step="1" class="w-full rounded-lg bg-slate-900 border border-slate-700 px-2.5 py-1.5 font-mono text-slate-200" />
+            </div>
+            <div>
+              <label class="block text-[11px] text-slate-400 mb-1">Verified Threshold</label>
+              <input type="number" id="rngVerifiedThreshold" value="11.0" step="0.5" class="w-full rounded-lg bg-slate-900 border border-slate-700 px-2.5 py-1.5 font-mono text-slate-200" />
+            </div>
+            <div>
+              <label class="block text-[11px] text-slate-400 mb-1">Candidate Threshold</label>
+              <input type="number" id="rngCandidateThreshold" value="6.8" step="0.5" class="w-full rounded-lg bg-slate-900 border border-slate-700 px-2.5 py-1.5 font-mono text-slate-200" />
+            </div>
+            <div>
+              <label class="block text-[11px] text-slate-400 mb-1">Uncued Hadith Threshold</label>
+              <input type="number" id="rngUncuedHadithThreshold" value="16.0" step="0.5" class="w-full rounded-lg bg-slate-900 border border-slate-700 px-2.5 py-1.5 font-mono text-slate-200" />
+            </div>
+            <div>
+              <label class="block text-[11px] text-slate-400 mb-1">Min Hadith Words</label>
+              <input type="number" id="rngMinHadithContentWords" value="3" step="1" class="w-full rounded-lg bg-slate-900 border border-slate-700 px-2.5 py-1.5 font-mono text-slate-200" />
+            </div>
+            <div>
+              <label class="block text-[11px] text-slate-400 mb-1">Uncued Quran Coverage %</label>
+              <input type="number" id="rngUncuedQuranCoverage" value="65" step="5" class="w-full rounded-lg bg-slate-900 border border-slate-700 px-2.5 py-1.5 font-mono text-slate-200" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Remote Corpus URLs & Local JSON Upload -->
+        <div class="space-y-3 pt-3 border-t border-slate-800">
+          <h4 class="font-bold text-slate-200">روابط مصادر القواعد السحابية أو الاستيراد المحلي:</h4>
+          <div class="space-y-2.5 bg-slate-950 p-4 rounded-2xl border border-slate-800">
+            <div>
+              <label class="block text-slate-300 font-semibold mb-1">رابط ملف <code class="text-emerald-300">corpus.json</code> مخصص (اختياري):</label>
+              <input type="url" id="inpCustomCorpusUrl" dir="ltr" placeholder="https://gist.githubusercontent.com/.../raw/corpus.json"
+                class="w-full rounded-xl bg-slate-900 border border-slate-700 px-3 py-1.5 font-mono text-slate-200" />
+            </div>
+            <div>
+              <label class="block text-slate-300 font-semibold mb-1">مصدر المصحف العثماني (AlQuran Cloud API):</label>
+              <input type="url" id="inpQuranUthmaniUrl" dir="ltr"
+                class="w-full rounded-xl bg-slate-900 border border-slate-700 px-3 py-1.5 font-mono text-slate-200" />
+            </div>
+            <div>
+              <label class="block text-slate-300 font-semibold mb-1">مصدر قاعدة بيانات الأذكار السحابية:</label>
+              <input type="url" id="inpAdhkarMirrorUrl" dir="ltr"
+                class="w-full rounded-xl bg-slate-900 border border-slate-700 px-3 py-1.5 font-mono text-slate-200" />
+            </div>
+            <div class="pt-2 border-t border-slate-800 flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <label class="block text-slate-300 font-semibold mb-1">أو استيراد ملف <code class="text-amber-300">corpus.json</code> محلي:</label>
+                <input type="file" id="inpUploadLocalCorpusJson" accept=".json"
+                  class="text-xs text-slate-300 file:ml-2 file:py-1 file:px-3 file:rounded-lg file:border-0 file:bg-slate-800 file:text-sky-300 file:font-bold" />
+              </div>
+              <button type="button" id="btnSaveCorpusSettings" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold">
+                💾 حفظ الروابط وإعادة التحميل
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL 3: CORPUS REFERENCE LINKER MODAL (#corpusSearchModal)           -->
+  <!-- ===================================================================== -->
+  <div id="corpusSearchModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4">
+    <div class="w-full max-w-2xl rounded-2xl bg-slate-900 border border-slate-700 shadow-2xl overflow-hidden flex flex-col max-h-[88vh]">
+      <div class="px-5 py-3.5 border-b border-slate-800 flex items-center justify-between">
+        <h3 class="text-sm font-bold text-white">🔍 البحث في القاعدة وربط المرجع</h3>
+        <button type="button" id="btnCloseCorpusSearchModal" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold">إغلاق ✕</button>
+      </div>
+
+      <div class="p-4 space-y-3 overflow-y-auto">
+        <div class="rounded-xl bg-slate-950 border border-slate-800 p-2.5 text-xs">
+          <span class="text-slate-400">النص المحدد في المحاضرة:</span>
+          <div id="modalSelectedSpanPreview" class="text-emerald-300 font-semibold mt-1"></div>
+        </div>
+
+        <div class="flex flex-col sm:flex-row gap-2">
+          <select id="selModalCorpusCategory" class="rounded-xl bg-slate-950 border border-slate-700 px-3 py-2 text-xs font-bold text-slate-200">
+            <option value="ALL">كل القواعد (قرآن + حديث + أذكار)</option>
+            <option value="ayah">القرآن الكريم فقط</option>
+            <option value="hadith">الحديث النبوي فقط</option>
+            <option value="dhikr">الأذكار والأدعية فقط</option>
+          </select>
+          <input type="search" id="inpModalCorpusSearch" placeholder="ابحث بكلمات الآية أو الحديث أو اسم السورة..."
+            class="flex-1 rounded-xl bg-slate-950 border border-slate-700 px-3 py-2 text-xs text-slate-100 focus:border-emerald-500 focus:outline-none" />
+        </div>
+
+        <div id="modalCorpusResultsList" class="space-y-2 max-h-64 overflow-y-auto pr-1"></div>
+
+        <div class="pt-3 border-t border-slate-800 flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+          <input type="text" id="inpModalCustomReference" placeholder="أو اكتب المرجع يدوياً..."
+            class="flex-1 rounded-xl bg-slate-950 border border-slate-700 px-3 py-2 text-xs text-slate-200" />
+          <button type="button" id="btnCommitCustomRefModal" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shrink-0">
+            ✓ حفظ المرجع وتحديث الكابشن
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toastBox" class="hidden fixed bottom-5 left-5 z-50 rounded-xl bg-slate-900/95 border border-emerald-500/50 px-4 py-2.5 shadow-2xl flex items-center gap-2 text-xs font-bold text-emerald-200">
+    <span id="toastText"></span>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- APPLICATION SCRIPTS (Strict Execution Order: Error Trap First!)       -->
+  <!-- ===================================================================== -->
+  <script defer src="js/error-handler.js"></script>
+  <script defer src="js/state.js"></script>
+  <script defer src="js/corpus-loader.js"></script>
+  <script defer src="js/engine.js"></script>
+  <script defer src="js/caption-builder.js"></script>
+  <script defer src="js/editor.js"></script>
+  <script defer src="js/render.js"></script>
+  <script defer src="js/events.js"></script>
+</body>
+
+</html>

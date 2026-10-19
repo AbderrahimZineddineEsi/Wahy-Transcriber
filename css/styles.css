@@ -1,0 +1,422 @@
+/* =========================================================================
+   Wahy Studio (Wahy-Transcriber) — Public Edition Stylesheet
+   Clean, spacious typography, RTL layout, synchronized word progress,
+   FN Studio range highlighting, and Dark/Light themes.
+   ========================================================================= */
+
+:root {
+  --bg-app: #070b14;
+  --bg-surface: #0f172a;
+  --bg-elevated: #1e293b;
+  --border-subtle: rgba(51, 65, 85, 0.65);
+}
+
+body {
+  font-family: 'IBM Plex Sans Arabic', 'Inter', sans-serif;
+  background-color: #070b14;
+  color: #f1f5f9;
+  overflow-x: hidden;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.font-quran-text {
+  font-family: 'Amiri', serif;
+  line-height: 2.15;
+  font-size: 1.22rem;
+}
+
+.lecture-pane {
+  line-height: 2.15;
+  font-size: 1.08rem;
+}
+
+/* Custom Sleek Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
+/* Main Navigation Pills in Compact Navbar */
+.main-nav-pill {
+  position: relative;
+  border-radius: 0.75rem;
+  transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.main-nav-pill.nav-active {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.22), rgba(13, 148, 136, 0.18));
+  color: #34d399;
+  border-color: rgba(16, 185, 129, 0.45);
+  font-weight: 700;
+  box-shadow: 0 2px 10px -2px rgba(16, 185, 129, 0.2);
+}
+
+.main-nav-pill.nav-inactive {
+  background-color: transparent;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.main-nav-pill.nav-inactive:hover {
+  background-color: rgba(30, 41, 59, 0.65);
+  color: #f1f5f9;
+}
+
+/* Citation Badges & Spans in Lecture View */
+.citation-ayah {
+  background-color: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  color: #6ee7b7;
+  font-family: 'Amiri', serif;
+  font-size: 1.2rem;
+  padding: 0.12rem 0.5rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.citation-ayah:hover {
+  background-color: rgba(16, 185, 129, 0.25);
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.55);
+}
+
+.citation-hadith {
+  background-color: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  color: #fcd34d;
+  padding: 0.12rem 0.5rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.citation-hadith:hover {
+  background-color: rgba(245, 158, 11, 0.25);
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.55);
+}
+
+.citation-dhikr {
+  background-color: rgba(139, 92, 246, 0.16);
+  border: 1px solid rgba(139, 92, 246, 0.45);
+  color: #c4b5fd;
+  padding: 0.12rem 0.5rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.citation-dhikr:hover {
+  background-color: rgba(139, 92, 246, 0.28);
+  box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.55);
+}
+
+.citation-selected-ring {
+  box-shadow: 0 0 0 2.5px #38bdf8 !important;
+}
+
+/* Word Tokens & Real-time Word Progress Indicator */
+.lecture-word-token {
+  cursor: pointer;
+  border-radius: 0.3rem;
+  padding: 0.05rem 0.16rem;
+  transition: background-color 0.12s ease, color 0.12s ease, box-shadow 0.12s ease;
+  display: inline-block;
+}
+
+.lecture-word-token:hover {
+  background-color: rgba(56, 189, 248, 0.16);
+}
+
+.lecture-word-active {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.55), rgba(56, 189, 248, 0.5)) !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 0 2px #34d399, 0 3px 12px rgba(16, 185, 129, 0.4);
+  font-weight: 700;
+  border-radius: 0.375rem;
+  padding: 0.05rem 0.28rem;
+  transform: translateY(-1px);
+}
+
+.lecture-word-passed {
+  color: #cbd5e1;
+}
+
+/* =========================================================================
+   FN Studio Interactive Word Range Selection & Highlighting (from Wahy-Finder)
+   ========================================================================= */
+.raw-tok-item {
+  transition: all 0.12s ease;
+}
+
+.editor-word-selectable:hover {
+  background-color: rgba(16, 185, 129, 0.22);
+  color: #a7f3d0;
+}
+
+.fn-tok-start {
+  background-color: #10b981 !important;
+  color: #022c22 !important;
+  font-weight: 700 !important;
+  border-radius: 0.375rem;
+  padding: 0.06rem 0.38rem !important;
+  box-shadow: 0 0 0 2px #34d399, 0 4px 12px rgba(16, 185, 129, 0.4);
+}
+
+.fn-tok-in-range {
+  background-color: rgba(16, 185, 129, 0.28) !important;
+  color: #a7f3d0 !important;
+  border-bottom: 2px solid #10b981 !important;
+  font-weight: 600;
+  border-radius: 0.25rem;
+  padding: 0.04rem 0.22rem !important;
+}
+
+.fn-tok-end {
+  background-color: #059669 !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  border-radius: 0.375rem;
+  padding: 0.06rem 0.38rem !important;
+  box-shadow: 0 0 0 2px #6ee7b7, 0 4px 12px rgba(5, 150, 105, 0.45);
+}
+
+.fn-tok-hover-preview {
+  background-color: rgba(56, 189, 248, 0.26) !important;
+  color: #e0f2fe !important;
+  border-bottom: 2px dashed #38bdf8 !important;
+  border-radius: 0.25rem;
+}
+
+/* Inline Word Quick Edit */
+.inline-edit-wrap {
+  display: inline-flex;
+  vertical-align: middle;
+  line-height: 1.4;
+}
+
+.inline-edit-wrap input {
+  font-family: inherit;
+}
+
+/* Video Player & Custom Styled Caption Overlay */
+.video-stage-container {
+  position: relative;
+  background: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
+  border-radius: 1rem;
+  overflow: hidden;
+  border: 1px solid rgba(51, 65, 85, 0.75);
+}
+
+.video-caption-overlay {
+  position: absolute;
+  bottom: 3.1rem;
+  left: 4%;
+  right: 4%;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+  text-align: center;
+}
+
+.overlay-caption-box {
+  max-width: 94%;
+  padding: 0.55rem 1.15rem;
+  border-radius: 0.85rem;
+  backdrop-filter: blur(10px);
+  background: rgba(2, 6, 23, 0.86);
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  color: #f8fafc;
+  font-size: 1.08rem;
+  line-height: 1.85;
+  box-shadow: 0 12px 28px -5px rgba(0, 0, 0, 0.75);
+  transition: all 0.15s ease;
+}
+
+.overlay-caption-box.overlay-ayah {
+  background: rgba(6, 78, 59, 0.9);
+  border-color: rgba(16, 185, 129, 0.65);
+  color: #ecfdf5;
+  font-family: 'Amiri', serif;
+  font-size: 1.25rem;
+}
+
+.overlay-caption-box.overlay-hadith {
+  background: rgba(120, 53, 15, 0.9);
+  border-color: rgba(245, 158, 11, 0.65);
+  color: #fffbeb;
+}
+
+.overlay-caption-box.overlay-dhikr {
+  background: rgba(49, 46, 129, 0.9);
+  border-color: rgba(139, 92, 246, 0.65);
+  color: #eef2ff;
+}
+
+/* Interactive Caption Timeline Cards */
+.caption-row-card {
+  transition: border-color 0.15s ease, background-color 0.15s ease, transform 0.1s ease;
+}
+
+.caption-row-active {
+  border-color: #38bdf8 !important;
+  background-color: rgba(14, 116, 144, 0.18) !important;
+  box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.5);
+}
+
+/* Light Mode Theme Overrides */
+html.light body {
+  background-color: #f8fafc !important;
+  color: #0f172a !important;
+}
+
+html.light header {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  border-color: #e2e8f0 !important;
+}
+
+html.light .main-nav-pill.nav-active {
+  background: #ecfdf5 !important;
+  color: #047857 !important;
+  border-color: #6ee7b7 !important;
+}
+
+html.light .main-nav-pill.nav-inactive {
+  color: #475569 !important;
+}
+
+html.light .main-nav-pill.nav-inactive:hover {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+
+html.light .bg-slate-950,
+html.light .bg-slate-950\/95,
+html.light .bg-slate-950\/90,
+html.light .bg-slate-950\/80,
+html.light .bg-slate-950\/60,
+html.light .bg-slate-950\/50,
+html.light .bg-slate-950\/40 {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+
+html.light .bg-slate-900,
+html.light .bg-slate-900\/95,
+html.light .bg-slate-900\/90,
+html.light .bg-slate-900\/80 {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+}
+
+html.light .bg-slate-800,
+html.light .bg-slate-800\/90,
+html.light .bg-slate-800\/80 {
+  background-color: #f1f5f9 !important;
+  color: #1e293b !important;
+}
+
+html.light .border-slate-800,
+html.light .border-slate-800\/80,
+html.light .border-slate-700 {
+  border-color: #e2e8f0 !important;
+}
+
+html.light .text-white,
+html.light .text-slate-100,
+html.light .text-slate-200 {
+  color: #0f172a !important;
+}
+
+html.light .text-slate-300 {
+  color: #334155 !important;
+}
+
+html.light .text-slate-400,
+html.light .text-slate-500 {
+  color: #64748b !important;
+}
+
+html.light .citation-ayah {
+  background-color: #ecfdf5 !important;
+  border-color: #10b981 !important;
+  color: #065f46 !important;
+}
+
+html.light .citation-hadith {
+  background-color: #fffbeb !important;
+  border-color: #f59e0b !important;
+  color: #92400e !important;
+}
+
+html.light .citation-dhikr {
+  background-color: #f5f3ff !important;
+  border-color: #8b5cf6 !important;
+  color: #4c1d95 !important;
+}
+
+html.light .fn-tok-in-range {
+  background-color: #d1fae5 !important;
+  color: #065f46 !important;
+}
+
+html.light select,
+html.light input[type="text"],
+html.light input[type="url"],
+html.light input[type="search"],
+html.light input[type="number"],
+html.light input[type="password"],
+html.light textarea {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+}
+
+@media print {
+  header,
+  #section_input,
+  #section_editor,
+  #section_datasets,
+  #displayVideoColumn,
+  #floatingSelectionToolbar,
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: #ffffff !important;
+    color: #0f172a !important;
+  }
+  #formattedLectureStage {
+    border: none !important;
+    box-shadow: none !important;
+    background: #ffffff !important;
+    color: #0f172a !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+}

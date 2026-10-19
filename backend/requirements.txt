@@ -1,0 +1,14 @@
+# Wahy-Finder v2.0 — Python Backend Dependencies
+# Optimized for GTX 1050 (3GB VRAM) + Groq Cloud API (whisper-large-v3-turbo)
+
+fastapi>=0.115.0
+uvicorn[standard]>=0.30.0
+python-multipart>=0.0.9
+pydantic>=2.8.0
+httpx>=0.27.0
+aiofiles>=24.1.0
+groq>=0.11.0
+yt-dlp>=2024.10.7
+faster-whisper>=1.0.3
+ctranslate2>=4.4.0
+torch>=2.2.0
