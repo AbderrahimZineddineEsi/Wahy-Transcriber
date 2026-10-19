@@ -4,4 +4,6 @@ __pycache__/
 *.pyc
 backend/data_cache/
 backend/temp_media/
+backend/models/
+*.jsonl
 .DS_Store

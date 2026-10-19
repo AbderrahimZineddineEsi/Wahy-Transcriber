@@ -167,10 +167,71 @@ let currentState = {
     showHadithSource: true,
     showAdhkarTag: true,
     groupContiguousAyat: true
+  },
+  aiVerification: {
+    enabled: true,
+    autoVerifyAfterEngine: false,
+    targetScope: "HADITH_AND_CANDIDATES", // "ALL" | "HADITH_ONLY" | "HADITH_AND_CANDIDATES"
+    contextWindowWords: 25,
+    activeProvider: "gemini",             // "gemini" | "openrouter_jev" | "openrouter_chat" | "local_laya"
+
+    // Provider 1: Google Gemini API (Free Plan / Paid Tier)
+    geminiApiKey: "",
+    geminiModel: "gemini-3.5-flash-lite", // Default: latest 3.5 Flash-Lite
+    geminiFreeTierMode: true,
+    geminiRpmLimit: 12,
+    geminiBatchSize: 5,
+
+    // Provider 2 & 3: OpenRouter
+    openRouterApiKey: "",
+    openRouterMode: "jev",                // "jev" | "chat"
+    openRouterJevModel: "typesafe/jev-1.14",
+    openRouterSelectedModel: "deepseek/deepseek-chat",
+    openRouterModelsCatalog: [],
+    openRouterSearchQuery: "",
+
+    // Provider 4: Local Laya
+    layaCheckpoint: "convaiinnovations/laya-multilingual",
+    layaDevice: "auto",                   // "auto" | "cuda" | "cpu"
+    layaCustomCheckpointPath: "",
+    layaBackendReady: false,
+
+    // Display & Editor Verdict Filter
+    visibilityFilter: {
+      showCorrect: true,
+      showNotSure: true,
+      showFalse: false,
+      showUnverified: true
+    },
+
+    // Metrics Summary
+    metrics: {
+      engineDetectionTimeMs: 0,
+      totalRequests: 0,
+      successfulRequests: 0,
+      failedOrRateLimitedRequests: 0,
+      totalFindingsEvaluated: 0,
+      verdictCounts: { CORRECT: 0, FALSE: 0, NOT_SURE: 0 },
+      requestsFullTimeMs: 0,
+      avgRequestTimeMs: 0,
+      totalContextTokens: 0,
+      totalOutputTokens: 0,
+      avgContextTokensPerRequest: 0,
+      totalContextChars: 0,
+      avgContextCharsPerRequest: 0,
+      estimatedTotalCostUsd: 0.0
+    },
+
+    requestLogs: [],
+    trainingDatasetRecords: []
   }
 };
 
 window.state = currentState;
+
+const LS_AI_CONFIG_KEY = "wahyTranscriber_aiConfig_v22";
+const IDB_AI_TRAINING_DB_NAME = "WahyLayaTrainingDB";
+const IDB_AI_TRAINING_STORE_NAME = "verification_records";
 
 function loadSavedUserDatasetsAndPrefs() {
   try {
@@ -202,8 +263,139 @@ function loadSavedUserDatasetsAndPrefs() {
       }
     }
   } catch (e) {}
+
+  try {
+    const savedAi = localStorage.getItem(LS_AI_CONFIG_KEY);
+    if (savedAi) {
+      const parsed = JSON.parse(savedAi);
+      if (parsed && typeof parsed === "object") {
+        const currentVis = Object.assign({}, currentState.aiVerification.visibilityFilter, parsed.visibilityFilter || {});
+        currentState.aiVerification = Object.assign({}, currentState.aiVerification, parsed);
+        currentState.aiVerification.visibilityFilter = currentVis;
+      }
+    }
+  } catch (e) {}
 }
 loadSavedUserDatasetsAndPrefs();
+
+function saveAiConfigToStorage() {
+  try {
+    const cfg = {
+      enabled: currentState.aiVerification.enabled,
+      autoVerifyAfterEngine: currentState.aiVerification.autoVerifyAfterEngine,
+      targetScope: currentState.aiVerification.targetScope,
+      contextWindowWords: currentState.aiVerification.contextWindowWords,
+      activeProvider: currentState.aiVerification.activeProvider,
+      geminiApiKey: currentState.aiVerification.geminiApiKey,
+      geminiModel: currentState.aiVerification.geminiModel,
+      geminiFreeTierMode: currentState.aiVerification.geminiFreeTierMode,
+      geminiRpmLimit: currentState.aiVerification.geminiRpmLimit,
+      geminiBatchSize: currentState.aiVerification.geminiBatchSize,
+      openRouterApiKey: currentState.aiVerification.openRouterApiKey,
+      openRouterMode: currentState.aiVerification.openRouterMode,
+      openRouterJevModel: currentState.aiVerification.openRouterJevModel,
+      openRouterSelectedModel: currentState.aiVerification.openRouterSelectedModel,
+      layaCheckpoint: currentState.aiVerification.layaCheckpoint,
+      layaDevice: currentState.aiVerification.layaDevice,
+      layaCustomCheckpointPath: currentState.aiVerification.layaCustomCheckpointPath,
+      visibilityFilter: currentState.aiVerification.visibilityFilter
+    };
+    localStorage.setItem(LS_AI_CONFIG_KEY, JSON.stringify(cfg));
+  } catch (e) {}
+}
+
+// -----------------------------------------------------------------------------
+// IndexedDB Training Dataset Store (WahyLayaTrainingDB)
+// -----------------------------------------------------------------------------
+
+function openWahyLayaTrainingDB() {
+  return new Promise((resolve, reject) => {
+    if (!window.indexedDB) {
+      return reject(new Error("IndexedDB غير مدعوم في هذا المتصفح."));
+    }
+    const req = window.indexedDB.open(IDB_AI_TRAINING_DB_NAME, 1);
+    req.onupgradeneeded = (e) => {
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains(IDB_AI_TRAINING_STORE_NAME)) {
+        const store = db.createObjectStore(IDB_AI_TRAINING_STORE_NAME, { keyPath: "id" });
+        store.createIndex("verdict", "answers.verdict.choice", { unique: false });
+        store.createIndex("timestamp", "meta.converted_at", { unique: false });
+      }
+    };
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error || new Error("فشل فتح قاعدة بيانات WahyLayaTrainingDB"));
+  });
+}
+
+async function saveVerificationRecordToDB(record) {
+  if (!record || !record.id) return null;
+  try {
+    const db = await openWahyLayaTrainingDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction([IDB_AI_TRAINING_STORE_NAME], "readwrite");
+      const store = tx.objectStore(IDB_AI_TRAINING_STORE_NAME);
+      const req = store.put(record);
+      req.onsuccess = () => {
+        // Keep in-memory cache synchronized
+        const idx = currentState.aiVerification.trainingDatasetRecords.findIndex(r => r.id === record.id);
+        if (idx >= 0) {
+          currentState.aiVerification.trainingDatasetRecords[idx] = record;
+        } else {
+          currentState.aiVerification.trainingDatasetRecords.push(record);
+        }
+        resolve(record);
+      };
+      req.onerror = () => reject(req.error);
+    });
+  } catch (err) {
+    console.warn("Failed to persist verification record to IndexedDB:", err);
+    return null;
+  }
+}
+
+async function getAllVerificationRecordsFromDB() {
+  try {
+    const db = await openWahyLayaTrainingDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction([IDB_AI_TRAINING_STORE_NAME], "readonly");
+      const store = tx.objectStore(IDB_AI_TRAINING_STORE_NAME);
+      const req = store.getAll();
+      req.onsuccess = () => {
+        const records = req.result || [];
+        currentState.aiVerification.trainingDatasetRecords = records;
+        resolve(records);
+      };
+      req.onerror = () => reject(req.error);
+    });
+  } catch (err) {
+    console.warn("Failed to read verification records from IndexedDB:", err);
+    return [];
+  }
+}
+
+async function clearVerificationRecordsDB() {
+  try {
+    const db = await openWahyLayaTrainingDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction([IDB_AI_TRAINING_STORE_NAME], "readwrite");
+      const store = tx.objectStore(IDB_AI_TRAINING_STORE_NAME);
+      const req = store.clear();
+      req.onsuccess = () => {
+        currentState.aiVerification.trainingDatasetRecords = [];
+        resolve(true);
+      };
+      req.onerror = () => reject(req.error);
+    });
+  } catch (err) {
+    console.warn("Failed to clear IndexedDB records:", err);
+    return false;
+  }
+}
+
+// Automatically load training records into state on startup
+if (typeof window !== "undefined") {
+  getAllVerificationRecordsFromDB().catch(() => {});
+}
 
 function persistUserDatasetsToStorage() {
   try {

@@ -1,206 +1,167 @@
-# Wahy Studio — Wahy Transcriber
+# وحي ستوديو (Wahy Studio — Wahy-Transcriber v2.2)
 
-A local-first Arabic transcription and lecture editing workspace for audio, video, and YouTube media. Wahy Studio combines a Vanilla JavaScript frontend with a FastAPI backend, word-level timestamps, Arabic-aware transcription workflows, and tools for reviewing, editing, and exporting synchronized captions.
+> **منصة متكاملة لتفريغ المحاضرات والدروس العلمية، واكتشاف وتخريج الآيات القرآنية والأحاديث النبوية والأذكار، وبناء الكابشن المرئي المتزامن، مع طبقة تدقيق ذكية متعددة النماذج (AI Verification Layer) واستدلال محلي فائق السرعة عبر نموذج Laya (3GB VRAM).**
 
-> **Project status:** Active development. Interfaces and backend behavior may change as the project evolves.
+---
 
-## Features
+## 🌟 أبرز مميزات الإصدار v2.2 (Key Highlights)
 
-- **Multiple input sources**
-  - Paste or edit transcript text directly in the browser.
-  - Import subtitle files such as `.txt`, `.srt`, and `.vtt`.
-  - Upload local audio or video files.
-  - Download YouTube media through `yt-dlp`.
-- **Arabic speech transcription**
-  - Groq Cloud transcription using `whisper-large-v3-turbo`.
-  - Local transcription using `faster-whisper` with `large-v3-turbo` or `small` models.
-  - Word-level timestamps for synchronized editing and caption generation.
-  - Automatic fallback from Groq to local models when enabled.
-- **Media processing**
-  - FFmpeg-based audio extraction and normalization.
-  - Automatic conversion to 16 kHz mono WAV for local Whisper processing.
-  - Compressed MP3 generation for Groq uploads.
-  - Long recordings are split into sequential chunks while preserving time offsets.
-- **Editing and review tools**
-  - Synchronized media playback and transcript navigation.
-  - Caption and transcript editing.
-  - Qur’an, hadith, adhkar, and corpus-oriented review workflows supported by the frontend.
-  - Structured error diagnostics from the backend.
-- **Export and data workflows**
-  - Export transcript and caption content in formats supported by the frontend, including HTML, Markdown, TXT, JSON, and subtitle-oriented outputs.
-  - Optional corpus cache stored locally by the backend.
+### 1. 🤖 طبقة التدقيق الذكي للمقتبسات (AI Verification Layer)
+محرك تدقيق شرعي ولغوي يدعم 4 مزودين ونماذج عمل مختلفة للتحقق من صحة الاقتباسات وتمييز الاقتباس الحقيقي من كلام الشيخ الشارح العادي:
 
-## Architecture
+* **✨ Google Gemini 3.5 Flash-Lite (API & Free Plan):**
+  * يدعم أحدث إصدارات فلاش لايت (`gemini-3.5-flash-lite`, `gemini-3.1-flash-lite`, `gemini-3.8-flash`).
+  * **منظم معدل الطلبات (Sliding Window RPM Pacer):** التزام تلقائي بحد الخطة المجانية (12–15 RPM) دون توقف المفتاح.
+  * **معالجة حظر المعدل (429 / 503 Backoff):** قراءة تلقائية لترويسة `Retry-After` والتراجع الأسي التلقائي مع أزرار الإيقاف والاستئناف والتخطي.
+  * **تجميع الطلبات (Smart Batching):** حزم حتى 5–10 مقتبسات في طلب API واحد لتوفير الحصة المجانية.
+* **🎯 OpenRouter — نمط JEV المخصص (Decisions API):**
+  * اتصال مخصص بنماذج TypeSafe System-1 (`typesafe/jev-1.14`, `~typesafe/jev-latest`, `typesafe/jev-1.13`) عبر واجهة القرارات `/api/alpha/decisions`.
+  * إخراج احتمالات معايرة دقيقة لكل خيار (`CORRECT`, `FALSE`, `NOT_SURE`) بدون توليد نصوص وبكلفة رمزية ($0.042 لكل مليون توكن).
+* **🌐 OpenRouter — البحث الشامل في كافة النماذج (Universal LLMs):**
+  * شريط بحث فوري ومكتبة حية تضم أكثر من 500 نموذج (DeepSeek V3/R1, Qwen 2.5, Claude, Gemini, Llama, والنماذج المجانية `:free`).
+  * عرض أسعار التوكنز الحية والتوجيه التلقائي لطريقة الاستدعاء.
+* **🖥️ محرك Laya المحلي (Local Laya-Multilingual on GTX 1050 3GB VRAM):**
+  * تشغيل محلي 100% دون إنترنت لنموذج `convaiinnovations/laya-multilingual` (322M معمارية `mmBERT-base`).
+  * استهلاك اقتصادي جداً لذاكرة الرسوميات (~750MB في FP16) مع سرعة استدلال ~30ms لكل قرار.
+  * حماية ذكية لذاكرة الـ VRAM وتفريغ نموذج Whisper تلقائياً عند طلب الفحص، والتراجع التلقائي لمعالج CPU إذا قلّت الذاكرة عن 850MB.
 
-```text
+---
+
+### 2. 🎛️ فلترة إجابات الذكاء الاصطناعي في واجهة القراءة والمحرر (Visibility Filter)
+تحكم حر وتام في طريقة ظهور وتنسيق الاقتباسات داخل المحاضرة والكابشن المرئي حسب حكم الذكاء الاصطناعي:
+* **مجموعة أزرار الفلترة المتعددة (`#aiVerdictFilterGroup`):**
+  * `[✓ مقبول 🟢]` (`showCorrect`)
+  * `[؟ غير متأكد 🟡]` (`showNotSure`)
+  * `[✕ خاطئ / كلام عادي 🔴]` (`showFalse` — معطل افتراضياً بعد الفحص لتنقية المحاضرة تلقائياً، مع إمكانية تفعيله بضغطة زر لمراجعة المستبعدات).
+  * `[⏳ غير مفحوص ⚪]` (`showUnverified`)
+  * أزرار تبديل سريعة: `الكل`، `المقبول فقط`، `المقبول + غير المتأكد`، `المستبعد فقط`.
+* **سلوك العرض الذكي:** عند تصنيف الاقتباس كـ `FALSE` وإخفائه، **لا يُحذف النص الأصلي** بل تُرفع عنه التنسيقات والأقواس ليعود ككلام عادي في تفريغ المحاضرة وفي ترجمات الفيديو (Subtitles).
+* **شارات التوثيق اللحظية:** إظهار نسبة الثقة بدقة على الاقتباسات: `🟢 مؤكد (94%)`، `🟡 غير متأكد (58%)`، `🔴 كلام عادي (89%)`.
+
+---
+
+### 3. 📊 استوديو سجل الطلبات والقياسات الحية (Tab 5: AI & Logs)
+تبويب خامس رئيسي مخصص للتحليل والمراقبة والضبط:
+* **شريط المؤشرات الحية (8 بطاقات KPI):**
+  * زمن اكتشاف المحرك اللغوي • إجمالي الطلبات ونسبة النجاح • زمن الطلبات الكلي (Wall-Clock & Cumulative) • متوسط زمن الطلب • إجمالي السياق المرسل (توكن وحروف) • متوسط السياق لكل طلب • توزيع القرارات (صحيح / خاطئ / غير متأكد) • التكلفة الفعلية المقدرة بالدولار ($USD).
+* **جدول فحص الطلبات التفصيلي (`Requests Inspector`):**
+  * استعراض كل طلب وتوقيته والنموذج وشريط الاحتمالات وتكلفته وزمنه.
+  * **التصحيح البشري الفوري (Human Gold Override):** أزرار تصحيح مباشرة `[🟢]` `[🔴]` `[🟡]` داخل الجدول وفي بطاقة الفحص (Finding Inspector) تمنح رأي المستخدم أولوية قصوى وتخزنه كبيانات تدريب ذهبية.
+  * **نافذة فحص الحزمة (`Inspect Payload Modal`):** عرض الـ JSON الدقيق المُرسل للنموذج (`state` و `questions`) والرد الخام المستلم.
+
+---
+
+### 4. 📦 محوّل بيانات Laya الشامل وسكريبت التدريب (Converter & Fine-Tuning)
+* **المحوّل الشامل (Universal Laya Converter):**
+  * تحويل سجلات التدقيق أياً كان مصدرها (Gemini, OpenRouter LLMs, JEV, Human Overrides) إلى صيغة `.jsonl` قياسية متوافقة تماماً مع معايير تدريب `Laya`.
+  * توليد احتمالات ناعمة (Laplace-smoothed soft targets) لمخرجات Gemini/LLM وهدف معلم فائق الدقة (0.98) للتصحيحات البشرية.
+* **بنك بيانات التدريب التراكمي:**
+  * حفظ تلقائي للقرارات عبر IndexedDB (`WahyLayaTrainingDB`) عبر جميع المحاضرات وتصدير بضغطة زر.
+* **سكريبت التدريب الجاهز ([`backend/finetune_laya.py`](file:///home/zeno/Documents/work/new_projects/Wahy-Transcriber/backend/finetune_laya.py)):**
+  * **نمط `--head-only`:** مخصص للأجهزة الاقتصادية مثل GTX 1050 (3GB VRAM)؛ يجمّد نموذج `mmBERT` (307M) ويدرّب رأس القرارات (15M) فقط مع معايرة درجات الحرارة في أقل من 1.3GB VRAM.
+  * **نمط `--full-finetune`:** لتدريب كامل على بطاقات السحابة (Google Colab / Kaggle T4 16GB).
+
+---
+
+### 5. 🎬 محرك العرض والتحرير وبناء الكابشن (Core Features)
+* **عرض متزامن (Display View):** مشغل فيديو متطور متزامن مع نص المحاضرة المنسق، مزود بـ **شريط تتبع الكلمة المقروءة اللحظي** وتمرير سلس ذكي يتوقف تلقائياً أثناء التحديد أو التحرير.
+* **استوديو إضافة المفقود (FN Studio):** تحديد الآيات والأحاديث والأذكار الفائتة بنقرتين (أول كلمة وآخر كلمة) مع تظليل تفاعلي واقتراحات فورية من القواعد ومطابقة الرسم العثماني ودعم الروايات العشر.
+* **الكابشن الذكي غير المنقسم (Atomic Captions):** بناء ترجمات متزامنة (`SRT`, `VTT`, `ASS`) تضمن بقاء الآيات والأحاديث كوحدة واحدة غير منقسمة، مع ضبط زمني دقيق للكلمات عبر خوارزمية أطول تسلسل مشترك (LCS).
+* **إدارة القواعد والأذكار (Datasets & Adhkar Studio):** إدارة وبحث واستيراد وتصدير قاعدة الأذكار والأدعية ومزامنتها محلياً وسحابياً.
+
+---
+
+## 🏗️ هيكلية المشروع (Project Architecture)
+
+```
 Wahy-Transcriber/
-├── index.html                 # Main browser application
-├── css/                       # Frontend styles
-├── js/                        # Frontend modules and editor logic
-├── data/                      # Optional static datasets
+├── index.html                       # الواجهة الرئيسية (5 تبويبات، أشرطة الفلترة، استوديو الذكاء الاصطناعي)
+├── css/
+│   └── styles.css                   # تنسيقات الواجهة، شارات الذكاء الاصطناعي، وبطاقات القياسات
+├── js/
+│   ├── state.js                     # إدارة الحالة العامة ومخزن IndexedDB للتدريب
+│   ├── ai-verifier.js               # محرك التحقق بالذكاء الاصطناعي (Gemini, JEV, OpenRouter, Laya) والمحوّل الشامل
+│   ├── engine.js                    # محرك المطابقة والاكتشاف اللغوي الصوتي للمقتبسات
+│   ├── corpus-loader.js             # تحميل قواعد القرآن والحديث والأذكار
+│   ├── caption-builder.js           # بناء وتوليد الكابشن مع احترام فلترة الذكاء الاصطناعي
+│   ├── render.js                    # صياغة الواجهة، شريط الفلترة، جدول الطلبات، وبطاقات القياس
+│   ├── editor.js                    # المحرر الذكي واستوديو FN والتعديل اليدوي للقرارات
+│   ├── events.js                    # ربط كافة عناصر الواجهة والأحداث والأزرار
+│   └── error-handler.js             # فخ الأخطاء التشخيصي ونافذة النسخ للذكاء الاصطناعي
 ├── backend/
-│   ├── app.py                 # FastAPI server and API routes
-│   ├── media_processor.py     # Upload, YouTube, FFmpeg, and chunk processing
-│   ├── transcriber.py         # Groq and faster-whisper transcription engines
-│   └── requirements.txt       # Python dependencies
-├── run.sh                     # Linux/macOS launcher
-├── run.bat                    # Windows launcher
-└── .gitignore
+│   ├── app.py                       # خادم FastAPI، نقاط نهاية Laya، وتفريغ الصوت والوسائط
+│   ├── laya_engine.py               # محرك Laya المحلي الآمن على GTX 1050 (3GB VRAM)
+│   ├── laya_converter.py            # أداة تحويل السجلات إلى بيانات تدريب Laya JSONL
+│   ├── finetune_laya.py             # سكريبت التدريب الدقيق المحلي والسحابي
+│   ├── transcriber.py               # تفريغ الصوت عبر faster-whisper أو Groq
+│   ├── media_processor.py           # معالجة يوتيوب وتحويل الوسائط عبر yt-dlp و ffmpeg
+│   └── requirements.txt             # متطلبات بايثون (torch, laya, transformers, fastapi)
+├── run.sh                           # سكريبت التشغيل التلقائي على Linux / macOS
+├── run.bat                          # سكريبت التشغيل التلقائي على Windows
+└── wahy_ai_verification_and_laya_plan.md # المرجع المعماري ومواصفات النظام
 ```
 
-The backend serves the frontend at `http://127.0.0.1:8000` and exposes the transcription API. Temporary media is written to `backend/temp_media/`, while optional corpus data is cached under `backend/data_cache/`; both locations are ignored by Git.
+---
 
-## Requirements
+## 🚀 البدء السريع وطريقة التشغيل (Quick Start)
 
-- Python 3.9 or newer
-- FFmpeg and FFprobe available on your system `PATH`
-- A modern browser
-- Optional:
-  - A **Groq API key** for cloud transcription.
-  - A CUDA-capable NVIDIA GPU for local Whisper transcription. The implementation is optimized for constrained GPUs using INT8 processing, but CPU execution can also be used when CUDA is unavailable.
+### الطريقة 1: التشغيل المباشر عبر المتصفح (Client-Only Mode)
+* لا يتطلب أي خادم خلفي! افتح ملف `index.html` في أي متصفح حديث (Chrome / Firefox / Edge).
+* يتيح لك فوراً:
+  * لصق النصوص وملفات الترجمة (`.txt / .srt / .vtt`).
+  * تشغيل الاكتشاف ومطابقة القرآن والحديث والأذكار محلياً في المتصفح.
+  * التدقيق بنماذج **Gemini 3.5 Flash-Lite** و **OpenRouter (JEV & Universal)** عبر مفاتيح API الخاصة بك.
+  * تصدير بيانات تدريب Laya من المتصفح مباشرة.
 
-### Installing FFmpeg
+---
 
-Install FFmpeg using your operating system's package manager, then verify both commands are available:
+### الطريقة 2: التشغيل الكامل مع الخادم المحلي (Full-Stack Mode)
+يتيح تفريغ يوتيوب، رفع الملفات الصوتية والمرئية، وتشغيل **نموذج Laya المحلي** على كارت الشاشة (GTX 1050 3GB):
 
+#### على أنظمة Linux / macOS:
 ```bash
-ffmpeg -version
-ffprobe -version
+# إعطاء صلاحية التشغيل
+chmod +x run.sh
+
+# التشغيل التلقائي (يقوم بإنشاء البيئة وتثبيت المتطلبات وتشغيل الخادم)
+./run.sh
 ```
 
-Examples:
-
-```bash
-# Ubuntu/Debian
-sudo apt update && sudo apt install ffmpeg
-
-# macOS with Homebrew
-brew install ffmpeg
-
-# Windows with winget
-winget install Gyan.FFmpeg
-```
-
-## Quick start
-
-### Windows
-
-From the repository root, run:
-
+#### على أنظمة Windows:
+انقر نقراً مزدوجاً على ملف `run.bat` أو شغّله عبر موجه الأوامر:
 ```bat
 run.bat
 ```
 
-The script creates `.venv` when needed, installs `backend/requirements.txt`, and starts the FastAPI server.
+سيفتح النظام المتصفح تلقائياً على الرابط: `http://127.0.0.1:8000`
 
-### Linux/macOS
+---
 
-Make the launcher executable once, then run it:
+## ⚙️ إعداد مزودي الذكاء الاصطناعي (AI Setup)
 
-```bash
-chmod +x run.sh
-./run.sh
-```
+افتح تبويب **«🤖 الذكاء الاصطناعي والسجل»**:
+1. **Google Gemini:** أدخل مفتاحك من Google AI Studio، واختر `gemini-3.5-flash-lite`. فعّل خيار `الخطة المجانية (Free Tier)` لحماية حصتك من التجاوز.
+2. **OpenRouter:** أدخل مفتاح OpenRouter:
+   * اختر نمط `🎯 JEV Decisions API` لاستخدام نماذج `typesafe/jev-1.14`.
+   * أو استخدم نمط `💬 البحث الشامل` لكتابة اسم أي نموذج تريده (مثل `deepseek/deepseek-chat` أو `qwen/qwen-2.5-72b-instruct` أو `free`).
+3. **Local Laya:** في بطاقة Laya، اضغط على **«تحميل Laya محلياً»**؛ سيتم فحص الذاكرة وتفعيل النموذج على `CUDA FP16` أو `CPU`.
 
-Open [http://127.0.0.1:8000](http://127.0.0.1:8000) in your browser.
+---
 
-### Manual setup
+## 🧪 تدريب Laya محلياً (Fine-Tuning Laya)
 
-```bash
-python3 -m venv .venv
-source .venv/bin/activate              # Windows: .venv\\Scripts\\activate
-python -m pip install --upgrade pip
-pip install -r backend/requirements.txt
-
-# Optional: configure Groq for cloud transcription
-export GROQ_API_KEY="your_api_key_here" # Windows PowerShell: $env:GROQ_API_KEY="your_api_key_here"
-
-cd backend
-uvicorn app:app --host 127.0.0.1 --port 8000 --reload
-```
-
-If you only need the browser-based text and subtitle tools, you can open `index.html` directly or serve the repository with a simple local web server. You will need the FastAPI backend for YouTube downloads, uploaded-media transcription, and backend-managed media playback.
-
-## Transcription modes
-
-The backend supports these model selections:
-
-| Mode | Description | Best for |
-| --- | --- | --- |
-| `groq-whisper-large-v3-turbo` | Uses Groq Cloud with `whisper-large-v3-turbo`; can fall back locally when enabled. | Fast cloud transcription with a Groq API key |
-| `local-turbo-int8` | Uses local `faster-whisper` with `large-v3-turbo` in INT8 mode. | Higher local quality on compatible hardware |
-| `local-small-int8` | Uses local `faster-whisper` with the `small` model in INT8 mode. | Lower VRAM usage and safer fallback processing |
-
-When the Groq mode is selected, long audio is automatically divided into smaller chunks before upload. The resulting word timestamps are stitched back together using each chunk's original time offset.
-
-## API overview
-
-### Health check
-
-```http
-GET /api/health
-```
-
-Returns backend status, FFmpeg availability, CUDA availability, detected GPU information, and whether `GROQ_API_KEY` is configured.
-
-### Transcribe media
-
-```http
-POST /api/transcribe
-Content-Type: multipart/form-data
-```
-
-Accepted form fields include:
-
-- `youtube_url` — a YouTube URL, or
-- `file` — an uploaded audio/video file
-- `model_selected` — one of the supported model names
-- `groq_api_key` — optional key supplied by the client
-- `auto_fallback` — whether local fallback is enabled
-
-A successful response includes the media URL, title, selected model, duration, full text, and an array of timestamped words with character offsets.
-
-Example health check:
+بعد تجميع وتدقيق المحاضرات وتصدير ملف `wahy_laya_train.jsonl` عبر بنك البيانات:
 
 ```bash
-curl http://127.0.0.1:8000/api/health
+# التدريب الاقتصادي لرأس القرارات على كارت GTX 1050 (أقل من 1.3GB VRAM):
+python backend/finetune_laya.py --data wahy_laya_train.jsonl --head-only --epochs 5
+
+# التدريب الكامل على Google Colab / Kaggle:
+python backend/finetune_laya.py --data wahy_laya_train.jsonl --full-finetune --epochs 3
 ```
 
-## Development notes
+---
 
-- Frontend code is written in plain JavaScript using ES modules; no frontend build step is currently required.
-- The FastAPI application enables CORS for local development.
-- Temporary uploads, downloaded media, generated audio files, and cache files should not be committed.
-- The backend returns structured diagnostic information for unexpected errors, including the endpoint, selected model, input source, and traceback.
-- Do not expose the development server or Groq API keys publicly without adding appropriate authentication, access controls, and production configuration.
-
-## Troubleshooting
-
-### `FFmpeg was not found`
-
-Install FFmpeg and FFprobe, confirm they are on `PATH`, then restart the launcher or terminal.
-
-### Groq transcription fails
-
-Verify that the API key is valid, that the selected model is available to your account, and that the media can be processed within the provider's limits. Enable automatic fallback to try local transcription instead.
-
-### CUDA out-of-memory errors
-
-Use `local-small-int8`, enable automatic fallback, or run transcription on the CPU. Closing other GPU-heavy applications may also help.
-
-### The page loads but transcription does not work
-
-Start the FastAPI backend with `run.bat`, `run.sh`, or Uvicorn, then use `http://127.0.0.1:8000` rather than opening the HTML file from an unrelated origin.
-
-## Contributing
-
-Contributions, bug reports, and suggestions are welcome. Before opening a pull request:
-
-1. Describe the problem or improvement clearly.
-2. Test the frontend and backend paths affected by the change.
-3. Avoid committing `.venv/`, generated media, cache files, API keys, or model artifacts.
-4. Include screenshots or sample input/output when changing the editor UI or export behavior.
-
-## License
-
-No license file is currently included in this repository. Until a license is added, the project's source code should be treated as **all rights reserved**.
+## 📄 التراخيص والاعتمادات (License & Credits)
+* بني المشروع بأحدث تقنيات الويب ومعايير معالجة النصوص الإسلامية وعلوم الحديث والقرآن الكريم.
+* يستخدم المشروع حزم: [Laya](https://github.com/convaiinnovations/laya), [Faster-Whisper](https://github.com/SYSTRAN/faster-whisper), [Transformers](https://github.com/huggingface/transformers), [FastAPI](https://fastapi.tiangolo.com).

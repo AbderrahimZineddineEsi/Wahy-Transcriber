@@ -43,10 +43,13 @@ from transcriber import (
     GroqAPIError,
     LocalWhisperError,
     build_unified_word_schema,
+    cleanup_cuda_vram,
     get_vram_allocated_mb,
     transcribe_with_groq_chunks,
     transcribe_with_local_faster_whisper,
 )
+from laya_engine import laya_verifier
+from laya_converter import convert_verification_records_to_laya_jsonl
 
 BACKEND_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = BACKEND_DIR.parent
@@ -265,6 +268,117 @@ async def clear_backend_corpus_cache() -> Dict[str, Any]:
     if CORPUS_CACHE_FILE.exists():
         CORPUS_CACHE_FILE.unlink()
     return {"cleared": True}
+
+
+@app.get("/api/laya/status")
+async def api_laya_status() -> Dict[str, Any]:
+    """Check local Laya model status, device, and GTX 1050 VRAM."""
+    status = laya_verifier.get_status()
+    status["installed"] = True
+    status["laya_installed"] = True
+    return status
+
+
+@app.post("/api/laya/load")
+async def api_laya_load(request: Request) -> Dict[str, Any]:
+    """Load Laya model with 3GB VRAM protection, automatically unloading Whisper."""
+    body = {}
+    try:
+        body = await request.json()
+    except Exception:
+        pass
+    checkpoint = body.get("checkpoint") or "convaiinnovations/laya-multilingual"
+    preferred_device = body.get("device") or "auto"
+    return laya_verifier.load_model(
+        checkpoint_id_or_path=checkpoint,
+        preferred_device=preferred_device,
+        unload_whisper_fn=cleanup_cuda_vram,
+    )
+
+
+@app.post("/api/laya/unload")
+async def api_laya_unload() -> Dict[str, Any]:
+    """Unload Laya from GPU/RAM and clean CUDA VRAM."""
+    status = laya_verifier.unload_model()
+    cleanup_cuda_vram()
+    return status
+
+
+@app.post("/api/laya/predict")
+async def api_laya_predict(request: Request) -> Dict[str, Any]:
+    """
+    Run local Laya-Multilingual inference.
+    Supports either:
+    1. Single envelope: { "state": {...}, "questions": {...}, "max_len": 1024 }
+    2. Batched findings: { "items": [ { "finding_id": "...", "state": {...}, "questions": {...} } ] }
+    """
+    body = await request.json()
+    max_len = int(body.get("max_len") or 1024)
+
+    # Batch support
+    if "items" in body and isinstance(body["items"], list):
+        results = []
+        for item in body["items"]:
+            finding_id = item.get("finding_id") or ""
+            state = item.get("state") or {}
+            questions = item.get("questions") or {}
+            pred = laya_verifier.predict_decision(state, questions, max_len=max_len)
+            results.append({
+                "finding_id": finding_id,
+                "answers": pred.get("answers", {}),
+                "latency_ms": pred.get("latency_ms", 0),
+                "model": pred.get("model", ""),
+                "device": pred.get("device", ""),
+            })
+        return {"items": results, "total": len(results)}
+
+    state = body.get("state") or {}
+    questions = body.get("questions") or {}
+    return laya_verifier.predict_decision(state, questions, max_len=max_len)
+
+
+@app.post("/api/laya/convert-dataset")
+async def api_laya_convert_dataset(request: Request) -> Dict[str, Any]:
+    """Convert accumulated verification records into Laya JSONL training format."""
+    body = await request.json()
+    records = body.get("records") or []
+    jsonl_str, stats = convert_verification_records_to_laya_jsonl(records)
+    return {
+        "success": True,
+        "jsonl": jsonl_str,
+        "stats": stats,
+    }
+
+
+@app.post("/api/openrouter/decisions")
+async def api_openrouter_decisions(request: Request) -> JSONResponse:
+    """
+    Server-side proxy for OpenRouter Decisions API (https://openrouter.ai/api/alpha/decisions).
+    Bypasses browser CORS restrictions while preserving user's OpenRouter API key.
+    """
+    auth_header = request.headers.get("authorization") or ""
+    if not auth_header:
+        return JSONResponse(status_code=400, content={"error": True, "message": "Missing Authorization header."})
+
+    body = await request.json()
+    target_url = "https://openrouter.ai/api/alpha/decisions"
+    headers = {
+        "Authorization": auth_header,
+        "Content-Type": "application/json",
+        "HTTP-Referer": "https://wahy-transcriber.local",
+        "X-Title": "Wahy Transcriber AI Verifier",
+    }
+
+    try:
+        async with httpx.AsyncClient(timeout=120.0) as client:
+            resp = await client.post(target_url, headers=headers, json=body)
+            try:
+                resp_data = resp.json()
+            except Exception:
+                resp_data = {"text": resp.text}
+            return JSONResponse(status_code=resp.status_code, content=resp_data)
+    except Exception as exc:
+        return JSONResponse(status_code=502, content={"error": True, "message": f"Proxy request failed: {exc}"})
 
 
 @app.post("/api/diagnostic-test-error")

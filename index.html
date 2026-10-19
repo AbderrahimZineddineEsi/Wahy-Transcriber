@@ -72,6 +72,12 @@
           <span>القواعد والأذكار</span>
           <span id="navBadgeAdhkarCount" class="px-1.5 py-0.2 rounded-full bg-violet-500/20 text-violet-300 font-mono text-[10px]">42</span>
         </button>
+
+        <button type="button" id="navBtn_ai_logs" class="main-nav-pill nav-inactive px-3 sm:px-4 py-1.5 text-xs flex items-center gap-1.5" title="تدقيق المقتبسات بالذكاء الاصطناعي وسجل الطلبات ونموذج Laya">
+          <span>🤖</span>
+          <span>الذكاء الاصطناعي والسجل</span>
+          <span id="navBadgeAiVerifiedCount" class="px-1.5 py-0.2 rounded-full bg-sky-500/20 text-sky-300 font-mono text-[10px]">0</span>
+        </button>
       </nav>
 
       <!-- Left: Compact Utility Actions (Undo, Export Menu, Theme, Settings Menu) -->
@@ -278,6 +284,94 @@
         </div>
       </div>
 
+      <!-- AI Verification Quick Bar & Real-time Metrics Ribbon -->
+      <div id="aiVerificationQuickBar" class="rounded-2xl bg-slate-900/90 border border-slate-800/90 p-3.5 space-y-3">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div class="flex flex-wrap items-center gap-2 text-xs">
+            <span class="font-bold text-sky-300 flex items-center gap-1.5">
+              <span>🤖</span>
+              <span>التدقيق الذكي للمقتبسات:</span>
+            </span>
+
+            <select id="selAiQuickProvider" class="rounded-xl bg-slate-950 border border-slate-800 text-xs text-sky-200 px-3 py-1.5 font-semibold focus:outline-none focus:border-sky-500">
+              <option value="gemini">✨ Google Gemini (3.5 Flash-Lite)</option>
+              <option value="openrouter_jev">🎯 OpenRouter — JEV Mode (Decisions API)</option>
+              <option value="openrouter_chat">💬 OpenRouter — Chat LLMs (DeepSeek / Qwen / etc.)</option>
+              <option value="local_laya">🖥️ Laya-Multilingual (GTX 1050 3GB VRAM)</option>
+            </select>
+
+            <select id="selAiQuickScope" class="rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-200 px-3 py-1.5 focus:outline-none focus:border-sky-500">
+              <option value="HADITH_AND_CANDIDATES">الأحاديث والمشتبه به فقط (موصى به)</option>
+              <option value="HADITH_ONLY">الأحاديث النبوية فقط</option>
+              <option value="ALL">جميع المقتبسات (قرآن + حديث + أذكار)</option>
+            </select>
+          </div>
+
+          <div class="flex items-center gap-2 mr-auto">
+            <button type="button" id="btnStartAiVerification" class="px-4 py-1.5 rounded-xl bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 text-white font-bold text-xs shadow-md transition flex items-center gap-1.5">
+              <span>🤖</span>
+              <span>بدء التدقيق الذكي</span>
+            </button>
+            <button type="button" id="btnPauseAiVerification" class="hidden px-3 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-xs font-bold transition">
+              ⏸ إيقاف مؤقت
+            </button>
+            <button type="button" id="btnCancelAiVerification" class="hidden px-3 py-1.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 text-xs font-bold transition">
+              ✕ إلغاء
+            </button>
+            <button type="button" id="btnGoToAiLogsTab" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-xs font-semibold transition" title="فتح استوديو النماذج وسجل الطلبات">
+              📊 السجل والتفاصيل
+            </button>
+          </div>
+        </div>
+
+        <!-- Live Progress & Status Bar (Hidden when idle) -->
+        <div id="aiVerificationProgressWrap" class="hidden rounded-xl bg-slate-950 border border-sky-500/30 p-2.5 space-y-1.5">
+          <div class="flex items-center justify-between text-xs">
+            <span id="aiVerificationStatusMsg" class="text-sky-300 font-semibold animate-pulse">جاري فحص المقتبسات...</span>
+            <span id="aiVerificationPercentLabel" class="font-mono text-sky-400 font-bold">0%</span>
+          </div>
+          <div class="h-1.5 rounded-full bg-slate-800 overflow-hidden">
+            <div id="aiVerificationProgressBar" class="h-full bg-gradient-to-l from-sky-400 via-indigo-400 to-emerald-400 transition-all duration-200" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <!-- 8-Card Telemetry & Performance Strip (#aiMetricsSummaryGrid) -->
+        <div id="aiMetricsSummaryGrid" class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2 text-xs pt-1">
+          <div class="ai-metric-card">
+            <span class="text-[10px] text-slate-400">زمن المحرك</span>
+            <strong id="aiMetricEngineTime" class="text-emerald-400 font-mono text-xs">0 ms</strong>
+          </div>
+          <div class="ai-metric-card">
+            <span class="text-[10px] text-slate-400">إجمالي الطلبات</span>
+            <strong id="aiMetricTotalReq" class="text-sky-400 font-mono text-xs">0 طلب</strong>
+          </div>
+          <div class="ai-metric-card">
+            <span class="text-[10px] text-slate-400">الزمن الكلي</span>
+            <strong id="aiMetricFullTime" class="text-indigo-300 font-mono text-xs">0 s</strong>
+          </div>
+          <div class="ai-metric-card">
+            <span class="text-[10px] text-slate-400">متوسط زمن الطلب</span>
+            <strong id="aiMetricAvgTime" class="text-cyan-300 font-mono text-xs">0 ms</strong>
+          </div>
+          <div class="ai-metric-card">
+            <span class="text-[10px] text-slate-400">إجمالي السياق</span>
+            <strong id="aiMetricTotalTokens" class="text-amber-300 font-mono text-xs">0 توكن</strong>
+          </div>
+          <div class="ai-metric-card">
+            <span class="text-[10px] text-slate-400">متوسط السياق</span>
+            <strong id="aiMetricAvgContext" class="text-teal-300 font-mono text-xs">0 توكن/طلب</strong>
+          </div>
+          <div class="ai-metric-card">
+            <span class="text-[10px] text-slate-400">نتائج التصنيف</span>
+            <strong id="aiMetricVerdicts" class="text-slate-200 font-mono text-[11px] truncate">0✓ | 0✕ | 0؟</strong>
+          </div>
+          <div class="ai-metric-card">
+            <span class="text-[10px] text-slate-400">التكلفة التقديرية</span>
+            <strong id="aiMetricCost" class="text-emerald-400 font-mono text-xs">$0.00</strong>
+          </div>
+        </div>
+      </div>
+
       <!-- Dual Display Grid: Lecture Next to Video Player -->
       <div id="dualWorkspaceGrid" class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
 
@@ -299,6 +393,36 @@
                     <span>تتبع الكلمة تلقائياً</span>
                   </label>
 
+                  <!-- AI Verdict Multi-Toggle Filter Group (User requirement: freely toggle showing correct, not sure, false, unverified) -->
+                  <div id="aiVerdictFilterGroup" class="flex flex-wrap items-center gap-1 p-1 rounded-xl bg-slate-950 border border-slate-800 text-xs">
+                    <label class="ai-filter-pill ai-filter-pill-correct active" title="إظهار المقتبسات المقبولة / الصحيحة">
+                      <input type="checkbox" id="chkFilterShowCorrect" checked class="hidden" />
+                      <span>✓ مقبول 🟢</span>
+                    </label>
+
+                    <label class="ai-filter-pill ai-filter-pill-notsure active" title="إظهار المقتبسات غير المؤكدة أو التقريبية">
+                      <input type="checkbox" id="chkFilterShowNotSure" checked class="hidden" />
+                      <span>؟ غير متأكد 🟡</span>
+                    </label>
+
+                    <label class="ai-filter-pill ai-filter-pill-false" title="إظهار المقتبسات المستبعدة (كلام عادي أو تشابه لفظي خاطئ)">
+                      <input type="checkbox" id="chkFilterShowFalse" class="hidden" />
+                      <span>✕ خاطئ 🔴</span>
+                    </label>
+
+                    <label class="ai-filter-pill ai-filter-pill-unverified active" title="إظهار المقتبسات التي لم تفحص بعد">
+                      <input type="checkbox" id="chkFilterShowUnverified" checked class="hidden" />
+                      <span>⏳ غير مفحوص ⚪</span>
+                    </label>
+
+                    <div class="h-3.5 w-px bg-slate-800 mx-0.5 hidden xl:block"></div>
+                    <div class="flex items-center gap-1 text-[10px]">
+                      <button type="button" id="btnFilterPreset_ALL" class="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300">الكل</button>
+                      <button type="button" id="btnFilterPreset_CORRECT_ONLY" class="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-emerald-300">الصحيح</button>
+                      <button type="button" id="btnFilterPreset_FALSE_ONLY" class="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-rose-300">الخاطئ</button>
+                    </div>
+                  </div>
+
                   <select id="selLectureCategoryFilter" class="rounded-lg bg-slate-950 border border-slate-800 text-xs text-slate-200 px-2.5 py-1">
                     <option value="ALL">الكل</option>
                     <option value="ayah">﴿ الآيات فقط ﴾</option>
@@ -307,7 +431,7 @@
                   </select>
 
                   <input type="search" id="inpLectureSearch" placeholder="🔍 بحث في المحاضرة..."
-                    class="w-36 sm:w-44 rounded-lg bg-slate-950 border border-slate-800 px-2.5 py-1 text-xs text-slate-200 focus:border-emerald-500 focus:outline-none" />
+                    class="w-32 sm:w-40 rounded-lg bg-slate-950 border border-slate-800 px-2.5 py-1 text-xs text-slate-200 focus:border-emerald-500 focus:outline-none" />
                 </div>
               </div>
 
@@ -779,6 +903,317 @@
       </div>
     </section>
 
+    <!-- =================================================================== -->
+    <!-- SECTION 5: AI VERIFICATION, REQUEST TELEMETRY & LAYA STUDIO         -->
+    <!-- =================================================================== -->
+    <section id="section_ai_logs" class="hidden space-y-6">
+
+      <!-- Top Summary Header -->
+      <div class="rounded-2xl bg-gradient-to-r from-slate-900 via-indigo-950/40 to-slate-900 border border-slate-800 p-4 flex flex-wrap items-center justify-between gap-3 shadow-xl">
+        <div class="space-y-1">
+          <h2 class="text-base font-bold text-white flex items-center gap-2">
+            <span>🤖</span>
+            <span>استوديو التدقيق بالذكاء الاصطناعي ونموذج Laya المحلي</span>
+            <span class="px-2.5 py-0.5 rounded-full bg-sky-500/20 text-sky-300 text-xs font-mono font-bold">Wahy v2.2</span>
+          </h2>
+          <p class="text-xs text-slate-300">
+            تدقيق المقتبسات بدقة عبر Gemini 3.5 Flash-Lite و OpenRouter JEV ونموذج Laya-Multilingual المحلي (3GB VRAM)، مع سجل تتبع كامل ومحول موحد لبيانات التدريب.
+          </p>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button type="button" id="btnRunAiVerificationFromLogs" class="px-4 py-2 rounded-xl bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 text-white font-bold text-xs shadow-md transition flex items-center gap-1.5">
+            <span>⚡</span>
+            <span>بدء تدقيق المحاضرة الحالية</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- SUB-PANEL 1: Provider Configuration & Model Combobox Studio -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 items-stretch">
+
+        <!-- Card 1: Google Gemini (Free Tier / Paid) -->
+        <div class="rounded-2xl bg-slate-900/95 border border-slate-800/90 p-4 space-y-3.5 flex flex-col justify-between shadow-lg">
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-white text-sm flex items-center gap-1.5">
+                <span>✨</span>
+                <span>Google Gemini API</span>
+              </span>
+              <span class="px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 text-[10px] font-bold">خطة مجانية مدعومة</span>
+            </div>
+
+            <div class="space-y-1.5 text-xs">
+              <label class="text-slate-300 font-medium">مفتاح API (Gemini API Key):</label>
+              <input type="password" id="inpGeminiApiKey" placeholder="AIzaSy..."
+                class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-1.5 text-slate-100 font-mono text-xs focus:outline-none focus:border-sky-500" />
+            </div>
+
+            <div class="space-y-1.5 text-xs">
+              <label class="text-slate-300 font-medium">النموذج المختار:</label>
+              <select id="selGeminiModel" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-1.5 text-slate-200 text-xs focus:outline-none">
+                <option value="gemini-3.5-flash-lite">gemini-3.5-flash-lite (الأحدث والأدق — موصى به)</option>
+                <option value="gemini-3.1-flash-lite">gemini-3.1-flash-lite</option>
+                <option value="gemini-3.8-flash">gemini-3.8-flash (الأعلى قدرة)</option>
+                <option value="gemini-2.5-flash-lite">gemini-2.5-flash-lite</option>
+              </select>
+            </div>
+
+            <div class="pt-2 border-t border-slate-800/80 space-y-2 text-xs">
+              <label class="flex items-center gap-2 cursor-pointer select-none">
+                <input type="checkbox" id="chkGeminiFreeTierMode" checked class="rounded text-sky-500" />
+                <span class="text-slate-200 font-medium">حماية الخطة المجانية (Free-Tier RPM Pacer)</span>
+              </label>
+
+              <div class="grid grid-cols-2 gap-2 text-[11px] text-slate-400">
+                <div>
+                  <span>الحد الأقصى للطلبات/د:</span>
+                  <input type="number" id="inpGeminiRpmLimit" value="12" min="1" max="60"
+                    class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2 py-1 text-slate-200 text-xs mt-0.5" />
+                </div>
+                <div>
+                  <span>حجم الدفعة (مقتبسات/طلب):</span>
+                  <input type="number" id="inpGeminiBatchSize" value="5" min="1" max="10"
+                    class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2 py-1 text-slate-200 text-xs mt-0.5" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <button type="button" id="btnSaveGeminiConfig" class="w-full mt-3 px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 text-xs font-bold transition">
+            ✓ حفظ إعدادات Gemini
+          </button>
+        </div>
+
+        <!-- Card 2: OpenRouter Studio (JEV Mode + Searchable 500+ LLMs) -->
+        <div class="rounded-2xl bg-slate-900/95 border border-slate-800/90 p-4 space-y-3 flex flex-col justify-between shadow-lg">
+          <div class="space-y-2.5">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-white text-sm flex items-center gap-1.5">
+                <span>🎯</span>
+                <span>OpenRouter Studio</span>
+              </span>
+              <span id="badgeOpenRouterModeStatus" class="px-2 py-0.5 rounded-md bg-indigo-500/20 text-indigo-300 text-[10px] font-bold">JEV Decisions</span>
+            </div>
+
+            <div class="space-y-1 text-xs">
+              <label class="text-slate-300 font-medium">مفتاح OpenRouter API Key:</label>
+              <input type="password" id="inpOpenRouterApiKey" placeholder="sk-or-v1-..."
+                class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-1.5 text-slate-100 font-mono text-xs focus:outline-none focus:border-indigo-500" />
+            </div>
+
+            <!-- Mode Selector -->
+            <div class="grid grid-cols-2 gap-1.5 p-1 rounded-xl bg-slate-950 border border-slate-800 text-xs">
+              <button type="button" id="btnOpenRouterMode_jev" class="px-2.5 py-1.5 rounded-lg font-bold bg-indigo-600/30 text-indigo-300 border border-indigo-500/50 transition">
+                🎯 JEV Decisions Mode
+              </button>
+              <button type="button" id="btnOpenRouterMode_chat" class="px-2.5 py-1.5 rounded-lg font-medium text-slate-400 hover:text-slate-200 transition">
+                💬 General LLM Chat
+              </button>
+            </div>
+
+            <!-- JEV Model Picker (Shown in JEV mode) -->
+            <div id="wrapOpenRouterJevConfig" class="space-y-1 text-xs">
+              <label class="text-slate-300 font-medium">نموذج JEV System-1:</label>
+              <select id="selOpenRouterJevModel" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-1.5 text-indigo-200 text-xs focus:outline-none">
+                <option value="typesafe/jev-1.14">typesafe/jev-1.14 ($0.042/1M tokens — موصى به)</option>
+                <option value="~typesafe/jev-latest">~typesafe/jev-latest</option>
+                <option value="typesafe/jev-1.13">typesafe/jev-1.13</option>
+              </select>
+            </div>
+
+            <!-- Universal Searchable Combobox (Shown in Chat mode) -->
+            <div id="wrapOpenRouterChatConfig" class="hidden space-y-2 text-xs relative">
+              <label class="text-slate-300 font-medium">البحث اللحظي في جميع النماذج:</label>
+              
+              <!-- Category Filter Chips -->
+              <div class="flex flex-wrap items-center gap-1 text-[10px]">
+                <button type="button" id="chipCatAll" class="px-1.5 py-0.5 rounded bg-indigo-600 text-white font-bold">الكل</button>
+                <button type="button" id="chipCatJev" class="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300">⚡ JEV</button>
+                <button type="button" id="chipCatGemini" class="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300">✨ Gemini</button>
+                <button type="button" id="chipCatChinese" class="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300">🐉 DeepSeek/Qwen</button>
+                <button type="button" id="chipCatFree" class="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300">🆓 مجاني</button>
+              </div>
+
+              <input type="search" id="inpOpenRouterModelSearch" placeholder="🔍 اكتب اسم النموذج (مثلاً: deepseek, qwen, free)..."
+                class="w-full bg-slate-950 border border-indigo-500/50 rounded-xl px-3 py-1.5 text-slate-100 text-xs focus:outline-none" />
+
+              <div id="openRouterModelDropdownList" class="hidden absolute top-full left-0 right-0 z-30 model-dropdown-list mt-1 text-xs"></div>
+
+              <div class="p-2 rounded-lg bg-slate-950 border border-slate-800 text-[11px] text-slate-300">
+                <span>النموذج المحدد: </span>
+                <strong id="lblOpenRouterSelectedModelDisplay" class="text-indigo-300 font-mono">deepseek/deepseek-chat</strong>
+              </div>
+            </div>
+          </div>
+
+          <button type="button" id="btnSaveOpenRouterConfig" class="w-full mt-3 px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-indigo-300 border border-slate-700 text-xs font-bold transition">
+            ✓ حفظ إعدادات OpenRouter
+          </button>
+        </div>
+
+        <!-- Card 3: Local Laya-Multilingual Studio (GTX 1050 3GB Safe) -->
+        <div class="rounded-2xl bg-slate-900/95 border border-slate-800/90 p-4 space-y-3 flex flex-col justify-between shadow-lg">
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-white text-sm flex items-center gap-1.5">
+                <span>🖥️</span>
+                <span>Laya المحلي (3GB VRAM)</span>
+              </span>
+              <span id="lblLayaEngineStatus" class="px-2 py-0.5 rounded-md bg-slate-800 text-slate-300 text-[10px] font-mono">غير محمل</span>
+            </div>
+
+            <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs space-y-1">
+              <div class="flex items-center justify-between text-[11px]">
+                <span class="text-slate-400">حالة الذاكرة (GTX 1050):</span>
+                <span id="lblGpuVramSummary" class="font-mono text-emerald-400 font-bold">فحص...</span>
+              </div>
+              <div class="flex items-center justify-between text-[11px]">
+                <span class="text-slate-400">النموذج المعتمد:</span>
+                <span class="font-mono text-sky-300">laya-multilingual (FP16)</span>
+              </div>
+            </div>
+
+            <div class="space-y-1.5 text-xs">
+              <label class="text-slate-300 font-medium">مسار أو معرّف النموذج:</label>
+              <select id="selLayaCheckpointOption" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-1.5 text-slate-200 text-xs focus:outline-none">
+                <option value="convaiinnovations/laya-multilingual">convaiinnovations/laya-multilingual (الافتراضي للعربية)</option>
+                <option value="custom">مسار مجلد تدريب محلي (models/laya-wahy-finetuned)...</option>
+              </select>
+              <input type="text" id="inpLayaCustomPath" placeholder="models/laya-wahy-finetuned"
+                class="hidden w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-1.5 text-slate-100 font-mono text-xs mt-1" />
+            </div>
+
+            <div class="space-y-1.5 text-xs">
+              <label class="text-slate-300 font-medium">العتاد المفضل:</label>
+              <select id="selLayaDeviceChoice" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-1.5 text-slate-200 text-xs focus:outline-none">
+                <option value="auto">Auto (CUDA FP16 إذا توفر ≥850MB وإلا CPU)</option>
+                <option value="cuda">CUDA FP16 (البطاقة الرسومية إجبارياً)</option>
+                <option value="cpu">CPU (المعالج المركزي)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="pt-2 flex flex-col gap-1.5">
+            <button type="button" id="btnLoadLayaEngine" class="w-full px-3 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs shadow transition flex items-center justify-center gap-1.5">
+              <span>⚡</span>
+              <span>تحميل Laya محلياً للاستدلال</span>
+            </button>
+            <div class="grid grid-cols-2 gap-1.5 text-xs">
+              <button type="button" id="btnTestLayaPredict" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-semibold transition">
+                🧪 فحص تجريبي
+              </button>
+              <button type="button" id="btnUnloadLayaEngine" class="px-2.5 py-1.5 rounded-lg bg-rose-950/40 hover:bg-rose-900/60 text-rose-300 border border-rose-800/50 font-semibold transition">
+                ⏹ تفريغ الذاكرة
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- SUB-PANEL 2: Detailed Requests Inspector & Override Table -->
+      <div class="rounded-2xl bg-slate-900/95 border border-slate-800/90 p-4 space-y-3.5 shadow-xl">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div class="space-y-0.5">
+            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+              <span>📊</span>
+              <span>سجل طلبات التدقيق اللحظي (Request Telemetry & Decision Inspector)</span>
+            </h3>
+            <p class="text-xs text-slate-400">
+              تتبع كل طلب أُرسل، زمن الاستجابة، عدد التوكنات، التكلفة، والقرار مع إمكانية التصحيح البشري اليدوي الفوري.
+            </p>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button type="button" id="btnClearAiRequestLogs" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-xs font-semibold transition">
+              🗑️ مسح السجل
+            </button>
+          </div>
+        </div>
+
+        <div class="border border-slate-800 rounded-xl overflow-hidden bg-slate-950/50 max-h-[460px] overflow-y-auto">
+          <table class="w-full text-right text-xs">
+            <thead class="bg-slate-950 text-slate-400 sticky top-0 border-b border-slate-800 z-10 font-semibold">
+              <tr>
+                <th class="py-2.5 px-3 w-12 text-center font-mono">#</th>
+                <th class="py-2.5 px-3 w-28">الوقت والمزود</th>
+                <th class="py-2.5 px-3">المقتبس المفحوص</th>
+                <th class="py-2.5 px-3 w-56 text-center">القرار والاحتمالات والتصحيح اليدوي</th>
+                <th class="py-2.5 px-3 w-28 text-center">السياق</th>
+                <th class="py-2.5 px-3 w-24 text-center">الزمن</th>
+                <th class="py-2.5 px-3 w-24 text-center">التكلفة</th>
+                <th class="py-2.5 px-3 w-24 text-center">التفاصيل</th>
+              </tr>
+            </thead>
+            <tbody id="tbodyAiRequestLogs" class="divide-y divide-slate-800/60 font-medium">
+              <tr>
+                <td colspan="8" class="text-center py-8 text-slate-500">لا توجد طلبات تدقيق مسجلة حتى الآن. انقر على «بدء التدقيق الذكي» لبدء الفحص.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- SUB-PANEL 3: Phase 3 Laya Dataset Bank & Universal Converter -->
+      <div id="layaDatasetBankPanel" class="rounded-2xl bg-gradient-to-r from-slate-900 via-emerald-950/20 to-slate-900 border border-emerald-500/30 p-5 space-y-4 shadow-xl">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div class="space-y-1">
+            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+              <span>📦</span>
+              <span>بنك بيانات تدريب Laya الموحد (IndexedDB Training Bank & Universal Converter)</span>
+            </h3>
+            <p class="text-xs text-slate-300">
+              يجمع كافة القرارات المؤكدة (من Gemini و JEV و Laya والتصحيحات البشرية) ويحولها تلقائياً إلى صيغة Laya .jsonl للضبط الدقيق في المرحلة الثالثة.
+            </p>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2">
+            <button type="button" id="btnExportLayaJsonl" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md transition flex items-center gap-1.5">
+              <span>📦</span>
+              <span>تصدير بيانات تدريب Laya الموحدة (.jsonl)</span>
+            </button>
+            <button type="button" id="btnDownloadFinetuneScript" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 font-bold text-xs transition flex items-center gap-1.5">
+              <span>🐍</span>
+              <span>تحميل سكريبت التدريب (finetune_laya.py)</span>
+            </button>
+            <button type="button" id="btnClearLayaTrainingDB" class="px-3 py-2 rounded-xl bg-rose-950/40 hover:bg-rose-900/60 text-rose-300 border border-rose-800/50 text-xs font-semibold transition">
+              🗑️ مسح البنك
+            </button>
+          </div>
+        </div>
+
+        <!-- Bank Counters Strip -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 text-xs pt-1">
+          <div class="p-3 rounded-xl bg-slate-950/80 border border-slate-800">
+            <span class="text-slate-400 text-[11px] block">إجمالي السجلات المحفوظة</span>
+            <strong id="lblLayaTotalRecords" class="text-white font-mono text-base font-bold">0</strong>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-950/80 border border-emerald-500/20">
+            <span class="text-emerald-400 text-[11px] block">مقبول / صحيح 🟢</span>
+            <strong id="lblLayaCorrectCount" class="text-emerald-300 font-mono text-base font-bold">0</strong>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-950/80 border border-rose-500/20">
+            <span class="text-rose-400 text-[11px] block">مستبعد / كلام عادي 🔴</span>
+            <strong id="lblLayaFalseCount" class="text-rose-300 font-mono text-base font-bold">0</strong>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-950/80 border border-amber-500/20">
+            <span class="text-amber-400 text-[11px] block">غير متأكد 🟡</span>
+            <strong id="lblLayaNotSureCount" class="text-amber-300 font-mono text-base font-bold">0</strong>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-950/80 border border-sky-500/20">
+            <span class="text-sky-400 text-[11px] block">تصحيحات بشرية ذهبية 👤</span>
+            <strong id="lblLayaHumanCount" class="text-sky-300 font-mono text-base font-bold">0</strong>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-950/80 border border-indigo-500/20">
+            <span class="text-indigo-400 text-[11px] block">تقييم النماذج الذكية 🤖</span>
+            <strong id="lblLayaAiCount" class="text-indigo-300 font-mono text-base font-bold">0</strong>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
   </main>
 
   <!-- ===================================================================== -->
@@ -1063,6 +1498,44 @@
     </div>
   </div>
 
+  <!-- ===================================================================== -->
+  <!-- MODAL 4: AI REQUEST PAYLOAD & DECISION INSPECTOR (#aiPayloadModal)   -->
+  <!-- ===================================================================== -->
+  <div id="aiPayloadModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4">
+    <div class="w-full max-w-3xl rounded-2xl bg-slate-900 border border-slate-700 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+      <div class="px-5 py-3.5 border-b border-slate-800 flex items-center justify-between">
+        <h3 class="text-sm font-bold text-white flex items-center gap-2">
+          <span>🔍</span>
+          <span>تفاصيل مدخلات ومخرجات طلب الذكاء الاصطناعي (Request & Response Payload)</span>
+        </h3>
+        <button type="button" id="btnCloseAiPayloadModal" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold">إغلاق ✕</button>
+      </div>
+
+      <div class="p-5 space-y-4 overflow-y-auto text-xs" dir="ltr">
+        <div class="space-y-1 text-right" dir="rtl">
+          <span class="text-slate-400">معلومات الطلب:</span>
+          <div id="aiPayloadSummaryText" class="font-bold text-sky-300"></div>
+        </div>
+
+        <div class="space-y-1">
+          <div class="flex items-center justify-between text-slate-400 font-mono text-[11px]">
+            <span>1. Exact Canonical Request Envelope (state & questions):</span>
+            <button type="button" id="btnCopyAiPayloadReq" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 text-[10px]">Copy JSON</button>
+          </div>
+          <pre id="preAiPayloadRequest" class="p-3.5 rounded-xl bg-slate-950 border border-slate-800 font-mono text-emerald-400 text-xs overflow-x-auto max-h-56 select-all"></pre>
+        </div>
+
+        <div class="space-y-1">
+          <div class="flex items-center justify-between text-slate-400 font-mono text-[11px]">
+            <span>2. Raw Model Response & Probabilities:</span>
+            <button type="button" id="btnCopyAiPayloadResp" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 text-[10px]">Copy JSON</button>
+          </div>
+          <pre id="preAiPayloadResponse" class="p-3.5 rounded-xl bg-slate-950 border border-slate-800 font-mono text-sky-300 text-xs overflow-x-auto max-h-56 select-all"></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast Notification -->
   <div id="toastBox" class="hidden fixed bottom-5 left-5 z-50 rounded-xl bg-slate-900/95 border border-emerald-500/50 px-4 py-2.5 shadow-2xl flex items-center gap-2 text-xs font-bold text-emerald-200">
     <span id="toastText"></span>
@@ -1076,6 +1549,7 @@
   <script defer src="js/corpus-loader.js"></script>
   <script defer src="js/engine.js"></script>
   <script defer src="js/caption-builder.js"></script>
+  <script defer src="js/ai-verifier.js"></script>
   <script defer src="js/editor.js"></script>
   <script defer src="js/render.js"></script>
   <script defer src="js/events.js"></script>

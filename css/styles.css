@@ -420,3 +420,160 @@ html.light textarea {
     overflow: visible !important;
   }
 }
+
+/* =========================================================================
+   AI Verification Layer & Telemetry Studio Styles (v2.2)
+   ========================================================================= */
+
+.ai-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.1rem 0.4rem;
+  border-radius: 9999px;
+  vertical-align: middle;
+  line-height: 1.2;
+  margin-right: 0.35rem;
+}
+
+.ai-badge-correct {
+  background-color: rgba(16, 185, 129, 0.22);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.5);
+}
+
+.ai-badge-not-sure {
+  background-color: rgba(245, 158, 11, 0.22);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.5);
+}
+
+.ai-badge-false {
+  background-color: rgba(239, 68, 68, 0.22);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.5);
+  text-decoration: line-through;
+}
+
+.ai-badge-pending {
+  background-color: rgba(56, 189, 248, 0.22);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.5);
+  animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* False Positive Citation when showFalse is enabled */
+.citation-hadith.ai-marked-false,
+.citation-ayah.ai-marked-false,
+.citation-dhikr.ai-marked-false {
+  border: 1px dashed rgba(239, 68, 68, 0.65) !important;
+  background-color: rgba(239, 68, 68, 0.12) !important;
+  color: #fca5a5 !important;
+  opacity: 0.85;
+}
+
+/* Multi-Toggle Pill Group for AI Verdict Filter */
+.ai-filter-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.65rem;
+  border-radius: 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  user-select: none;
+  border: 1px solid transparent;
+}
+
+.ai-filter-pill-correct {
+  background-color: rgba(16, 185, 129, 0.12);
+  color: #6ee7b7;
+  border-color: rgba(16, 185, 129, 0.3);
+}
+.ai-filter-pill-correct.active {
+  background-color: rgba(16, 185, 129, 0.3);
+  color: #34d399;
+  border-color: rgba(16, 185, 129, 0.7);
+  box-shadow: 0 0 10px -2px rgba(16, 185, 129, 0.3);
+}
+
+.ai-filter-pill-notsure {
+  background-color: rgba(245, 158, 11, 0.12);
+  color: #fcd34d;
+  border-color: rgba(245, 158, 11, 0.3);
+}
+.ai-filter-pill-notsure.active {
+  background-color: rgba(245, 158, 11, 0.3);
+  color: #fbbf24;
+  border-color: rgba(245, 158, 11, 0.7);
+  box-shadow: 0 0 10px -2px rgba(245, 158, 11, 0.3);
+}
+
+.ai-filter-pill-false {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #fca5a5;
+  border-color: rgba(239, 68, 68, 0.3);
+}
+.ai-filter-pill-false.active {
+  background-color: rgba(239, 68, 68, 0.3);
+  color: #f87171;
+  border-color: rgba(239, 68, 68, 0.7);
+  box-shadow: 0 0 10px -2px rgba(239, 68, 68, 0.3);
+}
+
+.ai-filter-pill-unverified {
+  background-color: rgba(148, 163, 184, 0.1);
+  color: #cbd5e1;
+  border-color: rgba(148, 163, 184, 0.3);
+}
+.ai-filter-pill-unverified.active {
+  background-color: rgba(148, 163, 184, 0.25);
+  color: #f8fafc;
+  border-color: rgba(148, 163, 184, 0.6);
+}
+
+/* Telemetry KPI Strip */
+.ai-metric-card {
+  background-color: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(51, 65, 85, 0.8);
+  border-radius: 0.85rem;
+  padding: 0.65rem 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  transition: border-color 0.15s ease;
+}
+
+.ai-metric-card:hover {
+  border-color: rgba(56, 189, 248, 0.5);
+}
+
+/* OpenRouter Live Model Combobox Dropdown */
+.model-dropdown-list {
+  max-height: 280px;
+  overflow-y: auto;
+  border-radius: 0.85rem;
+  background-color: #0b1120;
+  border: 1px solid #1e293b;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+}
+
+.model-dropdown-item {
+  padding: 0.55rem 0.75rem;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(30, 41, 59, 0.6);
+  transition: background-color 0.12s ease;
+}
+
+.model-dropdown-item:hover,
+.model-dropdown-item.selected {
+  background-color: rgba(30, 41, 59, 0.9);
+}
+
+.model-dropdown-item:last-child {
+  border-bottom: none;
+}
