@@ -1,181 +1,181 @@
-# وحي ستوديو (Wahy Studio — Wahy-Transcriber v2.2)
+# Wahy Studio (Wahy-Transcriber v2.2)
 
-> **منصة متكاملة لتفريغ المحاضرات والدروس العلمية، واكتشاف وتخريج الآيات القرآنية والأحاديث النبوية والأذكار، وبناء الكابشن المرئي المتزامن، مع طبقة تدقيق ذكية متعددة النماذج (AI Verification Layer) واستدلال محلي فائق السرعة عبر نموذج Laya (3GB VRAM).**
+> **An integrated platform for transcribing lectures and scholarly lessons, detecting and sourcing Quranic verses, Prophetic hadiths, and adhkar, building synchronized visual captions, with a multi-model AI Verification Layer and ultra-fast local inference via the Laya model (3GB VRAM).**
 
 ---
 
-## 🌟 أبرز مميزات الإصدار v2.2 (Key Highlights)
+## 🌟 Key Highlights of v2.2
 
-### 1. 🤖 طبقة التدقيق الذكي للمقتبسات (AI Verification Layer)
-محرك تدقيق شرعي ولغوي يدعم 4 مزودين ونماذج عمل مختلفة للتحقق من صحة الاقتباسات وتمييز الاقتباس الحقيقي من كلام الشيخ الشارح العادي:
+### 1. 🤖 AI Verification Layer for Quotes
+A religious and linguistic verification engine supporting 4 providers and multiple working models to validate quotes and distinguish genuine quotes from ordinary explanatory speech by the sheikh:
 
 * **✨ Google Gemini 3.5 Flash-Lite (API & Free Plan):**
-  * يدعم أحدث إصدارات فلاش لايت (`gemini-3.5-flash-lite`, `gemini-3.1-flash-lite`, `gemini-3.8-flash`).
-  * **منظم معدل الطلبات (Sliding Window RPM Pacer):** التزام تلقائي بحد الخطة المجانية (12–15 RPM) دون توقف المفتاح.
-  * **معالجة حظر المعدل (429 / 503 Backoff):** قراءة تلقائية لترويسة `Retry-After` والتراجع الأسي التلقائي مع أزرار الإيقاف والاستئناف والتخطي.
-  * **تجميع الطلبات (Smart Batching):** حزم حتى 5–10 مقتبسات في طلب API واحد لتوفير الحصة المجانية.
-* **🎯 OpenRouter — نمط JEV المخصص (Decisions API):**
-  * اتصال مخصص بنماذج TypeSafe System-1 (`typesafe/jev-1.14`, `~typesafe/jev-latest`, `typesafe/jev-1.13`) عبر واجهة القرارات `/api/alpha/decisions`.
-  * إخراج احتمالات معايرة دقيقة لكل خيار (`CORRECT`, `FALSE`, `NOT_SURE`) بدون توليد نصوص وبكلفة رمزية ($0.042 لكل مليون توكن).
-* **🌐 OpenRouter — البحث الشامل في كافة النماذج (Universal LLMs):**
-  * شريط بحث فوري ومكتبة حية تضم أكثر من 500 نموذج (DeepSeek V3/R1, Qwen 2.5, Claude, Gemini, Llama, والنماذج المجانية `:free`).
-  * عرض أسعار التوكنز الحية والتوجيه التلقائي لطريقة الاستدعاء.
-* **🖥️ محرك Laya المحلي (Local Laya-Multilingual on GTX 1050 3GB VRAM):**
-  * تشغيل محلي 100% دون إنترنت لنموذج `convaiinnovations/laya-multilingual` (322M معمارية `mmBERT-base`).
-  * استهلاك اقتصادي جداً لذاكرة الرسوميات (~750MB في FP16) مع سرعة استدلال ~30ms لكل قرار.
-  * حماية ذكية لذاكرة الـ VRAM وتفريغ نموذج Whisper تلقائياً عند طلب الفحص، والتراجع التلقائي لمعالج CPU إذا قلّت الذاكرة عن 850MB.
+  * Supports the latest Flash-Lite releases (`gemini-3.5-flash-lite`, `gemini-3.1-flash-lite`, `gemini-3.8-flash`).
+  * **Sliding Window RPM Pacer:** automatic compliance with the free plan limit (12–15 RPM) without key suspension.
+  * **Rate-Limit Handling (429 / 503 Backoff):** automatic reading of the `Retry-After` header with exponential backoff, plus pause/resume/skip controls.
+  * **Smart Batching:** batch up to 5–10 quotes per API request to conserve the free quota.
+* **🎯 OpenRouter — Custom JEV Mode (Decisions API):**
+  * Dedicated connection to TypeSafe System-1 models (`typesafe/jev-1.14`, `~typesafe/jev-latest`, `typesafe/jev-1.13`) via the `/api/alpha/decisions` endpoint.
+  * Calibrated probability output per option (`CORRECT`, `FALSE`, `NOT_SURE`) without text generation, at minimal token cost ($0.042 per million tokens).
+* **🌐 OpenRouter — Universal LLM Search:**
+  * Instant search bar and live library of 500+ models (DeepSeek V3/R1, Qwen 2.5, Claude, Gemini, Llama, and `:free` models).
+  * Live token pricing display and automatic routing of the invocation method.
+* **🖥️ Local Laya Engine (Local Laya-Multilingual on GTX 1050 3GB VRAM):**
+  * 100% offline execution of `convaiinnovations/laya-multilingual` (322M, `mmBERT-base` architecture).
+  * Very economical VRAM usage (~750MB in FP16) with ~30ms inference per decision.
+  * Smart VRAM protection: automatically unloads the Whisper model when verification is requested, with automatic fallback to CPU if VRAM drops below 850MB.
 
 ---
 
-### 2. 🎛️ فلترة إجابات الذكاء الاصطناعي في واجهة القراءة والمحرر (Visibility Filter)
-تحكم حر وتام في طريقة ظهور وتنسيق الاقتباسات داخل المحاضرة والكابشن المرئي حسب حكم الذكاء الاصطناعي:
-* **مجموعة أزرار الفلترة المتعددة (`#aiVerdictFilterGroup`):**
-  * `[✓ مقبول 🟢]` (`showCorrect`)
-  * `[؟ غير متأكد 🟡]` (`showNotSure`)
-  * `[✕ خاطئ / كلام عادي 🔴]` (`showFalse` — معطل افتراضياً بعد الفحص لتنقية المحاضرة تلقائياً، مع إمكانية تفعيله بضغطة زر لمراجعة المستبعدات).
-  * `[⏳ غير مفحوص ⚪]` (`showUnverified`)
-  * أزرار تبديل سريعة: `الكل`، `المقبول فقط`، `المقبول + غير المتأكد`، `المستبعد فقط`.
-* **سلوك العرض الذكي:** عند تصنيف الاقتباس كـ `FALSE` وإخفائه، **لا يُحذف النص الأصلي** بل تُرفع عنه التنسيقات والأقواس ليعود ككلام عادي في تفريغ المحاضرة وفي ترجمات الفيديو (Subtitles).
-* **شارات التوثيق اللحظية:** إظهار نسبة الثقة بدقة على الاقتباسات: `🟢 مؤكد (94%)`، `🟡 غير متأكد (58%)`، `🔴 كلام عادي (89%)`.
+### 2. 🎛️ AI Answer Filtering in Reader and Editor (Visibility Filter)
+Full, free control over how quotes appear and are formatted inside the lecture and visual captions, based on the AI verdict:
+* **Multi-button filter group (`#aiVerdictFilterGroup`):**
+  * `[✓ Accepted 🟢]` (`showCorrect`)
+  * `[? Unsure 🟡]` (`showNotSure`)
+  * `[✕ Wrong / Ordinary speech 🔴]` (`showFalse` — disabled by default after verification to clean up the lecture automatically, re-enable with one click to review excluded items).
+  * `[⏳ Unverified ⚪]` (`showUnverified`)
+  * Quick toggle buttons: `All`, `Accepted only`, `Accepted + Unsure`, `Excluded only`.
+* **Smart display behavior:** when a quote is classified as `FALSE` and hidden, **the original text is not deleted** — formatting and brackets are stripped so it returns to ordinary speech in both the lecture transcript and video subtitles.
+* **Instant verification badges:** confidence percentage shown on quotes: `🟢 Confirmed (94%)`, `🟡 Unsure (58%)`, `🔴 Ordinary speech (89%)`.
 
 ---
 
-### 3. 📊 استوديو سجل الطلبات والقياسات الحية (Tab 5: AI & Logs)
-تبويب خامس رئيسي مخصص للتحليل والمراقبة والضبط:
-* **شريط المؤشرات الحية (8 بطاقات KPI):**
-  * زمن اكتشاف المحرك اللغوي • إجمالي الطلبات ونسبة النجاح • زمن الطلبات الكلي (Wall-Clock & Cumulative) • متوسط زمن الطلب • إجمالي السياق المرسل (توكن وحروف) • متوسط السياق لكل طلب • توزيع القرارات (صحيح / خاطئ / غير متأكد) • التكلفة الفعلية المقدرة بالدولار ($USD).
-* **جدول فحص الطلبات التفصيلي (`Requests Inspector`):**
-  * استعراض كل طلب وتوقيته والنموذج وشريط الاحتمالات وتكلفته وزمنه.
-  * **التصحيح البشري الفوري (Human Gold Override):** أزرار تصحيح مباشرة `[🟢]` `[🔴]` `[🟡]` داخل الجدول وفي بطاقة الفحص (Finding Inspector) تمنح رأي المستخدم أولوية قصوى وتخزنه كبيانات تدريب ذهبية.
-  * **نافذة فحص الحزمة (`Inspect Payload Modal`):** عرض الـ JSON الدقيق المُرسل للنموذج (`state` و `questions`) والرد الخام المستلم.
+### 3. 📊 Request Telemetry Studio (Tab 5: AI & Logs)
+A fifth main tab dedicated to analysis, monitoring, and tuning:
+* **Live KPI strip (8 cards):**
+  * Language engine detection time • total requests and success rate • total request time (Wall-Clock & Cumulative) • average request time • total context sent (tokens and characters) • average context per request • decision distribution (correct / wrong / unsure) • estimated actual cost in USD.
+* **Detailed Request Inspector table:**
+  * Review every request with its timestamp, model, probability bar, cost, and duration.
+  * **Instant Human Gold Override:** direct correction buttons `[🟢]` `[🔴]` `[🟡]` inside the table and in the Finding Inspector card, giving the user's opinion top priority and storing it as golden training data.
+  * **Inspect Payload Modal:** view the exact JSON sent to the model (`state` and `questions`) and the raw response received.
 
 ---
 
-### 4. 📦 محوّل بيانات Laya الشامل وسكريبت التدريب (Converter & Fine-Tuning)
-* **المحوّل الشامل (Universal Laya Converter):**
-  * تحويل سجلات التدقيق أياً كان مصدرها (Gemini, OpenRouter LLMs, JEV, Human Overrides) إلى صيغة `.jsonl` قياسية متوافقة تماماً مع معايير تدريب `Laya`.
-  * توليد احتمالات ناعمة (Laplace-smoothed soft targets) لمخرجات Gemini/LLM وهدف معلم فائق الدقة (0.98) للتصحيحات البشرية.
-* **بنك بيانات التدريب التراكمي:**
-  * حفظ تلقائي للقرارات عبر IndexedDB (`WahyLayaTrainingDB`) عبر جميع المحاضرات وتصدير بضغطة زر.
-* **سكريبت التدريب الجاهز ([`backend/finetune_laya.py`](file:///home/zeno/Documents/work/new_projects/Wahy-Transcriber/backend/finetune_laya.py)):**
-  * **نمط `--head-only`:** مخصص للأجهزة الاقتصادية مثل GTX 1050 (3GB VRAM)؛ يجمّد نموذج `mmBERT` (307M) ويدرّب رأس القرارات (15M) فقط مع معايرة درجات الحرارة في أقل من 1.3GB VRAM.
-  * **نمط `--full-finetune`:** لتدريب كامل على بطاقات السحابة (Google Colab / Kaggle T4 16GB).
+### 4. 📦 Universal Laya Converter and Training Script
+* **Universal Laya Converter:**
+  * Converts audit logs from any source (Gemini, OpenRouter LLMs, JEV, Human Overrides) into standard `.jsonl` fully compatible with `Laya` training standards.
+  * Generates Laplace-smoothed soft targets for Gemini/LLM outputs and a high-precision teacher target (0.98) for human corrections.
+* **Cumulative training data bank:**
+  * Automatic saving of decisions via IndexedDB (`WahyLayaTrainingDB`) across all lectures, exportable with one click.
+* **Ready training script ([`backend/finetune_laya.py`](file:///home/zeno/Documents/work/new_projects/Wahy-Transcriber/backend/finetune_laya.py)):**
+  * **`--head-only` mode:** designed for budget hardware such as GTX 1050 (3GB VRAM); freezes `mmBERT` (307M) and trains only the decision head (15M) with temperature calibration, under 1.3GB VRAM.
+  * **`--full-finetune` mode:** full training on cloud GPUs (Google Colab / Kaggle T4 16GB).
 
 ---
 
-### 5. 🎬 محرك العرض والتحرير وبناء الكابشن (Core Features)
-* **عرض متزامن (Display View):** مشغل فيديو متطور متزامن مع نص المحاضرة المنسق، مزود بـ **شريط تتبع الكلمة المقروءة اللحظي** وتمرير سلس ذكي يتوقف تلقائياً أثناء التحديد أو التحرير.
-* **استوديو إضافة المفقود (FN Studio):** تحديد الآيات والأحاديث والأذكار الفائتة بنقرتين (أول كلمة وآخر كلمة) مع تظليل تفاعلي واقتراحات فورية من القواعد ومطابقة الرسم العثماني ودعم الروايات العشر.
-* **الكابشن الذكي غير المنقسم (Atomic Captions):** بناء ترجمات متزامنة (`SRT`, `VTT`, `ASS`) تضمن بقاء الآيات والأحاديث كوحدة واحدة غير منقسمة، مع ضبط زمني دقيق للكلمات عبر خوارزمية أطول تسلسل مشترك (LCS).
-* **إدارة القواعد والأذكار (Datasets & Adhkar Studio):** إدارة وبحث واستيراد وتصدير قاعدة الأذكار والأدعية ومزامنتها محلياً وسحابياً.
+### 5. 🎬 Display, Editing, and Caption Building Engine (Core Features)
+* **Synchronized Display View:** advanced video player synchronized with the formatted lecture text, equipped with a **live word-tracking bar** and smart smooth scrolling that pauses automatically during selection or editing.
+* **FN Studio (missing-item studio):** mark missed verses, hadiths, and adhkar with two clicks (first word and last word) with interactive highlighting, instant suggestions from the corpus, Ottoman-script matching, and support for the ten readings.
+* **Atomic (undivided) smart captions:** build synchronized subtitles (`SRT`, `VTT`, `ASS`) ensuring verses and hadiths stay as a single undivided unit, with precise word timing via the Longest Common Subsequence (LCS) algorithm.
+* **Datasets & Adhkar Studio:** manage, search, import, and export the adhkar and supplications database, synced locally and in the cloud.
 
 ---
 
-### 6. ✂️ اكتشاف اقتطاع الحدود والمعالجة التلقائية بضغطة زر (Boundary-Truncation Flagging & Smart Auto-Heal)
-نظام متقدم لمعالجة قصور المحركات الصوتية في تحديد بداية أو نهاية المقتبس بدقة:
-* **استعلام متزامن بصفر كلفة إضافية (Zero Extra API Requests):** يُدرج سؤال ثانٍ متعامد `boundary_status` (`COMPLETE_SPAN`, `MISSING_START`, `MISSING_END`, `MISSING_BOTH`) في نفس طلب التحقق الأصلي لكافة المزودين (Gemini, OpenRouter JEV, Universal LLMs, Local Laya).
-* **تمييز الاقتباس الجزئي المتعمد:** يميّز بذكاء بين الاقتباس الجزئي المقصود من الشيخ الشارح (موضع الشاهد - `COMPLETE_SPAN`) وبين اقتطاع المحرك لبداية أو نهاية الآية/الحديث الذي نطق به الشيخ فعلاً في التفريغ المجاور.
-* **شارات بصرية وفلترة مخصصة:**
-  * شارات تحذيرية في عرض المحاضرة: `[✂️ ناقص البداية]`, `[✂️ ناقص النهاية]`, `[✂️ ناقص الطرفين]`.
-  * زر فلترة سريع في شريط الأدوات: `[✂️ ناقص الحدود فقط 🟠]` لعزل المقتبسات المقتطعة بنقرة واحدة.
-* **المعالجة التلقائية الذكية بنقرة زر (1-Click Auto-Heal Boundary):** زر سحري `[🪄 توسيع تلقائي للحدود الناقصة]` في بطاقة فحص المقتبس يقوم خوارزمياً بمطابقة الكلمات المجاورة من المتن الأصلي وتوسيع نطاق المقتبس زمنياً ونصياً وتحديث الكابشن فوراً دون الحاجة لتعديل يدوي.
-* **مخرجات تدريب Laya متعددة المهام:** تصدير صيغ `.jsonl` تحتوي على القرارين معاً لتدريب نموذج Laya على الفحص الشرعي واكتشاف بتر الحدود بالتوازي.
+### 6. ✂️ Boundary-Truncation Flagging & Smart Auto-Heal
+An advanced system for handling the limitations of audio engines in precisely determining the start or end of a quote:
+* **Zero extra API cost synchronous query:** a second orthogonal `boundary_status` question (`COMPLETE_SPAN`, `MISSING_START`, `MISSING_END`, `MISSING_BOTH`) is injected into the same original verification request for all providers (Gemini, OpenRouter JEV, Universal LLMs, Local Laya).
+* **Distinguishing intentional partial quotes:** intelligently distinguishes an intentional partial quote by the explanatory sheikh (the evidentiary spot — `COMPLETE_SPAN`) from engine truncation of the start or end of a verse/hadith actually spoken by the sheikh in the adjacent transcript.
+* **Visual badges and dedicated filtering:**
+  * Warning badges in the lecture view: `[✂️ Missing start]`, `[✂️ Missing end]`, `[✂️ Missing both ends]`.
+  * Quick filter button in the toolbar: `[✂️ Truncated boundaries only 🟠]` to isolate truncated quotes with one click.
+* **1-Click Smart Auto-Heal:** a magic button `[🪄 Auto-expand missing boundaries]` in the quote inspection card algorithmically matches adjacent words from the original text and expands the quote's time range and text, updating captions instantly without manual editing.
+* **Multi-task Laya training outputs:** export `.jsonl` files containing both decisions to train Laya on religious verification and boundary-truncation detection in parallel.
 
 ---
 
-## 🏗️ هيكلية المشروع (Project Architecture)
+## 🏗️ Project Architecture
 
 ```
 Wahy-Transcriber/
-├── index.html                       # الواجهة الرئيسية (5 تبويبات، أشرطة الفلترة، استوديو الذكاء الاصطناعي)
+├── index.html                       # Main UI (5 tabs, filter bars, AI studio)
 ├── css/
-│   └── styles.css                   # تنسيقات الواجهة، شارات الذكاء الاصطناعي، وبطاقات القياسات
+│   └── styles.css                   # UI styling, AI badges, and metric cards
 ├── js/
-│   ├── state.js                     # إدارة الحالة العامة ومخزن IndexedDB للتدريب
-│   ├── ai-verifier.js               # محرك التحقق بالذكاء الاصطناعي (Gemini, JEV, OpenRouter, Laya) والمحوّل الشامل
-│   ├── engine.js                    # محرك المطابقة والاكتشاف اللغوي الصوتي للمقتبسات
-│   ├── corpus-loader.js             # تحميل قواعد القرآن والحديث والأذكار
-│   ├── caption-builder.js           # بناء وتوليد الكابشن مع احترام فلترة الذكاء الاصطناعي
-│   ├── render.js                    # صياغة الواجهة، شريط الفلترة، جدول الطلبات، وبطاقات القياس
-│   ├── editor.js                    # المحرر الذكي واستوديو FN والتعديل اليدوي للقرارات
-│   ├── events.js                    # ربط كافة عناصر الواجهة والأحداث والأزرار
-│   └── error-handler.js             # فخ الأخطاء التشخيصي ونافذة النسخ للذكاء الاصطناعي
+│   ├── state.js                     # Global state management and IndexedDB training store
+│   ├── ai-verifier.js               # AI verification engine (Gemini, JEV, OpenRouter, Laya) and universal converter
+│   ├── engine.js                    # Linguistic and audio matching engine for quotes
+│   ├── corpus-loader.js             # Loading Quran, hadith, and adhkar corpora
+│   ├── caption-builder.js           # Caption generation respecting AI filters
+│   ├── render.js                    # UI rendering, filter bar, request table, metric cards
+│   ├── editor.js                    # Smart editor, FN studio, manual decision editing
+│   ├── events.js                    # Wiring all UI elements, events, and buttons
+│   └── error-handler.js             # Diagnostic error trap and AI copy window
 ├── backend/
-│   ├── app.py                       # خادم FastAPI، نقاط نهاية Laya، وتفريغ الصوت والوسائط
-│   ├── laya_engine.py               # محرك Laya المحلي الآمن على GTX 1050 (3GB VRAM)
-│   ├── laya_converter.py            # أداة تحويل السجلات إلى بيانات تدريب Laya JSONL
-│   ├── finetune_laya.py             # سكريبت التدريب الدقيق المحلي والسحابي
-│   ├── transcriber.py               # تفريغ الصوت عبر faster-whisper أو Groq
-│   ├── media_processor.py           # معالجة يوتيوب وتحويل الوسائط عبر yt-dlp و ffmpeg
-│   └── requirements.txt             # متطلبات بايثون (torch, laya, transformers, fastapi)
-├── run.sh                           # سكريبت التشغيل التلقائي على Linux / macOS
-├── run.bat                          # سكريبت التشغيل التلقائي على Windows
-├── wahy_ai_verification_and_laya_plan.md     # المرجع المعماري ومواصفات النظام
-├── agy_phase2_audit_and_fix_plan.md          # خطة التدقيق والإصلاح المرحلي الشامل
-└── agy_boundary_truncation_feature_plan.md   # خطة ميزة كشف اقتطاع الحدود والمعالجة التلقائية
+│   ├── app.py                       # FastAPI server, Laya endpoints, audio/media transcription
+│   ├── laya_engine.py               # Safe local Laya engine on GTX 1050 (3GB VRAM)
+│   ├── laya_converter.py            # Converting logs into Laya JSONL training data
+│   ├── finetune_laya.py             # Local and cloud precise training script
+│   ├── transcriber.py               # Audio transcription via faster-whisper or Groq
+│   ├── media_processor.py           # YouTube processing and media conversion via yt-dlp and ffmpeg
+│   └── requirements.txt            # Python requirements (torch, laya, transformers, fastapi)
+├── run.sh                           # Auto-run script for Linux / macOS
+├── run.bat                          # Auto-run script for Windows
+├── wahy_ai_verification_and_laya_plan.md     # Architectural reference and system specs
+├── agy_phase2_audit_and_fix_plan.md          # Comprehensive phased audit and fix plan
+└── agy_boundary_truncation_feature_plan.md   # Boundary-truncation detection and auto-heal feature plan
 ```
 
 ---
 
-## 🚀 البدء السريع وطريقة التشغيل (Quick Start)
+## 🚀 Quick Start
 
-### الطريقة 1: التشغيل المباشر عبر المتصفح (Client-Only Mode)
-* لا يتطلب أي خادم خلفي! افتح ملف `index.html` في أي متصفح حديث (Chrome / Firefox / Edge).
-* يتيح لك فوراً:
-  * لصق النصوص وملفات الترجمة (`.txt / .srt / .vtt`).
-  * تشغيل الاكتشاف ومطابقة القرآن والحديث والأذكار محلياً في المتصفح.
-  * التدقيق بنماذج **Gemini 3.5 Flash-Lite** و **OpenRouter (JEV & Universal)** عبر مفاتيح API الخاصة بك.
-  * تصدير بيانات تدريب Laya من المتصفح مباشرة.
+### Method 1: Direct Browser Run (Client-Only Mode)
+* No backend server required! Open `index.html` in any modern browser (Chrome / Firefox / Edge).
+* Immediately enables:
+  * Pasting text and subtitle files (`.txt / .srt / .vtt`).
+  * Running detection and matching of Quran, hadith, and adhkar locally in the browser.
+  * Verification with **Gemini 3.5 Flash-Lite** and **OpenRouter (JEV & Universal)** using your own API keys.
+  * Exporting Laya training data directly from the browser.
 
 ---
 
-### الطريقة 2: التشغيل الكامل مع الخادم المحلي (Full-Stack Mode)
-يتيح تفريغ يوتيوب، رفع الملفات الصوتية والمرئية، وتشغيل **نموذج Laya المحلي** على كارت الشاشة (GTX 1050 3GB):
+### Method 2: Full Run with Local Server (Full-Stack Mode)
+Enables YouTube transcription, audio/video file uploads, and running the **local Laya model** on your GPU (GTX 1050 3GB):
 
-#### على أنظمة Linux / macOS:
+#### On Linux / macOS:
 ```bash
-# إعطاء صلاحية التشغيل
+# Grant execute permission
 chmod +x run.sh
 
-# التشغيل التلقائي (يقوم بإنشاء البيئة وتثبيت المتطلبات وتشغيل الخادم)
+# Auto-run (creates the environment, installs requirements, and starts the server)
 ./run.sh
 ```
 
-#### على أنظمة Windows:
-انقر نقراً مزدوجاً على ملف `run.bat` أو شغّله عبر موجه الأوامر:
+#### On Windows:
+Double-click `run.bat` or run it from the command prompt:
 ```bat
 run.bat
 ```
 
-سيفتح النظام المتصفح تلقائياً على الرابط: `http://127.0.0.1:8000`
+The system will automatically open the browser at: `http://127.0.0.1:8000`
 
 ---
 
-## ⚙️ إعداد مزودي الذكاء الاصطناعي (AI Setup)
+## ⚙️ AI Provider Setup
 
-افتح تبويب **«🤖 الذكاء الاصطناعي والسجل»**:
-1. **Google Gemini:** أدخل مفتاحك من Google AI Studio، واختر `gemini-3.5-flash-lite`. فعّل خيار `الخطة المجانية (Free Tier)` لحماية حصتك من التجاوز.
-2. **OpenRouter:** أدخل مفتاح OpenRouter:
-   * اختر نمط `🎯 JEV Decisions API` لاستخدام نماذج `typesafe/jev-1.14`.
-   * أو استخدم نمط `💬 البحث الشامل` لكتابة اسم أي نموذج تريده (مثل `deepseek/deepseek-chat` أو `qwen/qwen-2.5-72b-instruct` أو `free`).
-3. **Local Laya:** في بطاقة Laya، اضغط على **«تحميل Laya محلياً»**؛ سيتم فحص الذاكرة وتفعيل النموذج على `CUDA FP16` أو `CPU`.
+Open the **«🤖 AI & Logs»** tab:
+1. **Google Gemini:** enter your key from Google AI Studio and select `gemini-3.5-flash-lite`. Enable `Free Tier` to protect your quota from overuse.
+2. **OpenRouter:** enter your OpenRouter key:
+   * Choose `🎯 JEV Decisions API` mode to use `typesafe/jev-1.14` models.
+   * Or use `💬 Universal Search` mode to type any model name you want (e.g. `deepseek/deepseek-chat`, `qwen/qwen-2.5-72b-instruct`, or `free`).
+3. **Local Laya:** in the Laya card, click **«Load Laya locally»**; VRAM will be checked and the model activated on `CUDA FP16` or `CPU`.
 
 ---
 
-## 🧪 تدريب Laya محلياً (Fine-Tuning Laya)
+## 🧪 Fine-Tuning Laya Locally
 
-بعد تجميع وتدقيق المحاضرات وتصدير ملف `wahy_laya_train.jsonl` عبر بنك البيانات:
+After collecting and verifying lectures and exporting `wahy_laya_train.jsonl` via the data bank:
 
 ```bash
-# التدريب الاقتصادي لرأس القرارات على كارت GTX 1050 (أقل من 1.3GB VRAM):
+# Economical decision-head training on GTX 1050 (under 1.3GB VRAM):
 python backend/finetune_laya.py --data wahy_laya_train.jsonl --head-only --epochs 5
 
-# التدريب الكامل على Google Colab / Kaggle:
+# Full training on Google Colab / Kaggle:
 python backend/finetune_laya.py --data wahy_laya_train.jsonl --full-finetune --epochs 3
 ```
 
 ---
 
-## 📄 التراخيص والاعتمادات (License & Credits)
-* بني المشروع بأحدث تقنيات الويب ومعايير معالجة النصوص الإسلامية وعلوم الحديث والقرآن الكريم.
-* يستخدم المشروع حزم: [Laya](https://github.com/convaiinnovations/laya), [Faster-Whisper](https://github.com/SYSTRAN/faster-whisper), [Transformers](https://github.com/huggingface/transformers), [FastAPI](https://fastapi.tiangolo.com).
+## 📄 License & Credits
+* The project is built with the latest web technologies and standards for processing Islamic texts and the sciences of Quran and hadith.
+* The project uses: [Laya](https://github.com/convaiinnovations/laya), [Faster-Whisper](https://github.com/SYSTRAN/faster-whisper), [Transformers](https://github.com/huggingface/transformers), [FastAPI](https://fastapi.tiangolo.com).
