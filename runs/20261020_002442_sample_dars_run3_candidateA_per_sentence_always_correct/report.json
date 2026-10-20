@@ -1,0 +1,34 @@
+{
+  "run_id": "run_a4cd9009d565",
+  "lecture_slug": "sample_dars",
+  "label": "run3_candidateA_per_sentence_always_correct",
+  "total_requests": 11,
+  "total_input_tokens": 0,
+  "total_output_tokens": 0,
+  "total_cached_tokens": 0,
+  "total_cost_usd": 0.0,
+  "wall_clock_seconds": 0.0,
+  "cost_per_100_sentences_usd": 0.0,
+  "time_per_100_sentences_sec": 0.0,
+  "failure_rate": 0.0,
+  "retry_rate": 0.0,
+  "fallback_rate": 0.0,
+  "latency_by_purpose_ms": {
+    "classify": {
+      "p50": 0.12,
+      "p95": 0.13,
+      "max": 0.13
+    }
+  },
+  "structural_tag_distribution": {
+    "heading": 1,
+    "matn_section": 1,
+    "paragraph": 3,
+    "list_intro": 1,
+    "list_item": 2,
+    "continuation": 1,
+    "comment": 1
+  },
+  "review_flag_counts": {},
+  "evaluation_metrics": null
+}

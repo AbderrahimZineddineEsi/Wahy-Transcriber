@@ -1,0 +1,14 @@
+{
+  "run_id": "run_54b102bfc458",
+  "processing_mode": "per_sentence",
+  "window_size": 20,
+  "model_candidate": "jev_hybrid",
+  "jev_layout": "independent_questions",
+  "jev_execution_order": "sequential",
+  "typo_strategy": "gated",
+  "use_detection_boundaries": true,
+  "num_segments": 10,
+  "wall_clock_seconds": 0.01,
+  "run_dir": "runs/20261020_002442_sample_dars_run5_candidateB_jev_independent_sequential",
+  "completed_at": "2026-10-20T00:24:42.829847+00:00"
+}

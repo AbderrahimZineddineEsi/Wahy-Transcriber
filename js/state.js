@@ -168,6 +168,16 @@ let currentState = {
     showAdhkarTag: true,
     groupContiguousAyat: true
   },
+  tafrigh: {
+    active: false,
+    viewMode: "sync",               // "sync" | "tafrigh"
+    data: null,                     // Last result from /api/tafrigh/run
+    isLoading: false,
+    provider: "gemini_all",
+    processingMode: "per_sentence",
+    matnMode: "no_matn",
+    matnText: ""
+  },
   aiVerification: {
     enabled: true,
     autoVerifyAfterEngine: false,

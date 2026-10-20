@@ -596,6 +596,308 @@ window.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  async function triggerRunAiTafrigh() {
+    let rawText = (currentState.words && currentState.words.length)
+      ? currentState.words.map(w => w.word).join(" ")
+      : (currentState.rawText || "");
+
+    if (!rawText.trim()) {
+      const fastPathVal = document.getElementById("textareaFastPathInput")?.value || "";
+      const mainInputVal = document.getElementById("mainTranscriptInput")?.value || "";
+      const editorVal = document.getElementById("lectureTranscriptEditor")?.value || "";
+      rawText = (fastPathVal || mainInputVal || editorVal).trim();
+    }
+
+    if (typeof switchLectureStageTab === "function") {
+      switchLectureStageTab("tafrigh");
+    }
+
+    const emptyState = document.getElementById("tafrighEmptyState");
+    const progressWrap = document.getElementById("tafrighProgressWrap");
+    const progressBar = document.getElementById("tafrighProgressBar");
+    const progressTitle = document.getElementById("tafrighProgressTitle");
+    const progressSubtitle = document.getElementById("tafrighProgressSubtitle");
+    const errorWrap = document.getElementById("tafrighErrorWrap");
+    const errorMessage = document.getElementById("tafrighErrorMessage");
+    const resultsView = document.getElementById("tafrighResultsView");
+
+    if (!rawText.trim()) {
+      showToast("⚠️ لا يوجد نص تفريغ حالياً للبدء بمرحلة التفريغ الذكي");
+      if (emptyState) emptyState.classList.remove("hidden");
+      if (progressWrap) progressWrap.classList.add("hidden");
+      if (resultsView) resultsView.classList.add("hidden");
+      return;
+    }
+
+    const btnTop = document.getElementById("btnRunAiTafrigh");
+    const btnEmpty = document.getElementById("btnRunTafrighFromEmpty");
+    const btnRerun = document.getElementById("btnRerunTafrigh");
+
+    if (btnTop) {
+      btnTop.disabled = true;
+      btnTop.innerHTML = `⏳ جاري التفريغ...`;
+    }
+    if (btnEmpty) {
+      btnEmpty.disabled = true;
+      btnEmpty.innerHTML = `⏳ جاري المعالجة...`;
+    }
+    if (btnRerun) {
+      btnRerun.disabled = true;
+      btnRerun.innerHTML = `⏳ جاري التحديث...`;
+    }
+
+    if (emptyState) emptyState.classList.add("hidden");
+    if (errorWrap) errorWrap.classList.add("hidden");
+    if (resultsView) resultsView.classList.add("hidden");
+    if (progressWrap) progressWrap.classList.remove("hidden");
+    if (progressBar) progressBar.style.width = "20%";
+
+    showToast("⏳ جاري تشغيل مرحلة التفريغ الذكي (AI Tafrigh)...");
+
+    const steps = [
+      { width: "35%", title: "جاري تقطيع الجمل وفحص الفواصل...", sub: "تحليل الحدود الطبيعية للكلام العربي" },
+      { width: "55%", title: "جاري استخراج المتون وعزلها عن الشرح...", sub: "مطابقة النصوص المروية وحمايتها بدقة مطلقة" },
+      { width: "75%", title: "جاري هيكلة العناوين وتصنيف الاستطرادات...", sub: "توليد شجرة الأبواب والفصول وحواشي الأسئلة" },
+      { width: "90%", title: "جاري التدقيق النهائي وتوليد المستند...", sub: "فحص قيود السلامة وبناء العرض النهائي" }
+    ];
+    let stepIdx = 0;
+    const progressInterval = setInterval(() => {
+      if (stepIdx < steps.length) {
+        if (progressBar) progressBar.style.width = steps[stepIdx].width;
+        if (progressTitle) progressTitle.textContent = steps[stepIdx].title;
+        if (progressSubtitle) progressSubtitle.textContent = steps[stepIdx].sub;
+        stepIdx++;
+      }
+    }, 450);
+
+    const restoreButtons = () => {
+      clearInterval(progressInterval);
+      if (btnTop) {
+        btnTop.disabled = false;
+        btnTop.innerHTML = `📑 التفريغ الذكي (AI Tafrigh)`;
+      }
+      if (btnEmpty) {
+        btnEmpty.disabled = false;
+        btnEmpty.innerHTML = `<span>🚀</span><span>بدء التفريغ وهيكلة المتن والشرح الآن</span>`;
+      }
+      if (btnRerun) {
+        btnRerun.disabled = false;
+        btnRerun.innerHTML = `<span>🔄 إعادة المعالجة</span>`;
+      }
+    };
+
+    try {
+      let apiBase = "";
+      if (window.location.protocol === "file:" || window.location.port === "8089") {
+        apiBase = "http://127.0.0.1:8000";
+      }
+
+      const geminiKey = currentState?.aiVerification?.geminiApiKey || localStorage.getItem("wahy_gemini_api_key") || "";
+      const payload = {
+        raw_text: rawText,
+        processing_mode: "per_sentence",
+        model_candidate: "gemini_all",
+        typo_strategy: "gated",
+        gemini_api_key: geminiKey
+      };
+
+      let resp;
+      try {
+        resp = await fetch(`${apiBase}/api/tafrigh/run`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+      } catch (netErr) {
+        if (!apiBase) {
+          resp = await fetch("http://127.0.0.1:8000/api/tafrigh/run", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          });
+        } else {
+          throw netErr;
+        }
+      }
+
+      const data = await resp.json();
+      restoreButtons();
+
+      if (data.success) {
+        if (progressBar) progressBar.style.width = "100%";
+        setTimeout(() => {
+          if (progressWrap) progressWrap.classList.add("hidden");
+          if (typeof renderTafrighOutput === "function") {
+            renderTafrighOutput(data);
+          }
+          showToast("✅ اكتملت مرحلة التفريغ الذكي وهيكلة المتن والشرح بنجاح!");
+        }, 200);
+      } else {
+        if (progressWrap) progressWrap.classList.add("hidden");
+        if (errorWrap) {
+          errorWrap.classList.remove("hidden");
+          if (errorMessage) {
+            errorMessage.textContent = data.message || "حدث خطأ أثناء معالجة التفريغ في الخادم.";
+          }
+        }
+        showToast("❌ حدث خطأ أثناء تشغيل التفريغ الذكي");
+      }
+    } catch (e) {
+      restoreButtons();
+      console.error("Tafrigh error:", e);
+      if (progressWrap) progressWrap.classList.add("hidden");
+      if (errorWrap) {
+        errorWrap.classList.remove("hidden");
+        if (errorMessage) {
+          errorMessage.textContent = `تعذر الاتصال بخادم التفريغ الذكي. يرجى التأكد من تشغيل خادم Wahy Backend على المنفذ 8000 (${e.message}).`;
+        }
+      }
+      showToast("❌ تعذر الاتصال بخادم التفريغ الذكي");
+    }
+  }
+
+  // Tafrigh Run Buttons
+  document.getElementById("btnRunAiTafrigh")?.addEventListener("click", triggerRunAiTafrigh);
+  document.getElementById("btnRunTafrighFromEmpty")?.addEventListener("click", triggerRunAiTafrigh);
+  document.getElementById("btnRerunTafrigh")?.addEventListener("click", triggerRunAiTafrigh);
+  document.getElementById("btnTafrighRetry")?.addEventListener("click", triggerRunAiTafrigh);
+
+  // Tab switching buttons
+  document.getElementById("btnLectureTab_SYNC")?.addEventListener("click", () => {
+    if (typeof switchLectureStageTab === "function") {
+      switchLectureStageTab("sync");
+    }
+  });
+
+  document.getElementById("btnLectureTab_TAFRIGH")?.addEventListener("click", () => {
+    if (typeof switchLectureStageTab === "function") {
+      switchLectureStageTab("tafrigh");
+    }
+  });
+
+  // Markdown copy button
+  document.getElementById("btnCopyTafrighMarkdown")?.addEventListener("click", () => {
+    const md = currentState.tafrigh?.data?.markdown;
+    if (!md) {
+      showToast("⚠️ لا يوجد نص Markdown متوفر للنسخ");
+      return;
+    }
+    navigator.clipboard.writeText(md).then(() => {
+      showToast("📋 تم نسخ التفريغ المهيكل بصيغة Markdown إلى الحافظة");
+    }).catch(() => {
+      showToast("❌ تعذر النسخ إلى الحافظة");
+    });
+  });
+
+  // Export HTML button
+  document.getElementById("btnExportTafrighHtml")?.addEventListener("click", () => {
+    const htmlContent = currentState.tafrigh?.data?.html;
+    if (!htmlContent) {
+      showToast("⚠️ لا يوجد محتوى HTML جاهز للتصدير");
+      return;
+    }
+    const fullHtml = `<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>التفريغ المهيكل — Wahy Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Tajawal:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Tajawal', sans-serif;
+      background-color: #020617;
+      color: #e2e8f0;
+      padding: 2.5rem 1.5rem;
+      max-width: 860px;
+      margin: 0 auto;
+      line-height: 2;
+    }
+    .tafrigh-matn-block {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(217, 119, 6, 0.1));
+      border-right: 4px solid #f59e0b;
+      border-radius: 0.5rem;
+      padding: 0.85rem 1.25rem;
+      margin: 1.25rem 0;
+      font-family: 'Amiri', serif;
+      font-size: 1.35rem;
+      line-height: 2.3;
+      color: #fef3c7;
+    }
+    .tafrigh-matn-block .tafrigh-label {
+      color: #fbbf24;
+      font-weight: 700;
+      margin-left: 0.5rem;
+    }
+    .tafrigh-sharh-block {
+      margin-top: 1.25rem;
+      margin-bottom: 0.5rem;
+    }
+    .tafrigh-sharh-block .tafrigh-label {
+      color: #38bdf8;
+      font-weight: 700;
+      font-size: 1.2rem;
+      border-bottom: 2px solid rgba(56, 189, 248, 0.3);
+      padding-bottom: 0.2rem;
+      display: inline-block;
+    }
+    .tafrigh-heading {
+      color: #38bdf8;
+      font-weight: 700;
+      margin: 2rem 0 0.85rem 0;
+    }
+    .tafrigh-list-intro {
+      font-weight: 600;
+      color: #e2e8f0;
+      margin-top: 1rem;
+    }
+    .tafrigh-list-item {
+      margin: 0.35rem 1.5rem;
+      list-style-type: disc;
+      color: #cbd5e1;
+    }
+    .tafrigh-comment {
+      background-color: rgba(100, 116, 139, 0.15);
+      border: 1px dashed rgba(148, 163, 184, 0.4);
+      border-radius: 0.5rem;
+      padding: 0.6rem 0.85rem;
+      margin: 0.85rem 0;
+      color: #94a3b8;
+      font-style: italic;
+    }
+    .tafrigh-comment-badge {
+      display: inline-block;
+      background-color: rgba(148, 163, 184, 0.25);
+      color: #e2e8f0;
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 0.1rem 0.4rem;
+      border-radius: 0.25rem;
+      margin-left: 0.35rem;
+      font-style: normal;
+    }
+    .tafrigh-paragraph {
+      margin: 0.75rem 0;
+      text-align: justify;
+    }
+  </style>
+</head>
+<body>
+  ${htmlContent}
+</body>
+</html>`;
+    const blob = new Blob([fullHtml], { type: "text/html;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `tafrigh_lecture_${Date.now()}.html`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast("📥 تم تصدير صفحة التفريغ بصيغة HTML");
+  });
+
   document.getElementById("btnSnapAllToCanonical")?.addEventListener("click", () => {
     pushUndoSnapshot("تبديل الرسم القياسي لجميع المقتبسات");
     currentState.snapAllToCanonical = !currentState.snapAllToCanonical;

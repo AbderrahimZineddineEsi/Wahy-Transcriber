@@ -16,3 +16,6 @@ laya>=0.1.0
 transformers>=4.46.0
 accelerate>=0.34.0
 safetensors>=0.4.5
+pytest>=8.0.0
+rapidfuzz>=3.0.0
+

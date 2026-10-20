@@ -53,6 +53,54 @@ from transcriber import (
 from laya_engine import laya_verifier
 from laya_converter import convert_verification_records_to_laya_jsonl
 
+try:
+    from backend.tafrigh.pipeline import TafrighPipeline
+    from backend.tafrigh.schemas import PipelineConfig
+    from backend.tafrigh.matn_aligner import MatnConfig
+    from backend.tafrigh.outline_repair import run_outline_repair_pass
+    from backend.tafrigh.review_queue import ReviewQueueManager
+    from backend.tafrigh.run_logger import RunLogger
+    from backend.tafrigh.compare_runs import compare_run_dirs
+    from backend.tafrigh.renderer import (
+        RenderConfig,
+        render_to_html,
+        render_to_markdown,
+        render_to_structured_json,
+    )
+    from backend.tafrigh.training_store import CanonicalTrainingRecord, TrainingStore
+    from backend.tafrigh.models import (
+        CommentKind,
+        SourcePosition,
+        StructuralTag,
+        TranscriptSegment,
+    )
+    from backend.tafrigh.adapters.gemini_adapter import GeminiAdapter
+    from backend.tafrigh.adapters.jev_adapter import JEVAdapter, JEVRequestConfig
+except ImportError:
+    from tafrigh.pipeline import TafrighPipeline
+    from tafrigh.schemas import PipelineConfig
+    from tafrigh.matn_aligner import MatnConfig
+    from tafrigh.outline_repair import run_outline_repair_pass
+    from tafrigh.review_queue import ReviewQueueManager
+    from tafrigh.run_logger import RunLogger
+    from tafrigh.compare_runs import compare_run_dirs
+    from tafrigh.renderer import (
+        RenderConfig,
+        render_to_html,
+        render_to_markdown,
+        render_to_structured_json,
+    )
+    from tafrigh.training_store import CanonicalTrainingRecord, TrainingStore
+    from tafrigh.models import (
+        CommentKind,
+        SourcePosition,
+        StructuralTag,
+        TranscriptSegment,
+    )
+    from tafrigh.adapters.gemini_adapter import GeminiAdapter
+    from tafrigh.adapters.jev_adapter import JEVAdapter, JEVRequestConfig
+
+
 BACKEND_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = BACKEND_DIR.parent
 DATA_CACHE_DIR = BACKEND_DIR / "data_cache"
@@ -392,6 +440,252 @@ async def trigger_test_backend_error(request: Request) -> Dict[str, Any]:
     raise CUDAOutOfMemoryError(
         "Simulated CUDA out of memory error on GTX 1050 (3GB VRAM): tried to allocate 512.00 MiB."
     )
+
+
+# -------------------------------------------------------------------------
+# AI Tafrigh Phase Endpoints
+# -------------------------------------------------------------------------
+ACTIVE_TAFRIGH_SESSIONS: Dict[str, Dict[str, Any]] = {}
+GLOBAL_TRAINING_STORE = TrainingStore()
+
+
+@app.post("/api/tafrigh/run")
+async def api_tafrigh_run(request: Request) -> JSONResponse:
+    """
+    Executes the 7-stage AI Tafrigh pipeline.
+    Transforms raw ASR transcripts into faithfully structured output with versions and review queue.
+    """
+    body = await request.json()
+    raw_text = body.get("raw_text")
+    segments_raw = body.get("segments")
+    asr_words = body.get("asr_words")
+    detection_spans = body.get("detection_spans")
+
+    processing_mode = body.get("processing_mode", "per_sentence")
+    model_candidate = body.get("model_candidate", "gemini_all")
+    jev_layout = body.get("jev_layout", "independent_questions")
+    typo_strategy = body.get("typo_strategy", "gated")
+    lecture_slug = body.get("lecture_slug", "lecture")
+    label = body.get("label", "default")
+
+    matn_cfg_dict = body.get("matn_config", {})
+    matn_cfg = MatnConfig(
+        mode=matn_cfg_dict.get("mode", "no_matn"),
+        matn_id=matn_cfg_dict.get("matn_id"),
+        raw_matn_text=matn_cfg_dict.get("raw_matn_text"),
+    )
+
+    pipeline_cfg = PipelineConfig(
+        processing_mode=processing_mode,
+        model_candidate=model_candidate,
+        jev_layout=jev_layout,
+        typo_strategy=typo_strategy,
+    )
+
+    initial_segments = None
+    if segments_raw and isinstance(segments_raw, list):
+        initial_segments = []
+        for s in segments_raw:
+            sp = s.get("source_pos", {})
+            pos = SourcePosition(
+                char_start=sp.get("char_start", 0),
+                char_end=sp.get("char_end", len(s.get("text", s.get("original_text", "")))),
+                start_time=sp.get("start_time"),
+                end_time=sp.get("end_time"),
+            )
+            initial_segments.append(
+                TranscriptSegment(
+                    id=s.get("id", f"seg_{len(initial_segments)+1:04d}"),
+                    original_text=s.get("text", s.get("original_text", "")),
+                    source_pos=pos,
+                )
+            )
+
+    gemini_key = body.get("gemini_api_key") or body.get("api_key") or os.getenv("GEMINI_API_KEY", "")
+    openrouter_key = body.get("openrouter_api_key") or os.getenv("JEV_API_KEY", "")
+    model_name = body.get("model_name") or "gemini-2.0-flash"
+
+    custom_adapters: Dict[str, Any] = {}
+    custom_adapters["gemini"] = GeminiAdapter(
+        api_key=gemini_key,
+        model_name=model_name,
+        typo_strategy=typo_strategy,
+    )
+    if openrouter_key:
+        jev_cfg = JEVRequestConfig(
+            jev_layout=jev_layout,
+            execution_order=body.get("jev_execution_order", "parallel"),
+        )
+        custom_adapters["jev"] = JEVAdapter(api_key=openrouter_key, config=jev_cfg)
+
+    logger = RunLogger(lecture_slug=lecture_slug, label=label)
+    pipeline = TafrighPipeline(pipeline_config=pipeline_cfg, matn_config=matn_cfg, adapters=custom_adapters)
+
+
+    # Execute Stages 1 - 5
+    result = pipeline.run(
+        raw_text=raw_text,
+        initial_segments=initial_segments,
+        asr_words=asr_words,
+        detection_spans=detection_spans,
+    )
+
+    for req in result.request_logs:
+        logger.log_request(req)
+
+    # Stage 6: Outline Repair Pass
+    run_outline_repair_pass(result.segments, result.outline_state)
+
+    # Review Queue
+    review_manager = ReviewQueueManager(result.segments)
+
+    # Finalize logger
+    report_data = logger.finalize_run(result.run_manifest, result.segments)
+
+    # Stage 7: Deterministic Rendering
+    rendered_md = render_to_markdown(result.segments, result.outline_state)
+    rendered_html = render_to_html(result.segments, result.outline_state)
+    rendered_json = render_to_structured_json(
+        result.segments, result.outline_state, result.lecture_spans
+    )
+
+    run_id = result.run_manifest["run_id"]
+    ACTIVE_TAFRIGH_SESSIONS[run_id] = {
+        "segments": result.segments,
+        "outline_state": result.outline_state,
+        "lecture_spans": result.lecture_spans,
+        "manager": review_manager,
+        "logger": logger,
+        "manifest": result.run_manifest,
+    }
+
+    return JSONResponse({
+        "success": True,
+        "run_id": run_id,
+        "markdown": rendered_md,
+        "html": rendered_html,
+        "structured_json": rendered_json,
+        "review_items": [item.model_dump() for item in review_manager.get_items()],
+        "report": report_data,
+    })
+
+
+@app.post("/api/tafrigh/review-action")
+async def api_tafrigh_review_action(request: Request) -> JSONResponse:
+    """
+    Applies a human review decision (confirm, correct, reject).
+    Immediately updates version history and re-renders output with zero model calls.
+    """
+    body = await request.json()
+    run_id = body.get("run_id")
+    segment_id = body.get("segment_id")
+    action = body.get("action", "confirm")
+
+    session = ACTIVE_TAFRIGH_SESSIONS.get(run_id)
+    if not session:
+        return JSONResponse(status_code=404, content={"error": True, "message": f"Run session '{run_id}' not found."})
+
+    manager: ReviewQueueManager = session["manager"]
+    segments: List[TranscriptSegment] = session["segments"]
+    outline_state = session["outline_state"]
+    lecture_spans = session["lecture_spans"]
+
+    reviewer_id = body.get("reviewer_id", "web_editor")
+    note = body.get("note")
+
+    target_seg = None
+    if action == "confirm":
+        target_seg = manager.confirm_decision(segment_id, reviewer_id=reviewer_id, note=note)
+    elif action == "correct":
+        corr_tag_str = body.get("corrected_tag")
+        corr_tag = StructuralTag(corr_tag_str) if corr_tag_str else None
+        corr_level = body.get("corrected_level")
+        corr_parent = body.get("corrected_parent")
+        corr_text = body.get("corrected_text")
+        target_seg = manager.correct_decision(
+            segment_id=segment_id,
+            corrected_tag=corr_tag,
+            corrected_level=corr_level,
+            corrected_parent=corr_parent,
+            corrected_text=corr_text,
+            reviewer_id=reviewer_id,
+            note=note,
+        )
+    elif action == "reject":
+        target_seg = manager.reject_decision(segment_id, reviewer_id=reviewer_id, note=note)
+
+    # Append to canonical training store
+    if target_seg:
+        training_rec = CanonicalTrainingRecord(
+            run_id=run_id,
+            segment_id=target_seg.id,
+            original_text=target_seg.original_text,
+            source_pos=target_seg.source_pos.model_dump(),
+            context_shown={},
+            dynamic_choice_list=[],
+            validation_result={"is_valid": True},
+            final_accepted_decision={
+                "tag": target_seg.final_decision.tag.value if target_seg.final_decision else "paragraph",
+                "level": target_seg.final_decision.level if target_seg.final_decision else None,
+                "parent_id": target_seg.final_decision.parent_id if target_seg.final_decision else None,
+                "edits": [ed.model_dump() for ed in target_seg.versions[-1].edits] if target_seg.versions else [],
+            },
+            review_status={
+                "provenance": (
+                    target_seg.versions[-1].provenance.value
+                    if target_seg.versions
+                    else "human_confirmed"
+                ),
+                "review_action": action,
+                "reviewer_note": note,
+            },
+        )
+        GLOBAL_TRAINING_STORE.append_record(training_rec)
+
+    # Deterministic re-render
+    rendered_md = render_to_markdown(segments, outline_state)
+    rendered_html = render_to_html(segments, outline_state)
+
+    return JSONResponse({
+        "success": True,
+        "segment_id": segment_id,
+        "markdown": rendered_md,
+        "html": rendered_html,
+        "review_items": [item.model_dump() for item in manager.get_items()],
+    })
+
+
+@app.get("/api/tafrigh/runs")
+async def api_tafrigh_list_runs() -> JSONResponse:
+    """Lists past execution runs and reports from the runs/ directory."""
+    runs_dir = Path("runs")
+    if not runs_dir.exists():
+        return JSONResponse({"runs": []})
+
+    runs = []
+    for d in sorted(runs_dir.iterdir(), reverse=True):
+        if d.is_dir() and (d / "report.json").exists():
+            try:
+                with open(d / "report.json", "r", encoding="utf-8") as f:
+                    rep = json.load(f)
+                runs.append({"dir": str(d), "report": rep})
+            except Exception:
+                pass
+
+    return JSONResponse({"runs": runs})
+
+
+@app.post("/api/tafrigh/compare")
+async def api_tafrigh_compare(request: Request) -> JSONResponse:
+    """Compares multiple runs side-by-side."""
+    body = await request.json()
+    run_dirs = body.get("run_dirs", [])
+    paths = [Path(d) for d in run_dirs if Path(d).exists()]
+    if not paths:
+        return JSONResponse(status_code=400, content={"error": True, "message": "No valid run directories provided."})
+
+    md_report = compare_run_dirs(paths)
+    return JSONResponse({"report_markdown": md_report})
 
 
 # Mount static directories

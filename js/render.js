@@ -1648,12 +1648,237 @@ function renderAiLogsSection() {
   }
 }
 
+function switchLectureStageTab(tab) {
+  if (currentState && currentState.tafrigh) {
+    currentState.tafrigh.viewMode = tab;
+  }
+  const syncBtn = document.getElementById("btnLectureTab_SYNC");
+  const tafrighBtn = document.getElementById("btnLectureTab_TAFRIGH");
+  const syncToolbar = document.getElementById("lectureSyncToolbar");
+  const syncStage = document.getElementById("formattedLectureStage");
+  const tafrighStage = document.getElementById("tafrighStage");
+  const tafrighActions = document.getElementById("tafrighQuickActions");
+
+  if (tab === "tafrigh") {
+    if (syncBtn) {
+      syncBtn.classList.remove("active");
+      syncBtn.classList.add("inactive");
+      syncBtn.setAttribute("aria-selected", "false");
+    }
+    if (tafrighBtn) {
+      tafrighBtn.classList.add("active");
+      tafrighBtn.classList.remove("inactive");
+      tafrighBtn.setAttribute("aria-selected", "true");
+    }
+    if (syncToolbar) syncToolbar.classList.add("hidden");
+    if (syncStage) syncStage.classList.add("hidden");
+    if (tafrighStage) tafrighStage.classList.remove("hidden");
+    if (tafrighActions && currentState.tafrigh && currentState.tafrigh.hasRun) {
+      tafrighActions.classList.remove("hidden");
+    }
+  } else {
+    if (syncBtn) {
+      syncBtn.classList.add("active");
+      syncBtn.classList.remove("inactive");
+      syncBtn.setAttribute("aria-selected", "true");
+    }
+    if (tafrighBtn) {
+      tafrighBtn.classList.remove("active");
+      tafrighBtn.classList.add("inactive");
+      tafrighBtn.setAttribute("aria-selected", "false");
+    }
+    if (syncToolbar) syncToolbar.classList.remove("hidden");
+    if (syncStage) syncStage.classList.remove("hidden");
+    if (tafrighStage) tafrighStage.classList.add("hidden");
+    if (tafrighActions) tafrighActions.classList.add("hidden");
+  }
+}
+
+function renderTafrighOutput(tafrighData) {
+  if (!tafrighData) return;
+
+  // Persist state
+  if (currentState && currentState.tafrigh) {
+    currentState.tafrigh.hasRun = true;
+    currentState.tafrigh.data = tafrighData;
+    currentState.tafrigh.viewMode = "tafrigh";
+  }
+
+  const emptyState = document.getElementById("tafrighEmptyState");
+  const progressWrap = document.getElementById("tafrighProgressWrap");
+  const errorWrap = document.getElementById("tafrighErrorWrap");
+  const resultsView = document.getElementById("tafrighResultsView");
+  const badgeStatus = document.getElementById("badgeTafrighStatus");
+  const quickActions = document.getElementById("tafrighQuickActions");
+  const tocBar = document.getElementById("tafrighTocBar");
+  const reviewQueueWrap = document.getElementById("tafrighReviewQueueWrap");
+  const renderedContent = document.getElementById("tafrighRenderedContent");
+
+  // Ensure tafrigh tab is active and visible
+  switchLectureStageTab("tafrigh");
+
+  if (emptyState) emptyState.classList.add("hidden");
+  if (progressWrap) progressWrap.classList.add("hidden");
+  if (errorWrap) errorWrap.classList.add("hidden");
+  if (resultsView) resultsView.classList.remove("hidden");
+  if (badgeStatus) badgeStatus.classList.remove("hidden");
+  if (quickActions) quickActions.classList.remove("hidden");
+
+  const html = tafrighData.html || "";
+  const reviewItems = tafrighData.review_items || [];
+  const runId = tafrighData.run_id || (currentState.tafrigh?.data?.run_id) || "";
+
+  // 1. Render TOC Bar from structured JSON headings
+  if (tocBar) {
+    const headings = tafrighData.structured_json?.headings || [];
+    if (headings.length > 0) {
+      tocBar.innerHTML = headings.map(h => {
+        const title = h.canonical_title || h.title || "عنوان";
+        const segId = h.segment_id || "";
+        return `<a href="#${segId}" class="tafrigh-toc-pill" data-seg-id="${segId}">📌 ${escapeHtml(title)}</a>`;
+      }).join("");
+      tocBar.classList.remove("hidden");
+
+      tocBar.querySelectorAll(".tafrigh-toc-pill").forEach(pill => {
+        pill.addEventListener("click", (e) => {
+          e.preventDefault();
+          const targetId = pill.getAttribute("data-seg-id");
+          const el = document.getElementById(targetId);
+          if (el) {
+            el.scrollIntoView({ behavior: "smooth", block: "center" });
+            el.classList.add("ring-2", "ring-amber-400", "rounded");
+            setTimeout(() => el.classList.remove("ring-2", "ring-amber-400"), 1800);
+          }
+        });
+      });
+    } else {
+      tocBar.innerHTML = "";
+      tocBar.classList.add("hidden");
+    }
+  }
+
+  // 2. Render Human Review Queue Banner
+  if (reviewQueueWrap) {
+    if (reviewItems.length > 0) {
+      reviewQueueWrap.innerHTML = `
+        <div class="p-4 rounded-xl bg-amber-950/40 border border-amber-500/40 text-amber-200">
+          <div class="flex items-center justify-between mb-2">
+            <strong class="text-sm font-bold flex items-center gap-2">
+              <span>⚠️</span>
+              <span>طابور المراجعة البشرية (${reviewItems.length} فقرة تتطلب التحقق):</span>
+            </strong>
+            <span class="text-[10px] text-amber-400/80">انقر تأكيد أو تراجع لتحديث الهيكل فوراً</span>
+          </div>
+          <div class="space-y-2 max-h-60 overflow-y-auto no-scrollbar">
+            ${reviewItems.map(item => `
+              <div class="p-2.5 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-between gap-3 text-xs" id="review_row_${item.segment_id}">
+                <div class="flex-1">
+                  <span class="font-mono text-sky-400 font-bold ml-1">${item.segment_id}</span>
+                  <span class="text-slate-300">${escapeHtml(item.active_text || item.original_text || "")}</span>
+                  <div class="text-[10px] text-amber-400 mt-1">${(item.review_flags || []).join(' • ')}</div>
+                </div>
+                <div class="flex items-center gap-1.5 shrink-0">
+                  <button type="button" class="btn-tafrigh-confirm px-2.5 py-1 rounded-lg bg-emerald-600/30 text-emerald-300 hover:bg-emerald-600/50 font-bold transition" data-run-id="${runId}" data-seg-id="${item.segment_id}">تأكيد ✓</button>
+                  <button type="button" class="btn-tafrigh-reject px-2.5 py-1 rounded-lg bg-rose-600/30 text-rose-300 hover:bg-rose-600/50 font-bold transition" data-run-id="${runId}" data-seg-id="${item.segment_id}">تراجع ✕</button>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+      reviewQueueWrap.classList.remove("hidden");
+
+      reviewQueueWrap.querySelectorAll(".btn-tafrigh-confirm").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          const segId = btn.getAttribute("data-seg-id");
+          const rId = btn.getAttribute("data-run-id");
+          await executeTafrighReviewAction(rId, segId, "confirm");
+        });
+      });
+
+      reviewQueueWrap.querySelectorAll(".btn-tafrigh-reject").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          const segId = btn.getAttribute("data-seg-id");
+          const rId = btn.getAttribute("data-run-id");
+          await executeTafrighReviewAction(rId, segId, "reject");
+        });
+      });
+    } else {
+      reviewQueueWrap.innerHTML = "";
+      reviewQueueWrap.classList.add("hidden");
+    }
+  }
+
+  // 3. Render Semantic HTML Structure
+  if (renderedContent) {
+    renderedContent.innerHTML = html;
+  }
+}
+
+async function executeTafrighReviewAction(runId, segmentId, action) {
+  try {
+    let apiBase = "";
+    if (window.location.protocol === "file:" || window.location.port === "8089") {
+      apiBase = "http://127.0.0.1:8000";
+    }
+    let url = `${apiBase}/api/tafrigh/review-action`;
+    let res;
+    try {
+      res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ run_id: runId, segment_id: segmentId, action })
+      });
+    } catch (netErr) {
+      if (!apiBase) {
+        url = `http://127.0.0.1:8000/api/tafrigh/review-action`;
+        res = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ run_id: runId, segment_id: segmentId, action })
+        });
+      } else {
+        throw netErr;
+      }
+    }
+    const data = await res.json();
+    if (data.success) {
+      renderTafrighOutput({
+        run_id: runId,
+        markdown: data.markdown,
+        html: data.html,
+        review_items: data.review_items,
+        structured_json: currentState.tafrigh?.data?.structured_json
+      });
+      if (typeof showToast === "function") {
+        showToast(action === "confirm" ? "✅ تم اعتماد القرار بنجاح" : "↩️ تم التراجع وتحديث الهيكل");
+      }
+    } else {
+      if (typeof showToast === "function") {
+        showToast("❌ تعذر تنفيذ إجراء المراجعة");
+      }
+    }
+  } catch (err) {
+    console.error("Tafrigh review action error:", err);
+    if (typeof showToast === "function") {
+      showToast("❌ خطأ في الاتصال بالخادم الخلفي");
+    }
+  }
+}
+
+window.switchLectureStageTab = switchLectureStageTab;
+window.renderTafrighOutput = renderTafrighOutput;
+window.executeTafrighReviewAction = executeTafrighReviewAction;
 window.updateAiMetricsUI = updateAiMetricsUI;
+
 window.renderAiRequestLogsTable = renderAiRequestLogsTable;
 window.renderLayaDatasetBankStats = renderLayaDatasetBankStats;
 window.renderAiLogsSection = renderAiLogsSection;
 
 window.WahyRenderer = {
+  switchLectureStageTab,
+  renderTafrighOutput,
+  executeTafrighReviewAction,
   switchMainSection,
   switchEditorSubMode,
   renderAllViews,

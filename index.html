@@ -265,9 +265,13 @@
 
         <!-- Layout & Quick Actions -->
         <div class="flex flex-wrap items-center gap-1.5">
+          <button type="button" id="btnRunAiTafrigh" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-600/20 hover:bg-amber-600/35 text-amber-300 border border-amber-500/40 transition" title="تشغيل مرحلة التفريغ الذكي وتقسيم المتن والشرح والهيكلة">
+            📑 التفريغ الذكي (AI Tafrigh)
+          </button>
           <button type="button" id="btnSnapAllToCanonical" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-950/70 hover:bg-emerald-900/80 text-emerald-300 border border-emerald-500/40 transition">
             ✨ توحيد بالرسم القياسي
           </button>
+
           <button type="button" id="btnQuickGoToEditor" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-sky-600/20 hover:bg-sky-600/35 text-sky-300 border border-sky-500/40 transition" title="الانتقال إلى استوديو التحرير وإضافة المقتبسات المفقودة (FN Studio)">
             ✍️ تحرير / إضافة مفقود (FN)
           </button>
@@ -379,8 +383,32 @@
         <div id="rightLectureColumn" class="lg:col-span-7 flex flex-col gap-4">
           <div class="rounded-2xl bg-slate-900/95 border border-slate-800/90 shadow-xl overflow-hidden flex flex-col">
 
+            <!-- Lecture Stage Tabs: Sync Word Stage vs. Structured Tafrigh Stage -->
+            <div class="bg-slate-950/90 border-b border-slate-800/80 px-4 py-2 flex flex-wrap items-center justify-between gap-2">
+              <div class="flex items-center gap-1.5" role="tablist">
+                <button type="button" id="btnLectureTab_SYNC" class="tafrigh-tab-btn active" role="tab" aria-selected="true">
+                  <span>📖 النص المتزامن والكابشن</span>
+                </button>
+                <button type="button" id="btnLectureTab_TAFRIGH" class="tafrigh-tab-btn inactive flex items-center gap-1.5" role="tab" aria-selected="false">
+                  <span>📑 التفريغ المهيكل (المتن والشرح)</span>
+                  <span id="badgeTafrighStatus" class="hidden px-1.5 py-0.5 rounded-full text-[10px] bg-amber-500/20 text-amber-300 font-bold">جاهز</span>
+                </button>
+              </div>
+              <div id="tafrighQuickActions" class="hidden flex items-center gap-1.5">
+                <button type="button" id="btnCopyTafrighMarkdown" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 text-[11px] font-bold transition flex items-center gap-1" title="نسخ التفريغ المهيكل بصيغة Markdown">
+                  <span>📋 نسخ Markdown</span>
+                </button>
+                <button type="button" id="btnExportTafrighHtml" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-slate-700 text-[11px] font-bold transition flex items-center gap-1" title="تنزيل صفحة التفريغ بصيغة HTML منسقة">
+                  <span>📥 تصدير HTML</span>
+                </button>
+                <button type="button" id="btnRerunTafrigh" class="px-2.5 py-1 rounded-lg bg-amber-600/20 hover:bg-amber-600/35 text-amber-300 border border-amber-500/40 text-[11px] font-bold transition flex items-center gap-1" title="إعادة تشغيل التفريغ المهيكل">
+                  <span>🔄 إعادة المعالجة</span>
+                </button>
+              </div>
+            </div>
+
             <!-- Lecture Toolbar + Real-time Word Progress Bar -->
-            <div class="bg-slate-900 border-b border-slate-800 px-4 py-3 space-y-2.5">
+            <div id="lectureSyncToolbar" class="bg-slate-900 border-b border-slate-800 px-4 py-3 space-y-2.5">
               <div class="flex flex-wrap items-center justify-between gap-2">
                 <div class="flex items-center gap-2">
                   <h2 class="text-sm font-bold text-white">📖 نص المحاضرة المتزامن</h2>
@@ -451,6 +479,67 @@
 
             <!-- Formatted Lecture Rich Text Stage -->
             <div id="formattedLectureStage" class="lecture-pane p-5 sm:p-6 max-h-[640px] overflow-y-auto bg-slate-950/50 text-slate-100 select-text"></div>
+
+            <!-- Structured AI Tafrigh Stage -->
+            <div id="tafrighStage" class="lecture-pane p-5 sm:p-6 max-h-[640px] overflow-y-auto bg-slate-950/50 text-slate-100 select-text hidden">
+              <!-- Empty State -->
+              <div id="tafrighEmptyState" class="py-12 px-4 text-center max-w-lg mx-auto space-y-4">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-amber-500/15 border border-amber-500/30 text-amber-300 text-3xl mb-1 shadow-inner">
+                  📑
+                </div>
+                <h3 class="text-base font-bold text-white">التفريغ المهيكل بالذكاء الاصطناعي (AI Tafrigh)</h3>
+                <p class="text-xs text-slate-300 leading-relaxed">
+                  هذه المرحلة تنشئ نسخة تفريغ احترافية تليق بالدروس العلمية: تمييز عبارات المتن المقروءة بدقة وفصلها عن الشرح، توليد شجرة عناوين ذكية هرمية، استخراج الاستطرادات والأسئلة كحواشٍ عارضة، مع ضمان بقاء نصوص المتكلم وحروفه مطابقة 100% دون أي تبديل أو اختلاق.
+                </p>
+                <div class="pt-2">
+                  <button type="button" id="btnRunTafrighFromEmpty" class="px-4 py-2.5 rounded-xl text-xs font-bold bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-slate-950 shadow-lg shadow-amber-600/25 transition flex items-center gap-2 mx-auto">
+                    <span>🚀</span>
+                    <span>بدء التفريغ وهيكلة المتن والشرح الآن</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Animated Progress State -->
+              <div id="tafrighProgressWrap" class="py-12 px-6 max-w-md mx-auto space-y-4 text-center hidden">
+                <div class="relative w-14 h-14 mx-auto flex items-center justify-center">
+                  <div class="absolute inset-0 rounded-full border-2 border-amber-500/20 border-t-amber-400 animate-spin"></div>
+                  <span class="text-xl">⏳</span>
+                </div>
+                <div class="space-y-1">
+                  <h4 id="tafrighProgressTitle" class="text-sm font-bold text-white">جاري معالجة التفريغ المهيكل...</h4>
+                  <p id="tafrighProgressSubtitle" class="text-xs text-amber-300/80">تقطيع الجمل • كشف المتون • ترتيب الهيكل • الفحص اللغوي</p>
+                </div>
+                <div class="w-full h-1.5 rounded-full bg-slate-900 border border-slate-800 overflow-hidden">
+                  <div id="tafrighProgressBar" class="h-full bg-gradient-to-l from-amber-500 to-amber-300 transition-all duration-300" style="width: 45%"></div>
+                </div>
+              </div>
+
+              <!-- Diagnostic Error State -->
+              <div id="tafrighErrorWrap" class="p-4 rounded-xl bg-rose-950/40 border border-rose-500/40 text-rose-200 space-y-2 hidden">
+                <div class="flex items-center gap-2 font-bold text-sm">
+                  <span>❌</span>
+                  <span id="tafrighErrorTitle">تعذر إكمال التفريغ المهيكل</span>
+                </div>
+                <p id="tafrighErrorMessage" class="text-xs text-rose-300/90 leading-relaxed"></p>
+                <div class="pt-2 flex items-center gap-2">
+                  <button type="button" id="btnTafrighRetry" class="px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs transition">
+                    🔄 إعادة المحاولة
+                  </button>
+                </div>
+              </div>
+
+              <!-- Structured Results Container -->
+              <div id="tafrighResultsView" class="space-y-4 hidden">
+                <!-- TOC Pills Bar -->
+                <div id="tafrighTocBar" class="tafrigh-toc-bar hidden"></div>
+
+                <!-- Review Queue Alert Banner -->
+                <div id="tafrighReviewQueueWrap" class="hidden"></div>
+
+                <!-- Rendered Semantic HTML -->
+                <div id="tafrighRenderedContent" class="tafrigh-rendered-content text-right font-sans leading-relaxed text-slate-200 space-y-3"></div>
+              </div>
+            </div>
           </div>
         </div>
 

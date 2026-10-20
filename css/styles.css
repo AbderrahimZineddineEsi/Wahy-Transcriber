@@ -585,3 +585,149 @@ html.light textarea {
   box-shadow: 0 0 12px -2px rgba(249, 115, 22, 0.4);
 }
 
+/* =========================================================================
+   AI Tafrigh Phase Stylesheet Extensions
+   ========================================================================= */
+
+.tafrigh-matn-block {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(217, 119, 6, 0.08));
+  border-right: 4px solid #f59e0b;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  margin: 1rem 0;
+  font-family: 'Amiri', serif;
+  font-size: 1.25rem;
+  line-height: 2.2;
+  color: #fef3c7;
+}
+
+.tafrigh-matn-block .tafrigh-label {
+  color: #fbbf24;
+  font-weight: 700;
+  margin-left: 0.5rem;
+}
+
+.tafrigh-sharh-block {
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.tafrigh-sharh-block .tafrigh-label {
+  color: #38bdf8;
+  font-weight: 700;
+  font-size: 1.15rem;
+  border-bottom: 2px solid rgba(56, 189, 248, 0.3);
+  padding-bottom: 0.2rem;
+  display: inline-block;
+}
+
+.tafrigh-heading {
+  color: #38bdf8;
+  font-weight: 700;
+  margin: 1.5rem 0 0.75rem 0;
+}
+
+.tafrigh-list-intro {
+  font-weight: 600;
+  color: #e2e8f0;
+  margin-top: 1rem;
+  margin-bottom: 0.25rem;
+}
+
+.tafrigh-list-item {
+  margin: 0.35rem 1.5rem;
+  list-style-type: disc;
+  color: #cbd5e1;
+}
+
+.tafrigh-continuation {
+  display: inline;
+}
+
+.tafrigh-comment {
+  background-color: rgba(100, 116, 139, 0.12);
+  border: 1px dashed rgba(148, 163, 184, 0.4);
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  margin: 0.75rem 0;
+  font-size: 0.95rem;
+  color: #94a3b8;
+  font-style: italic;
+}
+
+.tafrigh-comment-badge {
+  display: inline-block;
+  background-color: rgba(148, 163, 184, 0.25);
+  color: #e2e8f0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.1rem 0.4rem;
+  border-radius: 0.25rem;
+  margin-left: 0.35rem;
+  font-style: normal;
+}
+
+.tafrigh-diff-popover {
+  position: absolute;
+  z-index: 50;
+  background-color: #0f172a;
+  border: 1px solid #334155;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  width: 280px;
+}
+
+.tafrigh-tab-btn {
+  padding: 0.35rem 0.85rem;
+  border-radius: 0.65rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  transition: all 0.15s ease;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+.tafrigh-tab-btn.active {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.25), rgba(217, 119, 6, 0.2));
+  color: #fbbf24;
+  border-color: rgba(245, 158, 11, 0.6);
+  box-shadow: 0 2px 8px -2px rgba(245, 158, 11, 0.3);
+}
+.tafrigh-tab-btn.inactive {
+  background-color: rgba(15, 23, 42, 0.6);
+  color: #94a3b8;
+  border-color: rgba(51, 65, 85, 0.5);
+}
+.tafrigh-tab-btn.inactive:hover {
+  background-color: rgba(30, 41, 59, 0.8);
+  color: #f1f5f9;
+}
+
+.tafrigh-toc-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  padding: 0.5rem 0.75rem;
+  background-color: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(51, 65, 85, 0.6);
+  border-radius: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+.tafrigh-toc-pill {
+  padding: 0.2rem 0.6rem;
+  border-radius: 0.5rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  background-color: rgba(56, 189, 248, 0.12);
+  color: #7dd3fc;
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  text-decoration: none;
+  transition: all 0.12s ease;
+}
+.tafrigh-toc-pill:hover {
+  background-color: rgba(56, 189, 248, 0.25);
+  color: #e0f2fe;
+}
+
+
+

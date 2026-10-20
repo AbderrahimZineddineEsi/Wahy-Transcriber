@@ -1,0 +1,28 @@
+{
+  "run_id": "run_5e62aa246591",
+  "lecture_slug": "lecture",
+  "label": "default",
+  "total_requests": 1,
+  "total_input_tokens": 0,
+  "total_output_tokens": 0,
+  "total_cached_tokens": 0,
+  "total_cost_usd": 0.0,
+  "wall_clock_seconds": 0.0,
+  "cost_per_100_sentences_usd": 0.0,
+  "time_per_100_sentences_sec": 0.0,
+  "failure_rate": 0.0,
+  "retry_rate": 0.0,
+  "fallback_rate": 0.0,
+  "latency_by_purpose_ms": {
+    "classify": {
+      "p50": 0.79,
+      "p95": 0.79,
+      "max": 0.79
+    }
+  },
+  "structural_tag_distribution": {
+    "paragraph": 1
+  },
+  "review_flag_counts": {},
+  "evaluation_metrics": null
+}

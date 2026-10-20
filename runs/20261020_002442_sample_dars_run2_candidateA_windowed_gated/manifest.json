@@ -1,0 +1,14 @@
+{
+  "run_id": "run_6787442ab810",
+  "processing_mode": "windowed",
+  "window_size": 20,
+  "model_candidate": "gemini_all",
+  "jev_layout": "independent_questions",
+  "jev_execution_order": "parallel",
+  "typo_strategy": "gated",
+  "use_detection_boundaries": true,
+  "num_segments": 10,
+  "wall_clock_seconds": 0.0,
+  "run_dir": "runs/20261020_002442_sample_dars_run2_candidateA_windowed_gated",
+  "completed_at": "2026-10-20T00:24:42.802118+00:00"
+}
