@@ -102,14 +102,21 @@
             </summary>
             <pre class="p-4 text-[11px] leading-relaxed font-mono text-emerald-200/90 overflow-x-auto max-h-48 whitespace-pre-wrap" dir="ltr"><code id="diagErrMarkdownPreview"></code></pre>
           </details>
+
+          <!-- Module 8: AI Error Diagnostic Output Box -->
+          <div id="aiErrorDiagnosticOutput" class="hidden rounded-xl bg-slate-950 p-4 border border-violet-500/50 text-xs space-y-2 mt-3 text-slate-200 leading-relaxed font-arabic-ui"></div>
         </div>
 
         <!-- Footer Actions -->
         <div class="border-t border-slate-800 bg-slate-900/95 px-5 py-3.5 flex flex-wrap items-center justify-between gap-3">
-          <span class="text-xs text-slate-400" id="diagCopyFeedback">جاهز للنسخ الفوري بصيغة Markdown مهيأة للذكاء الاصطناعي.</span>
+          <span class="text-xs text-slate-400" id="diagCopyFeedback">جاهز للنسخ الفوري أو التشخيص المباشر بالذكاء الاصطناعي.</span>
           <div class="flex items-center gap-2.5">
+            <button type="button" id="btnAiExplainError" class="px-3.5 py-2 rounded-xl bg-violet-600 hover:bg-violet-500 text-white font-bold text-xs shadow-lg transition flex items-center gap-1.5">
+              <span>🤖</span>
+              <span>تشخيص الخطأ واقتراح الحل بالذكاء الاصطناعي</span>
+            </button>
             <button type="button" id="btnCopyDiagnosticForAI" class="px-4 py-2 rounded-xl bg-gradient-to-l from-rose-600 to-amber-600 hover:from-rose-500 hover:to-amber-500 text-white font-bold text-xs shadow-lg shadow-rose-900/40 flex items-center gap-2 transition">
-              <span>📋 نسخ التقرير التشخيصي للذكاء الاصطناعي (Copy Diagnostic Report for AI)</span>
+              <span>📋 نسخ التقرير</span>
             </button>
           </div>
         </div>
@@ -126,7 +133,103 @@
       copyDiagnosticReportForAI();
     });
 
+    modal.querySelector("#btnAiExplainError")?.addEventListener("click", async () => {
+      await runAiErrorDiagnostic();
+    });
+
     return modal;
+  }
+
+  async function runAiErrorDiagnostic() {
+    const outEl = document.getElementById("aiErrorDiagnosticOutput");
+    const btn = document.getElementById("btnAiExplainError");
+    if (!outEl) return;
+
+    outEl.classList.remove("hidden");
+    outEl.innerHTML = `<div class="flex items-center gap-2 text-violet-300 font-bold"><span>⏳</span><span>جاري تحليل الخطأ وسجل العمليات بالذكاء الاصطناعي...</span></div>`;
+    if (btn) btn.disabled = true;
+
+    try {
+      const err = window.__lastDiagnosticError || {};
+      const errorStack = err.traceback || err.message || "Unknown error";
+      const actionContext = JSON.stringify({
+        context: err.context || {},
+        recent_actions: window.__wahyActionLog?.slice(-5) || []
+      }, null, 2);
+
+      const promptText = `أنت مهندس دعم فني خبير بنظام Wahy-Transcriber.
+حدث الخطأ التالي أثناء تشغيل النظام:
+${errorStack}
+البيئة والإجراء الحالي: ${actionContext}
+
+اشرح للمستخدم في 3 نقاط محددة وموجزة جداً:
+1. سبب المشكلة باختصار غير تقني.
+2. ما الذي يجب على المستخدم فعله فوراً (إعادة المحاولة، تعديل الإعدادات، فحص مفتاح API).
+3. التعديل البرمجي المطلوب إن كان هناك خطأ برمجي (مع ذكر اسم الملف).`;
+
+      // Check if user has Gemini Key configured
+      const st = (typeof currentState === "object" && currentState) || {};
+      const geminiKey = st.aiVerification?.geminiApiKey || (document.getElementById("inpGeminiApiKey")?.value || "").trim();
+
+      if (geminiKey) {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${geminiKey}`;
+        const resp = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: promptText }] }]
+          })
+        });
+        const data = await resp.json();
+        const diagnosis = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (diagnosis) {
+          outEl.innerHTML = `
+            <div class="font-bold text-violet-300 border-b border-violet-500/30 pb-1.5 mb-2 flex items-center justify-between">
+              <span>🤖 تشخيص الذكاء الاصطناعي وخطة الحل:</span>
+              <span class="text-[10px] text-text-muted font-mono">Gemini Flash-Lite</span>
+            </div>
+            <div class="text-xs whitespace-pre-wrap leading-relaxed">${escapeErrHtml(diagnosis)}</div>
+          `;
+          return;
+        }
+      }
+
+      // Fallback: Smart local rule-based diagnostic if no active Gemini Key
+      let reason = "حدث استثناء غير متوقع في معالجة الطلب أو الاتصال بالخادم.";
+      let immediateFix = "تأكد من تشغيل خادم FastAPI (bash run.sh أو run.bat) وفحص الاتصال بالإنترنت.";
+      let codeFix = "تحقق من سجل الخادم في Terminal أو ملف backend/app.py.";
+
+      const msg = (err.message || "").toLowerCase() + " " + (err.traceback || "").toLowerCase();
+      if (msg.includes("cuda out of memory") || msg.includes("cudaoutofmemory")) {
+        reason = "نفاد ذاكرة كارت الشاشة (CUDA VRAM) أثناء تحميل نموذج Whisper أو Laya.";
+        immediateFix = "اختر نموذجاً أخف (مثل local-small-int8 أو Groq Cloud) أو أعد تشغيل المتصفح لتحرير الذاكرة.";
+        codeFix = "تأكد من استدعاء cleanup_cuda_vram() في backend/transcriber.py.";
+      } else if (msg.includes("25mb") || msg.includes("groq") || msg.includes("rate limit")) {
+        reason = "تجاوز حد حجم ملف الصوت المجاني لـ Groq API (الحد الأقصى 25 ميجابايت) أو حد الطلبات.";
+        immediateFix = "استخدم ملفاً صوتياً أقصر أو اختر نموذج Whisper المحلي int8 للتعامل مع أي مدة.";
+        codeFix = "فحص استدعاء slice_audio_for_groq() في backend/media_processor.py.";
+      } else if (msg.includes("yt-dlp") || msg.includes("youtube") || msg.includes("download")) {
+        reason = "فشل أداة yt-dlp في تحميل فيديو يوتيوب (ربما بسبب حظر قيود أو رابط غير صالح).";
+        immediateFix = "تأكد من صحة الرابط أو حمّل الفيديو محلياً بصيغة MP4/MP3 واسحبه مباشرة للموقع.";
+        codeFix = "تحديث مكتبة yt-dlp في البيئة: pip install -U yt-dlp.";
+      }
+
+      outEl.innerHTML = `
+        <div class="font-bold text-violet-300 border-b border-violet-500/30 pb-1.5 mb-2 flex items-center justify-between">
+          <span>🤖 تشخيص الخطأ واقتراح الحل المباشر:</span>
+          <span class="text-[10px] text-amber-300">نظام التشخيص الفوري</span>
+        </div>
+        <div class="space-y-2 text-xs">
+          <div><strong class="text-emerald-300 font-bold">1. سبب المشكلة:</strong> ${escapeErrHtml(reason)}</div>
+          <div><strong class="text-sky-300 font-bold">2. الإجراء الفوري المطلوب:</strong> ${escapeErrHtml(immediateFix)}</div>
+          <div><strong class="text-amber-300 font-bold">3. الملاحظة البرمجية:</strong> ${escapeErrHtml(codeFix)}</div>
+        </div>
+      `;
+    } catch (e) {
+      outEl.innerHTML = `<div class="text-rose-400">فشل إجراء التشخيص بالذكاء الاصطناعي: ${escapeErrHtml(e.message || e)}</div>`;
+    } finally {
+      if (btn) btn.disabled = false;
+    }
   }
 
   function getActiveStateSnapshot() {

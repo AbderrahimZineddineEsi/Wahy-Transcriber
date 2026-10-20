@@ -1,0 +1,14 @@
+{
+  "run_id": "run_2e4e5abf8281",
+  "processing_mode": "per_sentence",
+  "window_size": 20,
+  "model_candidate": "gemini_all",
+  "jev_layout": "independent_questions",
+  "jev_execution_order": "parallel",
+  "typo_strategy": "gated",
+  "use_detection_boundaries": true,
+  "num_segments": 5,
+  "wall_clock_seconds": 0.0,
+  "run_dir": "runs/20261020_145033_lecture_default",
+  "completed_at": "2026-10-20T14:50:33.452243+00:00"
+}

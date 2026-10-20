@@ -107,9 +107,12 @@ let demoPlaybackTimer = null;
 
 let currentState = {
   version: "2.1.0",
-  activeSection: "display",       // "input" | "display" | "editor" | "datasets"
+  activeSection: "display",       // "input" | "display" | "editor" | "datasets" | "training_data"
   editorSubMode: "fn_studio",     // "fn_studio" | "text_edit" | "captions_edit"
   editorDockTab: "fn",            // "fn" | "inspector"
+  editorPlaybackFollowsSelection: true,
+  editorViewRasmQiyasi: false,
+  editorViewFullCanonicalSpan: false,
   fnSelectMode: true,
   fnClickStep: 0,                 // 0 = waiting for start word click, 1 = start clicked (hover preview active)
   adhkarEnabled: true,
@@ -400,6 +403,114 @@ async function clearVerificationRecordsDB() {
     });
   } catch (err) {
     console.warn("Failed to clear IndexedDB records:", err);
+    return false;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// IndexedDB Lecture Sessions Store (WahyLecturesDB) - Module 6
+// -----------------------------------------------------------------------------
+const IDB_LECTURES_DB_NAME = "WahyLecturesDB";
+const IDB_LECTURES_STORE_NAME = "saved_sessions";
+
+function openWahyLecturesDB() {
+  return new Promise((resolve, reject) => {
+    if (!window.indexedDB) {
+      return reject(new Error("IndexedDB غير مدعوم في هذا المتصفح."));
+    }
+    const req = window.indexedDB.open(IDB_LECTURES_DB_NAME, 1);
+    req.onupgradeneeded = (e) => {
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains(IDB_LECTURES_STORE_NAME)) {
+        const store = db.createObjectStore(IDB_LECTURES_STORE_NAME, { keyPath: "id" });
+        store.createIndex("title", "title", { unique: false });
+        store.createIndex("updated_at", "updated_at", { unique: false });
+      }
+    };
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error || new Error("فشل فتح قاعدة بيانات WahyLecturesDB"));
+  });
+}
+
+async function saveLectureSessionToDB(sessionData = {}) {
+  try {
+    const db = await openWahyLecturesDB();
+    const id = sessionData.id || `lecture_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+    const record = {
+      id,
+      title: sessionData.title || currentState.lectureTitle || "محاضرة علمية — استوديو الوحيين",
+      created_at: sessionData.created_at || new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      media_url: sessionData.mediaUrl || currentState.mediaUrl || "",
+      media_type: sessionData.mediaType || currentState.mediaType || "demo",
+      raw_transcript: sessionData.rawTranscript || currentState.rawTranscript || currentState.rawText || "",
+      words: sessionData.words || currentState.words || [],
+      detections: sessionData.detections || currentState.detections || [],
+      captions: sessionData.captions || currentState.captions || [],
+      tafrigh_result: sessionData.tafrigh || currentState.tafrigh?.data || null,
+      word_count: (sessionData.words || currentState.words || []).length,
+      quote_count: (sessionData.detections || currentState.detections || []).length
+    };
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction([IDB_LECTURES_STORE_NAME], "readwrite");
+      const store = tx.objectStore(IDB_LECTURES_STORE_NAME);
+      const req = store.put(record);
+      req.onsuccess = () => resolve(record);
+      req.onerror = () => reject(req.error);
+    });
+  } catch (err) {
+    console.error("Failed to save lecture session:", err);
+    throw err;
+  }
+}
+
+async function getAllSavedLecturesFromDB() {
+  try {
+    const db = await openWahyLecturesDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction([IDB_LECTURES_STORE_NAME], "readonly");
+      const store = tx.objectStore(IDB_LECTURES_STORE_NAME);
+      const req = store.getAll();
+      req.onsuccess = () => {
+        const list = (req.result || []).sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
+        resolve(list);
+      };
+      req.onerror = () => reject(req.error);
+    });
+  } catch (err) {
+    console.warn("Failed to read saved lectures:", err);
+    return [];
+  }
+}
+
+async function getLectureSessionFromDB(id) {
+  try {
+    const db = await openWahyLecturesDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction([IDB_LECTURES_STORE_NAME], "readonly");
+      const store = tx.objectStore(IDB_LECTURES_STORE_NAME);
+      const req = store.get(id);
+      req.onsuccess = () => resolve(req.result || null);
+      req.onerror = () => reject(req.error);
+    });
+  } catch (err) {
+    console.warn("Failed to get lecture session:", err);
+    return null;
+  }
+}
+
+async function deleteSavedLectureFromDB(id) {
+  try {
+    const db = await openWahyLecturesDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction([IDB_LECTURES_STORE_NAME], "readwrite");
+      const store = tx.objectStore(IDB_LECTURES_STORE_NAME);
+      const req = store.delete(id);
+      req.onsuccess = () => resolve(true);
+      req.onerror = () => reject(req.error);
+    });
+  } catch (err) {
+    console.warn("Failed to delete saved lecture:", err);
     return false;
   }
 }

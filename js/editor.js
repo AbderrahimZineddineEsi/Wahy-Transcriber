@@ -322,7 +322,23 @@ function handleFnWordClick(e) {
   const tokIdx = parseInt(tokEl.getAttribute("data-raw-tok-idx") ?? tokEl.getAttribute("data-word-idx") ?? "-1", 10);
   if (isNaN(tokIdx) || tokIdx < 0) return;
 
-  // Alt+Click seeks audio/video preview without losing FN range selection
+  // Module 1.1: Bidirectional Video Playback Sync
+  if (currentState.editorPlaybackFollowsSelection) {
+    const word = currentState.words[tokIdx];
+    const targetTime = (word && typeof word.start === "number") ? word.start : parseFloat(tokEl.getAttribute("data-start-time") || "0");
+    const media = document.getElementById("mainMediaPlayer") || document.getElementById("mainAudioPlayer");
+    if (media) {
+      const wasPlaying = !media.paused && !media.ended;
+      media.currentTime = targetTime;
+      if (wasPlaying) {
+        media.play().catch(() => {});
+      }
+    } else if (typeof seekToMediaTimestamp === "function") {
+      seekToMediaTimestamp(targetTime, false);
+    }
+  }
+
+  // Alt+Click forces playing preview
   if (e.altKey) {
     const startSec = parseFloat(tokEl.getAttribute("data-start-time") || "0");
     seekToMediaTimestamp(startSec, true);

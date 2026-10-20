@@ -5,7 +5,7 @@
 // =============================================================================
 
 function switchMainSection(sectionName) {
-  const validSections = ["input", "display", "editor", "datasets", "ai_logs"];
+  const validSections = ["input", "display", "editor", "datasets", "ai_logs", "training_data"];
   const target = validSections.includes(sectionName) ? sectionName : "display";
   currentState.activeSection = target;
 
@@ -45,6 +45,8 @@ function switchMainSection(sectionName) {
     updateVideoCaptionOverlay(currentState.currentTime);
   } else if (target === "ai_logs") {
     renderAiLogsSection();
+  } else if (target === "training_data") {
+    renderTrainingDataHubTable();
   }
 }
 
@@ -189,6 +191,17 @@ function buildLectureHtmlContent(isEditorMode = false) {
         ? "citation-ayah"
         : (fType === "hadith" ? "citation-hadith" : "citation-dhikr");
 
+      // Module 7: Distinct Verification Badges & Visual Distinction
+      const isVerifiedStatus = det.aiVerification && (det.aiVerification.verdict === "CORRECT" || det.userApproved);
+      const isUnverifiedStatus = !det.aiVerification || det.aiVerification.status === "UNVERIFIED" || det.aiVerification.status === "IDLE";
+      
+      let verificationStyleClass = "";
+      if (isVerifiedStatus) {
+        verificationStyleClass = " border-emerald-500/80 shadow-[0_0_8px_rgba(16,185,129,0.25)]";
+      } else if (isUnverifiedStatus) {
+        verificationStyleClass = " border-dashed border-slate-600/70 opacity-90";
+      }
+
       if (v === "FALSE") {
         catClass += " ai-marked-false";
       }
@@ -196,19 +209,21 @@ function buildLectureHtmlContent(isEditorMode = false) {
       const selectedClass = isSelected ? "citation-selected-ring" : "";
       const dimmedClass = (filterCat !== "ALL" && filterCat !== fType) ? "opacity-35" : "";
 
-      // AI micro-badge
+      // AI micro-badge & Module 7 Verification Badges
       let aiBadgeHtml = "";
       if (det.aiVerification && det.aiVerification.status === "VERIFIED") {
         const confPct = Math.round((det.aiVerification.confidence || 0.88) * 100);
-        if (v === "CORRECT") {
-          aiBadgeHtml = `<span class="ai-badge ai-badge-correct" title="تدقيق الذكاء الاصطناعي: اقتباس مؤكد (${confPct}%)">🟢 ${confPct}%</span>`;
+        if (v === "CORRECT" || det.userApproved) {
+          aiBadgeHtml = `<span class="ai-badge ai-badge-correct" title="🟢 اقتباس مدقق ومطابق (${confPct}%)">🟢 مدقق ${confPct}%</span>`;
         } else if (v === "NOT_SURE") {
-          aiBadgeHtml = `<span class="ai-badge ai-badge-not-sure" title="تدقيق الذكاء الاصطناعي: شبه اقتباس غير مؤكد (${confPct}%)">🟡 ${confPct}%</span>`;
+          aiBadgeHtml = `<span class="ai-badge ai-badge-not-sure" title="🟡 شبه اقتباس غير مؤكد (${confPct}%)">🟡 ${confPct}%</span>`;
         } else if (v === "FALSE") {
-          aiBadgeHtml = `<span class="ai-badge ai-badge-false" title="تدقيق الذكاء الاصطناعي: مستبعد / كلام عادي (${confPct}%)">🔴 كلام عادي</span>`;
+          aiBadgeHtml = `<span class="ai-badge ai-badge-false" title="🔴 مستبعد / كلام عادي (${confPct}%)">🔴 كلام عادي</span>`;
         }
       } else if (det.aiVerification && det.aiVerification.status === "PENDING") {
         aiBadgeHtml = `<span class="ai-badge ai-badge-pending" title="جاري التدقيق بالذكاء الاصطناعي...">⏳ فحص...</span>`;
+      } else {
+        aiBadgeHtml = `<span class="ai-badge text-[10px] bg-slate-800/80 text-slate-400 border border-slate-700/60" title="⚪ غير مفحوص">⚪ غير مفحوص</span>`;
       }
 
       // Boundary status warning badge
@@ -224,9 +239,11 @@ function buildLectureHtmlContent(isEditorMode = false) {
         }
       }
 
+      // Module 1.2: Rasm Qiyasi toggle in editor or display
       let innerWordsHtml = "";
-      if (!isEditorMode && det.snappedToCanonical && det.canonicalText) {
-        innerWordsHtml = `<span class="font-bold">${escapeHtml(det.canonicalText)}</span>`;
+      const shouldShowRasmQiyasi = (isEditorMode && currentState.editorViewRasmQiyasi) || (!isEditorMode && det.snappedToCanonical);
+      if (shouldShowRasmQiyasi && det.canonicalText) {
+        innerWordsHtml = `<span class="font-bold text-accent-ayah">${escapeHtml(det.canonicalText)}</span>`;
       } else {
         const spanWordHtmls = [];
         for (let k = i; k <= endW; k++) {
@@ -235,13 +252,28 @@ function buildLectureHtmlContent(isEditorMode = false) {
             ? "lecture-word-token raw-tok-item editor-word-selectable"
             : "lecture-word-token";
           const tip = isEditorMode
-            ? `كلمة #${k + 1} [${formatSecondsToShortTime(wObj.start)}] • انقر لتحديد مدى FN أو نقر مزدوج لتعديل الكلمة`
+            ? `كلمة #${k + 1} [${formatSecondsToShortTime(wObj.start)}] • انقر لتحديد المدى أو نقر مزدوج لتعديل الكلمة`
             : `انقر للانتقال إلى التوقيت [${formatSecondsToShortTime(wObj.start)}] • نقر مزدوج لتصحيح الكلمة`;
           spanWordHtmls.push(
             `<span class="${tokCls}" data-word-idx="${k}" data-raw-tok-idx="${k}" data-start-time="${wObj.start}" title="${tip}">${escapeHtml(wObj.word)}</span>`
           );
         }
         innerWordsHtml = spanWordHtmls.join(" ");
+      }
+
+      // Module 1.2: Full canonical unit preview block inside editor
+      let fullMatnBlockHtml = "";
+      if (isEditorMode && currentState.editorViewFullCanonicalSpan) {
+        const unit = (activeMatcher?.units && det.unitId) ? activeMatcher.units.get(det.unitId) : null;
+        const fullCanonical = unit ? (unit.vocalizedWords ? unit.vocalizedWords.join(" ") : unit.text) : (det.canonicalText || "");
+        if (fullCanonical) {
+          fullMatnBlockHtml = `
+            <div class="block my-1 px-3 py-1.5 rounded-xl bg-bg-surface-sunken border border-accent-ayah/40 text-xs font-arabic-text text-text-primary">
+              <span class="text-accent-ayah text-[10px] font-bold block mb-0.5">📜 المتن الكامل للمرجع من المصدر:</span>
+              <div class="leading-relaxed select-text">${escapeHtml(fullCanonical)}</div>
+            </div>
+          `;
+        }
       }
 
       const refText = det.displayRef || det.reference || "";
@@ -256,12 +288,13 @@ function buildLectureHtmlContent(isEditorMode = false) {
       const timeTag = formatSecondsToShortTime(det.startTime || words[i].start);
 
       const citationHtml = `
-        <span class="${catClass} ${selectedClass} ${dimmedClass} inline-block my-1"
+        <span class="${catClass} ${selectedClass} ${dimmedClass} ${verificationStyleClass} inline-block my-1"
               data-finding-idx="${dIdx}"
               data-start-time="${det.startTime || words[i].start}"
               title="انقر لفحص وتعديل المقتبس [${escapeHtml(refText)}]">
           ${aiBadgeHtml}
           ${boundaryBadgeHtml}
+          ${fullMatnBlockHtml}
           <span class="opacity-85 select-none">${escapeHtml(brackets.open)}</span>${innerWordsHtml}<span class="opacity-85 select-none">${escapeHtml(brackets.close)}</span>
           ${(refText && showBadge) ? `<span class="inline-flex items-center gap-1 px-2 py-0.5 mr-1 rounded-md text-[11px] font-sans font-bold border ${badgeColor}">📖 ${escapeHtml(refText)} <span class="font-mono text-[10px] opacity-75" dir="ltr">${timeTag}</span></span>` : ""}
         </span>
@@ -436,7 +469,280 @@ function startInlineWordEdit(wordEl) {
 }
 
 /**
- * Render Finding Inspector inside Smart Editor Dock
+ * Module 1.4: Interactive Reference Word-Chip Grid & Flexible Substitution
+ */
+function renderReferenceWordChips(det, containerEl) {
+  if (!containerEl) return;
+  const unit = (activeMatcher?.units && det.unitId) ? activeMatcher.units.get(det.unitId) : null;
+  const words = unit ? (unit.vocalizedWords || unit.text.split(/\s+/)) : (det.canonicalText || "").split(/\s+/);
+
+  if (!words.length) {
+    containerEl.innerHTML = `<div class="text-text-muted text-xs p-3">لا يتوفر متن كامل لهذا المرجع.</div>`;
+    return;
+  }
+
+  // Active selected indices in the canonical unit
+  if (!det._selectedChipIndices) {
+    det._selectedChipIndices = new Set();
+    if (Array.isArray(det.qSegments) && det.qSegments.length) {
+      det.qSegments.forEach(([qStart, qEnd]) => {
+        for (let i = qStart; i < qEnd; i++) {
+          if (i >= 0 && i < words.length) det._selectedChipIndices.add(i);
+        }
+      });
+    }
+    if (!det._selectedChipIndices.size) {
+      const rawTokens = (det.matchedText || "").split(/\s+/).map(w => w.replace(/[^\u0621-\u064A]/g, ""));
+      words.forEach((w, wIdx) => {
+        const cleanW = w.replace(/[^\u0621-\u064A]/g, "");
+        if (cleanW && rawTokens.includes(cleanW)) {
+          det._selectedChipIndices.add(wIdx);
+        }
+      });
+    }
+    if (!det._selectedChipIndices.size) {
+      words.forEach((_, wIdx) => det._selectedChipIndices.add(wIdx));
+    }
+  }
+
+  const activeIndices = det._selectedChipIndices;
+
+  let html = `
+    <div class="rounded-xl bg-bg-surface-sunken p-3.5 border border-border-subtle space-y-2.5">
+      <div class="flex items-center justify-between text-[11px] text-text-muted">
+        <span class="font-semibold text-text-secondary">المتن الكامل للمرجع (حدد الكلمات المراد إدراجها بالدرس):</span>
+        <div class="flex items-center gap-1.5">
+          <span class="px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-400 font-mono text-[10px] font-bold">
+            محدد: ${activeIndices.size} / ${words.length} كلمة
+          </span>
+          <button type="button" id="btnChipsSelectAll" class="text-[10px] text-sky-400 hover:underline">تحديد الكل</button>
+          <span class="text-text-muted">|</span>
+          <button type="button" id="btnChipsClearAll" class="text-[10px] text-rose-400 hover:underline">تفريغ</button>
+        </div>
+      </div>
+      <div class="flex flex-wrap gap-1.5 leading-loose text-base font-arabic-text" dir="rtl" id="refChipsBox">
+  `;
+
+  words.forEach((word, wIdx) => {
+    const isMatched = activeIndices.has(wIdx);
+    const chipClass = isMatched
+      ? "bg-emerald-600/30 text-emerald-200 border-emerald-500/60 font-bold shadow-sm"
+      : "bg-bg-surface text-text-muted border-border-subtle hover:border-text-secondary opacity-75";
+
+    html += `
+      <span class="ref-word-chip px-2 py-0.5 rounded-lg border text-sm cursor-pointer transition select-none ${chipClass}"
+            data-ref-word-idx="${wIdx}" title="انقر لتضمين/استبعاد هذه الكلمة">
+        ${escapeHtml(word)}
+      </span>
+    `;
+  });
+
+  html += `
+      </div>
+      <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-border-subtle">
+        <div class="text-[11px] text-text-muted">يمكنك اختيار أي كلمات من الحديث أو الآية حتى لو لم ينطقها الشيخ لإكمال المتن.</div>
+        <button type="button" id="btnApplyCustomRefSpan" class="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow transition">
+          ✓ تطبيق الكلمات المختارة على النص
+        </button>
+      </div>
+    </div>
+  `;
+
+  containerEl.innerHTML = html;
+
+  let lastClickedIdx = -1;
+  containerEl.querySelectorAll(".ref-word-chip").forEach(chip => {
+    chip.addEventListener("click", (e) => {
+      const idx = parseInt(chip.getAttribute("data-ref-word-idx"), 10);
+      if (e.shiftKey && lastClickedIdx >= 0) {
+        const low = Math.min(lastClickedIdx, idx);
+        const high = Math.max(lastClickedIdx, idx);
+        for (let k = low; k <= high; k++) activeIndices.add(k);
+      } else {
+        if (activeIndices.has(idx)) activeIndices.delete(idx);
+        else activeIndices.add(idx);
+        lastClickedIdx = idx;
+      }
+      renderReferenceWordChips(det, containerEl);
+    });
+  });
+
+  containerEl.querySelector("#btnChipsSelectAll")?.addEventListener("click", () => {
+    words.forEach((_, idx) => activeIndices.add(idx));
+    renderReferenceWordChips(det, containerEl);
+  });
+
+  containerEl.querySelector("#btnChipsClearAll")?.addEventListener("click", () => {
+    activeIndices.clear();
+    renderReferenceWordChips(det, containerEl);
+  });
+
+  containerEl.querySelector("#btnApplyCustomRefSpan")?.addEventListener("click", () => {
+    applyReferenceWordsToTranscript(det, Array.from(activeIndices).sort((a, b) => a - b));
+  });
+}
+
+function applyReferenceWordsToTranscript(det, selectedUnitWordIndices) {
+  if (!det) return;
+  const unit = (activeMatcher?.units && det.unitId) ? activeMatcher.units.get(det.unitId) : null;
+  const canonicalWords = unit ? (unit.vocalizedWords || unit.text.split(/\s+/)) : (det.canonicalText || "").split(/\s+/);
+  if (!canonicalWords || !canonicalWords.length) {
+    showToast("⚠️ لا يتوفر متن كامل لهذا المرجع.");
+    return;
+  }
+  if (!selectedUnitWordIndices || !selectedUnitWordIndices.length) {
+    showToast("⚠️ يرجى اختيار كلمة واحدة على الأقل من المتن لإدراجها.");
+    return;
+  }
+
+  const selectedWords = selectedUnitWordIndices.map(idx => canonicalWords[idx]).filter(Boolean);
+  if (!selectedWords.length) return;
+
+  const wStart = det.wordStartIdx;
+  const wEnd = det.wordEndIdx;
+  const origWordCount = Math.max(1, wEnd - wStart + 1);
+
+  const startSec = Number(currentState.words[wStart]?.start ?? 0);
+  const endSec = Number(currentState.words[wEnd]?.end ?? (startSec + selectedWords.length * 0.4));
+  const dur = Math.max(0.2, endSec - startSec);
+  const step = dur / selectedWords.length;
+
+  const newWords = selectedWords.map((w, idx) => ({
+    id: wStart + idx,
+    word: w,
+    start: +(startSec + idx * step).toFixed(2),
+    end: +(startSec + (idx + 1) * step).toFixed(2),
+    char_start: 0,
+    char_end: 0
+  }));
+
+  currentState.words.splice(wStart, origWordCount, ...newWords);
+
+  det.wordEndIdx = wStart + newWords.length - 1;
+  det.matchedText = selectedWords.join(" ");
+  det.canonicalText = selectedWords.join(" ");
+  det.snappedToCanonical = true;
+
+  const delta = newWords.length - origWordCount;
+  if (delta !== 0) {
+    currentState.detections.forEach(otherDet => {
+      if (otherDet !== det) {
+        if (otherDet.wordStartIdx > wStart) otherDet.wordStartIdx += delta;
+        if (otherDet.wordEndIdx >= wStart) otherDet.wordEndIdx += delta;
+      }
+    });
+  }
+
+  syncRawTextFromWords();
+  recalculateCaptionsFromCurrentFindings();
+  renderAllViews();
+  renderFindingInspector();
+  showToast(`✨ تم إدراج ${newWords.length} كلمة من المتن وتحديث الكابشن!`);
+}
+
+/**
+ * Module 1.11: Deletion Intent Dialog & Training Telemetry
+ */
+function openDeleteIntentModal(findingIdx) {
+  const modal = document.getElementById("modalDeleteIntent");
+  const det = currentState.detections[findingIdx];
+  if (!modal || !det) {
+    deleteFinding(findingIdx);
+    return;
+  }
+
+  modal.classList.remove("hidden");
+  modal.classList.add("flex");
+
+  const closeFn = () => {
+    modal.classList.add("hidden");
+    modal.classList.remove("flex");
+  };
+
+  const cancelBtn = document.getElementById("btnCancelDeleteIntent");
+  if (cancelBtn) {
+    cancelBtn.onclick = closeFn;
+  }
+
+  modal.querySelectorAll("[data-delete-intent]").forEach(btn => {
+    btn.onclick = async () => {
+      const intent = btn.getAttribute("data-delete-intent");
+      closeFn();
+
+      if (intent === "FALSE_POSITIVE") {
+        det.humanGoldVerdict = "FALSE";
+        det.userApproved = true;
+        det.isHardNegative = true;
+        if (typeof saveDecisionToTrainingDB === "function") {
+          await saveDecisionToTrainingDB(det, "DELETE_INTENT_FALSE_POSITIVE");
+        }
+        deleteFinding(findingIdx);
+        showToast("🗑️ تم حذف المقتبس وحفظه كعينة سلبية ذهبية لتدريب Laya!");
+      } else if (intent === "BOUNDARY_RESELECT") {
+        const s = det.wordStartIdx;
+        const e = det.wordEndIdx;
+        deleteFinding(findingIdx);
+        switchEditorDockTab("fn");
+        const startInp = document.getElementById("inpFnStartIdx");
+        const endInp = document.getElementById("inpFnEndIdx");
+        if (startInp) startInp.value = String(s);
+        if (endInp) endInp.value = String(e + 1);
+        currentState.fnClickStep = 0;
+        if (typeof updateFnStudioSuggestions === "function") updateFnStudioSuggestions();
+        if (typeof updateFnRangeVisualHighlight === "function") updateFnRangeVisualHighlight();
+        showToast("🔄 تم حذف المقتبس لتعديل التظليل وإعادة إدراجه");
+      } else {
+        // TEST_SCRATCHPAD
+        deleteFinding(findingIdx);
+        showToast("🗑️ تم حذف الاقتباس الفحصي فوراً دون تسجيل.");
+      }
+    };
+  });
+}
+
+/**
+ * Module 1.8: AI Telemetry Deep Linking
+ */
+function highlightAndOpenAiRequestLog(reqId) {
+  switchMainSection("ai_logs");
+  const tbody = document.getElementById("tbodyAiRequestLogs");
+  if (!tbody) return;
+
+  const row = tbody.querySelector(`tr[data-req-id="${reqId}"]`) || tbody.querySelector("tr");
+  if (row) {
+    row.scrollIntoView({ behavior: "smooth", block: "center" });
+    row.classList.add("ring-2", "ring-sky-400", "bg-sky-950/60");
+    setTimeout(() => {
+      row.classList.remove("ring-2", "ring-sky-400", "bg-sky-950/60");
+    }, 3000);
+
+    const btnInspect = row.querySelector(".btnInspectPayload");
+    if (btnInspect) {
+      btnInspect.click();
+    }
+  }
+}
+
+/**
+ * Module 1.10: Seamless Navigation to Adhkar Studio
+ */
+function jumpToAdhkarStudioWithFilter(dhikrText, dhikrRef) {
+  switchMainSection("datasets");
+  const dsTabBtn = document.getElementById("btnDsTab_ADHKAR");
+  if (dsTabBtn) dsTabBtn.click();
+
+  const searchInp = document.getElementById("inpDatasetBrowserSearch");
+  if (searchInp && dhikrText) {
+    searchInp.value = dhikrText.slice(0, 30).trim();
+    if (typeof renderDatasetBrowserTable === "function") {
+      renderDatasetBrowserTable();
+    }
+  }
+  showToast(`📿 تم فتح استوديو الأذكار وتحديد: ${dhikrRef || "الذكر المختار"}`);
+}
+
+/**
+ * Render Finding Inspector inside Citation & Editorial Studio Dock (Overhauled)
  */
 function renderFindingInspector() {
   const panel = document.getElementById("findingInspectorBody");
@@ -447,9 +753,10 @@ function renderFindingInspector() {
 
   if (!det) {
     panel.innerHTML = `
-      <div class="p-6 text-center text-xs text-slate-400 space-y-2">
-        <div class="text-lg">🔍</div>
-        <div>انقر على أي آية أو حديث أو ذكر ملون داخل نص المحاضرة لفحصه أو تعديل حدوده، أو انتقل إلى تبويب <strong>«إضافة مفقود (FN Studio)»</strong> لإدراج مقتبس جديد.</div>
+      <div class="p-6 text-center text-xs text-text-muted space-y-2">
+        <div class="text-2xl">🔍</div>
+        <div class="font-bold text-text-secondary">لم يتم تحديد أي مقتبس للفحص</div>
+        <div class="text-[11px] leading-relaxed">انقر على أي آية أو حديث أو ذكر ملون داخل نص المحاضرة لفحصه وتعديل حدوده أو متنه، أو استخدم «إضافة مقتبس يدوي» لإدراج مقتبس جديد.</div>
       </div>
     `;
     return;
@@ -458,149 +765,201 @@ function renderFindingInspector() {
   const fType = det.type || sourceTypeToCategorySlug(det.sourceType);
   const startW = currentState.words[det.wordStartIdx]?.word || "";
   const endW = currentState.words[det.wordEndIdx]?.word || "";
+  const prevWordBeforeStart = det.wordStartIdx > 0 ? (currentState.words[det.wordStartIdx - 1]?.word || "") : "لا يوجد";
+  const nextWordAfterEnd = det.wordEndIdx < currentState.words.length - 1 ? (currentState.words[det.wordEndIdx + 1]?.word || "") : "لا يوجد";
+
+  const candidates = Array.isArray(det.candidates) && det.candidates.length
+    ? det.candidates
+    : (Array.isArray(det.candidateRefs) && det.candidateRefs.length
+        ? det.candidateRefs.map((r, i) => ({
+            unitId: (det.candidateUnitIds && det.candidateUnitIds[i]) || det.unitId,
+            displayRef: r,
+            score: Math.round((det.confidence || 0.9) * 100),
+            textPreview: det.matchedText || ""
+          }))
+        : [{
+            unitId: det.unitId,
+            displayRef: det.displayRef || det.reference,
+            score: Math.round((det.confidence || 0.9) * 100),
+            textPreview: det.matchedText || ""
+          }]);
 
   panel.innerHTML = `
-    <div class="space-y-3 text-xs">
-      <!-- Top Row: Navigation, Category Switcher & Delete -->
-      <div class="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-slate-800">
+    <div class="space-y-4 text-xs font-arabic-ui">
+      <!-- Top Action Bar -->
+      <div class="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-border-subtle">
         <div class="flex items-center gap-1.5">
-          <span class="text-slate-400 font-semibold">التصنيف:</span>
-          <button type="button" data-set-cat="ayah" class="px-2.5 py-1 rounded-lg font-bold border transition ${fType === "ayah" ? "bg-emerald-600 text-white border-emerald-400" : "bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700"}">آية</button>
-          <button type="button" data-set-cat="hadith" class="px-2.5 py-1 rounded-lg font-bold border transition ${fType === "hadith" ? "bg-amber-600 text-white border-amber-400" : "bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700"}">حديث</button>
-          <button type="button" data-set-cat="dhikr" class="px-2.5 py-1 rounded-lg font-bold border transition ${fType === "dhikr" ? "bg-violet-600 text-white border-violet-400" : "bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700"}">ذكر</button>
+          <span class="text-text-muted font-semibold">التصنيف:</span>
+          <button type="button" data-set-cat="ayah" class="px-2.5 py-1 rounded-lg font-bold border transition ${fType === "ayah" ? "bg-emerald-600 text-white border-emerald-400" : "bg-bg-surface-elevated text-text-secondary border-border-subtle hover:text-text-primary"}">آية</button>
+          <button type="button" data-set-cat="hadith" class="px-2.5 py-1 rounded-lg font-bold border transition ${fType === "hadith" ? "bg-amber-600 text-white border-amber-400" : "bg-bg-surface-elevated text-text-secondary border-border-subtle hover:text-text-primary"}">حديث</button>
+          <button type="button" data-set-cat="dhikr" class="px-2.5 py-1 rounded-lg font-bold border transition ${fType === "dhikr" ? "bg-violet-600 text-white border-violet-400" : "bg-bg-surface-elevated text-text-secondary border-border-subtle hover:text-text-primary"}">ذكر</button>
         </div>
         <div class="flex items-center gap-1.5">
-          <button type="button" id="btnInspectorPlayQuote" class="px-2.5 py-1 rounded-lg bg-sky-600/20 hover:bg-sky-600/35 text-sky-300 border border-sky-500/40 font-bold transition" title="الاستماع لتوقيت هذا المقتبس">
-            ▶ استماع
+          <button type="button" id="btnInspectorPlayQuote" class="px-3 py-1 rounded-lg bg-sky-600/20 hover:bg-sky-600/35 text-sky-300 border border-sky-500/40 font-bold transition flex items-center gap-1" title="الاستماع لتوقيت هذا المقتبس">
+            <span>▶</span>
+            <span>استماع</span>
           </button>
-          <button type="button" id="btnInspectorDeleteFinding" class="px-2.5 py-1 rounded-lg bg-rose-950/80 hover:bg-rose-800 text-rose-200 border border-rose-500/40 font-bold transition">
-            🗑️ حذف
+          <button type="button" id="btnInspectorDeleteFinding" class="px-3 py-1 rounded-lg bg-rose-950/80 hover:bg-rose-800 text-rose-200 border border-rose-500/40 font-bold transition flex items-center gap-1">
+            <span>🗑️</span>
+            <span>حذف</span>
           </button>
         </div>
       </div>
 
-      <!-- Reference & Corpus Linker -->
-      <div class="rounded-xl bg-slate-950/80 border border-slate-800 p-3 flex flex-wrap items-center justify-between gap-2">
-        <div>
-          <span class="text-slate-400">المرجع:</span>
-          <span class="font-bold text-emerald-300 mr-1">${escapeHtml(det.displayRef || det.reference || "غير محدد")}</span>
-          <span class="text-[11px] font-mono text-slate-500 mr-1" dir="ltr">(${formatSecondsToShortTime(det.startTime)} → ${formatSecondsToShortTime(det.endTime)})</span>
+      <!-- Section 1: Raw Spoken Lecture Transcript Card (Prominent & Clear) -->
+      <div class="rounded-2xl bg-bg-surface-elevated border border-border-subtle p-4 space-y-2">
+        <div class="flex items-center justify-between text-text-muted text-[11px] font-semibold">
+          <span>النص المنطوق في المحاضرة (Raw ASR):</span>
+          <span class="font-mono text-text-secondary" dir="ltr">كلمات: #${det.wordStartIdx + 1} إلى #${det.wordEndIdx + 1} (${formatSecondsToShortTime(det.startTime)} → ${formatSecondsToShortTime(det.endTime)})</span>
         </div>
-        <div class="flex items-center gap-1.5">
-          <button type="button" id="btnInspectorConvertToAdhkar" class="px-2.5 py-1 rounded-lg bg-violet-600/20 hover:bg-violet-600/35 text-violet-300 border border-violet-500/40 font-bold transition" title="تحويل إلى ذكر وحفظه في قاعدة الأذكار">
-            📿 حفظ كذكر
-          </button>
-          <button type="button" id="btnInspectorSearchCorpusRef" class="px-2.5 py-1 rounded-lg bg-sky-600/25 hover:bg-sky-600/40 text-sky-300 border border-sky-500/40 font-bold transition">
-            🔍 تغيير المرجع
-          </button>
+        <div class="text-base sm:text-lg font-arabic-text text-text-primary leading-relaxed bg-bg-surface-sunken p-3.5 rounded-xl border border-border-subtle select-text">
+          "${escapeHtml(det.matchedText || "")}"
         </div>
       </div>
 
-      <!-- Word Boundary Controls (+1 / -1 word) -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-        <div class="rounded-xl bg-slate-950/80 border border-slate-800 p-2.5 flex items-center justify-between">
+      <!-- Section 2: Reference Header, Candidates Carousel & Search -->
+      <div class="rounded-2xl bg-bg-surface-elevated border border-border-subtle p-4 space-y-3">
+        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-border-subtle pb-2.5">
           <div>
-            <div class="text-[10px] text-slate-400">بداية المقتبس (#${det.wordStartIdx + 1})</div>
-            <div class="font-bold text-slate-200 truncate max-w-[120px]">«${escapeHtml(startW)}»</div>
+            <span class="text-text-muted text-[11px]">المرجع المعتمد:</span>
+            <h4 class="text-sm sm:text-base font-bold text-accent-ayah mt-0.5">${escapeHtml(det.displayRef || det.reference || "غير محدد")}</h4>
           </div>
-          <div class="flex items-center gap-1" dir="ltr">
-            <button type="button" id="btnStartWordMinus" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-mono font-bold" title="توسيع كلمة لليمين">-1W</button>
-            <button type="button" id="btnStartWordPlus" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-mono font-bold" title="تقليص كلمة من البداية">+1W</button>
+          <div class="flex items-center gap-1.5 flex-wrap">
+            <button type="button" id="btnToggleAllCandidates" class="px-3 py-1.5 rounded-xl bg-bg-surface border border-border-medium text-text-secondary hover:text-text-primary text-xs font-semibold transition flex items-center gap-1">
+              <span>📚</span>
+              <span>المراجع البديلة (${candidates.length})</span>
+            </button>
+            <button type="button" id="btnOpenSearchAddRef" class="px-3 py-1.5 rounded-xl bg-accent-matn/15 border border-accent-matn/40 text-accent-matn text-xs font-bold transition flex items-center gap-1">
+              <span>🔍</span>
+              <span>بحث في القاعدة</span>
+            </button>
+            ${(det.sourceType === "ADHKAR" || det.isOutsideCorpus) ? `
+              <button type="button" id="btnInspectorOpenAdhkarStudio" class="px-3 py-1.5 rounded-xl bg-accent-dhikr/15 border border-accent-dhikr/40 text-accent-dhikr text-xs font-bold transition flex items-center gap-1">
+                <span>📿</span>
+                <span>فتح في استوديو الأذكار</span>
+              </button>
+            ` : ""}
           </div>
         </div>
 
-        <div class="rounded-xl bg-slate-950/80 border border-slate-800 p-2.5 flex items-center justify-between">
-          <div>
-            <div class="text-[10px] text-slate-400">نهاية المقتبس (#${det.wordEndIdx + 1})</div>
-            <div class="font-bold text-slate-200 truncate max-w-[120px]">«${escapeHtml(endW)}»</div>
-          </div>
-          <div class="flex items-center gap-1" dir="ltr">
-            <button type="button" id="btnEndWordMinus" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-mono font-bold" title="تقليص كلمة من النهاية">-1W</button>
-            <button type="button" id="btnEndWordPlus" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-mono font-bold" title="توسيع كلمة لليسار">+1W</button>
+        <!-- Section 3.5: Multi-Candidate Reference Accordion -->
+        <div id="inspectorAllCandidatesAccordion" class="hidden rounded-xl bg-bg-surface-sunken border border-border-subtle p-3 space-y-2 mt-2">
+          <div class="text-[11px] font-bold text-text-secondary mb-1">المراجع البديلة المقترحة في القاعدة:</div>
+          <div class="space-y-1.5 max-h-52 overflow-y-auto">
+            ${candidates.map((c, cIdx) => `
+              <div class="p-2.5 rounded-lg bg-bg-surface border border-border-subtle hover:border-accent-ayah flex items-center justify-between gap-2 transition" data-candidate-idx="${cIdx}">
+                <div class="truncate max-w-[220px] sm:max-w-xs">
+                  <div class="font-bold text-xs text-text-primary">${escapeHtml(c.displayRef || c.reference || "")}</div>
+                  <div class="text-[11px] text-text-muted truncate">${escapeHtml(c.textPreview || "")}</div>
+                </div>
+                <div class="flex items-center gap-2 shrink-0">
+                  <span class="px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-400 font-mono text-[10px] font-bold">${c.score || 90}%</span>
+                  <button type="button" class="btnSetAsActiveRef px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] font-bold transition" data-cand-unit-id="${c.unitId || ""}">اعتماد</button>
+                </div>
+              </div>
+            `).join("")}
           </div>
         </div>
+
+        <!-- Section 3: Word-Chip Grid for the Reference -->
+        <div id="inspectorWordChipGridContainer" class="space-y-2"></div>
       </div>
 
-      <!-- Snap to Canonical Text Toggle -->
-      <div class="rounded-xl bg-emerald-950/25 border border-emerald-500/30 p-3 space-y-2">
-        <div class="flex flex-wrap items-center justify-between gap-2">
-          <div class="font-bold text-emerald-300">✨ المطابقة مع الرسم العثماني / القياسي</div>
-          <button type="button" id="btnInspectorSnapCanonical" class="px-3 py-1 rounded-xl font-bold text-xs border transition ${det.snappedToCanonical ? "bg-emerald-600 text-white border-emerald-400" : "bg-slate-800 hover:bg-slate-700 text-emerald-300 border-emerald-500/40"}">
-            ${det.snappedToCanonical ? "✓ مفعّل (الرسم القياسي)" : "تبديل للرسم القياسي"}
-          </button>
-        </div>
-        <div class="text-xs font-quran-text text-slate-200 bg-slate-950/70 p-2 rounded-lg border border-slate-800/80 leading-relaxed">${escapeHtml(det.canonicalText || det.matchedText || "")}</div>
-      </div>
-
-      ${(det.aiVerification?.boundaryStatus && det.aiVerification.boundaryStatus !== "COMPLETE_SPAN" && det.aiVerification.verdict !== "FALSE") ? `
-        <!-- Boundary Truncation Warning & 1-Click Auto-Heal Card -->
-        <div class="rounded-xl bg-orange-950/40 border border-orange-500/50 p-3 space-y-2 text-xs">
-          <div class="flex flex-wrap items-center justify-between gap-2">
-            <span class="font-bold text-orange-300 flex items-center gap-1.5">
-              ✂️ تنبيه الذكاء الاصطناعي: المقتبس ناقص الكلمات من
-              ${det.aiVerification.boundaryStatus === "MISSING_START" ? "البداية" : (det.aiVerification.boundaryStatus === "MISSING_END" ? "النهاية" : "البداية والنهاية")}
-            </span>
-            <button type="button" id="btnInspectorAutoHealBoundary" class="px-3 py-1 rounded-lg bg-orange-500 hover:bg-orange-400 text-slate-950 font-bold text-xs shadow transition">
-              🪄 توسيع تلقائي للحدود الناقصة
+      <!-- Section 4: Boundary Shift Controls (+1W / -1W with Live Word Previews) -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <!-- Start Boundary Card -->
+        <div class="rounded-xl bg-bg-surface-sunken border border-border-subtle p-3 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] text-text-muted">بداية المقتبس:</span>
+            <span class="font-mono text-emerald-400 font-bold truncate max-w-[130px]">#${det.wordStartIdx + 1} «${escapeHtml(startW)}»</span>
+          </div>
+          <div class="grid grid-cols-2 gap-1.5">
+            <button type="button" id="btnStartWordMinus" class="px-2 py-1.5 rounded-lg bg-bg-surface border border-border-medium hover:border-emerald-500 text-xs transition flex flex-col items-center">
+              <span class="font-mono font-bold text-emerald-300">-1W (توسيع يمين)</span>
+              <span class="text-[10px] text-text-muted truncate max-w-[110px]">+ «${escapeHtml(prevWordBeforeStart)}»</span>
+            </button>
+            <button type="button" id="btnStartWordPlus" class="px-2 py-1.5 rounded-lg bg-bg-surface border border-border-medium hover:border-rose-500 text-xs transition flex flex-col items-center">
+              <span class="font-mono font-bold text-rose-300">+1W (تقليص)</span>
+              <span class="text-[10px] text-text-muted truncate max-w-[110px]">- «${escapeHtml(startW)}»</span>
             </button>
           </div>
-          <div class="text-[11px] text-slate-300 leading-relaxed">
-            الكلمات التكميلية في المصدر: <span class="font-quran-text text-orange-200">${escapeHtml(det.aiVerification.unmatchedPrefixPreview || "")} ... ${escapeHtml(det.aiVerification.unmatchedSuffixPreview || "")}</span>
+        </div>
+
+        <!-- End Boundary Card -->
+        <div class="rounded-xl bg-bg-surface-sunken border border-border-subtle p-3 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] text-text-muted">نهاية المقتبس:</span>
+            <span class="font-mono text-emerald-400 font-bold truncate max-w-[130px]">#${det.wordEndIdx + 1} «${escapeHtml(endW)}»</span>
+          </div>
+          <div class="grid grid-cols-2 gap-1.5">
+            <button type="button" id="btnEndWordMinus" class="px-2 py-1.5 rounded-lg bg-bg-surface border border-border-medium hover:border-rose-500 text-xs transition flex flex-col items-center">
+              <span class="font-mono font-bold text-rose-300">-1W (تقليص)</span>
+              <span class="text-[10px] text-text-muted truncate max-w-[110px]">- «${escapeHtml(endW)}»</span>
+            </button>
+            <button type="button" id="btnEndWordPlus" class="px-2 py-1.5 rounded-lg bg-bg-surface border border-border-medium hover:border-emerald-500 text-xs transition flex flex-col items-center">
+              <span class="font-mono font-bold text-emerald-300">+1W (توسيع يسار)</span>
+              <span class="text-[10px] text-text-muted truncate max-w-[110px]">+ «${escapeHtml(nextWordAfterEnd)}»</span>
+            </button>
           </div>
         </div>
-      ` : ""}
+      </div>
 
-      <!-- AI Verification & Human Gold Override Card -->
-      <div class="rounded-xl bg-slate-950/90 border border-sky-500/30 p-3.5 space-y-3">
+      <!-- Section 5: AI Verification, Telemetry Deep-Link & Dual-State Training Telemetry -->
+      <div class="rounded-2xl bg-bg-surface-elevated border border-sky-500/30 p-4 space-y-3">
         <div class="flex flex-wrap items-center justify-between gap-2">
           <div class="font-bold text-sky-300 flex items-center gap-1.5">
             <span>🤖</span>
-            <span>تدقيق الذكاء الاصطناعي والتصحيح البشري اليدوي</span>
+            <span>تدقيق الذكاء الاصطناعي وبيانات التدريب لـ Laya</span>
           </div>
           ${det.aiVerification?.status === "VERIFIED"
-            ? (det.aiVerification.verdict === "CORRECT"
-                ? '<span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-bold">🟢 مقبول / اقتباس مؤكد</span>'
+            ? (det.aiVerification.verdict === "CORRECT" || det.userApproved
+                ? '<span class="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-bold">🟢 مقبول / اقتباس مؤكد</span>'
                 : (det.aiVerification.verdict === "FALSE"
-                    ? '<span class="px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 text-[10px] font-bold">🔴 مستبعد / كلام عادي</span>'
-                    : '<span class="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-[10px] font-bold">🟡 غير متأكد</span>'))
+                    ? '<span class="px-2.5 py-0.5 rounded-full bg-rose-500/20 text-rose-300 text-[10px] font-bold">🔴 مستبعد / كلام عادي</span>'
+                    : '<span class="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-[10px] font-bold">🟡 غير متأكد</span>'))
             : (det.aiVerification?.status === "PENDING"
-                ? '<span class="px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-300 text-[10px] font-bold animate-pulse">⏳ جاري الفحص...</span>'
-                : '<span class="px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 text-[10px]">⚪ غير مفحوص بعد</span>')}
+                ? '<span class="px-2.5 py-0.5 rounded-full bg-sky-500/20 text-sky-300 text-[10px] font-bold animate-pulse">⏳ جاري الفحص...</span>'
+                : '<span class="px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-400 text-[10px]">⚪ غير مفحوص بعد</span>')}
         </div>
 
         ${det.aiVerification?.status === "VERIFIED" ? `
-          <div class="p-2.5 rounded-lg bg-slate-900 border border-slate-800 text-xs space-y-1.5">
+          <div class="p-3 rounded-xl bg-bg-surface-sunken border border-border-subtle text-xs space-y-2">
             <div class="flex items-center justify-between text-[11px]">
-              <span class="text-slate-400">النموذج: <strong class="text-slate-200 font-mono">${escapeHtml(det.aiVerification.modelUsed || det.aiVerification.provider || "")}</strong></span>
-              <span class="text-slate-400">نسبة الثقة: <strong class="text-emerald-400 font-mono">${Math.round((det.aiVerification.confidence || 0.88) * 100)}%</strong></span>
+              <span class="text-text-muted">النموذج: <strong class="text-text-primary font-mono">${escapeHtml(det.aiVerification.modelUsed || det.aiVerification.provider || "")}</strong></span>
+              <span class="text-text-muted">نسبة الثقة: <strong class="text-emerald-400 font-mono">${Math.round((det.aiVerification.confidence || 0.88) * 100)}%</strong></span>
             </div>
-            ${det.aiVerification.probabilities ? `
-              <div class="text-[10px] font-mono text-slate-400 flex items-center justify-between pt-1 border-t border-slate-800/80">
-                <span>P(صحيح): ${(det.aiVerification.probabilities.CORRECT || 0).toFixed(2)}</span>
-                <span>P(خاطئ): ${(det.aiVerification.probabilities.FALSE || 0).toFixed(2)}</span>
-                <span>P(غير متأكد): ${(det.aiVerification.probabilities.NOT_SURE || 0).toFixed(2)}</span>
-              </div>
-            ` : ""}
             ${det.aiVerification.reason ? `
-              <div class="text-[11px] text-slate-300 pt-1 text-justify border-t border-slate-800/60 leading-relaxed">
+              <div class="text-[11px] text-text-secondary pt-1 text-justify border-t border-border-subtle leading-relaxed">
                 ${escapeHtml(det.aiVerification.reason)}
               </div>
             ` : ""}
           </div>
         ` : ""}
 
-        <!-- 1-Click Human Override Buttons -->
-        <div class="space-y-1.5 pt-1">
-          <div class="text-[11px] text-slate-400 font-medium">تصحيح / تأكيد الحكم يدوياً (حفظ كبيانات تدريب ذهبية لـ Laya):</div>
-          <div class="grid grid-cols-3 gap-1.5">
-            <button type="button" id="btnOverrideCorrect" class="px-2 py-1.5 rounded-lg font-bold text-xs bg-emerald-600/20 hover:bg-emerald-600/35 text-emerald-300 border border-emerald-500/40 transition">
-              🟢 صحيح
+        <!-- Module 1.8: AI Telemetry Deep-Link Button -->
+        <button type="button" id="btnInspectorDeepLinkAiLogs" data-req-id="${det.aiVerification?.requestId || det.id}"
+                class="w-full px-3 py-2 rounded-xl bg-sky-950/40 border border-sky-500/40 text-sky-300 hover:bg-sky-900/60 text-xs font-semibold flex items-center justify-center gap-2 transition">
+          <span>📊</span>
+          <span>عرض بيانات الطلب وسجل الاستجابة بالتفصيل في استوديو AI</span>
+        </button>
+
+        <!-- Module 1.9 & 3.9: Dual-State Training Telemetry Card -->
+        <div class="rounded-xl bg-bg-surface-sunken border border-border-subtle p-3.5 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] text-text-muted font-semibold">حالة التصنيف المعتمدة لتدريب Laya:</span>
+            <span id="lblTrainingRecordStatusBadge" class="px-2.5 py-0.5 rounded-full text-xs font-bold ${det.userApproved ? (det.humanGoldVerdict === 'FALSE' ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40' : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40') : 'bg-slate-800 text-text-muted'}">
+              ${det.userApproved ? (det.humanGoldVerdict === 'FALSE' ? '🔴 كلام عادي (Human Gold)' : '🟢 مقتبس صحيح (Human Gold)') : '⚪ بانتظار الاعتماد'}
+            </span>
+          </div>
+          <div class="text-[10px] text-text-muted leading-relaxed">
+            تنبيه: يتم حفظ حكم الذكاء الاصطناعي الأولي وتصحيحك اليدوي معاً لإنتاج أمثلة سلبية وإيجابية عالية الدقة لتدريب النموذج.
+          </div>
+          <div class="grid grid-cols-2 gap-2 pt-1">
+            <button type="button" id="btnMarkGoldCorrect" class="px-3 py-1.5 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/35 text-emerald-300 border border-emerald-500/40 font-bold text-xs transition">
+              🟢 اعتماد كاقتباس صحيح
             </button>
-            <button type="button" id="btnOverrideFalse" class="px-2 py-1.5 rounded-lg font-bold text-xs bg-rose-600/20 hover:bg-rose-600/35 text-rose-300 border border-rose-500/40 transition">
-              🔴 كلام عادي
-            </button>
-            <button type="button" id="btnOverrideNotSure" class="px-2 py-1.5 rounded-lg font-bold text-xs bg-amber-600/20 hover:bg-amber-600/35 text-amber-300 border border-amber-500/40 transition">
-              🟡 غير متأكد
+            <button type="button" id="btnMarkGoldFalse" class="px-3 py-1.5 rounded-lg bg-rose-600/20 hover:bg-rose-600/35 text-rose-300 border border-rose-500/40 font-bold text-xs transition">
+              🔴 تصنيف كـ «كلام عادي»
             </button>
           </div>
         </div>
@@ -608,43 +967,112 @@ function renderFindingInspector() {
     </div>
   `;
 
+  // Render Section 3 Word Chips
+  const chipsContainer = panel.querySelector("#inspectorWordChipGridContainer");
+  if (chipsContainer) {
+    renderReferenceWordChips(det, chipsContainer);
+  }
+
+  // Bind Category Switchers
   panel.querySelectorAll("[data-set-cat]").forEach(btn => {
     btn.addEventListener("click", () => {
       changeFindingCategory(idx, btn.getAttribute("data-set-cat"));
     });
   });
 
+  // Bind Actions
   panel.querySelector("#btnInspectorPlayQuote")?.addEventListener("click", () => {
     seekToMediaTimestamp(det.startTime || 0, true);
   });
-  panel.querySelector("#btnInspectorDeleteFinding")?.addEventListener("click", () => deleteFinding(idx));
-  panel.querySelector("#btnInspectorConvertToAdhkar")?.addEventListener("click", () => convertFindingToSavedDhikr(idx));
-  panel.querySelector("#btnInspectorSearchCorpusRef")?.addEventListener("click", () => openCorpusSearchModalForSelection(fType, idx));
+
+  // Module 1.11: Delete Intent Modal
+  panel.querySelector("#btnInspectorDeleteFinding")?.addEventListener("click", () => {
+    openDeleteIntentModal(idx);
+  });
+
+  // Module 1.4 & 3.5: Toggle Candidates Accordion
+  panel.querySelector("#btnToggleAllCandidates")?.addEventListener("click", () => {
+    const acc = panel.querySelector("#inspectorAllCandidatesAccordion");
+    if (acc) acc.classList.toggle("hidden");
+  });
+
+  panel.querySelectorAll(".btnSetAsActiveRef").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const uId = btn.getAttribute("data-cand-unit-id");
+      const cand = candidates.find(c => c.unitId === uId) || candidates[0];
+      if (cand) {
+        det.unitId = cand.unitId;
+        det.displayRef = cand.displayRef;
+        det.reference = cand.displayRef;
+        if (cand.sourceType) {
+          det.sourceType = cand.sourceType;
+          det.type = sourceTypeToCategorySlug(cand.sourceType);
+        }
+        delete det._selectedChipIndices;
+        recalculateCaptionsFromCurrentFindings();
+        renderFindingInspector();
+        renderAllViews();
+        showToast(`✅ تم اعتماد المرجع: ${cand.displayRef}`);
+      }
+    });
+  });
+
+  // Module 1.6: Open Corpus Search Drawer
+  panel.querySelector("#btnOpenSearchAddRef")?.addEventListener("click", () => {
+    const drawer = document.getElementById("drawerCorpusSearch");
+    if (drawer) {
+      drawer.classList.remove("hidden");
+      drawer.classList.add("flex");
+      const inp = document.getElementById("inpDrawerCorpusSearch");
+      if (inp) {
+        inp.value = det.matchedText ? det.matchedText.slice(0, 25) : "";
+        inp.focus();
+        if (typeof runDrawerCorpusLiveSearch === "function") {
+          runDrawerCorpusLiveSearch();
+        }
+      }
+    }
+  });
+
+  // Module 1.10: Open Adhkar Studio
+  panel.querySelector("#btnInspectorOpenAdhkarStudio")?.addEventListener("click", () => {
+    jumpToAdhkarStudioWithFilter(det.matchedText || det.canonicalText, det.displayRef);
+  });
+
+  // Module 1.7: Word Boundary Controls
   panel.querySelector("#btnStartWordMinus")?.addEventListener("click", () => adjustFindingWordBoundary(idx, "start", -1));
   panel.querySelector("#btnStartWordPlus")?.addEventListener("click", () => adjustFindingWordBoundary(idx, "start", 1));
   panel.querySelector("#btnEndWordMinus")?.addEventListener("click", () => adjustFindingWordBoundary(idx, "end", -1));
   panel.querySelector("#btnEndWordPlus")?.addEventListener("click", () => adjustFindingWordBoundary(idx, "end", 1));
-  panel.querySelector("#btnInspectorSnapCanonical")?.addEventListener("click", () => toggleSnapFindingToCanonical(idx));
-  panel.querySelector("#btnInspectorAutoHealBoundary")?.addEventListener("click", () => {
-    if (typeof autoHealClippedBoundary === "function") {
-      autoHealClippedBoundary(idx);
-    }
+
+  // Module 1.8: AI Telemetry Deep Link
+  panel.querySelector("#btnInspectorDeepLinkAiLogs")?.addEventListener("click", (e) => {
+    const reqId = e.currentTarget.getAttribute("data-req-id");
+    highlightAndOpenAiRequestLog(reqId);
   });
 
-  panel.querySelector("#btnOverrideCorrect")?.addEventListener("click", () => {
-    if (typeof WahyAiVerifier === "object" && typeof WahyAiVerifier.setHumanOverrideVerdict === "function") {
-      WahyAiVerifier.setHumanOverrideVerdict(det.id, "CORRECT");
+  // Module 1.9 & 3.9: Dual-State Gold Overrides
+  panel.querySelector("#btnMarkGoldCorrect")?.addEventListener("click", async () => {
+    det.userApproved = true;
+    det.humanGoldVerdict = "CORRECT";
+    if (typeof saveDecisionToTrainingDB === "function") {
+      await saveDecisionToTrainingDB(det, "OVERRIDE_HUMAN_GOLD_CORRECT");
     }
+    renderFindingInspector();
+    recalculateCaptionsFromCurrentFindings();
+    showToast("🟢 تم اعتماد المقتبس كصحيح وحفظه في بنك تدريب Laya!");
   });
-  panel.querySelector("#btnOverrideFalse")?.addEventListener("click", () => {
-    if (typeof WahyAiVerifier === "object" && typeof WahyAiVerifier.setHumanOverrideVerdict === "function") {
-      WahyAiVerifier.setHumanOverrideVerdict(det.id, "FALSE");
+
+  panel.querySelector("#btnMarkGoldFalse")?.addEventListener("click", async () => {
+    det.userApproved = true;
+    det.humanGoldVerdict = "FALSE";
+    det.isHardNegative = true;
+    if (typeof saveDecisionToTrainingDB === "function") {
+      await saveDecisionToTrainingDB(det, "OVERRIDE_HUMAN_GOLD_FALSE");
     }
-  });
-  panel.querySelector("#btnOverrideNotSure")?.addEventListener("click", () => {
-    if (typeof WahyAiVerifier === "object" && typeof WahyAiVerifier.setHumanOverrideVerdict === "function") {
-      WahyAiVerifier.setHumanOverrideVerdict(det.id, "NOT_SURE");
-    }
+    renderFindingInspector();
+    recalculateCaptionsFromCurrentFindings();
+    showToast("🔴 تم تصنيف المقتبس كـ «كلام عادي» وحفظه كبيانات سلبية ذهبية لـ Laya!");
   });
 }
 
@@ -1292,6 +1720,10 @@ function renderAllViews() {
     updateFnStudioSuggestions();
     updateFnRangeVisualHighlight();
   }
+  if (currentState.activeSection === "training_data") {
+    renderTrainingDataHubTable();
+  }
+  renderSavedLecturesList();
   updateVideoCaptionOverlay(currentState.currentTime);
 }
 
@@ -1866,6 +2298,521 @@ async function executeTafrighReviewAction(runId, segmentId, action) {
   }
 }
 
+// -----------------------------------------------------------------------------
+// Training Data Hub & Laya Fine-Tuning Bank (#section_training_data, Module 2)
+// -----------------------------------------------------------------------------
+
+async function renderTrainingDataHubTable() {
+  let records = currentState.aiVerification?.trainingDatasetRecords || [];
+  if ((!records || records.length === 0) && typeof getAllVerificationRecordsFromDB === "function") {
+    try {
+      records = await getAllVerificationRecordsFromDB();
+    } catch (_) {}
+  }
+  records = Array.isArray(records) ? records : [];
+
+  // 1. Compute Top Stats
+  const statTotal = records.length;
+  let countCorrect = 0;
+  let countFalse = 0;
+  let countCompleteness = 0;
+  let countSegmentation = 0;
+  let countTypo = 0;
+
+  records.forEach(rec => {
+    const verdict = rec.answers?.verdict?.choice || rec.answers?.classification || "";
+    const bStatus = rec.answers?.boundary_status?.choice || "";
+    const taskType = rec.meta?.task_type || (bStatus && bStatus !== "COMPLETE_SPAN" ? "VERIFICATION_COMPLETENESS" : "VERIFICATION_CORRECTNESS");
+
+    if (verdict === "CORRECT") countCorrect++;
+    if (verdict === "FALSE") countFalse++;
+    if (taskType === "VERIFICATION_COMPLETENESS" || (bStatus && bStatus !== "COMPLETE_SPAN")) countCompleteness++;
+    if (taskType === "TAFRIGH_SEGMENTATION") countSegmentation++;
+    if (taskType === "TAFRIGH_TYPO") countTypo++;
+  });
+
+  const setElText = (id, txt) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = String(txt);
+  };
+  setElText("statTrainingTotal", statTotal);
+  setElText("statTrainingCorrect", countCorrect);
+  setElText("statTrainingFalse", countFalse);
+  setElText("statTrainingCompleteness", countCompleteness);
+  setElText("statTrainingSegmentation", countSegmentation);
+  setElText("statTrainingTypo", countTypo);
+  setElText("badgeTrainingRecordCount", statTotal);
+
+  // 2. Apply Filters
+  const taskFilter = document.getElementById("selTrainingTaskFilter")?.value || "ALL";
+  const labelFilter = document.getElementById("selTrainingLabelFilter")?.value || "ALL";
+  const searchQ = (document.getElementById("inpTrainingDataSearch")?.value || "").trim().toLowerCase();
+
+  const filtered = records.filter(rec => {
+    const verdict = rec.answers?.verdict?.choice || "";
+    const bStatus = rec.answers?.boundary_status?.choice || "";
+    const taskType = rec.meta?.task_type || (bStatus && bStatus !== "COMPLETE_SPAN" ? "VERIFICATION_COMPLETENESS" : "VERIFICATION_CORRECTNESS");
+
+    if (taskFilter !== "ALL" && taskType !== taskFilter) {
+      return false;
+    }
+
+    if (labelFilter === "CORRECT" && verdict !== "CORRECT") return false;
+    if (labelFilter === "FALSE" && verdict !== "FALSE") return false;
+    if (labelFilter === "TRUNCATED" && bStatus === "COMPLETE_SPAN") return false;
+
+    if (searchQ) {
+      const matchText = (rec.state?.matched_span_in_lecture || rec.state?.candidate_quote || "").toLowerCase();
+      const refText = (rec.state?.candidate_reference || rec.meta?.lecture_title || "").toLowerCase();
+      const canonText = (rec.state?.canonical_corpus_text || "").toLowerCase();
+      if (!matchText.includes(searchQ) && !refText.includes(searchQ) && !canonText.includes(searchQ)) {
+        return false;
+      }
+    }
+    return true;
+  });
+
+  const tbody = document.getElementById("tbodyTrainingRecords");
+  if (!tbody) return;
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="8" class="text-center py-8 text-text-muted">
+          ${records.length === 0
+            ? "لا توجد بيانات تدريب مسجلة بعد. استخدم استوديو التحرير أو التدقيق الذكي لتوليد بيانات التدريب الذهبية."
+            : "لا توجد سجلات تدريب مطابقة لفلاتر البحث الحالية."}
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  tbody.innerHTML = filtered.map((rec, idx) => {
+    const verdict = rec.answers?.verdict?.choice || "NOT_SURE";
+    const bStatus = rec.answers?.boundary_status?.choice || "COMPLETE_SPAN";
+    const taskType = rec.meta?.task_type || (bStatus !== "COMPLETE_SPAN" ? "VERIFICATION_COMPLETENESS" : "VERIFICATION_CORRECTNESS");
+
+    let taskBadge = `<span class="px-2 py-0.5 rounded-lg bg-sky-500/20 text-sky-300 font-bold text-[10px]">تدقيق: مطابقة</span>`;
+    if (taskType === "VERIFICATION_COMPLETENESS") {
+      taskBadge = `<span class="px-2 py-0.5 rounded-lg bg-amber-500/20 text-amber-300 font-bold text-[10px]">تدقيق: حدود</span>`;
+    } else if (taskType === "TAFRIGH_SEGMENTATION") {
+      taskBadge = `<span class="px-2 py-0.5 rounded-lg bg-violet-500/20 text-violet-300 font-bold text-[10px]">تفريغ: تقطيع</span>`;
+    } else if (taskType === "TAFRIGH_TYPO") {
+      taskBadge = `<span class="px-2 py-0.5 rounded-lg bg-indigo-500/20 text-indigo-300 font-bold text-[10px]">تفريغ: إملاء</span>`;
+    }
+
+    let verdictBadge = `<span class="px-2 py-0.5 rounded-lg bg-emerald-500/20 text-emerald-300 font-bold text-[10px]">🟢 صحيح</span>`;
+    if (verdict === "FALSE") {
+      verdictBadge = `<span class="px-2 py-0.5 rounded-lg bg-rose-500/20 text-rose-300 font-bold text-[10px]">🔴 كلام عادي</span>`;
+    } else if (verdict === "NOT_SURE") {
+      verdictBadge = `<span class="px-2 py-0.5 rounded-lg bg-amber-500/20 text-amber-300 font-bold text-[10px]">🟡 غير متأكد</span>`;
+    }
+
+    const aiInitVerdict = rec.meta?.initial_ai_verdict || (rec.meta?.human_verified ? "تم الفحص" : verdict);
+    const dateFormatted = rec.meta?.converted_at
+      ? new Date(rec.meta.converted_at * 1000).toLocaleString("ar-SA", { dateStyle: "short", timeStyle: "short" })
+      : "-";
+
+    const ref = escapeHtml(rec.state?.candidate_reference || rec.state?.source_type || "مرجع شرعي");
+    const snippet = escapeHtml(rec.state?.matched_span_in_lecture || rec.state?.candidate_quote || rec.state?.canonical_corpus_text || "").slice(0, 75);
+
+    return `
+      <tr class="hover:bg-bg-surface-elevated transition border-b border-border-subtle" data-rec-id="${escapeHtml(rec.id)}">
+        <td class="py-2.5 px-3 font-mono text-text-muted">${idx + 1}</td>
+        <td class="py-2.5 px-3">${taskBadge}</td>
+        <td class="py-2.5 px-3 font-bold text-text-primary text-[11px] max-w-[130px] truncate" title="${ref}">${ref}</td>
+        <td class="py-2.5 px-4 text-text-secondary text-[11px] max-w-[220px] truncate" title="${snippet}">"${snippet}..."</td>
+        <td class="py-2.5 px-3 font-mono text-[11px] text-text-muted">${escapeHtml(aiInitVerdict)}</td>
+        <td class="py-2.5 px-3">${verdictBadge}</td>
+        <td class="py-2.5 px-3 text-text-muted text-[10px] whitespace-nowrap">${dateFormatted}</td>
+        <td class="py-2.5 px-3 text-center">
+          <div class="flex items-center justify-center gap-1.5">
+            <button type="button" class="btnViewTrainingRecordJson px-2 py-1 rounded bg-bg-surface-elevated hover:bg-bg-surface text-text-secondary hover:text-text-primary text-[10px] font-bold transition" data-rec-id="${escapeHtml(rec.id)}" title="فحص محتوى سجل التدريب بصيغة Laya JSON">
+              👁️ JSON
+            </button>
+            <button type="button" class="btnDeleteTrainingRecord px-2 py-1 rounded bg-rose-950/30 hover:bg-rose-900/50 text-rose-300 text-[10px] transition" data-rec-id="${escapeHtml(rec.id)}" title="حذف السجل">
+              🗑️
+            </button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join("");
+
+  tbody.querySelectorAll(".btnViewTrainingRecordJson").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const recId = btn.getAttribute("data-rec-id");
+      const record = records.find(r => r.id === recId);
+      if (record) {
+        showTrainingRecordJsonDialog(record);
+      }
+    });
+  });
+
+  tbody.querySelectorAll(".btnDeleteTrainingRecord").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const recId = btn.getAttribute("data-rec-id");
+      await deleteTrainingRecordById(recId);
+    });
+  });
+}
+
+async function deleteTrainingRecordById(recId) {
+  if (!confirm("هل أنت متأكد من رغبتك في حذف سجل التدريب هذا؟")) return;
+  try {
+    const db = await openWahyLayaTrainingDB();
+    const tx = db.transaction([IDB_AI_TRAINING_STORE_NAME], "readwrite");
+    const store = tx.objectStore(IDB_AI_TRAINING_STORE_NAME);
+    store.delete(recId);
+    tx.oncomplete = () => {
+      currentState.aiVerification.trainingDatasetRecords = (currentState.aiVerification.trainingDatasetRecords || []).filter(r => r.id !== recId);
+      renderTrainingDataHubTable();
+      if (typeof showToast === "function") {
+        showToast("🗑️ تم حذف سجل التدريب بنجاح");
+      }
+    };
+  } catch (err) {
+    console.error("Failed to delete training record:", err);
+  }
+}
+
+function showTrainingRecordJsonDialog(record) {
+  let modal = document.getElementById("modalTrainingJsonViewer");
+  if (!modal) {
+    modal = document.createElement("div");
+    modal.id = "modalTrainingJsonViewer";
+    modal.className = "fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4";
+    modal.innerHTML = `
+      <div class="bg-bg-surface border border-border-medium rounded-2xl max-w-2xl w-full p-5 space-y-3 shadow-2xl flex flex-col max-h-[85vh]">
+        <div class="flex items-center justify-between border-b border-border-subtle pb-2">
+          <h3 class="text-sm font-bold text-text-primary flex items-center gap-2">
+            <span>📊</span>
+            <span>سجل تدريب Laya JSONL Canonical Record</span>
+          </h3>
+          <button type="button" class="btnClsTrainingJson text-text-muted hover:text-text-primary text-base">✕</button>
+        </div>
+        <div class="overflow-y-auto flex-1 p-2 bg-bg-surface-sunken rounded-xl border border-border-subtle">
+          <pre id="preTrainingJsonContent" class="font-mono text-xs text-emerald-300 select-all whitespace-pre-wrap" dir="ltr"></pre>
+        </div>
+        <div class="flex items-center justify-between pt-2 border-t border-border-subtle">
+          <button type="button" id="btnCopyTrainingJson" class="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition flex items-center gap-1.5">
+            <span>📋</span>
+            <span>نسخ JSON</span>
+          </button>
+          <button type="button" class="btnClsTrainingJson px-4 py-1.5 rounded-xl bg-bg-surface-elevated text-text-secondary text-xs font-semibold">
+            إغلاق
+          </button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+
+    modal.querySelectorAll(".btnClsTrainingJson").forEach(b => {
+      b.addEventListener("click", () => modal.classList.add("hidden"));
+    });
+    modal.addEventListener("click", (e) => {
+      if (e.target.id === "modalTrainingJsonViewer") modal.classList.add("hidden");
+    });
+    modal.querySelector("#btnCopyTrainingJson")?.addEventListener("click", () => {
+      const code = modal.querySelector("#preTrainingJsonContent")?.textContent || "";
+      navigator.clipboard.writeText(code).then(() => {
+        if (typeof showToast === "function") showToast("📋 تم نسخ سجل التدريب بنجاح!");
+      });
+    });
+  }
+
+  const pre = modal.querySelector("#preTrainingJsonContent");
+  if (pre) {
+    pre.textContent = JSON.stringify(record, null, 2);
+  }
+  modal.classList.remove("hidden");
+}
+
+// -----------------------------------------------------------------------------
+// Lecture Session Manager & Persistence (Module 6 / Section 8.1)
+// -----------------------------------------------------------------------------
+
+async function renderSavedLecturesList() {
+  const container = document.getElementById("savedLecturesContainer");
+  if (!container) return;
+
+  let lectures = [];
+  if (typeof getAllSavedLecturesFromDB === "function") {
+    try {
+      lectures = await getAllSavedLecturesFromDB();
+    } catch (_) {}
+  }
+
+  if (!lectures || lectures.length === 0) {
+    container.innerHTML = `
+      <div class="p-4 rounded-xl bg-bg-surface-sunken border border-border-subtle text-center text-text-muted text-xs col-span-full">
+        لا توجد جلسات محفوظة بعد. انقر على «حفظ الجلسة الحالية» للاحتفاظ ببيانات المحاضرة والنتائج.
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = lectures.map(lec => {
+    const title = escapeHtml(lec.title || "محاضرة علمية");
+    const dateStr = lec.updated_at
+      ? new Date(lec.updated_at).toLocaleString("ar-SA", { dateStyle: "short", timeStyle: "short" })
+      : "-";
+    const wordCount = (lec.words || []).length;
+    const detCount = (lec.detections || []).length;
+
+    return `
+      <div class="p-3 rounded-xl bg-bg-surface border border-border-subtle hover:border-border-medium transition space-y-2 flex flex-col justify-between" data-lecture-id="${escapeHtml(lec.lecture_id)}">
+        <div>
+          <div class="flex items-center justify-between gap-1 mb-1">
+            <h4 class="font-bold text-xs text-text-primary truncate" title="${title}">${title}</h4>
+            <span class="text-[10px] text-text-muted font-mono whitespace-nowrap">${dateStr}</span>
+          </div>
+          <div class="flex items-center gap-2 text-[10px] text-text-secondary">
+            <span>📝 ${wordCount} كلمة</span>
+            <span>•</span>
+            <span class="text-emerald-400 font-semibold">✨ ${detCount} مقتبس</span>
+          </div>
+        </div>
+        <div class="flex items-center justify-between gap-1 pt-2 border-t border-border-subtle">
+          <button type="button" class="btnLoadSavedLecture px-2.5 py-1 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/35 text-emerald-300 font-bold text-[11px] transition flex items-center gap-1" data-lecture-id="${escapeHtml(lec.lecture_id)}">
+            <span>📂</span>
+            <span>فتح</span>
+          </button>
+          <div class="flex items-center gap-1">
+            <button type="button" class="btnExportSavedLectureJson px-2 py-1 rounded-lg bg-bg-surface-elevated hover:bg-bg-surface text-text-secondary hover:text-text-primary text-[10px] font-semibold transition" data-lecture-id="${escapeHtml(lec.lecture_id)}" title="تصدير كملف JSON">
+              📤
+            </button>
+            <button type="button" class="btnDeleteSavedLecture px-2 py-1 rounded-lg bg-rose-950/30 hover:bg-rose-900/50 text-rose-300 text-[10px] transition" data-lecture-id="${escapeHtml(lec.lecture_id)}" title="حذف الجلسة">
+              🗑️
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join("");
+
+  container.querySelectorAll(".btnLoadSavedLecture").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const id = btn.getAttribute("data-lecture-id");
+      await loadLectureSessionIntoWorkspace(id);
+    });
+  });
+
+  container.querySelectorAll(".btnExportSavedLectureJson").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const id = btn.getAttribute("data-lecture-id");
+      const lec = lectures.find(l => l.lecture_id === id);
+      if (lec) {
+        exportLectureSessionAsJson(lec);
+      }
+    });
+  });
+
+  container.querySelectorAll(".btnDeleteSavedLecture").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const id = btn.getAttribute("data-lecture-id");
+      if (confirm("هل تريد حذف هذه الجلسة المحفوظة؟")) {
+        await deleteSavedLectureFromDB(id);
+        renderSavedLecturesList();
+        if (typeof showToast === "function") {
+          showToast("🗑️ تم حذف المحاضرة من السجل المحلي");
+        }
+      }
+    });
+  });
+}
+
+async function loadLectureSessionIntoWorkspace(lectureId) {
+  try {
+    const session = await getLectureSessionFromDB(lectureId);
+    if (!session) return;
+
+    currentState.lectureTitle = session.title || "محاضرة علمية";
+    currentState.rawTranscript = session.raw_transcript || "";
+    currentState.words = session.words || [];
+    currentState.detections = session.detections || [];
+    currentState.captions = session.captions || [];
+    if (session.tafrigh_result) {
+      currentState.tafrigh = Object.assign({}, currentState.tafrigh, session.tafrigh_result);
+    }
+    currentState.activeFindingIndex = currentState.detections.length > 0 ? 0 : -1;
+
+    recalculateCaptionsFromCurrentFindings();
+    if (typeof window.renderAllViews === "function") {
+      window.renderAllViews();
+    }
+    switchMainSection("display");
+    if (typeof showToast === "function") {
+      showToast(`📂 تم استرجاع جلسة «${currentState.lectureTitle}» بنجاح!`);
+    }
+  } catch (err) {
+    console.error("Failed to load lecture session:", err);
+    if (typeof showToast === "function") {
+      showToast("❌ تعذر تحميل الجلسة المحفوظة");
+    }
+  }
+}
+
+function exportLectureSessionAsJson(session) {
+  if (!session) return;
+  const jsonStr = JSON.stringify(session, null, 2);
+  const blob = new Blob([jsonStr], { type: "application/json;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  const safeTitle = (session.title || "wahy_lecture").replace(/[^a-zA-Z0-9\u0600-\u06FF_-]/g, "_");
+  a.download = `${safeTitle}.wahy.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// -----------------------------------------------------------------------------
+// Pre-Flight Verification Estimator & Checklist (Module 5 / Section 7.2)
+// -----------------------------------------------------------------------------
+
+function renderPreFlightVerificationModal(selectedIdsSet = null) {
+  const modal = document.getElementById("modalPreFlightVerification");
+  const container = document.getElementById("preFlightChecklistContainer");
+  if (!modal || !container) return;
+
+  const detections = currentState.detections || [];
+  if (!detections.length) {
+    if (typeof showToast === "function") {
+      showToast("⚠️ لا توجد مقتبسات لفحصها");
+    }
+    return;
+  }
+
+  const selectedSet = selectedIdsSet || new Set(detections.map(d => d.id || d._uniqueKey));
+
+  container.innerHTML = detections.map((det, idx) => {
+    const key = det.id || det._uniqueKey || `det_${idx}`;
+    const isChecked = selectedSet.has(key);
+    const scorePct = Math.round((det.totalScore || 0) * 100);
+    const isQuran = det.sourceType === "QURAN";
+    const sourceBadge = isQuran
+      ? `<span class="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold text-[10px]">قرآن</span>`
+      : `<span class="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 font-bold text-[10px]">حديث</span>`;
+    const ref = escapeHtml(det.displayRef || det.reference || "");
+    const snippet = escapeHtml(det.matchedText || det.canonicalText || "").slice(0, 50);
+
+    return `
+      <label class="flex items-center justify-between p-2 rounded-lg bg-bg-surface border border-border-subtle hover:border-border-medium cursor-pointer transition">
+        <div class="flex items-center gap-2">
+          <input type="checkbox" class="chkPreFlightItem text-sky-600 rounded" data-det-key="${escapeHtml(key)}" ${isChecked ? "checked" : ""} />
+          <span class="font-mono text-text-muted text-[10px]">#${idx + 1}</span>
+          ${sourceBadge}
+          <span class="font-bold text-text-primary text-xs truncate max-w-[140px]">${ref}</span>
+          <span class="text-text-muted text-[11px] truncate max-w-[200px]">"${snippet}..."</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="font-mono text-[10px] font-bold ${scorePct >= 80 ? "text-emerald-400" : "text-amber-400"}">${scorePct}%</span>
+        </div>
+      </label>
+    `;
+  }).join("");
+
+  updatePreFlightEstimatorKPIs();
+
+  container.querySelectorAll(".chkPreFlightItem").forEach(chk => {
+    chk.addEventListener("change", () => {
+      updatePreFlightEstimatorKPIs();
+    });
+  });
+
+  modal.classList.remove("hidden");
+}
+
+function updatePreFlightEstimatorKPIs() {
+  const container = document.getElementById("preFlightChecklistContainer");
+  if (!container) return;
+
+  const totalDets = (currentState.detections || []).length;
+  const checkedItems = container.querySelectorAll(".chkPreFlightItem:checked");
+  const selectedCount = checkedItems.length;
+
+  const tokensEst = selectedCount * 380;
+  const isFreePlan = currentState.aiVerification?.geminiFreeTierMode !== false;
+  const costEst = isFreePlan ? "$0.00 (Free)" : `$${((tokensEst / 1000000) * 0.042).toFixed(4)}`;
+  const rpm = currentState.aiVerification?.geminiRpmLimit || 12;
+  const timeEst = `~${Math.max(2, Math.ceil(selectedCount / rpm) * 60)}s`;
+
+  const setEl = (id, val) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = String(val);
+  };
+  setEl("kpiPreFlightTotalCandidates", totalDets);
+  setEl("kpiPreFlightSelectedCount", selectedCount);
+  setEl("kpiPreFlightTokensEst", tokensEst.toLocaleString());
+  setEl("kpiPreFlightCostEst", costEst);
+  setEl("kpiPreFlightTimeEst", timeEst);
+}
+
+// -----------------------------------------------------------------------------
+// Validate All AI Decisions Action (Module 4 / Section 6.2)
+// -----------------------------------------------------------------------------
+
+async function executeValidateAllAiDecisions() {
+  const verifiedList = (currentState.detections || []).filter(d => d.aiVerification?.status === "VERIFIED");
+  if (!verifiedList.length) {
+    if (typeof showToast === "function") {
+      showToast("⚠️ لا توجد اقتباسات مفحوصة لاعتمادها دفعة واحدة.");
+    }
+    return;
+  }
+
+  let count = 0;
+  for (const det of verifiedList) {
+    if (!det.userApproved) {
+      det.userApproved = true;
+      det.humanGoldVerdict = det.aiVerification.verdict;
+      if (typeof saveVerificationRecordToDB === "function") {
+        const env = typeof buildCanonicalDecisionEnvelope === "function"
+          ? buildCanonicalDecisionEnvelope(det, currentState.words)
+          : null;
+        if (typeof convertRecordToLayaTrainingEnvelope === "function") {
+          const layaRec = convertRecordToLayaTrainingEnvelope(det, env, Math.floor(Date.now() / 1000) + count);
+          layaRec.answers.verdict.choice = det.humanGoldVerdict;
+          layaRec.meta.human_verified = true;
+          layaRec.meta.task_type = "VERIFICATION_CORRECTNESS";
+          await saveVerificationRecordToDB(layaRec);
+        }
+      }
+      count++;
+    }
+  }
+
+  if (typeof recalculateCaptionsFromCurrentFindings === "function") {
+    recalculateCaptionsFromCurrentFindings();
+  }
+  if (typeof renderFormattedLectureView === "function") {
+    renderFormattedLectureView();
+  }
+  if (typeof renderEditorLectureStage === "function") {
+    renderEditorLectureStage();
+  }
+  if (typeof renderFindingInspector === "function") {
+    renderFindingInspector();
+  }
+  if (typeof showToast === "function") {
+    showToast(`✅ تم اعتماد جميع نتائج الذكاء الاصطناعي (${count} مقتبس) وحفظها كبيانات ذهبية!`);
+  }
+  document.getElementById("modalPreFlightVerification")?.classList.add("hidden");
+}
+
+window.renderTrainingDataHubTable = renderTrainingDataHubTable;
+window.deleteTrainingRecordById = deleteTrainingRecordById;
+window.showTrainingRecordJsonDialog = showTrainingRecordJsonDialog;
+window.renderSavedLecturesList = renderSavedLecturesList;
+window.loadLectureSessionIntoWorkspace = loadLectureSessionIntoWorkspace;
+window.exportLectureSessionAsJson = exportLectureSessionAsJson;
+window.renderPreFlightVerificationModal = renderPreFlightVerificationModal;
+window.updatePreFlightEstimatorKPIs = updatePreFlightEstimatorKPIs;
+window.executeValidateAllAiDecisions = executeValidateAllAiDecisions;
+
 window.switchLectureStageTab = switchLectureStageTab;
 window.renderTafrighOutput = renderTafrighOutput;
 window.executeTafrighReviewAction = executeTafrighReviewAction;
@@ -1874,6 +2821,12 @@ window.updateAiMetricsUI = updateAiMetricsUI;
 window.renderAiRequestLogsTable = renderAiRequestLogsTable;
 window.renderLayaDatasetBankStats = renderLayaDatasetBankStats;
 window.renderAiLogsSection = renderAiLogsSection;
+
+window.renderReferenceWordChips = renderReferenceWordChips;
+window.applyReferenceWordsToTranscript = applyReferenceWordsToTranscript;
+window.openDeleteIntentModal = openDeleteIntentModal;
+window.highlightAndOpenAiRequestLog = highlightAndOpenAiRequestLog;
+window.jumpToAdhkarStudioWithFilter = jumpToAdhkarStudioWithFilter;
 
 window.WahyRenderer = {
   switchLectureStageTab,
@@ -1891,6 +2844,20 @@ window.WahyRenderer = {
   renderAiRequestLogsTable,
   updateAiMetricsUI,
   renderLayaDatasetBankStats,
+  renderReferenceWordChips,
+  applyReferenceWordsToTranscript,
+  openDeleteIntentModal,
+  highlightAndOpenAiRequestLog,
+  jumpToAdhkarStudioWithFilter,
+  renderTrainingDataHubTable,
+  deleteTrainingRecordById,
+  showTrainingRecordJsonDialog,
+  renderSavedLecturesList,
+  loadLectureSessionIntoWorkspace,
+  exportLectureSessionAsJson,
+  renderPreFlightVerificationModal,
+  updatePreFlightEstimatorKPIs,
+  executeValidateAllAiDecisions,
   updateVideoCaptionOverlay,
   seekToMediaTimestamp,
   toggleSimulatedPlayback,

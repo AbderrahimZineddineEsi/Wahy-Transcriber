@@ -14,6 +14,7 @@ Responsibilities:
 
 from __future__ import annotations
 
+import hashlib
 import json
 import math
 import os
@@ -40,6 +41,23 @@ class FFmpegProcessingError(RuntimeError):
 BASE_DIR = Path(__file__).resolve().parent
 TEMP_MEDIA_DIR = BASE_DIR / "temp_media"
 TEMP_MEDIA_DIR.mkdir(parents=True, exist_ok=True)
+
+MEDIA_CACHE_DIR = BASE_DIR / "data" / "media_cache"
+MEDIA_CACHE_DIR.mkdir(parents=True, exist_ok=True)
+
+
+def get_cached_media_path(source_url: str) -> Optional[Path]:
+    """
+    Computes a deterministic SHA-256 hash of the URL and returns cached media path if present.
+    """
+    if not source_url or not source_url.strip():
+        return None
+    url_hash = hashlib.sha256(source_url.strip().encode("utf-8")).hexdigest()[:16]
+    for ext in (".mp4", ".m4a", ".webm", ".mp3", ".wav"):
+        candidate = MEDIA_CACHE_DIR / f"{url_hash}{ext}"
+        if candidate.exists() and candidate.stat().st_size > 1024:
+            return candidate
+    return None
 
 
 def check_ffmpeg_available() -> bool:
@@ -74,6 +92,7 @@ def download_youtube_media(youtube_url: str, session_id: Optional[str] = None) -
     """
     Download best MP4 video up to 720p for local playback in the UI player,
     using the yt_dlp Python library directly for rich exception capture.
+    Caches media files locally by URL hash to avoid duplicate downloads.
     """
     if yt_dlp is None:
         raise YtDlpDownloadError(
@@ -81,6 +100,23 @@ def download_youtube_media(youtube_url: str, session_id: Optional[str] = None) -
         )
 
     sid = session_id or uuid.uuid4().hex[:10]
+
+    # Check local media cache first
+    cached_path = get_cached_media_path(youtube_url)
+    if cached_path is not None:
+        target_path = TEMP_MEDIA_DIR / f"yt_{sid}{cached_path.suffix}"
+        if not target_path.exists():
+            shutil.copy2(cached_path, target_path)
+        return {
+            "session_id": sid,
+            "video_path": target_path,
+            "media_url": f"/media/{target_path.name}",
+            "title": f"YouTube (Cached) {sid}",
+            "duration": float(probe_media_duration_seconds(target_path)),
+            "webpage_url": youtube_url,
+            "from_cache": True,
+        }
+
     out_tmpl = str(TEMP_MEDIA_DIR / f"yt_{sid}.%(ext)s")
 
     ydl_opts: Dict[str, Any] = {
@@ -106,6 +142,15 @@ def download_youtube_media(youtube_url: str, session_id: Optional[str] = None) -
                     raise YtDlpDownloadError(f"لم يتم العثور على الملف المحمّل من الرابط: {youtube_url}")
                 downloaded_path = matches[0]
 
+            # Cache the newly downloaded file for future sessions
+            try:
+                url_hash = hashlib.sha256(youtube_url.strip().encode("utf-8")).hexdigest()[:16]
+                cache_dest = MEDIA_CACHE_DIR / f"{url_hash}{downloaded_path.suffix}"
+                if not cache_dest.exists() or cache_dest.stat().st_size <= 1024:
+                    shutil.copy2(downloaded_path, cache_dest)
+            except Exception:
+                pass
+
             return {
                 "session_id": sid,
                 "video_path": downloaded_path,
@@ -113,6 +158,7 @@ def download_youtube_media(youtube_url: str, session_id: Optional[str] = None) -
                 "title": info.get("title") or f"YouTube_{sid}",
                 "duration": float(info.get("duration") or probe_media_duration_seconds(downloaded_path)),
                 "webpage_url": youtube_url,
+                "from_cache": False,
             }
     except Exception as exc:
         if isinstance(exc, YtDlpDownloadError):

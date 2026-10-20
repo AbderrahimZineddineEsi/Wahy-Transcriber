@@ -71,6 +71,27 @@
       }
     }
 
+    // Module 5: Quran Ayah Completeness Context Engine (N-1, N, N+1)
+    let quranVerseContext = null;
+    if (det.sourceType === "QURAN" && det.unitId) {
+      const parts = String(det.unitId).split(":");
+      const sNum = parts.length >= 3 ? parseInt(parts[1], 10) : (parts.length === 2 ? parseInt(parts[0], 10) : null);
+      const aNum = parts.length >= 3 ? parseInt(parts[2], 10) : (parts.length === 2 ? parseInt(parts[1], 10) : null);
+
+      if (sNum && aNum && typeof activeMatcher === "object" && activeMatcher?.units) {
+        const prevUnit = activeMatcher.units.get(`quran:${sNum}:${aNum - 1}`) || activeMatcher.units.get(`${sNum}:${aNum - 1}`);
+        const nextUnit = activeMatcher.units.get(`quran:${sNum}:${aNum + 1}`) || activeMatcher.units.get(`${sNum}:${aNum + 1}`);
+
+        quranVerseContext = {
+          surah_number: sNum,
+          ayah_number: aNum,
+          previous_ayah_text: prevUnit && Array.isArray(prevUnit.vocalizedWords) ? prevUnit.vocalizedWords.slice(-15).join(" ") : (prevUnit?.text ? prevUnit.text.split(/\s+/).slice(-15).join(" ") : ""),
+          current_ayah_text: det.canonicalText || (unit && unit.vocalizedWords ? unit.vocalizedWords.join(" ") : ""),
+          next_ayah_text: nextUnit && Array.isArray(nextUnit.vocalizedWords) ? nextUnit.vocalizedWords.slice(0, 15).join(" ") : (nextUnit?.text ? nextUnit.text.split(/\s+/).slice(0, 15).join(" ") : "")
+        };
+      }
+    }
+
     const canonicalState = {
       source_type: det.sourceType || "HADITH", // "QURAN" | "HADITH" | "ADHKAR"
       candidate_reference: det.displayRef || det.reference || "",
@@ -84,7 +105,8 @@
       immediate_transcript_after: immediateAfter,
       engine_confidence_band: det.confidenceBand || "CANDIDATE",
       engine_score: Number((det.totalScore || 0).toFixed(2)),
-      has_citation_cue: Boolean(det.hasCitationCue)
+      has_citation_cue: Boolean(det.hasCitationCue),
+      quran_verse_context: quranVerseContext
     };
 
     const canonicalQuestions = {
@@ -104,7 +126,7 @@
       boundary_status: {
         type: "choice",
         instructions:
-          "Compare `immediate_transcript_before` against `unmatched_corpus_prefix_words`, and `immediate_transcript_after` against `unmatched_corpus_suffix_words`. Determine whether the speaker actually uttered additional words of this quote at the beginning or end (even with minor ASR spelling errors) that were accidentally cut off from `matched_span_in_lecture`. If the speaker intentionally stopped quoting and resumed normal commentary, select COMPLETE_SPAN.",
+          "Compare `immediate_transcript_before` against `unmatched_corpus_prefix_words` (and preceding verse in `quran_verse_context` if applicable), and `immediate_transcript_after` against `unmatched_corpus_suffix_words` (and succeeding verse in `quran_verse_context` if applicable). Determine whether the speaker actually uttered additional words of this quote at the beginning or end (even with minor ASR spelling errors) that were accidentally cut off from `matched_span_in_lecture`. If the speaker intentionally stopped quoting and resumed normal commentary, select COMPLETE_SPAN.",
         criteria: {
           COMPLETE_SPAN:
             "The detected span captures all words of the quote that the speaker actually uttered in this segment (no words of the quote were cut off in the adjacent transcript).",
@@ -818,7 +840,7 @@
   /**
    * Run verification over all matching detections in the active lecture
    */
-  async function runBatchAiVerification(onProgress) {
+  async function runBatchAiVerification(onProgress, candidateIds = null) {
     isVerificationPaused = false;
     isVerificationCancelled = false;
 
@@ -827,7 +849,12 @@
     const contextWindow = currentState.aiVerification.contextWindowWords || 25;
     const batchSize = provider === "gemini" ? (currentState.aiVerification.geminiBatchSize || 5) : 1;
 
-    const targetDetections = filterDetectionsByScope(currentState.detections, scope);
+    let targetDetections = filterDetectionsByScope(currentState.detections, scope);
+    if (Array.isArray(candidateIds) && candidateIds.length > 0) {
+      const idSet = new Set(candidateIds);
+      targetDetections = targetDetections.filter(d => idSet.has(d.id) || idSet.has(d._uniqueKey));
+    }
+
     if (!targetDetections.length) {
       if (typeof showToast === "function") {
         showToast("لا توجد مقتبسات تطابق نطاق التدقيق المحدد.");
