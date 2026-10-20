@@ -71,11 +71,22 @@ def compute_fuzzy_similarity(spoken_norm: str, line_norm: str) -> float:
         return 0.0
 
     if RAPIDFUZZ_AVAILABLE:
-        # Rapidfuzz token_set_ratio is robust to extraneous introductory words
         score = fuzz.token_set_ratio(spoken_norm, line_norm) / 100.0
     else:
-        matcher = difflib.SequenceMatcher(None, spoken_norm, line_norm)
-        score = matcher.ratio()
+        tokens1 = set(spoken_norm.split())
+        tokens2 = set(line_norm.split())
+        if not tokens1 or not tokens2:
+            return 0.0
+        intersection = tokens1 & tokens2
+        diff1to2 = tokens1 - tokens2
+        diff2to1 = tokens2 - tokens1
+        sorted_inter = " ".join(sorted(intersection))
+        sorted_1to2 = " ".join(sorted(intersection | diff1to2))
+        sorted_2to1 = " ".join(sorted(intersection | diff2to1))
+        r1 = difflib.SequenceMatcher(None, sorted_inter, sorted_1to2).ratio()
+        r2 = difflib.SequenceMatcher(None, sorted_inter, sorted_2to1).ratio()
+        r3 = difflib.SequenceMatcher(None, sorted_1to2, sorted_2to1).ratio()
+        score = max(r1, r2, r3)
 
     return round(score, 4)
 

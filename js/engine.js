@@ -1457,16 +1457,6 @@
           }
           best.candidateRefs = competing;
           best.candidateUnitIds = competingUids;
-          best.candidates = group.slice(0, 5).map(g => {
-            const u = this.units.get(g.unitId);
-            return {
-              unitId: g.unitId,
-              displayRef: g.displayRef,
-              score: g.totalScore,
-              sourceType: g.sourceType,
-              textPreview: u ? (u.vocalizedWords ? u.vocalizedWords.slice(0, 15).join(" ") + "..." : u.text || "") : ""
-            };
-          });
           if (competing.length > 1) {
             best.isAmbiguous = true;
             // Claude Blocker #2 Fix: Ambiguous multi-home Quran verses (e.g. Ar-Rahman refrain, standalone 27:3/31:4, standalone وهدى وبشرى للمؤمنين)
@@ -2102,15 +2092,6 @@
         det.canonicalText = canonicalText;
         det.reference = det.displayRef || det.reference || "";
         det.confidence = det.confidenceBand === "VERIFIED" ? 0.98 : (det.confidenceBand === "AMBIGUOUS" ? 0.82 : 0.72);
-        if (!Array.isArray(det.candidates) || !det.candidates.length) {
-          det.candidates = [{
-            unitId: det.unitId,
-            displayRef: det.displayRef || det.reference,
-            score: det.totalScore || Math.round((det.confidence || 0.9) * 100),
-            sourceType: det.sourceType,
-            textPreview: (det.canonicalText || det.matchedText || "").slice(0, 60) + "..."
-          }];
-        }
         if (typeof det.snappedToCanonical !== "boolean") {
           det.snappedToCanonical = false;
         }

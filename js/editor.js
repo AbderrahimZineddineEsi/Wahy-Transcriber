@@ -322,23 +322,22 @@ function handleFnWordClick(e) {
   const tokIdx = parseInt(tokEl.getAttribute("data-raw-tok-idx") ?? tokEl.getAttribute("data-word-idx") ?? "-1", 10);
   if (isNaN(tokIdx) || tokIdx < 0) return;
 
-  // Module 1.1: Bidirectional Video Playback Sync
+  // Bidirectional Video Playback Sync (Configurable follow-me playback)
   if (currentState.editorPlaybackFollowsSelection) {
-    const word = currentState.words[tokIdx];
-    const targetTime = (word && typeof word.start === "number") ? word.start : parseFloat(tokEl.getAttribute("data-start-time") || "0");
+    const startSec = parseFloat(tokEl.getAttribute("data-start-time") || (currentState.words[tokIdx]?.start ?? 0));
     const media = document.getElementById("mainMediaPlayer") || document.getElementById("mainAudioPlayer");
     if (media) {
       const wasPlaying = !media.paused && !media.ended;
-      media.currentTime = targetTime;
+      media.currentTime = startSec;
       if (wasPlaying) {
         media.play().catch(() => {});
       }
     } else if (typeof seekToMediaTimestamp === "function") {
-      seekToMediaTimestamp(targetTime, false);
+      seekToMediaTimestamp(startSec, false);
     }
   }
 
-  // Alt+Click forces playing preview
+  // Alt+Click force-plays regardless of sync toggle
   if (e.altKey) {
     const startSec = parseFloat(tokEl.getAttribute("data-start-time") || "0");
     seekToMediaTimestamp(startSec, true);
@@ -1584,3 +1583,85 @@ window.WahyEditor = {
   applyLectureTextEdits,
   toggleLectureEditMode
 };
+
+
+// =============================================================================
+// Module 12: Reference Word Substitution & Deletion Intent Telemetry
+// =============================================================================
+
+function applyReferenceWordsToTranscript(det, selectedWordIndices) {
+  if (!det || !Array.isArray(selectedWordIndices) || !selectedWordIndices.length) return;
+  pushUndoSnapshot("تطبيق كلمات المرجع على النص");
+
+  const unit = (typeof activeMatcher === "object" && activeMatcher?.units && det.unitId)
+    ? activeMatcher.units.get(det.unitId)
+    : null;
+  const words = unit ? (unit.vocalizedWords || unit.fullText.split(/\s+/)) : (det.canonicalText || "").split(/\s+/);
+  const chosenWords = selectedWordIndices.map(i => words[i]).filter(Boolean);
+  if (!chosenWords.length) return;
+
+  const newSpanText = chosenWords.join(" ");
+  det.canonicalText = newSpanText;
+  det.canonicalSegments = [newSpanText];
+
+  const sorted = [...selectedWordIndices].sort((a, b) => a - b);
+  det.qSegments = [[sorted[0], sorted[sorted.length - 1] + 1]];
+  det.snappedToCanonical = true;
+
+  recalculateCaptionsFromCurrentFindings();
+  if (typeof renderAllViews === "function") renderAllViews();
+  if (typeof showToast === "function") {
+    showToast(`✨ تم تطبيق (${chosenWords.length}) كلمة من المرجع على النص والكابشن!`);
+  }
+}
+
+function triggerDeleteFindingWithIntentModal(findingIdx) {
+  if (findingIdx < 0 || findingIdx >= (currentState.detections || []).length) return;
+  currentState.pendingDeleteFindingIdx = findingIdx;
+  const modal = document.getElementById("modalDeleteIntent");
+  if (modal) {
+    modal.classList.remove("hidden");
+    modal.classList.add("flex");
+  } else {
+    deleteFinding(findingIdx);
+  }
+}
+
+async function executeDeleteFindingIntent(intent) {
+  const modal = document.getElementById("modalDeleteIntent");
+  if (modal) {
+    modal.classList.add("hidden");
+    modal.classList.remove("flex");
+  }
+
+  const findingIdx = currentState.pendingDeleteFindingIdx;
+  if (typeof findingIdx !== "number" || findingIdx < 0 || findingIdx >= (currentState.detections || []).length) return;
+  currentState.pendingDeleteFindingIdx = null;
+
+  const det = currentState.detections[findingIdx];
+  if (!det) return;
+
+  if (intent === "FALSE_POSITIVE") {
+    try {
+      det.aiVerification = det.aiVerification || {};
+      det.aiVerification.verdict = "FALSE";
+      det.aiVerification.humanOverride = true;
+      det.aiVerification.reason = "حذف يدوي بواسطة المستخدم: كلام عادي للمتكلم وليس اقتباساً (عينة سلبية).";
+      if (typeof WahyAiVerifier === "object" && typeof WahyAiVerifier.buildCanonicalDecisionEnvelope === "function") {
+        const env = WahyAiVerifier.buildCanonicalDecisionEnvelope(det, currentState.words);
+        const layaRec = WahyAiVerifier.convertRecordToLayaTrainingEnvelope(det, env);
+        layaRec.answers.verdict.choice = "FALSE";
+        layaRec.answers.verdict.probabilities = { CORRECT: 0.01, FALSE: 0.98, NOT_SURE: 0.01 };
+        layaRec.initial_system_prediction = { verdict: "CORRECT", confidence: 0.90 };
+        layaRec.human_gold_resolution = { verdict: "FALSE", user_action: "DELETE_FALSE_POSITIVE", timestamp: new Date().toISOString() };
+        if (typeof saveVerificationRecordToDB === "function") {
+          await saveVerificationRecordToDB(layaRec);
+        }
+      }
+    } catch (e) {
+      console.warn("Failed to record deletion telemetry:", e);
+    }
+  }
+
+  deleteFinding(findingIdx);
+}

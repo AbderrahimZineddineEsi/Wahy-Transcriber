@@ -12,7 +12,42 @@ from datetime import datetime, timezone
 from enum import Enum
 from typing import Any, Dict, List, Literal, Optional, Tuple
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import Field
+try:
+    from pydantic import ConfigDict, field_validator, model_validator
+    from pydantic import BaseModel
+except ImportError:
+    from pydantic import BaseModel as _PydanticBaseModel
+    ConfigDict = dict
+    def field_validator(*args, **kwargs):
+        def dec(f): return f
+        return dec
+    def model_validator(*args, **kwargs):
+        def dec(f): return f
+        return dec
+
+    class BaseModel(_PydanticBaseModel):
+        def __setattr__(self, name, value):
+            cfg = getattr(self, "model_config", None)
+            if isinstance(cfg, dict) and cfg.get("frozen"):
+                from pydantic.error_wrappers import ErrorWrapper
+                from pydantic import ValidationError
+                raise ValidationError([ErrorWrapper(ValueError(f"{self.__class__.__name__} is immutable"), name)], self.__class__)
+            super().__setattr__(name, value)
+
+        def model_dump(self, **kwargs):
+            return self.dict(**kwargs)
+
+        def model_dump_json(self, **kwargs):
+            return self.json(**kwargs)
+
+        @classmethod
+        def model_validate(cls, obj, **kwargs):
+            return cls.parse_obj(obj, **kwargs)
+
+        @classmethod
+        def model_validate_json(cls, json_data, **kwargs):
+            return cls.parse_raw(json_data, **kwargs)
 
 
 class StructuralTag(str, Enum):

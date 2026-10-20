@@ -7,7 +7,7 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Literal, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 from .models import CommentKind, StructuralTag, TextEdit
 
@@ -40,6 +40,20 @@ class JEVRequestConfig(BaseModel):
 
 class PipelineConfig(BaseModel):
     processing_mode: Literal["per_sentence", "windowed"] = "per_sentence"
+
+    @field_validator("model_candidate", mode="before")
+    @classmethod
+    def _normalize_model_candidate(cls, v):
+        if isinstance(v, str):
+            aliases = {
+                "jev_independent": "jev_hybrid",
+                "jev": "jev_hybrid",
+                "laya_only": "laya_hybrid",
+                "laya": "laya_hybrid",
+                "gemini": "gemini_all",
+            }
+            return aliases.get(v, v)
+        return v
     window_size: int = 20
     context_before: int = 3
     context_after: int = 3

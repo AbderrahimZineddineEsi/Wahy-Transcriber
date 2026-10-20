@@ -107,12 +107,9 @@ let demoPlaybackTimer = null;
 
 let currentState = {
   version: "2.1.0",
-  activeSection: "display",       // "input" | "display" | "editor" | "datasets" | "training_data"
+  activeSection: "display",       // "input" | "display" | "editor" | "datasets"
   editorSubMode: "fn_studio",     // "fn_studio" | "text_edit" | "captions_edit"
   editorDockTab: "fn",            // "fn" | "inspector"
-  editorPlaybackFollowsSelection: true,
-  editorViewRasmQiyasi: false,
-  editorViewFullCanonicalSpan: false,
   fnSelectMode: true,
   fnClickStep: 0,                 // 0 = waiting for start word click, 1 = start clicked (hover preview active)
   adhkarEnabled: true,
@@ -131,6 +128,29 @@ let currentState = {
   mediaUrl: "",
   mediaType: "demo",
   rawText: "",
+  editorPlaybackFollowsSelection: true,
+  editorViewRasmQiyasi: false,
+  editorViewFullCanonicalSpan: false,
+  displayFormatting: {
+    showSurahNames: true,
+    showHadithSources: true,
+    ayahBrackets: "quranic", // "quranic" | "angle" | "parentheses" | "none"
+    adhkarBrackets: "special", // "special" | "brackets" | "none"
+    highlightUnverified: false
+  },
+  tafrighConfig: {
+    mode: "per_sentence",
+    model: "gemini-3.5-flash-lite",
+    typoStrategy: "gated",
+    scope: "full"
+  },
+  verificationConfig: {
+    acceptThreshold: 0.75,
+    ambiguityThreshold: 0.45,
+    contextWindowWords: 25,
+    checkCompleteness: true,
+    checkCorrectness: true
+  },
   rawTranscript: "",
   words: [],                      // [{ id, word, start, end, char_start, char_end }]
   detections: [],                 // Engine findings mapped to word timestamps
@@ -403,114 +423,6 @@ async function clearVerificationRecordsDB() {
     });
   } catch (err) {
     console.warn("Failed to clear IndexedDB records:", err);
-    return false;
-  }
-}
-
-// -----------------------------------------------------------------------------
-// IndexedDB Lecture Sessions Store (WahyLecturesDB) - Module 6
-// -----------------------------------------------------------------------------
-const IDB_LECTURES_DB_NAME = "WahyLecturesDB";
-const IDB_LECTURES_STORE_NAME = "saved_sessions";
-
-function openWahyLecturesDB() {
-  return new Promise((resolve, reject) => {
-    if (!window.indexedDB) {
-      return reject(new Error("IndexedDB غير مدعوم في هذا المتصفح."));
-    }
-    const req = window.indexedDB.open(IDB_LECTURES_DB_NAME, 1);
-    req.onupgradeneeded = (e) => {
-      const db = e.target.result;
-      if (!db.objectStoreNames.contains(IDB_LECTURES_STORE_NAME)) {
-        const store = db.createObjectStore(IDB_LECTURES_STORE_NAME, { keyPath: "id" });
-        store.createIndex("title", "title", { unique: false });
-        store.createIndex("updated_at", "updated_at", { unique: false });
-      }
-    };
-    req.onsuccess = () => resolve(req.result);
-    req.onerror = () => reject(req.error || new Error("فشل فتح قاعدة بيانات WahyLecturesDB"));
-  });
-}
-
-async function saveLectureSessionToDB(sessionData = {}) {
-  try {
-    const db = await openWahyLecturesDB();
-    const id = sessionData.id || `lecture_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
-    const record = {
-      id,
-      title: sessionData.title || currentState.lectureTitle || "محاضرة علمية — استوديو الوحيين",
-      created_at: sessionData.created_at || new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      media_url: sessionData.mediaUrl || currentState.mediaUrl || "",
-      media_type: sessionData.mediaType || currentState.mediaType || "demo",
-      raw_transcript: sessionData.rawTranscript || currentState.rawTranscript || currentState.rawText || "",
-      words: sessionData.words || currentState.words || [],
-      detections: sessionData.detections || currentState.detections || [],
-      captions: sessionData.captions || currentState.captions || [],
-      tafrigh_result: sessionData.tafrigh || currentState.tafrigh?.data || null,
-      word_count: (sessionData.words || currentState.words || []).length,
-      quote_count: (sessionData.detections || currentState.detections || []).length
-    };
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction([IDB_LECTURES_STORE_NAME], "readwrite");
-      const store = tx.objectStore(IDB_LECTURES_STORE_NAME);
-      const req = store.put(record);
-      req.onsuccess = () => resolve(record);
-      req.onerror = () => reject(req.error);
-    });
-  } catch (err) {
-    console.error("Failed to save lecture session:", err);
-    throw err;
-  }
-}
-
-async function getAllSavedLecturesFromDB() {
-  try {
-    const db = await openWahyLecturesDB();
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction([IDB_LECTURES_STORE_NAME], "readonly");
-      const store = tx.objectStore(IDB_LECTURES_STORE_NAME);
-      const req = store.getAll();
-      req.onsuccess = () => {
-        const list = (req.result || []).sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
-        resolve(list);
-      };
-      req.onerror = () => reject(req.error);
-    });
-  } catch (err) {
-    console.warn("Failed to read saved lectures:", err);
-    return [];
-  }
-}
-
-async function getLectureSessionFromDB(id) {
-  try {
-    const db = await openWahyLecturesDB();
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction([IDB_LECTURES_STORE_NAME], "readonly");
-      const store = tx.objectStore(IDB_LECTURES_STORE_NAME);
-      const req = store.get(id);
-      req.onsuccess = () => resolve(req.result || null);
-      req.onerror = () => reject(req.error);
-    });
-  } catch (err) {
-    console.warn("Failed to get lecture session:", err);
-    return null;
-  }
-}
-
-async function deleteSavedLectureFromDB(id) {
-  try {
-    const db = await openWahyLecturesDB();
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction([IDB_LECTURES_STORE_NAME], "readwrite");
-      const store = tx.objectStore(IDB_LECTURES_STORE_NAME);
-      const req = store.delete(id);
-      req.onsuccess = () => resolve(true);
-      req.onerror = () => reject(req.error);
-    });
-  } catch (err) {
-    console.warn("Failed to delete saved lecture:", err);
     return false;
   }
 }
@@ -946,4 +858,141 @@ function buildDynamicSampleLectureFromCorpus() {
     `ومن أعظم آيات التوحيد في كتاب الله آية الكرسي في سورة البقرة، قال الله عز وجل: ${aBaqara255}، فينبغي للمؤمن أن يتدبر معانيها عند كل صلاة.`,
     `وتذكروا وصية الله الجامعة في سورة العصر حيث أقسم سبحانه فقال: ${aAsr1} ${aAsr2} ${aAsr3}، ونختم مجلسنا هذا بالذكر المأثور في كفارة المجلس: ${sampleDhikr1}.`
   ].join("\n\n");
+}
+
+
+// =============================================================================
+// IndexedDB Lecture Sessions Store (WahyLecturesDB)
+// File: js/state.js
+// =============================================================================
+
+const IDB_LECTURES_DB_NAME = "WahyLecturesDB";
+const IDB_LECTURES_STORE_NAME = "lectures";
+
+function openWahyLecturesDB() {
+  return new Promise((resolve, reject) => {
+    if (!window.indexedDB) {
+      return reject(new Error("IndexedDB غير مدعوم في هذا المتصفح."));
+    }
+    const req = window.indexedDB.open(IDB_LECTURES_DB_NAME, 1);
+    req.onupgradeneeded = (e) => {
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains(IDB_LECTURES_STORE_NAME)) {
+        const store = db.createObjectStore(IDB_LECTURES_STORE_NAME, { keyPath: "id" });
+        store.createIndex("title", "title", { unique: false });
+        store.createIndex("updated_at", "updated_at", { unique: false });
+      }
+    };
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error || new Error("فشل فتح قاعدة بيانات WahyLecturesDB"));
+  });
+}
+
+async function saveCurrentLectureSession(customTitle = null) {
+  try {
+    const db = await openWahyLecturesDB();
+    const id = currentState.currentLectureId || ("lec_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6));
+    currentState.currentLectureId = id;
+    const title = customTitle || currentState.lectureTitle || "محاضرة علمية محفوطة";
+
+    const sessionPayload = {
+      id,
+      title,
+      created_at: currentState.lectureCreatedAt || new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      mediaUrl: currentState.mediaUrl || "",
+      mediaType: currentState.mediaType || "text",
+      rawText: currentState.rawText || "",
+      rawTranscript: currentState.rawTranscript || "",
+      words: currentState.words || [],
+      detections: currentState.detections || [],
+      captions: currentState.captions || [],
+      tafrighResult: currentState.tafrighResult || null,
+      stats: {
+        wordsCount: (currentState.words || []).length,
+        detectionsCount: (currentState.detections || []).length,
+        captionsCount: (currentState.captions || []).length
+      }
+    };
+
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction([IDB_LECTURES_STORE_NAME], "readwrite");
+      const store = tx.objectStore(IDB_LECTURES_STORE_NAME);
+      const req = store.put(sessionPayload);
+      req.onsuccess = () => resolve(sessionPayload);
+      req.onerror = () => reject(req.error);
+    });
+  } catch (err) {
+    console.error("Failed to save lecture session:", err);
+    return null;
+  }
+}
+
+async function loadLectureSession(sessionId) {
+  try {
+    const db = await openWahyLecturesDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction([IDB_LECTURES_STORE_NAME], "readonly");
+      const store = tx.objectStore(IDB_LECTURES_STORE_NAME);
+      const req = store.get(sessionId);
+      req.onsuccess = () => {
+        const item = req.result;
+        if (item) {
+          currentState.currentLectureId = item.id;
+          currentState.lectureTitle = item.title;
+          currentState.lectureCreatedAt = item.created_at;
+          currentState.mediaUrl = item.mediaUrl || "";
+          currentState.mediaType = item.mediaType || "text";
+          currentState.rawText = item.rawText || "";
+          currentState.rawTranscript = item.rawTranscript || item.rawText || "";
+          currentState.words = Array.isArray(item.words) ? item.words : [];
+          currentState.detections = Array.isArray(item.detections) ? item.detections : [];
+          currentState.captions = Array.isArray(item.captions) ? item.captions : [];
+          currentState.tafrighResult = item.tafrighResult || null;
+          resolve(item);
+        } else {
+          reject(new Error("لم يتم العثور على الجلسة"));
+        }
+      };
+      req.onerror = () => reject(req.error);
+    });
+  } catch (err) {
+    console.error("Failed to load lecture session:", err);
+    return null;
+  }
+}
+
+async function listSavedLectureSessions() {
+  try {
+    const db = await openWahyLecturesDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction([IDB_LECTURES_STORE_NAME], "readonly");
+      const store = tx.objectStore(IDB_LECTURES_STORE_NAME);
+      const req = store.getAll();
+      req.onsuccess = () => {
+        const list = (req.result || []).sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
+        resolve(list);
+      };
+      req.onerror = () => reject(req.error);
+    });
+  } catch (err) {
+    console.error("Failed to list lecture sessions:", err);
+    return [];
+  }
+}
+
+async function deleteSavedLectureSession(sessionId) {
+  try {
+    const db = await openWahyLecturesDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction([IDB_LECTURES_STORE_NAME], "readwrite");
+      const store = tx.objectStore(IDB_LECTURES_STORE_NAME);
+      const req = store.delete(sessionId);
+      req.onsuccess = () => resolve(true);
+      req.onerror = () => reject(req.error);
+    });
+  } catch (err) {
+    console.error("Failed to delete lecture session:", err);
+    return false;
+  }
 }

@@ -1,5 +1,5 @@
 {
-  "run_id": "run_45c643de618a",
+  "run_id": "run_1a6d9fb79d51",
   "processing_mode": "per_sentence",
   "window_size": 20,
   "model_candidate": "gemini_all",
@@ -9,6 +9,6 @@
   "use_detection_boundaries": true,
   "num_segments": 5,
   "wall_clock_seconds": 0.0,
-  "run_dir": "runs/20261020_142526_lecture_default",
-  "completed_at": "2026-10-20T14:25:26.243730+00:00"
+  "run_dir": "runs/20261020_170148_lecture_default",
+  "completed_at": "2026-10-20T17:01:48.609099+00:00"
 }

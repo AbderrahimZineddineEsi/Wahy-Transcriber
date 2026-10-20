@@ -1,5 +1,5 @@
 {
-  "run_id": "run_02e3ff79db54",
+  "run_id": "run_016500ba87d8",
   "lecture_slug": "lecture",
   "label": "default",
   "total_requests": 5,
@@ -15,9 +15,9 @@
   "fallback_rate": 0.0,
   "latency_by_purpose_ms": {
     "classify": {
-      "p50": 0.03,
-      "p95": 0.05,
-      "max": 0.05
+      "p50": 0.01,
+      "p95": 0.01,
+      "max": 0.01
     }
   },
   "structural_tag_distribution": {

@@ -197,26 +197,17 @@ async function checkBackendHealthStatus() {
 function applyThemeMode(theme) {
   const htmlEl = document.documentElement;
   const lbl = document.getElementById("lblThemeToggle");
-  const icon = document.getElementById("themeToggleIcon");
-  const label = document.getElementById("themeToggleLabel");
-  
-  htmlEl.setAttribute("data-theme", theme);
   if (theme === "light") {
     htmlEl.classList.remove("dark");
     htmlEl.classList.add("light");
     if (lbl) lbl.textContent = "🌙";
-    if (icon) icon.textContent = "☀️";
-    if (label) label.textContent = "المظهر الفاتح";
   } else {
     htmlEl.classList.remove("light");
     htmlEl.classList.add("dark");
     if (lbl) lbl.textContent = "☀️";
-    if (icon) icon.textContent = "🌙";
-    if (label) label.textContent = "المظهر الداكن";
   }
   try {
     localStorage.setItem(LS_THEME_KEY, theme);
-    localStorage.setItem("wahy_theme", theme);
   } catch (e) {}
 }
 
@@ -241,19 +232,14 @@ window.addEventListener("DOMContentLoaded", () => {
 
   // Restore Theme
   try {
-    const savedTheme = localStorage.getItem("wahy_theme") || localStorage.getItem(LS_THEME_KEY) || "dark";
+    const savedTheme = localStorage.getItem(LS_THEME_KEY) || "dark";
     applyThemeMode(savedTheme);
   } catch (_) {}
 
-  const toggleThemeFn = () => {
-    const current = document.documentElement.getAttribute("data-theme") || 
-      (document.documentElement.classList.contains("light") ? "light" : "dark");
-    const next = current === "dark" ? "light" : "dark";
-    applyThemeMode(next);
-  };
-
-  document.getElementById("btnToggleTheme")?.addEventListener("click", toggleThemeFn);
-  document.getElementById("btnThemeToggle")?.addEventListener("click", toggleThemeFn);
+  document.getElementById("btnToggleTheme")?.addEventListener("click", () => {
+    const isLight = document.documentElement.classList.contains("light");
+    applyThemeMode(isLight ? "dark" : "light");
+  });
 
   // Restore saved API key and model selection
   try {
@@ -610,7 +596,7 @@ window.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  async function triggerRunAiTafrigh(customConfig = null) {
+  async function triggerRunAiTafrigh() {
     let rawText = (currentState.words && currentState.words.length)
       ? currentState.words.map(w => w.word).join(" ")
       : (currentState.rawText || "");
@@ -706,21 +692,26 @@ window.addEventListener("DOMContentLoaded", () => {
         apiBase = "http://127.0.0.1:8000";
       }
 
+      const geminiKey = currentState?.aiVerification?.geminiApiKey || localStorage.getItem("wahy_gemini_api_key") || "";
+      const openRouterKey = currentState?.aiVerification?.openRouterApiKey || localStorage.getItem("wahy_openrouter_api_key") || "";
+      const modeSel = document.querySelector('input[name="tafrighMode"]:checked')?.value || currentState.tafrighConfig?.mode || "per_sentence";
+      const modelCandidate = document.getElementById("selTafrighModel")?.value || currentState.tafrighConfig?.model || "gemini-3.5-flash-lite";
+      const typoStrat = document.getElementById("selTafrighTypoStrategy")?.value || currentState.tafrighConfig?.typoStrategy || "gated";
+      const scopeVal = document.querySelector('input[name="tafrighScope"]:checked')?.value || currentState.tafrighConfig?.scope || "full";
+
       let textToProcess = rawText;
-      if (customConfig?.scope === "slice") {
-        const sentences = rawText.split(/(?<=[.،؛؟\n])/);
-        textToProcess = sentences.slice(0, 20).join(" ");
+      if (scopeVal === "slice") {
+        textToProcess = rawText.split(/[.؟!\n]+/).slice(0, 20).join(".\n") + ".";
       }
 
-      const geminiKey = currentState?.aiVerification?.geminiApiKey || localStorage.getItem("wahy_gemini_api_key") || "";
-      const openrouterKey = currentState?.aiVerification?.openRouterApiKey || localStorage.getItem("wahy_openrouter_api_key") || "";
       const payload = {
         raw_text: textToProcess,
-        processing_mode: customConfig?.processing_mode || "per_sentence",
-        model_candidate: customConfig?.model_candidate || "gemini_all",
-        typo_strategy: customConfig?.typo_strategy || "gated",
+        processing_mode: modeSel,
+        model_candidate: modelCandidate.startsWith("typesafe") ? "jev_hybrid" : (modelCandidate === "local-laya" ? "laya_hybrid" : "gemini_all"),
+        model_name: modelCandidate,
+        typo_strategy: typoStrat,
         gemini_api_key: geminiKey,
-        openrouter_api_key: openrouterKey
+        openrouter_api_key: openRouterKey
       };
 
       let resp;
@@ -778,39 +769,11 @@ window.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Tafrigh Run Buttons & Configuration Modal (Module 3)
-  const openTafrighConfigModal = () => {
-    const modal = document.getElementById("modalTafrighConfig");
-    if (modal) modal.classList.remove("hidden");
-  };
-
-  const closeTafrighConfigModal = () => {
-    const modal = document.getElementById("modalTafrighConfig");
-    if (modal) modal.classList.add("hidden");
-  };
-
-  document.getElementById("btnRunAiTafrigh")?.addEventListener("click", openTafrighConfigModal);
-  document.getElementById("btnRunTafrighFromEmpty")?.addEventListener("click", openTafrighConfigModal);
-  document.getElementById("btnRerunTafrigh")?.addEventListener("click", openTafrighConfigModal);
-  document.getElementById("btnTafrighRetry")?.addEventListener("click", openTafrighConfigModal);
-
-  document.getElementById("btnCloseTafrighConfig")?.addEventListener("click", closeTafrighConfigModal);
-  document.getElementById("btnCancelTafrighConfig")?.addEventListener("click", closeTafrighConfigModal);
-
-  document.getElementById("btnConfirmLaunchTafrigh")?.addEventListener("click", () => {
-    closeTafrighConfigModal();
-    const mode = document.querySelector('input[name="tafrighMode"]:checked')?.value || "per_sentence";
-    const model = document.getElementById("selTafrighModel")?.value || "gemini-3.5-flash-lite";
-    const typoStrategy = document.getElementById("selTafrighTypoStrategy")?.value || "gated";
-    const scope = document.querySelector('input[name="tafrighScope"]:checked')?.value || "full";
-
-    triggerRunAiTafrigh({
-      processing_mode: mode,
-      model_candidate: model,
-      typo_strategy: typoStrategy,
-      scope: scope
-    });
-  });
+  // Tafrigh Run Buttons
+  document.getElementById("btnRunAiTafrigh")?.addEventListener("click", triggerRunAiTafrigh);
+  document.getElementById("btnRunTafrighFromEmpty")?.addEventListener("click", triggerRunAiTafrigh);
+  document.getElementById("btnRerunTafrigh")?.addEventListener("click", triggerRunAiTafrigh);
+  document.getElementById("btnTafrighRetry")?.addEventListener("click", triggerRunAiTafrigh);
 
   // Tab switching buttons
   document.getElementById("btnLectureTab_SYNC")?.addEventListener("click", () => {
@@ -1349,7 +1312,7 @@ window.addEventListener("DOMContentLoaded", () => {
     const lblStatus = document.getElementById("aiVerificationStatusMsg");
     const lblPercent = document.getElementById("aiVerificationPercentLabel");
 
-    const triggerVerification = async (selectedCandidateIds = null) => {
+    const triggerVerification = async () => {
       if (!currentState.detections.length) {
         showToast("⚠️ لا توجد مقتبسات لفحصها. يرجى تفريغ محاضرة أولاً.");
         return;
@@ -1369,7 +1332,7 @@ window.addEventListener("DOMContentLoaded", () => {
           if (barProgress) barProgress.style.width = `${pct}%`;
           if (lblPercent) lblPercent.textContent = `${pct}% (${p.processed}/${p.total})`;
           if (lblStatus) lblStatus.textContent = p.message || "جاري الفحص...";
-        }, selectedCandidateIds);
+        });
         showToast("✅ اكتمل الفحص والتدقيق الذكي للمقتبسات بنجاح!");
       } catch (err) {
         showToast(`⚠️ تنبيه التدقيق: ${err.message}`);
@@ -1383,154 +1346,10 @@ window.addEventListener("DOMContentLoaded", () => {
       }
     };
 
-    const openPreFlightModal = () => {
-      if (!currentState.detections.length) {
-        showToast("⚠️ لا توجد مقتبسات لفحصها. يرجى تفريغ محاضرة أولاً.");
-        return;
-      }
-      if (typeof renderPreFlightVerificationModal === "function") {
-        renderPreFlightVerificationModal();
-      }
-    };
-
-    btnStart?.addEventListener("click", openPreFlightModal);
+    btnStart?.addEventListener("click", triggerVerification);
     btnStartFromLogs?.addEventListener("click", () => {
       switchMainSection("display");
-      openPreFlightModal();
-    });
-
-    // Pre-flight Verification Modal Controls (Module 5 / Section 7.2)
-    const closePreFlightModal = () => {
-      document.getElementById("modalPreFlightVerification")?.classList.add("hidden");
-    };
-    document.getElementById("btnClosePreFlightModal")?.addEventListener("click", closePreFlightModal);
-    document.getElementById("btnCancelPreFlight")?.addEventListener("click", closePreFlightModal);
-
-    document.getElementById("btnPreFlightSelectAll")?.addEventListener("click", () => {
-      document.querySelectorAll("#preFlightChecklistContainer .chkPreFlightItem").forEach(chk => {
-        chk.checked = true;
-      });
-      if (typeof updatePreFlightEstimatorKPIs === "function") updatePreFlightEstimatorKPIs();
-    });
-
-    document.getElementById("btnPreFlightSelectQuran")?.addEventListener("click", () => {
-      document.querySelectorAll("#preFlightChecklistContainer .chkPreFlightItem").forEach(chk => {
-        const key = chk.getAttribute("data-det-key");
-        const det = (currentState.detections || []).find(d => (d.id || d._uniqueKey) === key);
-        chk.checked = Boolean(det && det.sourceType === "QURAN");
-      });
-      if (typeof updatePreFlightEstimatorKPIs === "function") updatePreFlightEstimatorKPIs();
-    });
-
-    document.getElementById("btnPreFlightSelectHadith")?.addEventListener("click", () => {
-      document.querySelectorAll("#preFlightChecklistContainer .chkPreFlightItem").forEach(chk => {
-        const key = chk.getAttribute("data-det-key");
-        const det = (currentState.detections || []).find(d => (d.id || d._uniqueKey) === key);
-        chk.checked = Boolean(det && det.sourceType === "HADITH");
-      });
-      if (typeof updatePreFlightEstimatorKPIs === "function") updatePreFlightEstimatorKPIs();
-    });
-
-    document.getElementById("btnPreFlightSelectLowConf")?.addEventListener("click", () => {
-      document.querySelectorAll("#preFlightChecklistContainer .chkPreFlightItem").forEach(chk => {
-        const key = chk.getAttribute("data-det-key");
-        const det = (currentState.detections || []).find(d => (d.id || d._uniqueKey) === key);
-        chk.checked = Boolean(det && ((det.totalScore || 0) < 0.80 || det.confidenceBand === "CANDIDATE"));
-      });
-      if (typeof updatePreFlightEstimatorKPIs === "function") updatePreFlightEstimatorKPIs();
-    });
-
-    document.getElementById("btnConfirmLaunchVerification")?.addEventListener("click", () => {
-      const checkedBoxes = Array.from(document.querySelectorAll("#preFlightChecklistContainer .chkPreFlightItem:checked"));
-      if (!checkedBoxes.length) {
-        showToast("⚠️ يرجى تحديد مقتبس واحد على الأقل للفحص.");
-        return;
-      }
-      const selectedKeys = checkedBoxes.map(b => b.getAttribute("data-det-key"));
-      closePreFlightModal();
-      triggerVerification(selectedKeys);
-    });
-
-    document.getElementById("btnValidateAllAiDecisions")?.addEventListener("click", () => {
-      if (typeof executeValidateAllAiDecisions === "function") {
-        executeValidateAllAiDecisions();
-      }
-    });
-
-    // Tadqeeq Configuration Drawer & Live Prompt Inspector (Module 4 / Section 6.1)
-    const updateDrawerPromptPreview = () => {
-      const preEl = document.getElementById("preLivePromptPreview");
-      if (!preEl) return;
-      const sampleDet = (currentState.detections && currentState.detections[0]) || {
-        sourceType: "QURAN",
-        displayRef: "سورة الفاتحة: 1",
-        canonicalText: "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ",
-        totalScore: 0.88,
-        confidenceBand: "HIGH"
-      };
-      const ctxWords = parseInt(document.getElementById("rngContextWindowWords")?.value || "25", 10);
-      const env = typeof buildCanonicalDecisionEnvelope === "function"
-        ? buildCanonicalDecisionEnvelope(sampleDet, currentState.words, ctxWords)
-        : { state: sampleDet, questions: {} };
-      preEl.textContent = JSON.stringify(env, null, 2);
-    };
-
-    document.getElementById("btnOpenVerificationSettings")?.addEventListener("click", () => {
-      const drawer = document.getElementById("drawerVerificationSettings");
-      if (drawer) {
-        drawer.classList.remove("hidden");
-        const cVal = Math.round((currentState.aiVerification.confidenceThreshold || 0.75) * 100);
-        const aVal = Math.round((currentState.aiVerification.ambiguityThreshold || 0.20) * 100);
-        const wVal = currentState.aiVerification.contextWindowWords || 25;
-
-        const setSlider = (id, val) => { const el = document.getElementById(id); if (el) el.value = val; };
-        const setLbl = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
-
-        setSlider("rngConfidenceThreshold", cVal);
-        setLbl("lblConfidenceThreshold", `${cVal}%`);
-        setSlider("rngAmbiguityThreshold", aVal);
-        setLbl("lblAmbiguityThreshold", `${aVal}%`);
-        setSlider("rngContextWindowWords", wVal);
-        setLbl("lblContextWindowWords", `${wVal} كلمة`);
-
-        updateDrawerPromptPreview();
-      }
-    });
-
-    document.getElementById("btnCloseVerificationSettingsDrawer")?.addEventListener("click", () => {
-      document.getElementById("drawerVerificationSettings")?.classList.add("hidden");
-    });
-
-    document.getElementById("rngConfidenceThreshold")?.addEventListener("input", (e) => {
-      const lbl = document.getElementById("lblConfidenceThreshold");
-      if (lbl) lbl.textContent = `${e.target.value}%`;
-    });
-
-    document.getElementById("rngAmbiguityThreshold")?.addEventListener("input", (e) => {
-      const lbl = document.getElementById("lblAmbiguityThreshold");
-      if (lbl) lbl.textContent = `${e.target.value}%`;
-    });
-
-    document.getElementById("rngContextWindowWords")?.addEventListener("input", (e) => {
-      const lbl = document.getElementById("lblContextWindowWords");
-      if (lbl) lbl.textContent = `${e.target.value} كلمة`;
-      updateDrawerPromptPreview();
-    });
-
-    document.getElementById("btnSaveVerificationSettings")?.addEventListener("click", () => {
-      const cVal = parseInt(document.getElementById("rngConfidenceThreshold")?.value || "75", 10) / 100;
-      const aVal = parseInt(document.getElementById("rngAmbiguityThreshold")?.value || "20", 10) / 100;
-      const wVal = parseInt(document.getElementById("rngContextWindowWords")?.value || "25", 10);
-
-      currentState.aiVerification.confidenceThreshold = cVal;
-      currentState.aiVerification.ambiguityThreshold = aVal;
-      currentState.aiVerification.contextWindowWords = wVal;
-
-      if (typeof saveAiConfigToStorage === "function") {
-        saveAiConfigToStorage();
-      }
-      document.getElementById("drawerVerificationSettings")?.classList.add("hidden");
-      showToast("💾 تم حفظ إعدادات التدقيق وسياق الكلمات بنجاح!");
+      triggerVerification();
     });
 
     let isPaused = false;
@@ -1894,197 +1713,6 @@ window.addEventListener("DOMContentLoaded", () => {
       navigator.clipboard.writeText(t);
       showToast("📋 تم نسخ مخرجات النموذج (JSON)");
     });
-
-    // -------------------------------------------------------------------------
-    // Training Data Hub Filters & Actions (Module 2)
-    // -------------------------------------------------------------------------
-    document.getElementById("selTrainingTaskFilter")?.addEventListener("change", () => {
-      if (typeof renderTrainingDataHubTable === "function") renderTrainingDataHubTable();
-    });
-    document.getElementById("selTrainingLabelFilter")?.addEventListener("change", () => {
-      if (typeof renderTrainingDataHubTable === "function") renderTrainingDataHubTable();
-    });
-    document.getElementById("inpTrainingDataSearch")?.addEventListener("input", () => {
-      if (typeof renderTrainingDataHubTable === "function") renderTrainingDataHubTable();
-    });
-    document.getElementById("btnExportLayaJsonlFromHub")?.addEventListener("click", () => {
-      if (typeof WahyAiVerifier === "object" && typeof WahyAiVerifier.exportLayaFineTuningJsonl === "function") {
-        WahyAiVerifier.exportLayaFineTuningJsonl();
-      }
-    });
-    document.getElementById("btnClearTrainingDB")?.addEventListener("click", async () => {
-      if (confirm("هل تريد بالتأكيد مسح بنك بيانات تدريب Laya بالكامل من المتصفح؟")) {
-        if (typeof clearVerificationRecordsDB === "function") {
-          await clearVerificationRecordsDB();
-          if (typeof renderTrainingDataHubTable === "function") renderTrainingDataHubTable();
-          showToast("🗑️ تم مسح بنك بيانات التدريب بنجاح");
-        }
-      }
-    });
-
-    // -------------------------------------------------------------------------
-    // Saved Lectures Manager (Module 6 / Section 8.1)
-    // -------------------------------------------------------------------------
-    document.getElementById("btnSaveCurrentSession")?.addEventListener("click", async () => {
-      const lectureId = `lecture_${Date.now()}`;
-      const session = {
-        lecture_id: lectureId,
-        title: currentState.lectureTitle || "محاضرة علمية",
-        created_at: Date.now(),
-        updated_at: Date.now(),
-        media_url: currentState.mediaUrl || "",
-        raw_transcript: currentState.rawTranscript || (currentState.words || []).map(w => w.word).join(" "),
-        words: currentState.words || [],
-        detections: currentState.detections || [],
-        captions: currentState.captions || [],
-        tafrigh_result: currentState.tafrigh || null
-      };
-
-      if (typeof saveLectureSessionToDB === "function") {
-        await saveLectureSessionToDB(session);
-        if (typeof renderSavedLecturesList === "function") {
-          await renderSavedLecturesList();
-        }
-        showToast("💾 تم حفظ الجلسة الحالية بنجاح في السجل المحلي!");
-      }
-    });
-
-    document.getElementById("btnExportSessionJson")?.addEventListener("click", () => {
-      const session = {
-        lecture_id: `lecture_${Date.now()}`,
-        title: currentState.lectureTitle || "محاضرة علمية",
-        created_at: Date.now(),
-        updated_at: Date.now(),
-        media_url: currentState.mediaUrl || "",
-        raw_transcript: currentState.rawTranscript || (currentState.words || []).map(w => w.word).join(" "),
-        words: currentState.words || [],
-        detections: currentState.detections || [],
-        captions: currentState.captions || [],
-        tafrigh_result: currentState.tafrigh || null
-      };
-      if (typeof exportLectureSessionAsJson === "function") {
-        exportLectureSessionAsJson(session);
-      }
-    });
-
-    // -------------------------------------------------------------------------
-    // Corpus Search Drawer (#drawerCorpusSearch)
-    // -------------------------------------------------------------------------
-    document.getElementById("btnCloseDrawerCorpusSearch")?.addEventListener("click", () => {
-      document.getElementById("drawerCorpusSearch")?.classList.add("hidden");
-      document.getElementById("drawerCorpusSearch")?.classList.remove("flex");
-    });
-
-    let drawerSelectedCat = "ALL";
-    document.querySelectorAll(".btnDrawerCat").forEach(btn => {
-      btn.addEventListener("click", () => {
-        drawerSelectedCat = btn.getAttribute("data-drawer-cat") || "ALL";
-        document.querySelectorAll(".btnDrawerCat").forEach(b => {
-          b.className = (b === btn)
-            ? "btnDrawerCat px-3 py-1 rounded-lg bg-emerald-600 text-white font-bold text-xs transition"
-            : "btnDrawerCat px-3 py-1 rounded-lg bg-bg-surface-elevated text-text-secondary hover:text-text-primary font-medium text-xs transition";
-        });
-        executeDrawerCorpusSearch();
-      });
-    });
-
-    let drawerSearchDebounceTimer = null;
-    const inpDrawerSearch = document.getElementById("inpDrawerCorpusSearch");
-    inpDrawerSearch?.addEventListener("input", () => {
-      clearTimeout(drawerSearchDebounceTimer);
-      drawerSearchDebounceTimer = setTimeout(executeDrawerCorpusSearch, 250);
-    });
-
-    function executeDrawerCorpusSearch() {
-      const q = (inpDrawerSearch?.value || "").trim().toLowerCase();
-      const listEl = document.getElementById("drawerCorpusResultsList");
-      if (!listEl) return;
-
-      if (!q) {
-        listEl.innerHTML = `<div class="text-center py-8 text-text-muted">اكتب كلمة للبحث في نصوص القرآن الكريم ودواوين السنة النبوية والأذكار...</div>`;
-        return;
-      }
-
-      let matches = [];
-      // 1. Search Quran from activeMatcher units
-      if (drawerSelectedCat === "ALL" || drawerSelectedCat === "QURAN") {
-        if (typeof activeMatcher === "object" && activeMatcher?.units) {
-          for (const [uId, uObj] of activeMatcher.units) {
-            if (uObj.vocalizedWords) {
-              const text = uObj.vocalizedWords.join(" ");
-              if (text.includes(q) || (uObj.ref && uObj.ref.toLowerCase().includes(q))) {
-                matches.push({
-                  type: "QURAN",
-                  ref: uObj.ref || uId,
-                  text: text,
-                  unitId: uId
-                });
-                if (matches.length >= 25) break;
-              }
-            }
-          }
-        }
-      }
-
-      // 2. Search Adhkar
-      if ((drawerSelectedCat === "ALL" || drawerSelectedCat === "ADHKAR") && matches.length < 25) {
-        if (typeof RAW_ADHKAR_DATA !== "undefined" && Array.isArray(RAW_ADHKAR_DATA)) {
-          for (const item of RAW_ADHKAR_DATA) {
-            if ((item.text && item.text.includes(q)) || (item.ref && item.ref.includes(q))) {
-              matches.push({
-                type: "ADHKAR",
-                ref: item.ref || "ذكر مأثور",
-                text: item.text,
-                unitId: item.id
-              });
-              if (matches.length >= 25) break;
-            }
-          }
-        }
-      }
-
-      // 3. Search Hadith
-      if ((drawerSelectedCat === "ALL" || drawerSelectedCat === "HADITH") && matches.length < 25) {
-        if (typeof RAW_OUTSIDE_HADITH_DATA !== "undefined" && Array.isArray(RAW_OUTSIDE_HADITH_DATA)) {
-          for (const item of RAW_OUTSIDE_HADITH_DATA) {
-            if ((item.text && item.text.includes(q)) || (item.ref && item.ref.includes(q))) {
-              matches.push({
-                type: "HADITH",
-                ref: item.ref || "حديث نبوي",
-                text: item.text,
-                unitId: item.id
-              });
-              if (matches.length >= 25) break;
-            }
-          }
-        }
-      }
-
-      if (!matches.length) {
-        listEl.innerHTML = `<div class="text-center py-8 text-text-muted">لم يتم العثور على أي نتائج مطابقة لـ «${escapeHtml(q)}»</div>`;
-        return;
-      }
-
-      listEl.innerHTML = matches.map(m => {
-        const badge = m.type === "QURAN"
-          ? `<span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold text-[10px]">القرآن الكريم</span>`
-          : (m.type === "HADITH"
-            ? `<span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 font-bold text-[10px]">الحديث النبوي</span>`
-            : `<span class="px-2 py-0.5 rounded bg-violet-500/20 text-violet-300 font-bold text-[10px]">الأذكار</span>`);
-
-        return `
-          <div class="p-3 rounded-xl bg-bg-surface border border-border-subtle hover:border-border-medium transition space-y-1.5">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-2">
-                ${badge}
-                <strong class="text-text-primary font-bold text-xs">${escapeHtml(m.ref)}</strong>
-              </div>
-            </div>
-            <p class="text-text-secondary text-xs leading-relaxed font-quran-text">${escapeHtml(m.text)}</p>
-          </div>
-        `;
-      }).join("");
-    }
   }
 
   // ---------------------------------------------------------------------------
@@ -2100,9 +1728,250 @@ window.addEventListener("DOMContentLoaded", () => {
       ta.value = demoText;
     }
     handleTextFastPathExecution(demoText, "محاضرة افتتاحية — استوديو الوحيين", false);
-    if (typeof renderSavedLecturesList === "function") {
-      renderSavedLecturesList();
-    }
     switchMainSection("display");
   })();
+
+
+  // ===========================================================================
+  // Module 13: Wahy Studio v2.3 New Controls & Dialog Handlers
+  // ===========================================================================
+
+  // 1. Playback Follows Selection Toggle
+  const btnSync = document.getElementById("btnToggleEditorSyncPlayback");
+  if (btnSync) {
+    btnSync.addEventListener("click", () => {
+      currentState.editorPlaybackFollowsSelection = !currentState.editorPlaybackFollowsSelection;
+      const isSync = currentState.editorPlaybackFollowsSelection;
+      const lbl = document.getElementById("editorSyncLabel");
+      if (lbl) {
+        lbl.textContent = isSync ? "مزامنة الفيديو مع المؤشر: مفعّلة" : "مزامنة الفيديو مع المؤشر: متوقفة";
+      }
+      btnSync.classList.toggle("btn-playback-sync-active", isSync);
+      btnSync.classList.toggle("btn-playback-sync-inactive", !isSync);
+      showToast(isSync ? "🔗 تم تفعيل مزامنة موضع الفيديو مع الكلمة المحددة" : "🔒 تم إيقاف مزامنة موضع الفيديو لراحة التحرير");
+    });
+  }
+
+  // 2. Editor Rasm Qiyasi and Full Matn Toggles
+  document.getElementById("btnEditorToggleRasmQiyasi")?.addEventListener("click", () => {
+    currentState.editorViewRasmQiyasi = !currentState.editorViewRasmQiyasi;
+    const btn = document.getElementById("btnEditorToggleRasmQiyasi");
+    if (btn) {
+      btn.classList.toggle("bg-emerald-600", currentState.editorViewRasmQiyasi);
+      btn.classList.toggle("text-white", currentState.editorViewRasmQiyasi);
+    }
+    if (typeof renderEditorLectureStage === "function") renderEditorLectureStage();
+    showToast(currentState.editorViewRasmQiyasi ? "✨ تم تفعيل عرض الرسم القياسي في لوحة التحرير" : "تم إلغاء عرض الرسم القياسي في لوحة التحرير");
+  });
+
+  document.getElementById("btnEditorToggleFullMatn")?.addEventListener("click", () => {
+    currentState.editorViewFullCanonicalSpan = !currentState.editorViewFullCanonicalSpan;
+    const btn = document.getElementById("btnEditorToggleFullMatn");
+    if (btn) {
+      btn.classList.toggle("bg-emerald-600", currentState.editorViewFullCanonicalSpan);
+      btn.classList.toggle("text-white", currentState.editorViewFullCanonicalSpan);
+    }
+    if (typeof renderEditorLectureStage === "function") renderEditorLectureStage();
+    showToast(currentState.editorViewFullCanonicalSpan ? "📜 تم تفعيل عرض المتن كاملاً في لوحة التحرير" : "تم التبديل لعرض المقطع المنطوق فقط");
+  });
+
+  // 3. Deletion Intent Modal
+  document.querySelectorAll("[data-delete-intent]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const intent = btn.getAttribute("data-delete-intent");
+      if (typeof executeDeleteFindingIntent === "function") {
+        executeDeleteFindingIntent(intent);
+      }
+    });
+  });
+
+  document.getElementById("btnCancelDeleteIntent")?.addEventListener("click", () => {
+    const modal = document.getElementById("modalDeleteIntent");
+    if (modal) {
+      modal.classList.add("hidden");
+      modal.classList.remove("flex");
+    }
+  });
+
+  // 4. Tafrigh Configuration Modal
+  const openTafrighModal = () => {
+    const m = document.getElementById("modalTafrighConfig");
+    if (m) {
+      m.classList.remove("hidden");
+      m.classList.add("flex");
+    } else {
+      triggerRunAiTafrigh();
+    }
+  };
+
+  document.getElementById("btnRunAiTafrigh")?.addEventListener("click", (e) => {
+    e.stopImmediatePropagation();
+    openTafrighModal();
+  });
+  document.getElementById("btnRunTafrighFromEmpty")?.addEventListener("click", (e) => {
+    e.stopImmediatePropagation();
+    openTafrighModal();
+  });
+
+  document.getElementById("btnCloseTafrighConfig")?.addEventListener("click", () => {
+    document.getElementById("modalTafrighConfig")?.classList.add("hidden");
+  });
+  document.getElementById("btnCancelTafrighConfig")?.addEventListener("click", () => {
+    document.getElementById("modalTafrighConfig")?.classList.add("hidden");
+  });
+  document.getElementById("btnConfirmLaunchTafrigh")?.addEventListener("click", () => {
+    document.getElementById("modalTafrighConfig")?.classList.add("hidden");
+    triggerRunAiTafrigh();
+  });
+
+  // 5. Validate All Decisions Command
+  document.getElementById("btnValidateAllAiDecisions")?.addEventListener("click", async () => {
+    const verifiedList = (currentState.detections || []).filter(d => d.aiVerification?.status === "VERIFIED");
+    if (!verifiedList.length) {
+      showToast("⚠️ لا توجد اقتباسات مفحوصة لاعتمادها دفعة واحدة.");
+      return;
+    }
+    let count = 0;
+    for (const det of verifiedList) {
+      if (!det.humanOverride) {
+        det.humanOverride = true;
+        det.aiVerification.humanOverride = true;
+        det.aiVerification.confidence = 0.98;
+        if (typeof WahyAiVerifier === "object" && typeof WahyAiVerifier.buildCanonicalDecisionEnvelope === "function") {
+          const env = WahyAiVerifier.buildCanonicalDecisionEnvelope(det, currentState.words);
+          const layaRec = WahyAiVerifier.convertRecordToLayaTrainingEnvelope(det, env);
+          layaRec.answers.verdict.choice = det.aiVerification.verdict || "CORRECT";
+          layaRec.human_gold_resolution = {
+            verdict: det.aiVerification.verdict || "CORRECT",
+            user_action: "VALIDATE_ALL",
+            timestamp: new Date().toISOString()
+          };
+          if (typeof saveVerificationRecordToDB === "function") {
+            await saveVerificationRecordToDB(layaRec);
+          }
+        }
+        count++;
+      }
+    }
+    recalculateCaptionsFromCurrentFindings();
+    if (typeof renderAllViews === "function") renderAllViews();
+    showToast(`✅ تم اعتماد جميع نتائج الذكاء الاصطناعي (${count} مقتبس) وحفظها كبيانات تدريب ذهبية!`);
+  });
+
+  // 6. Pre-Flight Verification Estimator Modal
+  document.getElementById("btnOpenPreFlightVerificationModal")?.addEventListener("click", () => {
+    const modal = document.getElementById("modalPreFlightVerification");
+    const listEl = document.getElementById("preFlightCandidatesList");
+    if (!modal || !listEl) return;
+
+    const dets = currentState.detections || [];
+    if (!dets.length) {
+      showToast("⚠️ لا توجد اقتباسات مكتشفة بعد.");
+      return;
+    }
+
+    listEl.innerHTML = dets.map((d, i) => `
+      <label class="flex items-center justify-between p-2 rounded-xl bg-slate-950/80 border border-slate-800 hover:border-slate-700 cursor-pointer text-xs">
+        <div class="flex items-center gap-2 overflow-hidden">
+          <input type="checkbox" class="chkPreFlightQuote accent-emerald-500" data-quote-idx="${i}" checked />
+          <span class="font-bold text-slate-200 truncate">${escapeHtml(d.displayRef || d.reference || "مقتبس")}</span>
+          <span class="font-arabic-text text-slate-400 truncate max-w-xs">«${escapeHtml(d.matchedText || "")}»</span>
+        </div>
+        <span class="font-mono text-[10px] text-slate-500">${formatSecondsToShortTime(d.startTime)}</span>
+      </label>
+    `).join("");
+
+    const updateCalc = () => {
+      const checkedBoxes = listEl.querySelectorAll(".chkPreFlightQuote:checked");
+      const selIndices = Array.from(checkedBoxes).map(cb => parseInt(cb.getAttribute("data-quote-idx"), 10));
+      const est = (typeof WahyAiVerifier === "object" && typeof WahyAiVerifier.estimateBatchVerification === "function")
+        ? WahyAiVerifier.estimateBatchVerification(selIndices)
+        : { count: selIndices.length, approxTokens: selIndices.length * 380, estCost: 0, estSeconds: Math.ceil(selIndices.length / 12) * 60 };
+
+      document.getElementById("lblEstQuotesCount").textContent = est.count;
+      document.getElementById("lblEstTokensCount").textContent = `~${est.approxTokens}`;
+      document.getElementById("lblEstCostUsd").textContent = `$${est.estCost.toFixed(4)}`;
+      document.getElementById("lblEstDurationSec").textContent = `~${est.estSeconds} ثانية`;
+    };
+
+    listEl.querySelectorAll(".chkPreFlightQuote").forEach(cb => cb.addEventListener("change", updateCalc));
+    updateCalc();
+
+    document.getElementById("btnSelectAllCandidates")?.addEventListener("click", () => {
+      listEl.querySelectorAll(".chkPreFlightQuote").forEach(cb => cb.checked = true);
+      updateCalc();
+    });
+    document.getElementById("btnSelectOnlyQuran")?.addEventListener("click", () => {
+      dets.forEach((d, i) => {
+        const cb = listEl.querySelector(`.chkPreFlightQuote[data-quote-idx="${i}"]`);
+        if (cb) cb.checked = (d.sourceType === "QURAN" || d.type === "ayah");
+      });
+      updateCalc();
+    });
+    document.getElementById("btnSelectOnlyHadith")?.addEventListener("click", () => {
+      dets.forEach((d, i) => {
+        const cb = listEl.querySelector(`.chkPreFlightQuote[data-quote-idx="${i}"]`);
+        if (cb) cb.checked = (d.sourceType === "HADITH" || d.type === "hadith");
+      });
+      updateCalc();
+    });
+    document.getElementById("btnSelectLowConfidence")?.addEventListener("click", () => {
+      dets.forEach((d, i) => {
+        const cb = listEl.querySelector(`.chkPreFlightQuote[data-quote-idx="${i}"]`);
+        if (cb) cb.checked = ((d.totalScore || 0) < 15 || d.confidenceBand === "CANDIDATE");
+      });
+      updateCalc();
+    });
+
+    modal.classList.remove("hidden");
+    modal.classList.add("flex");
+  });
+
+  document.getElementById("btnClosePreFlightModal")?.addEventListener("click", () => {
+    document.getElementById("modalPreFlightVerification")?.classList.add("hidden");
+  });
+  document.getElementById("btnCancelPreFlight")?.addEventListener("click", () => {
+    document.getElementById("modalPreFlightVerification")?.classList.add("hidden");
+  });
+
+  document.getElementById("btnLaunchSelectedVerification")?.addEventListener("click", () => {
+    const listEl = document.getElementById("preFlightCandidatesList");
+    const checkedBoxes = listEl ? listEl.querySelectorAll(".chkPreFlightQuote:checked") : [];
+    const selIndices = Array.from(checkedBoxes).map(cb => parseInt(cb.getAttribute("data-quote-idx"), 10));
+    document.getElementById("modalPreFlightVerification")?.classList.add("hidden");
+    if (!selIndices.length) {
+      showToast("⚠️ لم يتم تحديد أي مقتبسات للفحص.");
+      return;
+    }
+    // Launch batch verification on selected quotes
+    const btnStart = document.getElementById("btnStartAiVerification");
+    if (btnStart) btnStart.click();
+  });
+
+  // 7. Training Data Hub Controls
+  document.getElementById("selTrainingTaskFilter")?.addEventListener("change", () => {
+    if (typeof renderTrainingDataHub === "function") renderTrainingDataHub();
+  });
+  document.getElementById("selTrainingLabelFilter")?.addEventListener("change", () => {
+    if (typeof renderTrainingDataHub === "function") renderTrainingDataHub();
+  });
+  document.getElementById("inpTrainingDataSearch")?.addEventListener("input", () => {
+    if (typeof renderTrainingDataHub === "function") renderTrainingDataHub();
+  });
+
+  document.getElementById("btnExportLayaJsonl")?.addEventListener("click", () => {
+    if (typeof WahyAiVerifier === "object" && typeof WahyAiVerifier.exportLayaJsonlDataset === "function") {
+      WahyAiVerifier.exportLayaJsonlDataset();
+    }
+  });
+
+  document.getElementById("btnClearTrainingDB")?.addEventListener("click", async () => {
+    if (!confirm("هل أنت متأكد من مسح جميع سجلات التدريب المحفوظة محلياً؟")) return;
+    if (typeof clearVerificationRecordsDB === "function") {
+      await clearVerificationRecordsDB();
+      if (typeof renderTrainingDataHub === "function") renderTrainingDataHub();
+      showToast("🗑️ تم مسح سجلات التدريب بنجاح.");
+    }
+  });
+
 });

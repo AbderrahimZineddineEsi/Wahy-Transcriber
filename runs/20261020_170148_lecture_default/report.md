@@ -1,6 +1,6 @@
 # Tafrigh Run Report: lecture (default)
 
-- **Run ID:** `run_02e3ff79db54`
+- **Run ID:** `run_1a6d9fb79d51`
 - **Processing Mode:** `per_sentence`
 - **Model Candidate:** `gemini_all`
 - **Segments Count:** 5
@@ -11,7 +11,7 @@
 ## Latency Breakdown (ms)
 | Purpose | p50 | p95 | Max |
 | :--- | :--- | :--- | :--- |
-| classify | 0.03 | 0.05 | 0.05 |
+| classify | 0.01 | 0.02 | 0.02 |
 
 ## Tag Distribution
 | Structural Tag | Count |

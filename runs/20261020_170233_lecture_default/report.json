@@ -1,8 +1,8 @@
 {
-  "run_id": "run_2e4e5abf8281",
+  "run_id": "run_f61596ffb8f1",
   "lecture_slug": "lecture",
   "label": "default",
-  "total_requests": 5,
+  "total_requests": 2,
   "total_input_tokens": 0,
   "total_output_tokens": 0,
   "total_cached_tokens": 0,
@@ -15,16 +15,16 @@
   "fallback_rate": 0.0,
   "latency_by_purpose_ms": {
     "classify": {
-      "p50": 0.02,
-      "p95": 0.02,
-      "max": 0.02
+      "p50": 0.46,
+      "p95": 0.46,
+      "max": 0.46
     }
   },
   "structural_tag_distribution": {
-    "paragraph": 5
+    "paragraph": 2
   },
   "review_flag_counts": {
-    "INVALID_TRANSITION_FALLBACK": 1
+    "SPLIT_VALIDATION_FAILED": 4
   },
   "evaluation_metrics": null
 }

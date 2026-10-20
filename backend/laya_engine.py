@@ -12,7 +12,10 @@ os.environ["TOKENIZERS_PARALLELISM"] = "false"
 import gc
 import time
 from typing import Any, Callable, Dict, List, Optional, Union
-import torch
+try:
+    import torch
+except ImportError:
+    torch = None
 
 class LocalLayaVerifier:
     DEFAULT_CHECKPOINT = "convaiinnovations/laya-multilingual"
@@ -24,7 +27,15 @@ class LocalLayaVerifier:
         self.dtype_str = "float16"
 
     def get_vram_status(self) -> Dict[str, Any]:
-        if not torch.cuda.is_available():
+        if torch is None or not torch.cuda.is_available():
+            return {
+                "cuda_available": False,
+                "gpu_name": "CPU / No Torch" if torch is None else "CPU Only",
+                "free_mb": 0.0,
+                "allocated_mb": 0.0,
+                "total_mb": 0.0,
+            }
+        if False:
             return {
                 "cuda_available": False,
                 "gpu_name": "CPU Only",
@@ -93,7 +104,7 @@ class LocalLayaVerifier:
             err_str = str(e).lower()
             if ("out of memory" in err_str or "cuda" in err_str) and target_device == "cuda":
                 if torch.cuda.is_available():
-                    torch.cuda.empty_cache()
+                    if torch is not None and torch.cuda.is_available(): torch.cuda.empty_cache()
                 gc.collect()
                 self.agent = laya.load(target_ckpt, device="cpu")
                 self.device = "cpu"
@@ -110,7 +121,7 @@ class LocalLayaVerifier:
             self.loaded_checkpoint = None
             gc.collect()
             if torch.cuda.is_available():
-                torch.cuda.empty_cache()
+                if torch is not None and torch.cuda.is_available(): torch.cuda.empty_cache()
         return self.get_status()
 
     def get_status(self) -> Dict[str, Any]:

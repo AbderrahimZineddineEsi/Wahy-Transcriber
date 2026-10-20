@@ -1,10 +1,47 @@
-# Wahy Studio (Wahy-Transcriber v2.2)
+# Wahy Studio (Wahy-Transcriber v2.3)
 
 > **An integrated platform for transcribing lectures and scholarly lessons, detecting and sourcing Quranic verses, Prophetic hadiths, and adhkar, building synchronized visual captions, with a multi-model AI Verification Layer and ultra-fast local inference via the Laya model (3GB VRAM).**
 
 ---
 
-## 🌟 Key Highlights of v2.2
+## 🌟 Key Highlights of v2.3
+
+### 1. 🎬 Bidirectional Video Playback Sync in Editorial Studio
+* **Interactive Follow-Me Playback (`#btnToggleEditorSyncPlayback`):** clicking on any word in the editor canvas seeks media playback directly to that word's exact start timestamp.
+* **Smart Playback Retention:** if media is playing, it seeks and automatically resumes seamlessly; if paused, it seeks to the frame and stays paused until clicked.
+* **Toggable Behavior:** can be toggled on/off with one click for uninterrupted editing sessions.
+
+### 2. 📖 Citation & Editorial Studio with Reference Word-Chip Grid
+* **Interactive Word-Chip Grid:** renders full reference texts as clickable/selectable chips (matching canonical hadith/ayah units).
+* **Flexible Transcript Substitution:** click or drag-select any span of words in the canonical reference — including words omitted in the raw audio — to substitute them into the lecture transcript and captions.
+* **Dynamic Boundary Previews:** `+1W` and `-1W` buttons display the exact target words to be added or dropped before clicking.
+* **Multi-Candidate References Accordion:** browse all top matching references from the corpus with match percentages and 1-click active assignment.
+* **Spacious Corpus Search Drawer:** full search across Sunnah, Quran, and Adhkar corpora to add or link new references.
+
+### 3. 📊 Training Data Hub (Tab 6: `#section_training_data`)
+* **Dedicated Data Management Workspace:** review, filter, and inspect training data across all sessions.
+* **Task & Subtask Filtering:** filter by Verification (Correctness vs Completeness) and Tafrigh (Segmentation, Classification, Typo Correction).
+* **Dual-State Telemetry for Laya:** preserves both the initial AI prediction and human gold resolution, ensuring valuable negative examples (ordinary speech mistaken for quotes) are retained for high-precision model fine-tuning.
+* **1-Click Export:** download unified Laya JSONL datasets formatted for direct training with `backend/finetune_laya.py`.
+
+### 4. 📑 Configurable AI Tafrigh Engine
+* **Flexible Processing Modes:** choose between `per_sentence` (fast, isolated) and `windowed` (context-aware sliding window).
+* **Model Selection:** execute using Gemini Flash-Lite models, OpenRouter JEV, or Local Laya FP16.
+* **Typo Strategies & Testing Slice:** toggle gated vs always-correct typo correction, and test on the first 20 sentences to conserve API credits.
+
+### 5. 🕌 Quran Ayah Completeness Context ($N-1$, $N$, $N+1$)
+* **Neighboring Verses Context Engine:** automatically pulls preceding ($N-1$) and succeeding ($N+1$) Ayah text to evaluate boundary continuations accurately.
+* **Pre-Flight Estimator Modal:** preview quote counts, estimated tokens, cost ($), and duration before launching verification, with selective candidate checklists.
+* **1-Click "Validate All":** commit all verified quotes as gold standard labels with one click.
+
+### 6. 💾 Persistence, Local Caching & AI Error Diagnostics
+* **Saved Lectures Manager:** save, load, and export full lecture sessions via IndexedDB (`WahyLecturesDB`).
+* **Local Media Cache:** automatically caches downloaded YouTube media in `data/media_cache/` to eliminate redundant downloads.
+* **AI-Powered Diagnostics:** error modals feature a 1-click AI diagnostic button providing concise root-cause analysis and actionable fixes.
+* **Scholarly Design System:** authentic, dignified typography (Amiri, Scheherazade New) with seamless Light (Parchment) and Dark (Obsidian) theme switching.
+
+---
+## 🌟 Key Highlights of v2.2 (Baseline)
 
 ### 1. 🤖 AI Verification Layer for Quotes
 A religious and linguistic verification engine supporting 4 providers and multiple working models to validate quotes and distinguish genuine quotes from ordinary explanatory speech by the sheikh:

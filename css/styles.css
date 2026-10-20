@@ -5,127 +5,16 @@
    ========================================================================= */
 
 :root {
-  /* Light Mode (Scholarly Daylight / Parchment) */
-  --bg-app: #f8fafc;
-  --bg-surface: #ffffff;
-  --bg-surface-elevated: #f1f5f9;
-  --bg-surface-sunken: #e2e8f0;
-  
-  --border-subtle: #e2e8f0;
-  --border-medium: #cbd5e1;
-  --border-strong: #94a3b8;
-  
-  --text-primary: #0f172a;
-  --text-secondary: #475569;
-  --text-muted: #64748b;
-  --text-inverse: #f8fafc;
-  
-  /* Semantic Category Accents */
-  --accent-ayah: #059669;        /* Deep Emerald */
-  --accent-ayah-bg: #ecfdf5;
-  --accent-ayah-border: #a7f3d0;
-  
-  --accent-hadith: #d97706;      /* Rich Amber */
-  --accent-hadith-bg: #fffbeb;
-  --accent-hadith-border: #fde68a;
-  
-  --accent-dhikr: #7c3aed;       /* Imperial Violet */
-  --accent-dhikr-bg: #f5f3ff;
-  --accent-dhikr-border: #ddd6fe;
-
-  --accent-matn: #0284c7;        /* Scholarly Sapphire */
-  --accent-matn-bg: #f0f9ff;
-  --accent-matn-border: #bae6fd;
-
-  --status-correct: #10b981;
-  --status-false: #ef4444;
-  --status-unsure: #f59e0b;
-  --status-unverified: #6b7280;
-
-  --font-arabic-text: 'Amiri', 'Scheherazade New', 'Traditional Arabic', serif;
-  --font-arabic-ui: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  --font-mono-numbers: 'SFMono-Regular', Menlo, Monaco, Consolas, monospace;
-}
-
-[data-theme="dark"],
-:root:not([data-theme="light"]) {
-  /* Dark Mode (Scholarly Obsidian / Midnight) - Default baseline */
-  --bg-app: #090d16;
+  --bg-app: #070b14;
   --bg-surface: #0f172a;
-  --bg-surface-elevated: #1e293b;
-  --bg-surface-sunken: #020617;
-  
-  --border-subtle: rgba(255, 255, 255, 0.08);
-  --border-medium: rgba(255, 255, 255, 0.16);
-  --border-strong: rgba(255, 255, 255, 0.28);
-  
-  --text-primary: #f8fafc;
-  --text-secondary: #cbd5e1;
-  --text-muted: #64748b;
-  --text-inverse: #0f172a;
-  
-  /* Semantic Category Accents (Luminous in Dark) */
-  --accent-ayah: #10b981;
-  --accent-ayah-bg: rgba(16, 185, 129, 0.12);
-  --accent-ayah-border: rgba(16, 185, 129, 0.35);
-  
-  --accent-hadith: #f59e0b;
-  --accent-hadith-bg: rgba(245, 158, 11, 0.12);
-  --accent-hadith-border: rgba(245, 158, 11, 0.35);
-  
-  --accent-dhikr: #8b5cf6;
-  --accent-dhikr-bg: rgba(139, 92, 246, 0.12);
-  --accent-dhikr-border: rgba(139, 92, 246, 0.35);
-
-  --accent-matn: #38bdf8;
-  --accent-matn-bg: rgba(56, 189, 248, 0.12);
-  --accent-matn-border: rgba(56, 189, 248, 0.35);
-
-  --status-correct: #10b981;
-  --status-false: #f43f5e;
-  --status-unsure: #fbbf24;
-  --status-unverified: #94a3b8;
+  --bg-elevated: #1e293b;
+  --border-subtle: rgba(51, 65, 85, 0.65);
 }
-
-/* Semantic Design System Utility Classes */
-.bg-bg-app { background-color: var(--bg-app) !important; }
-.bg-bg-surface { background-color: var(--bg-surface) !important; }
-.bg-bg-surface-elevated { background-color: var(--bg-surface-elevated) !important; }
-.bg-bg-surface-sunken { background-color: var(--bg-surface-sunken) !important; }
-
-.border-border-subtle { border-color: var(--border-subtle) !important; }
-.border-border-medium { border-color: var(--border-medium) !important; }
-.border-border-strong { border-color: var(--border-strong) !important; }
-
-.text-text-primary { color: var(--text-primary) !important; }
-.text-text-secondary { color: var(--text-secondary) !important; }
-.text-text-muted { color: var(--text-muted) !important; }
-.text-text-inverse { color: var(--text-inverse) !important; }
-
-.text-accent-ayah { color: var(--accent-ayah) !important; }
-.bg-accent-ayah { background-color: var(--accent-ayah) !important; }
-.border-accent-ayah { border-color: var(--accent-ayah) !important; }
-
-.text-accent-hadith { color: var(--accent-hadith) !important; }
-.bg-accent-hadith { background-color: var(--accent-hadith) !important; }
-.border-accent-hadith { border-color: var(--accent-hadith) !important; }
-
-.text-accent-dhikr { color: var(--accent-dhikr) !important; }
-.bg-accent-dhikr { background-color: var(--accent-dhikr) !important; }
-.border-accent-dhikr { border-color: var(--accent-dhikr) !important; }
-
-.text-accent-matn { color: var(--accent-matn) !important; }
-.bg-accent-matn { background-color: var(--accent-matn) !important; }
-.border-accent-matn { border-color: var(--accent-matn) !important; }
-
-.font-arabic-text { font-family: var(--font-arabic-text) !important; }
-.font-arabic-ui { font-family: var(--font-arabic-ui) !important; }
-.font-mono-numbers { font-family: var(--font-mono-numbers) !important; }
 
 body {
   font-family: 'IBM Plex Sans Arabic', 'Inter', sans-serif;
-  background-color: var(--bg-app);
-  color: var(--text-primary);
+  background-color: #070b14;
+  color: #f1f5f9;
   overflow-x: hidden;
 }
 
@@ -401,32 +290,27 @@ body {
 }
 
 /* Light Mode Theme Overrides */
-html.light body,
-[data-theme="light"] body {
+html.light body {
   background-color: #f8fafc !important;
   color: #0f172a !important;
 }
 
-html.light header,
-[data-theme="light"] header {
+html.light header {
   background-color: rgba(255, 255, 255, 0.95) !important;
   border-color: #e2e8f0 !important;
 }
 
-html.light .main-nav-pill.nav-active,
-[data-theme="light"] .main-nav-pill.nav-active {
+html.light .main-nav-pill.nav-active {
   background: #ecfdf5 !important;
   color: #047857 !important;
   border-color: #6ee7b7 !important;
 }
 
-html.light .main-nav-pill.nav-inactive,
-[data-theme="light"] .main-nav-pill.nav-inactive {
+html.light .main-nav-pill.nav-inactive {
   color: #475569 !important;
 }
 
-html.light .main-nav-pill.nav-inactive:hover,
-[data-theme="light"] .main-nav-pill.nav-inactive:hover {
+html.light .main-nav-pill.nav-inactive:hover {
   background-color: #f1f5f9 !important;
   color: #0f172a !important;
 }
@@ -437,14 +321,7 @@ html.light .bg-slate-950\/90,
 html.light .bg-slate-950\/80,
 html.light .bg-slate-950\/60,
 html.light .bg-slate-950\/50,
-html.light .bg-slate-950\/40,
-[data-theme="light"] .bg-slate-950,
-[data-theme="light"] .bg-slate-950\/95,
-[data-theme="light"] .bg-slate-950\/90,
-[data-theme="light"] .bg-slate-950\/80,
-[data-theme="light"] .bg-slate-950\/60,
-[data-theme="light"] .bg-slate-950\/50,
-[data-theme="light"] .bg-slate-950\/40 {
+html.light .bg-slate-950\/40 {
   background-color: #f1f5f9 !important;
   color: #0f172a !important;
 }
@@ -452,78 +329,58 @@ html.light .bg-slate-950\/40,
 html.light .bg-slate-900,
 html.light .bg-slate-900\/95,
 html.light .bg-slate-900\/90,
-html.light .bg-slate-900\/80,
-[data-theme="light"] .bg-slate-900,
-[data-theme="light"] .bg-slate-900\/95,
-[data-theme="light"] .bg-slate-900\/90,
-[data-theme="light"] .bg-slate-900\/80 {
+html.light .bg-slate-900\/80 {
   background-color: #ffffff !important;
   color: #0f172a !important;
 }
 
 html.light .bg-slate-800,
 html.light .bg-slate-800\/90,
-html.light .bg-slate-800\/80,
-[data-theme="light"] .bg-slate-800,
-[data-theme="light"] .bg-slate-800\/90,
-[data-theme="light"] .bg-slate-800\/80 {
+html.light .bg-slate-800\/80 {
   background-color: #f1f5f9 !important;
   color: #1e293b !important;
 }
 
 html.light .border-slate-800,
 html.light .border-slate-800\/80,
-html.light .border-slate-700,
-[data-theme="light"] .border-slate-800,
-[data-theme="light"] .border-slate-800\/80,
-[data-theme="light"] .border-slate-700 {
+html.light .border-slate-700 {
   border-color: #e2e8f0 !important;
 }
 
 html.light .text-white,
 html.light .text-slate-100,
-html.light .text-slate-200,
-[data-theme="light"] .text-white,
-[data-theme="light"] .text-slate-100,
-[data-theme="light"] .text-slate-200 {
+html.light .text-slate-200 {
   color: #0f172a !important;
 }
 
-html.light .text-slate-300,
-[data-theme="light"] .text-slate-300 {
+html.light .text-slate-300 {
   color: #334155 !important;
 }
 
 html.light .text-slate-400,
-html.light .text-slate-500,
-[data-theme="light"] .text-slate-400,
-[data-theme="light"] .text-slate-500 {
+html.light .text-slate-500 {
   color: #64748b !important;
 }
 
-html.light .citation-ayah,
-[data-theme="light"] .citation-ayah {
+html.light .citation-ayah {
   background-color: #ecfdf5 !important;
   border-color: #10b981 !important;
   color: #065f46 !important;
 }
 
-html.light .citation-hadith,
-[data-theme="light"] .citation-hadith {
+html.light .citation-hadith {
   background-color: #fffbeb !important;
   border-color: #f59e0b !important;
   color: #92400e !important;
 }
 
-html.light .citation-dhikr,
-[data-theme="light"] .citation-dhikr {
+html.light .citation-dhikr {
   background-color: #f5f3ff !important;
   border-color: #8b5cf6 !important;
   color: #4c1d95 !important;
 }
 
-html.light .fn-tok-in-range,
-[data-theme="light"] .fn-tok-in-range {
+html.light .fn-tok-in-range {
   background-color: #d1fae5 !important;
   color: #065f46 !important;
 }
@@ -534,14 +391,7 @@ html.light input[type="url"],
 html.light input[type="search"],
 html.light input[type="number"],
 html.light input[type="password"],
-html.light textarea,
-[data-theme="light"] select,
-[data-theme="light"] input[type="text"],
-[data-theme="light"] input[type="url"],
-[data-theme="light"] input[type="search"],
-[data-theme="light"] input[type="number"],
-[data-theme="light"] input[type="password"],
-[data-theme="light"] textarea {
+html.light textarea {
   background-color: #ffffff !important;
   color: #0f172a !important;
   border-color: #cbd5e1 !important;
@@ -881,3 +731,192 @@ html.light textarea,
 
 
 
+
+/* =========================================================================
+   Wahy Studio v2.3 — Enhanced Scholarly Theme Tokens & Components
+   ========================================================================= */
+
+:root {
+  --bg-app: #f8fafc;
+  --bg-surface: #ffffff;
+  --bg-surface-elevated: #f1f5f9;
+  --bg-surface-sunken: #e2e8f0;
+  
+  --border-subtle: #e2e8f0;
+  --border-medium: #cbd5e1;
+  --border-strong: #94a3b8;
+  
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+  --text-inverse: #f8fafc;
+  
+  --accent-ayah: #059669;
+  --accent-ayah-bg: #ecfdf5;
+  --accent-ayah-border: #a7f3d0;
+  
+  --accent-hadith: #d97706;
+  --accent-hadith-bg: #fffbeb;
+  --accent-hadith-border: #fde68a;
+  
+  --accent-dhikr: #7c3aed;
+  --accent-dhikr-bg: #f5f3ff;
+  --accent-dhikr-border: #ddd6fe;
+
+  --accent-matn: #0284c7;
+  --accent-matn-bg: #f0f9ff;
+  --accent-matn-border: #bae6fd;
+
+  --status-correct: #10b981;
+  --status-false: #ef4444;
+  --status-unsure: #f59e0b;
+  --status-unverified: #6b7280;
+
+  --font-arabic-text: 'Amiri', 'Scheherazade New', 'Traditional Arabic', serif;
+  --font-arabic-ui: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono-numbers: 'SFMono-Regular', Menlo, Monaco, Consolas, monospace;
+}
+
+html.dark, :root[data-theme="dark"] {
+  --bg-app: #090d16;
+  --bg-surface: #0f172a;
+  --bg-surface-elevated: #1e293b;
+  --bg-surface-sunken: #020617;
+  
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-medium: rgba(255, 255, 255, 0.16);
+  --border-strong: rgba(255, 255, 255, 0.28);
+  
+  --text-primary: #f8fafc;
+  --text-secondary: #cbd5e1;
+  --text-muted: #64748b;
+  --text-inverse: #0f172a;
+  
+  --accent-ayah: #10b981;
+  --accent-ayah-bg: rgba(16, 185, 129, 0.12);
+  --accent-ayah-border: rgba(16, 185, 129, 0.35);
+  
+  --accent-hadith: #f59e0b;
+  --accent-hadith-bg: rgba(245, 158, 11, 0.12);
+  --accent-hadith-border: rgba(245, 158, 11, 0.35);
+  
+  --accent-dhikr: #8b5cf6;
+  --accent-dhikr-bg: rgba(139, 92, 246, 0.12);
+  --accent-dhikr-border: rgba(139, 92, 246, 0.35);
+
+  --accent-matn: #38bdf8;
+  --accent-matn-bg: rgba(56, 189, 248, 0.12);
+  --accent-matn-border: rgba(56, 189, 248, 0.35);
+
+  --status-correct: #10b981;
+  --status-false: #f43f5e;
+  --status-unsure: #fbbf24;
+  --status-unverified: #94a3b8;
+}
+
+/* Reference Word Chips (Matching image_096977.png specification) */
+.ref-word-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem 0.6rem;
+  margin: 0.18rem;
+  border-radius: 0.5rem;
+  font-family: var(--font-arabic-text);
+  font-size: 1.05rem;
+  line-height: 1.6;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1.5px solid transparent;
+}
+
+.ref-word-chip.matched {
+  background-color: rgba(16, 185, 129, 0.2);
+  color: #34d399;
+  border-color: rgba(16, 185, 129, 0.65);
+  font-weight: bold;
+  box-shadow: 0 1px 4px rgba(16, 185, 129, 0.2);
+}
+
+.ref-word-chip.unmatched {
+  background-color: rgba(30, 41, 59, 0.7);
+  color: #94a3b8;
+  border-color: rgba(51, 65, 85, 0.5);
+}
+
+.ref-word-chip.unmatched:hover {
+  background-color: rgba(51, 65, 85, 0.8);
+  color: #f1f5f9;
+  border-color: rgba(148, 163, 184, 0.6);
+}
+
+.ref-word-chip.selected {
+  background-color: rgba(14, 165, 233, 0.25);
+  color: #38bdf8;
+  border-color: rgba(56, 189, 248, 0.8);
+  box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.3);
+}
+
+/* Verification State Borders & Badges */
+.quote-verified-solid {
+  border-style: solid !important;
+  border-width: 1.5px !important;
+}
+
+.quote-unverified-dashed {
+  border-style: dashed !important;
+  border-width: 1.5px !important;
+  opacity: 0.88;
+}
+
+.quote-unverified-dashed:hover {
+  opacity: 1;
+}
+
+/* Active Video Sync Mode Indicator */
+.btn-playback-sync-active {
+  background-color: rgba(16, 185, 129, 0.2) !important;
+  color: #34d399 !important;
+  border-color: rgba(16, 185, 129, 0.5) !important;
+}
+
+.btn-playback-sync-inactive {
+  background-color: rgba(30, 41, 59, 0.6) !important;
+  color: #94a3b8 !important;
+  border-color: rgba(51, 65, 85, 0.4) !important;
+}
+
+/* Training Data Hub Table & Cards */
+.training-metric-card {
+  background: linear-gradient(145deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.6));
+  border: 1px solid rgba(51, 65, 85, 0.5);
+  border-radius: 1rem;
+  padding: 1rem;
+  transition: all 0.2s ease;
+}
+
+html.light .training-metric-card {
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.training-metric-card:hover {
+  border-color: rgba(56, 189, 248, 0.5);
+  transform: translateY(-1px);
+}
+
+/* AI Diagnostics Card */
+.ai-diagnostic-box {
+  background: linear-gradient(135deg, rgba(88, 28, 135, 0.15), rgba(15, 23, 42, 0.9));
+  border: 1px solid rgba(168, 85, 247, 0.35);
+  border-radius: 0.875rem;
+  padding: 1rem;
+}
+
+html.light .ai-diagnostic-box {
+  background: #fdf4ff !important;
+  border-color: #d8b4fe !important;
+  color: #581c87 !important;
+}

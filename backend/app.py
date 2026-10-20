@@ -293,6 +293,7 @@ async def api_transcribe(
         duration_sec=duration_sec,
     )
     result["title"] = media_title
+    result["from_cache"] = bool(yt_info.get("from_cache", False)) if (youtube_url and youtube_url.strip()) else False
     return result
 
 
@@ -463,6 +464,14 @@ async def api_tafrigh_run(request: Request) -> JSONResponse:
 
     processing_mode = body.get("processing_mode", "per_sentence")
     model_candidate = body.get("model_candidate", "gemini_all")
+    _MODEL_CANDIDATE_ALIASES = {
+        "jev_independent": "jev_hybrid",
+        "jev": "jev_hybrid",
+        "laya_only": "laya_hybrid",
+        "laya": "laya_hybrid",
+        "gemini": "gemini_all",
+    }
+    model_candidate = _MODEL_CANDIDATE_ALIASES.get(model_candidate, model_candidate)
     jev_layout = body.get("jev_layout", "independent_questions")
     typo_strategy = body.get("typo_strategy", "gated")
     lecture_slug = body.get("lecture_slug", "lecture")
@@ -504,11 +513,14 @@ async def api_tafrigh_run(request: Request) -> JSONResponse:
     gemini_key = body.get("gemini_api_key") or body.get("api_key") or os.getenv("GEMINI_API_KEY", "")
     openrouter_key = body.get("openrouter_api_key") or os.getenv("JEV_API_KEY", "")
     model_name = body.get("model_name") or "gemini-2.0-flash"
+    # Gemini adapter must always target a valid Gemini model, even when a
+    # non-Gemini model (JEV/OpenRouter or local Laya) is selected as primary.
+    gemini_model_name = model_name if str(model_name).startswith("gemini") else "gemini-2.0-flash"
 
     custom_adapters: Dict[str, Any] = {}
     custom_adapters["gemini"] = GeminiAdapter(
         api_key=gemini_key,
-        model_name=model_name,
+        model_name=gemini_model_name,
         typo_strategy=typo_strategy,
     )
     if openrouter_key:
