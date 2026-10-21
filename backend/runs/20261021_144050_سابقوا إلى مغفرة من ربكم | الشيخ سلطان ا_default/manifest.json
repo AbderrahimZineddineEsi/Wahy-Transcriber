@@ -1,0 +1,21 @@
+{
+  "run_id": "run_aee2ce04444b",
+  "processing_mode": "per_sentence",
+  "window_size": 20,
+  "model_candidate": "jev_hybrid",
+  "jev_layout": "independent_questions",
+  "jev_execution_order": "parallel",
+  "typo_strategy": "gated",
+  "use_detection_boundaries": true,
+  "num_segments": 3,
+  "target_range": [
+    0,
+    25
+  ],
+  "cancelled": true,
+  "adapter_mode": "live",
+  "model_name": "gemini-flash-lite-latest",
+  "wall_clock_seconds": 49.83,
+  "run_dir": "runs/20261021_144050_سابقوا إلى مغفرة من ربكم | الشيخ سلطان ا_default",
+  "completed_at": "2026-10-21T14:41:40.792210+00:00"
+}

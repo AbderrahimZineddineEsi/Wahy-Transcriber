@@ -27,5 +27,14 @@ pip install --upgrade pip
 pip install -r backend/requirements.txt
 
 echo "[3/3] Starting Wahy-Finder v2.0 server at http://127.0.0.1:8000 ..."
+CORPUS_URL="https://raw.githubusercontent.com/AbderrahimZineddineEsi/Wahy-Finder/main/data/corpus.json"
+if [ ! -s data/corpus.json ]; then
+  echo "Downloading corpus (≈90 MB) into data/corpus.json ..."
+  curl -fL --progress-bar -o data/corpus.json.part "$CORPUS_URL" && mv data/corpus.json.part data/corpus.json \
+    || echo "[WARNING] corpus download failed; the app will fall back to the remote sources."
+fi
+
 cd backend
-exec uvicorn app:app --host 127.0.0.1 --port 8000 --reload
+# --timeout-graceful-shutdown: a reload must not wait forever on a stalled download (e.g. a backgrounded tab
+# that stopped reading the 90 MB corpus), or the server stops answering after any backend edit
+exec uvicorn app:app --host 127.0.0.1 --port 8000 --reload --timeout-graceful-shutdown 5

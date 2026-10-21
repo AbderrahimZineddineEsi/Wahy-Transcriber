@@ -29,6 +29,13 @@ class ReviewItem(BaseModel):
     review_flags: List[str] = Field(default_factory=list)
     confidence: Optional[float] = None
     has_typo_versions: bool = False
+    # why this sentence is in the queue: review flags and/or "low_confidence"
+    reasons: List[str] = Field(default_factory=list)
+    tag_probabilities: Dict[str, float] = Field(default_factory=dict)
+
+
+# bookkeeping flags: shown in the details view, but not something a reviewer can confirm or fix
+INFORMATIONAL_FLAGS = {"FROM_SPLIT", "UNRELIABLE_TIMESTAMP_MAPPING"}
 
 
 class ReviewQueueManager:
@@ -49,8 +56,11 @@ class ReviewQueueManager:
         """Returns all segments requiring review, filtered optionally by flag."""
         results: List[TranscriptSegment] = []
         for s in self.segments:
+            if s.trace.get("review"):          # a human already confirmed or corrected it
+                continue
             conf = s.final_decision.confidence if s.final_decision else None
-            needs_review = bool(s.review_flags) or (conf is not None and conf < self.confidence_threshold)
+            actionable = [f for f in s.review_flags if f not in INFORMATIONAL_FLAGS]
+            needs_review = bool(actionable) or (conf is not None and conf < self.confidence_threshold)
 
             if needs_review:
                 if flag_filter:
@@ -66,6 +76,11 @@ class ReviewQueueManager:
         items: List[ReviewItem] = []
         for s in flagged:
             conf = s.final_decision.confidence if s.final_decision else None
+            reasons = [f for f in s.review_flags if f not in INFORMATIONAL_FLAGS]
+            if conf is not None and conf < self.confidence_threshold:
+                reasons.append("low_confidence")
+            tag_answer = ((s.trace.get("decision") or (s.trace.get("split_from") or {}).get("decision") or {})
+                          .get("answers") or {}).get("tag") or {}
             items.append(
                 ReviewItem(
                     segment_id=s.id,
@@ -74,7 +89,9 @@ class ReviewQueueManager:
                     final_decision=s.final_decision,
                     review_flags=s.review_flags,
                     confidence=conf,
-                    has_typo_versions=bool(s.versions),
+                    has_typo_versions=bool(s.active_version_id),
+                    reasons=reasons,
+                    tag_probabilities=tag_answer.get("probabilities") or {},
                 )
             )
         return items
@@ -102,6 +119,8 @@ class ReviewQueueManager:
             active_v.reviewer_note = note
 
         seg.review_flags = [f for f in seg.review_flags if f not in ("LOW_CONFIDENCE", "OUTLINE_REPAIR_REVIEW")]
+
+        seg.trace["review"] = {"action": "confirm", "reviewer": reviewer_id, "note": note}
 
         if self.on_review_action_callback:
             self.on_review_action_callback({
@@ -156,6 +175,12 @@ class ReviewQueueManager:
             if f not in ("LOW_CONFIDENCE", "INVALID_TRANSITION_FALLBACK", "OUTLINE_REPAIR_REVIEW")
         ]
 
+        seg.trace["review"] = {
+            "action": "correct", "reviewer": reviewer_id, "note": note,
+            "corrected_tag": corrected_tag.value if corrected_tag else None, "corrected_level": corrected_level,
+            "text_changed": corrected_text is not None,
+        }
+
         if self.on_review_action_callback:
             self.on_review_action_callback({
                 "action": "correct",
@@ -182,6 +207,8 @@ class ReviewQueueManager:
 
         seg.active_version_id = None
         seg.review_flags = [f for f in seg.review_flags if f != "EDIT_CAP_EXCEEDED"]
+
+        seg.trace["review"] = {"action": "revert_edits", "reviewer": reviewer_id, "note": note}
 
         if self.on_review_action_callback:
             self.on_review_action_callback({

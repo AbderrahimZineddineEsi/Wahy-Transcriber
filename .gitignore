@@ -7,3 +7,7 @@ backend/temp_media/
 backend/models/
 *.jsonl
 .DS_Store
+
+# 90 MB corpus, fetched by run.sh from the Wahy-Finder repo
+data/corpus.json
+data/corpora/

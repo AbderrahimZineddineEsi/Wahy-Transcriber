@@ -134,6 +134,64 @@ function splitLongCitationWords(citationWords) {
 }
 
 /**
+ * Group back-to-back ayat of the same surah (ayah n, n+1, ... a few words apart) so the surah name is
+ * written once with a range ("البقرة: 1-5") on the LAST ayah of the run; earlier ayat of the run get "".
+ * Returns Map(detection -> reference label to display). Ungrouped detections map to their own displayRef.
+ */
+function buildAyahGroupRefMap(detections, prefs = null) {
+  const p = prefs || (typeof getOutputDisplayPrefs === "function" ? getOutputDisplayPrefs() : {});
+  const out = new Map();
+  const dets = (Array.isArray(detections) ? detections : [])
+    .filter(d => d && typeof d.wordStartIdx === "number")
+    .slice()
+    .sort((a, b) => a.wordStartIdx - b.wordStartIdx);
+  dets.forEach(d => out.set(d, d.displayRef || d.reference || ""));
+  if (p.groupContiguousAyat === false) return out;
+
+  // all (surah, ayah) readings of a detection: its candidates when ambiguous, else just its own unit
+  const reads = d => {
+    if (d.sourceType !== "QURAN") return [];
+    const ids = (d.isAmbiguous || d.confidenceBand === "AMBIGUOUS") && Array.isArray(d.candidateUnitIds) && d.candidateUnitIds.length
+      ? d.candidateUnitIds : [d.unitId];
+    return ids.map(id => /^(\d+):(\d+)$/.exec(String(id || ""))).filter(Boolean).map(m => ({ surah: +m[1], ayah: +m[2], id: m[0] }));
+  };
+  const unitRef = (r, d) => {
+    const u = (typeof activeMatcher !== "undefined" && activeMatcher && activeMatcher.units) ? activeMatcher.units.get(r.id) : null;
+    return (u && u.displayRef) || d.displayRef || "";
+  };
+  const MAX_GAP_WORDS = 6;
+  const near = (prev, d) => d.wordStartIdx - prev.d.wordEndIdx - 1 <= MAX_GAP_WORDS;
+  const unambiguous = d => !(d.isAmbiguous || d.confidenceBand === "AMBIGUOUS");
+
+  let run = [];
+  const flush = () => {
+    if (run.length > 1) {
+      const name = unitRef(run[0], run[0].d).split(":")[0].trim();
+      const label = `${name}: ${run[0].ayah}-${run[run.length - 1].ayah}`;
+      run.forEach((r, k) => out.set(r.d, k === run.length - 1 ? label : ""));
+    }
+    run = [];
+  };
+  for (let k = 0; k < dets.length; k++) {
+    const d = dets[k], rs = reads(d);
+    if (!rs.length) { flush(); continue; }
+    const prev = run[run.length - 1];
+    const next = prev && prev.surah ? rs.find(r => r.surah === prev.surah && r.ayah === prev.ayah + 1) : null;
+    if (prev && next && near(prev, d)) { run.push({ d, ...next }); continue; }
+    flush();
+    // start a run: an unambiguous ayah, or an ambiguous one that is the predecessor of the next detection
+    let start = unambiguous(d) ? rs[0] : null;
+    if (!start) {
+      const nd = dets[k + 1], nrs = nd && unambiguous(nd) ? reads(nd) : [];
+      if (nrs.length && near({ d }, nd)) start = rs.find(r => r.surah === nrs[0].surah && r.ayah === nrs[0].ayah - 1) || null;
+    }
+    if (start) run.push({ d, ...start });
+  }
+  flush();
+  return out;
+}
+
+/**
  * Build smart citation-aware captions from word-level timestamps and engine detections.
  */
 function buildSmartCaptions(words, detections, prefs = null) {
@@ -162,6 +220,7 @@ function buildSmartCaptions(words, detections, prefs = null) {
     .filter(d => typeof d.wordStartIdx === "number" && typeof d.wordEndIdx === "number" && isFindingVisible(d))
     .sort((a, b) => a.wordStartIdx - b.wordStartIdx);
 
+  const groupRefMap = buildAyahGroupRefMap(sortedFindings, prefs);
   const findingByStartWord = new Map();
   const wordOccupiedByFinding = new Map();
 
@@ -219,7 +278,7 @@ function buildSmartCaptions(words, detections, prefs = null) {
 
       const fType = finding.type || (finding.sourceType === "QURAN" ? "ayah" : (finding.sourceType === "ADHKAR" ? "dhikr" : "hadith"));
       const brackets = getBracketsForCategory(fType, prefs);
-      const refBadge = finding.displayRef || finding.reference || "";
+      const refBadge = groupRefMap.has(finding) ? groupRefMap.get(finding) : (finding.displayRef || finding.reference || "");
       const useCanonical = Boolean(finding.snappedToCanonical && finding.canonicalText);
 
       // Rule 3A: Atomic Citation Rule (<= 22 words or <= 9.0 seconds -> single unified block)

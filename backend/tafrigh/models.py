@@ -167,6 +167,9 @@ class TranscriptSegment(BaseModel):
     versions: List[SegmentVersion] = Field(default_factory=list)
     active_version_id: Optional[str] = None
     review_flags: List[str] = Field(default_factory=list)
+    cut_reason: Optional[str] = None   # why the segmenter ended this sentence (punctuation | pause | length | detection | end)
+    # what happened to this sentence: model answers + confidences, splits, proposed/applied/rejected edits, quotes
+    trace: Dict[str, Any] = Field(default_factory=dict)
 
     def __init__(self, **data: Any) -> None:
         if "original_text" in data and ("tokens" not in data or not data["tokens"]):
@@ -322,7 +325,8 @@ class OutlineState(BaseModel):
         if self.in_list_context:
             choices.append({"tag": StructuralTag.LIST_ITEM.value, "level": None, "parent_id": None})
 
-        if self.last_segment_tag is not None:
+        # nothing "continues" a heading: the text after a heading starts its own block
+        if self.last_segment_tag is not None and self.last_segment_tag != StructuralTag.HEADING:
             choices.append({"tag": StructuralTag.CONTINUATION.value, "level": None, "parent_id": None})
 
         # Dynamic headings

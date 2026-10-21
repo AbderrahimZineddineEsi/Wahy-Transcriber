@@ -99,6 +99,9 @@ class RunLogger:
                     "edits": [ed.model_dump() for ed in s.versions[-1].edits] if s.versions else [],
                     "review_flags": s.review_flags,
                     "matn_match": s.matn_evidence.model_dump() if s.matn_evidence else None,
+                    "cut_reason": s.cut_reason,
+                    "detections": s.detection_signals,
+                    "trace": s.trace,
                 }
                 f.write(json.dumps(item, ensure_ascii=False) + "\n")
 

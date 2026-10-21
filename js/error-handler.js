@@ -168,9 +168,9 @@ ${errObj.traceback || "No traceback available"}
         let answer = "";
         if (geminiKey) {
           if (statusEl) statusEl.textContent = "Gemini Flash-Lite";
-          const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${geminiKey}`, {
+          const res = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-lite-latest:generateContent", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: { "Content-Type": "application/json", "x-goog-api-key": geminiKey },
             body: JSON.stringify({
               contents: [{ parts: [{ text: promptText }] }]
             })
@@ -270,12 +270,17 @@ ${errObj.traceback || "No traceback available"}
     ].join("\n");
   }
 
+  // API keys must never end up in a bug report that gets copied around or pasted into an AI chat
+  function redactSecrets(text) {
+    return String(text ?? "").replace(/(key=|x-goog-api-key["':\s=]+)[A-Za-z0-9_\-.]{12,}/gi, "$1***");
+  }
+
   function showDiagnosticErrorModal(rawError) {
     const errObj = {
       error: true,
       error_type: rawError?.error_type || rawError?.name || "ApplicationError",
-      message: rawError?.message || String(rawError || "Unknown error"),
-      traceback: rawError?.traceback || rawError?.stack || String(rawError || ""),
+      message: redactSecrets(rawError?.message || String(rawError || "Unknown error")),
+      traceback: redactSecrets(rawError?.traceback || rawError?.stack || String(rawError || "")),
       context: Object.assign({
         endpoint: "frontend/runtime",
         model_selected: getActiveStateSnapshot().activeModel,

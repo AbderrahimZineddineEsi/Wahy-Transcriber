@@ -475,7 +475,8 @@
         }
 
         for (const h of hadithData) {
-          const matn = h.book === "Builtin" ? h.t : stripIsnad(h.t);
+          // a corpus that ships its own isnad/matn split (Open Hadith Data) is used as-is; otherwise guess the cut
+          const matn = h.matn ? expandHonorificLigatures(h.matn) : (h.book === "Builtin" ? h.t : stripIsnad(h.t));
           const toks = tokenizeText(matn);
           if (toks.length < 2) continue;
           const unit = {

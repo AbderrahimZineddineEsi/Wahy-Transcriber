@@ -148,6 +148,152 @@
     return { state: canonicalState, questions: canonicalQuestions };
   }
 
+  // ---------------------------------------------------------------------------
+  // 1b. User Prompt Configuration (presets, rules, extra instructions)
+  // Applied on top of the canonical envelope at request time only; the
+  // canonical envelope stays untouched so Laya training records stay stable.
+  // ---------------------------------------------------------------------------
+
+  const DEFAULT_SYSTEM_PROMPTS = {
+    gemini:
+      "أنت مدقق شرعي ولغوي خبير في تفريغ المحاضرات الإسلامية. " +
+      "مهمتك التمييز بدقة بين الاقتباس الفعلي (آية أو حديث نبوي أو ذكر) " +
+      "وبين الكلام العادي للشيخ الشارح الذي تتشابه كلماته لفظياً مع الحديث أو الآية.",
+    openrouter_chat:
+      "You are an expert Arabic Islamic text verifier. " +
+      "Given the JSON `state` and `questions`, determine whether `matched_span_in_lecture` is a genuine quotation or ordinary speech, and determine boundary status."
+  };
+
+  const CHAT_OUTPUT_CONTRACT =
+    "Return ONLY a valid JSON object with keys: {\"verdict\": \"CORRECT\" | \"FALSE\" | \"NOT_SURE\", \"confidence\": 0.0-1.0, \"probabilities\": {\"CORRECT\": p1, \"FALSE\": p2, \"NOT_SURE\": p3}, \"boundary_status\": \"COMPLETE_SPAN\" | \"MISSING_START\" | \"MISSING_END\" | \"MISSING_BOTH\", \"boundary_confidence\": 0.0-1.0, \"reason\": \"concise explanation\"}.";
+
+  const PROMPT_PRESETS = {
+    balanced: {
+      label: "⚖️ متوازن",
+      hint: "الإعداد الافتراضي: يقبل الاقتباس الحرفي والاستشهاد الواضح، ويستبعد الكلام العادي.",
+      verdictAddendum: "",
+      criteria: {}
+    },
+    strict: {
+      label: "🎯 صارم",
+      hint: "لا يقبل إلا التلاوة أو الرواية الحرفية الصريحة. مناسب حين تكثر الإيجابيات الكاذبة.",
+      verdictAddendum: "Be strict: only accept verbatim (or near-verbatim, allowing ASR noise) recitation of the corpus text that the speaker clearly presents as a quotation.",
+      criteria: {
+        CORRECT: "The speaker recites the corpus text verbatim (allowing only ASR spelling noise) and clearly presents it as a quotation.",
+        NOT_SURE: "Use only when the audio transcript is too garbled to decide; paraphrases and allusions are FALSE in strict mode."
+      }
+    },
+    lenient: {
+      label: "🤲 متساهل",
+      hint: "يقبل الاقتباس بالمعنى والإشارة الواضحة للنص. مناسب حين يفوتك اقتباسات حقيقية.",
+      verdictAddendum: "Be lenient: a clear paraphrase or partial quotation that unmistakably points to this specific text counts as a citation.",
+      criteria: {
+        CORRECT: "The speaker quotes this text verbatim, partially, or as a clear paraphrase that unmistakably refers to this specific Ayah, Hadith, or Dhikr.",
+        NOT_SURE: "Only when it is genuinely unclear whether the speaker is referring to this specific text at all."
+      }
+    },
+    boundaries: {
+      label: "✂️ تركيز على الحدود",
+      hint: "متوازن في الحكم، لكن يدقق بشدة في الكلمات المقطوعة من بداية المقتبس ونهايته.",
+      verdictAddendum: "",
+      criteria: {},
+      boundaryAddendum: "Pay special attention to boundaries: scan `immediate_transcript_before` and `immediate_transcript_after` word by word for any words of `unmatched_corpus_prefix_words` / `unmatched_corpus_suffix_words`, tolerating ASR spelling errors and missing diacritics."
+    }
+  };
+
+  const PROMPT_RULES = {
+    ignoreAsrErrors: {
+      label: "تجاهل أخطاء التفريغ الصوتي",
+      hint: "الفروق الإملائية والتشكيل الناتجة عن التعرف على الكلام لا تُعد اختلافاً.",
+      text: "The transcript comes from speech recognition: treat spelling differences, missing diacritics, merged or split words as matches, not as differences."
+    },
+    citationCues: {
+      label: "صيغ الإسناد دليل قوي",
+      hint: "«قال تعالى»، «قال رسول الله ﷺ»، «في الحديث» قبل النص ترجّح أنه اقتباس.",
+      text: "Introductory cues in `context_before` such as «قال تعالى», «قال الله», «قال رسول الله ﷺ», «في الحديث», «يقول النبي» are strong evidence of a genuine quotation."
+    },
+    narratorNames: {
+      label: "أسماء الرواة وحدها ليست اقتباساً",
+      hint: "ذكر «عن أبي هريرة» أو اسم صحابي دون متن الحديث يُعد كلاماً عادياً.",
+      text: "A span consisting only of narrator chains or names (e.g. «عن أبي هريرة رضي الله عنه») without the actual text of the hadith is FALSE."
+    },
+    explainingRepeat: {
+      label: "تكرار كلمة أثناء الشرح كلام عادي",
+      hint: "إذا أعاد الشيخ كلمة أو كلمتين من الآية ليشرحها فليس ذلك اقتباساً جديداً.",
+      text: "When the speaker repeats one or two words of the text in order to explain them (e.g. «قوله: الرحمن، أي...»), treat it as ordinary explanation (FALSE) unless a fuller recitation is present."
+    },
+    preferNotSure: {
+      label: "عند الشك: «غير متأكد»",
+      hint: "يفضل النموذج «غير متأكد» بدل التخمين، فتراجعه أنت يدوياً.",
+      text: "If the evidence is genuinely mixed, answer NOT_SURE rather than guessing."
+    }
+  };
+
+  const DEFAULT_PROMPT_CONFIG = {
+    preset: "balanced",
+    rules: { ignoreAsrErrors: true, citationCues: true, narratorNames: false, explainingRepeat: false, preferNotSure: false },
+    reasonLang: "ar",          // "ar" | "en"
+    reasonDetail: "brief",     // "brief" | "detailed"
+    extraInstructions: "",
+    systemPromptOverride: "",
+    temperature: 0.1
+  };
+
+  function getPromptConfig() {
+    const saved = currentState.aiVerification.promptConfig || {};
+    return Object.assign({}, DEFAULT_PROMPT_CONFIG, saved, {
+      rules: Object.assign({}, DEFAULT_PROMPT_CONFIG.rules, saved.rules || {})
+    });
+  }
+
+  function providerSupportsPrompt(provider) {
+    // Laya is a fine-tuned local classifier trained on the fixed canonical questions
+    return provider !== "local_laya";
+  }
+
+  function composeQuestions(baseQuestions, provider) {
+    if (!providerSupportsPrompt(provider)) return baseQuestions;
+    const cfg = getPromptConfig();
+    const preset = PROMPT_PRESETS[cfg.preset] || PROMPT_PRESETS.balanced;
+    const q = JSON.parse(JSON.stringify(baseQuestions));
+
+    const guidance = [];
+    if (preset.verdictAddendum) guidance.push(preset.verdictAddendum);
+    Object.keys(PROMPT_RULES).forEach(k => {
+      if (cfg.rules[k]) guidance.push(PROMPT_RULES[k].text);
+    });
+    const extra = (cfg.extraInstructions || "").trim();
+    if (extra) guidance.push(extra);
+
+    if (guidance.length) {
+      q.verdict.instructions += "\n\nAdditional guidance:\n" + guidance.map(g => `- ${g}`).join("\n");
+    }
+    Object.assign(q.verdict.criteria, preset.criteria || {});
+    if (preset.boundaryAddendum) {
+      q.boundary_status.instructions += "\n\n" + preset.boundaryAddendum;
+    }
+    return q;
+  }
+
+  function composeSystemPrompt(provider) {
+    const cfg = getPromptConfig();
+    const base = (cfg.systemPromptOverride || "").trim() || DEFAULT_SYSTEM_PROMPTS[provider] || "";
+    const lang = cfg.reasonLang === "en" ? "English" : "Arabic";
+    const detail = cfg.reasonDetail === "detailed"
+      ? "2-3 sentences citing the specific words that decided it"
+      : "one short sentence";
+    return `${base}\n\nWrite the \`reason\` field in ${lang}, ${detail}.`;
+  }
+
+  function getPromptTemperature() {
+    const t = Number(getPromptConfig().temperature);
+    return isFinite(t) ? Math.min(1, Math.max(0, t)) : 0.1;
+  }
+
+  function findingIdOf(item) {
+    return item.det.id || item.det._uniqueKey || `f_${item.index}`;
+  }
+
   function normalizeBoundaryVerdict(verdict, bStatus, state) {
     if (verdict === "FALSE") return "COMPLETE_SPAN";
     let s = bStatus || "COMPLETE_SPAN";
@@ -206,26 +352,13 @@
   // 3. Provider 1: Google Gemini (gemini-3.5-flash-lite)
   // ---------------------------------------------------------------------------
 
-  async function callGeminiApi(batchItems, onCountdown) {
-    const apiKey = (currentState.aiVerification.geminiApiKey || "").trim();
-    if (!apiKey) {
-      throw new Error("يرجى إدخال مفتاح Google Gemini API Key في إعدادات التدقيق الذكي.");
-    }
-
-    const model = (currentState.aiVerification.geminiModel || "gemini-3.5-flash-lite").trim();
-    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(apiKey)}`;
-
-    // Prepare batch payload
+  function buildGeminiRequestBody(batchItems) {
     const batchInput = batchItems.map(item => ({
-      finding_id: item.det.id || item.det._uniqueKey || `f_${item.index}`,
+      finding_id: findingIdOf(item),
       state: item.envelope.state,
-      questions: item.envelope.questions
+      questions: composeQuestions(item.envelope.questions, "gemini")
     }));
-
-    const systemPrompt =
-      "أنت مدقق شرعي ولغوي خبير في تفريغ المحاضرات الإسلامية. " +
-      "مهمتك التمييز بدقة بين الاقتباس الفعلي (آية أو حديث نبوي أو ذكر) " +
-      "وبين الكلام العادي للشيخ الشارح الذي تتشابه كلماته لفظياً مع الحديث أو الآية.";
+    const systemPrompt = composeSystemPrompt("gemini");
 
     const userPrompt =
       "Given the following candidate citations extracted by the transcription engine, " +
@@ -244,7 +377,7 @@
         }
       ],
       generationConfig: {
-        temperature: 0.1,
+        temperature: getPromptTemperature(),
         responseMimeType: "application/json",
         responseSchema: {
           type: "ARRAY",
@@ -275,6 +408,18 @@
         }
       }
     };
+    return requestBody;
+  }
+
+  async function callGeminiApi(batchItems, onCountdown) {
+    const apiKey = (currentState.aiVerification.geminiApiKey || "").trim();
+    if (!apiKey) {
+      throw new Error("يرجى إدخال مفتاح Google Gemini API Key في إعدادات التدقيق الذكي.");
+    }
+
+    const model = (currentState.aiVerification.geminiModel || "gemini-3.5-flash-lite").trim();
+    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(apiKey)}`;
+    const requestBody = buildGeminiRequestBody(batchItems);
 
     let retries = 0;
     const maxRetries = 4;
@@ -374,18 +519,22 @@
   // 4. Provider 2: OpenRouter JEV Mode (Decisions API)
   // ---------------------------------------------------------------------------
 
+  function buildJevPayload(item) {
+    return {
+      model: (currentState.aiVerification.openRouterJevModel || "typesafe/jev-1.14").trim(),
+      state: item.envelope.state,
+      questions: composeQuestions(item.envelope.questions, "openrouter_jev")
+    };
+  }
+
   async function callOpenRouterJev(item) {
     const apiKey = (currentState.aiVerification.openRouterApiKey || "").trim();
     if (!apiKey) {
       throw new Error("يرجى إدخال مفتاح OpenRouter API Key في إعدادات التدقيق الذكي.");
     }
 
-    const model = (currentState.aiVerification.openRouterJevModel || "typesafe/jev-1.14").trim();
-    const payload = {
-      model: model,
-      state: item.envelope.state,
-      questions: item.envelope.questions
-    };
+    const payload = buildJevPayload(item);
+    const model = payload.model;
 
     const headers = {
       "Authorization": `Bearer ${apiKey}`,
@@ -523,6 +672,27 @@
     }
   }
 
+  function buildOpenRouterChatPayload(item, modelId) {
+    return {
+      model: modelId,
+      temperature: getPromptTemperature(),
+      response_format: { type: "json_object" },
+      messages: [
+        {
+          role: "system",
+          content: composeSystemPrompt("openrouter_chat") + "\n\n" + CHAT_OUTPUT_CONTRACT
+        },
+        {
+          role: "user",
+          content: JSON.stringify({
+            state: item.envelope.state,
+            questions: composeQuestions(item.envelope.questions, "openrouter_chat")
+          })
+        }
+      ]
+    };
+  }
+
   async function callOpenRouterChat(item) {
     const apiKey = (currentState.aiVerification.openRouterApiKey || "").trim();
     if (!apiKey) {
@@ -537,24 +707,7 @@
       return callOpenRouterJev(item);
     }
 
-    const payload = {
-      model: modelId,
-      temperature: 0.1,
-      response_format: { type: "json_object" },
-      messages: [
-        {
-          role: "system",
-          content:
-            "You are an expert Arabic Islamic text verifier. " +
-            "Given the JSON `state` and `questions`, determine whether `matched_span_in_lecture` is a genuine quotation or ordinary speech, and determine boundary status. " +
-            "Return ONLY a valid JSON object with keys: {\"verdict\": \"CORRECT\" | \"FALSE\" | \"NOT_SURE\", \"confidence\": 0.0-1.0, \"probabilities\": {\"CORRECT\": p1, \"FALSE\": p2, \"NOT_SURE\": p3}, \"boundary_status\": \"COMPLETE_SPAN\" | \"MISSING_START\" | \"MISSING_END\" | \"MISSING_BOTH\", \"boundary_confidence\": 0.0-1.0, \"reason\": \"concise Arabic explanation\"}."
-        },
-        {
-          role: "user",
-          content: JSON.stringify({ state: item.envelope.state, questions: item.envelope.questions })
-        }
-      ]
-    };
+    const payload = buildOpenRouterChatPayload(item, modelId);
 
     const headers = {
       "Authorization": `Bearer ${apiKey}`,
@@ -638,29 +791,23 @@
   // 6. Provider 4: Local Laya Engine (GTX 1050 3GB VRAM)
   // ---------------------------------------------------------------------------
 
+  function buildLayaPayload(items) {
+    if (items.length === 1) {
+      return { state: items[0].envelope.state, questions: items[0].envelope.questions, max_len: 1024 };
+    }
+    return {
+      items: items.map(it => ({ finding_id: findingIdOf(it), state: it.envelope.state, questions: it.envelope.questions })),
+      max_len: 1024
+    };
+  }
+
   async function callLocalLaya(items) {
     await waitIfPaused();
     const t0 = performance.now();
 
     // Support single item or batch
     const isSingle = items.length === 1;
-    let requestPayload;
-    if (isSingle) {
-      requestPayload = {
-        state: items[0].envelope.state,
-        questions: items[0].envelope.questions,
-        max_len: 1024
-      };
-    } else {
-      requestPayload = {
-        items: items.map(it => ({
-          finding_id: it.det.id || it.det._uniqueKey || `f_${it.index}`,
-          state: it.envelope.state,
-          questions: it.envelope.questions
-        })),
-        max_len: 1024
-      };
-    }
+    const requestPayload = buildLayaPayload(items);
 
     const res = await fetch("/api/laya/predict", {
       method: "POST",
@@ -850,16 +997,11 @@
     isVerificationCancelled = false;
 
     const provider = currentState.aiVerification.activeProvider || "gemini";
-    const scope = currentState.aiVerification.targetScope || "HADITH_AND_CANDIDATES";
     const contextWindow = currentState.aiVerification.contextWindowWords || 25;
     const batchSize = provider === "gemini" ? (currentState.aiVerification.geminiBatchSize || 5) : 1;
 
-    let targetDetections = [];
-    if (Array.isArray(selectedIndices) && selectedIndices.length) {
-      targetDetections = currentState.detections.filter((_, idx) => selectedIndices.includes(idx));
-    } else {
-      targetDetections = filterDetectionsByScope(currentState.detections, scope);
-    }
+    const targetIdx = (Array.isArray(selectedIndices) && selectedIndices.length) ? selectedIndices : resolveTargetIndices();
+    const targetDetections = currentState.detections.filter((_, idx) => targetIdx.includes(idx));
     if (!targetDetections.length) {
       if (typeof showToast === "function") {
         showToast("لا توجد مقتبسات تطابق نطاق التدقيق المحدد.");
@@ -993,7 +1135,7 @@
 
           currentState.aiVerification.requestLogs.unshift({
             id: reqId,
-            timestamp: new Date().toLocaleTimeString("ar-SA"),
+            timestamp: new Date().toLocaleTimeString((typeof WahyI18n === "object" ? WahyI18n.dateLocale() : "ar-u-nu-latn")),
             model: providerResult.model,
             provider: providerResult.provider,
             findingsCount: currentChunk.length,
@@ -1020,7 +1162,7 @@
 
           currentState.aiVerification.requestLogs.unshift({
             id: reqId,
-            timestamp: new Date().toLocaleTimeString("ar-SA"),
+            timestamp: new Date().toLocaleTimeString((typeof WahyI18n === "object" ? WahyI18n.dateLocale() : "ar-u-nu-latn")),
             model: provider,
             provider: provider,
             findingsCount: currentChunk.length,
@@ -1249,17 +1391,72 @@
 
   // Export module to global scope
   
+  /**
+   * Indices of the detections the next batch run targets: either the manual pick
+   * from the request-options panel, or every detection matching the scope.
+   */
+  function resolveTargetIndices() {
+    const ai = currentState.aiVerification;
+    const dets = currentState.detections || [];
+    if (ai.selectionMode === "manual") {
+      const picked = new Set(ai.manualSelectedIds || []);
+      return dets.map((d, i) => (picked.has(d.id) ? i : -1)).filter(i => i >= 0);
+    }
+    const inScope = new Set(filterDetectionsByScope(dets, ai.targetScope || "HADITH_AND_CANDIDATES"));
+    return dets.map((d, i) => (inScope.has(d) ? i : -1)).filter(i => i >= 0);
+  }
+
+  /**
+   * Build (without sending) the exact request the active provider would receive
+   * for one detection, so the options panel can preview it.
+   */
+  function buildRequestPreview(detIdx, provider = null) {
+    const det = currentState.detections[detIdx];
+    if (!det) return null;
+    const prov = provider || currentState.aiVerification.activeProvider || "gemini";
+    const item = {
+      det,
+      index: detIdx,
+      envelope: buildCanonicalDecisionEnvelope(det, currentState.words, currentState.aiVerification.contextWindowWords || 25)
+    };
+    let model = "";
+    let endpoint = "";
+    let payload = null;
+    if (prov === "gemini") {
+      model = currentState.aiVerification.geminiModel || "gemini-3.5-flash-lite";
+      endpoint = `generativelanguage.googleapis.com/…/models/${model}:generateContent`;
+      payload = buildGeminiRequestBody([item]);
+    } else if (prov === "openrouter_jev") {
+      payload = buildJevPayload(item);
+      model = payload.model;
+      endpoint = "openrouter.ai/api/alpha/decisions";
+    } else if (prov === "openrouter_chat") {
+      model = currentState.aiVerification.openRouterSelectedModel || "deepseek/deepseek-chat";
+      payload = buildOpenRouterChatPayload(item, model);
+      endpoint = "openrouter.ai/api/v1/chat/completions";
+    } else {
+      model = currentState.aiVerification.layaCheckpoint || "laya-multilingual";
+      payload = buildLayaPayload([item]);
+      endpoint = "/api/laya/predict";
+    }
+    const json = JSON.stringify(payload);
+    return {
+      provider: prov,
+      model,
+      endpoint,
+      payload,
+      questions: composeQuestions(item.envelope.questions, prov),
+      systemPrompt: (prov === "gemini" || prov === "openrouter_chat") ? composeSystemPrompt(prov) : "",
+      approxTokens: Math.round(json.length / 3.2)
+    };
+  }
+
   function estimateBatchVerification(selectedIndices = null) {
     const provider = currentState.aiVerification.activeProvider || "gemini";
-    const scope = currentState.aiVerification.targetScope || "HADITH_AND_CANDIDATES";
-    let targets = [];
-    if (Array.isArray(selectedIndices) && selectedIndices.length) {
-      targets = currentState.detections.filter((_, idx) => selectedIndices.includes(idx));
-    } else {
-      targets = filterDetectionsByScope(currentState.detections, scope);
-    }
-    const count = targets.length;
-    const approxTokens = count * 380;
+    const targetIdx = (Array.isArray(selectedIndices)) ? selectedIndices : resolveTargetIndices();
+    const count = targetIdx.length;
+    const sample = count ? buildRequestPreview(targetIdx[0], provider) : null;
+    const approxTokens = count * (sample ? sample.approxTokens : 380);
     let estCost = 0.0;
     if (provider === "openrouter_chat") {
       estCost = (approxTokens / 1000000) * 0.14;
@@ -1273,6 +1470,14 @@
 
   window.WahyAiVerifier = {
     estimateBatchVerification,
+    resolveTargetIndices,
+    buildRequestPreview,
+    getPromptConfig,
+    providerSupportsPrompt,
+    DEFAULT_PROMPT_CONFIG,
+    DEFAULT_SYSTEM_PROMPTS,
+    PROMPT_PRESETS,
+    PROMPT_RULES,
     buildCanonicalDecisionEnvelope,
     callGeminiApi,
     callOpenRouterJev,

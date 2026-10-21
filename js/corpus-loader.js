@@ -6,7 +6,7 @@
 const CORPUS_IDB_NAME = "WahyCorpusDB";
 const CORPUS_IDB_VERSION = 2;
 const CORPUS_IDB_STORE = "datasets";
-const CORPUS_CACHE_KEY = "normalized_corpus_v2";
+const CORPUS_CACHE_KEY = "normalized_corpus_v3"; // v3: drops caches holding "[object Object]" hadith refs
 const LS_CORPUS_URLS_KEY = "wahyFinder_remoteCorpusUrls_v2";
 
 const DEFAULT_CORPUS_ENDPOINTS = {
@@ -19,8 +19,6 @@ const DEFAULT_CORPUS_ENDPOINTS = {
     { key: "Qudsi40", title: "الأربعون القدسية", url: "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/ara-qudsi.min.json" },
     { key: "RiyadSalihin", title: "رياض الصالحين", url: "https://raw.githubusercontent.com/AhmedBaset/hadith-json/v1.2.0/db/by_book/other_books/riyad_assalihin.json" }
   ],
-  adhkarMirrorUrl: "https://raw.githubusercontent.com/osamayy/azkar-db/master/azkar.json",
-  adhkarFallbackUrl: "https://cdn.jsdelivr.net/gh/osamayy/azkar-db@master/azkar.json"
 };
 
 function getCorpusEndpointsConfig() {
@@ -203,7 +201,9 @@ function normalizeHadithPayload(rawPayload, defaultBookKey = "RemoteHadith", def
     const book = item.book || defaultBookKey;
     const uid = String(item.id || "").includes(":") ? String(item.id) : `${book}:${num}`;
     const text = String(item.t || item.text || item.arabic || item.arab || "").trim();
-    const ref = String(item.ref || item.reference || `${defaultTitle} (${num})`).trim();
+    // Some APIs (fawazahmed0 hadith-api) send `reference` as an object ({book, hadith}), not a label
+    const rawRef = [item.ref, item.reference].find(r => typeof r === "string" && r.trim());
+    const ref = String(rawRef || `${defaultTitle} (${num})`).trim();
     if (text && text.length >= 8 && !seen.has(uid)) {
       seen.add(uid);
       normalized.push({
@@ -267,10 +267,10 @@ function normalizeAdhkarPayload(rawPayload) {
 }
 
 /**
- * Merge user's locally persisted Adhkar (and BUILTIN_ADHKAR_DATA) with any downloaded Adhkar
- * so user edits/additions to Adhkar are never lost.
+ * The adhkar in use: the user's saved list (built-in essentials + their own additions). Adhkar shipped inside a
+ * corpus file or a download are ignored on purpose — the user curates adhkar themselves in the Adhkar studio.
  */
-function mergeAdhkarPreservingUserEdits(remoteAdhkarList) {
+function mergeAdhkarPreservingUserEdits() {
   let localSaved = null;
   try {
     const raw = localStorage.getItem(LS_CUSTOM_ADHKAR_KEY);
@@ -282,39 +282,18 @@ function mergeAdhkarPreservingUserEdits(remoteAdhkarList) {
     }
   } catch (e) {}
 
-  // If the user already has a saved Adhkar list in localStorage, honor their exact managed list
-  // while appending any new remote items if remote was explicitly synced.
-  if (localSaved && localSaved.length > 0) {
-    return localSaved;
-  }
-
-  // Otherwise start with BUILTIN_ADHKAR_DATA (42 core Adhkar) + unique remote Adhkar
-  const merged = (typeof BUILTIN_ADHKAR_DATA !== "undefined" ? BUILTIN_ADHKAR_DATA : []).map(x => ({ ...x }));
-  const seenNorm = new Set(merged.map(x => (typeof normalizeArabic === "function" ? normalizeArabic(x.t) : x.t)));
-
-  (Array.isArray(remoteAdhkarList) ? remoteAdhkarList : []).forEach(item => {
-    const norm = typeof normalizeArabic === "function" ? normalizeArabic(item.t || "") : (item.t || "");
-    if (norm && !seenNorm.has(norm)) {
-      seenNorm.add(norm);
-      merged.push({
-        id: item.id || `Adhkar:${merged.length + 1}`,
-        category: item.category || "ذكر مأثور",
-        ref: item.ref || item.category || "ذكر مأثور",
-        t: item.t
-      });
-    }
-  });
-
-  return merged;
+  if (localSaved && localSaved.length > 0) return localSaved;
+  return (typeof BUILTIN_ADHKAR_DATA !== "undefined" ? BUILTIN_ADHKAR_DATA : []).map(x => ({ ...x }));
 }
 
 function applyNormalizedCorpusToState(corpusObj) {
   const ayat = Array.isArray(corpusObj?.ayat) ? corpusObj.ayat : [];
   const hadiths = Array.isArray(corpusObj?.hadiths) ? corpusObj.hadiths : [];
-  const adhkar = mergeAdhkarPreservingUserEdits(corpusObj?.adhkar);
+  const adhkar = mergeAdhkarPreservingUserEdits();
 
   RAW_QURAN_DATA = ayat;
   RAW_HADITH_DATA = hadiths;
+  DEFAULT_HADITH_DATA = hadiths;   // kept so switching back from another hadith corpus needs no reload
   RAW_ADHKAR_DATA = adhkar;
 
   if (Array.isArray(corpusObj?.outsideHadiths) && !RAW_OUTSIDE_HADITH_DATA.length) {
@@ -426,20 +405,7 @@ async function downloadAllCorporaFromRemote(force = false) {
     }
   }
 
-  // 4. Fetch Adhkar Mirror
-  updateCorpusProgressUI(84, "جاري مزامنة قاعدة بيانات الأذكار والأدعية...", true);
-  try {
-    const adhkarJson = await fetchJsonSafely(cfg.adhkarMirrorUrl);
-    adhkar.push(...normalizeAdhkarPayload(adhkarJson));
-  } catch (aErr) {
-    try {
-      const adhkarFb = await fetchJsonSafely(cfg.adhkarFallbackUrl);
-      adhkar.push(...normalizeAdhkarPayload(adhkarFb));
-    } catch (aFbErr) {
-      errors.push(`Adhkar Mirror: ${aFbErr.message}`);
-    }
-  }
-
+  // Adhkar are no longer downloaded: the built-in essentials plus the user's own additions are used
   const finalAdhkar = mergeAdhkarPreservingUserEdits(adhkar);
 
   if (!ayat.length && !hadiths.length) {
@@ -498,9 +464,70 @@ async function downloadAllCorporaFromRemote(force = false) {
   return normalizedCorpus;
 }
 
+// The project's own corpus (data/corpus.json, fetched by run.sh from the Wahy-Finder repo) is the primary source.
+// Hadith of the default corpus (data/corpus.json or the download), whatever hadith corpus is currently selected
+let DEFAULT_HADITH_DATA = [];
+
+const LOCAL_CORPUS_URL = "/data/corpus.json";
+const LOCAL_CORPUS_SOURCE = "local:data/corpus.json";
+
+/** Load data/corpus.json if the server has it. Returns the normalized corpus, or null when the file is absent. */
+async function loadLocalProjectCorpus() {
+  let head;
+  try {
+    head = await fetch(LOCAL_CORPUS_URL, { method: "HEAD", trapError: false });
+  } catch (e) {
+    return null;
+  }
+  if (!head.ok) return null;
+  const stamp = `${head.headers.get("content-length") || ""}|${head.headers.get("last-modified") || ""}`;
+
+  // the browser cache already holds this exact file: no need to parse 90 MB again
+  const cached = await readCorpusFromWahyDB(CORPUS_CACHE_KEY);
+  if (cached && cached.sourceSummary === LOCAL_CORPUS_SOURCE && cached.localStamp === stamp && cached.ayat?.length) {
+    return cached;
+  }
+
+  updateCorpusProgressUI(30, "جاري تحميل قاعدة البيانات المحلية (data/corpus.json)...", true);
+  const raw = await fetchJsonSafely(LOCAL_CORPUS_URL);
+  const corpus = {
+    ayat: Array.isArray(raw.ayat) ? raw.ayat : [],
+    hadiths: Array.isArray(raw.hadiths) ? raw.hadiths : [],
+    adhkar: Array.isArray(raw.adhkar) ? raw.adhkar : [],
+    loadedAt: new Date().toISOString(),
+    sourceSummary: LOCAL_CORPUS_SOURCE,
+    localStamp: stamp,
+    version: raw.version || ""
+  };
+  if (!corpus.ayat.length) return null;
+  await writeCorpusToWahyDB(corpus, CORPUS_CACHE_KEY);
+  return corpus;
+}
+
 async function initDynamicCorpus(forceDownload = false) {
+  const result = await loadDefaultCorpus(forceDownload);
+  // then switch to the hadith corpus the user selected, if it isn't the default one
+  if (typeof applySavedHadithCorpusChoice === "function") await applySavedHadithCorpusChoice();
+  return result;
+}
+
+async function loadDefaultCorpus(forceDownload = false) {
   // Always ensure built-in/custom Adhkar are indexed right away before network finishes
   rebuildMatcher();
+
+  try {
+    const local = await loadLocalProjectCorpus();
+    if (local) {
+      applyNormalizedCorpusToState(local);
+      updateCorpusProgressUI(100, `القاعدة المحلية: ${local.ayat.length} آية | ${local.hadiths.length} حديث | ${RAW_ADHKAR_DATA.length} ذكر`, false);
+      if (typeof logWahyAction === "function") {
+        logWahyAction("CORPUS_LOADED_LOCAL_FILE", { ayat: local.ayat.length, hadiths: local.hadiths.length, adhkar: RAW_ADHKAR_DATA.length });
+      }
+      return local;
+    }
+  } catch (err) {
+    console.error("Local data/corpus.json failed to load, falling back to cache/remote", err);
+  }
 
   if (!forceDownload) {
     updateCorpusProgressUI(25, "جاري فحص القواعد المحفوظة محلياً...", true);
@@ -536,42 +563,6 @@ async function clearAndRedownloadCorpus() {
   return await downloadAllCorporaFromRemote(true);
 }
 
-async function syncRemoteAdhkarIntoDataset() {
-  const cfg = getCorpusEndpointsConfig();
-  showToast("⏳ جاري جلب الأذكار الإضافية من المستودع السحابي...");
-  try {
-    let rawJson = null;
-    try {
-      rawJson = await fetchJsonSafely(cfg.adhkarMirrorUrl);
-    } catch (_) {
-      rawJson = await fetchJsonSafely(cfg.adhkarFallbackUrl);
-    }
-    const remoteItems = normalizeAdhkarPayload(rawJson);
-    const seenNorm = new Set(RAW_ADHKAR_DATA.map(x => (typeof normalizeArabic === "function" ? normalizeArabic(x.t) : x.t)));
-    let added = 0;
-    remoteItems.forEach(item => {
-      const norm = typeof normalizeArabic === "function" ? normalizeArabic(item.t) : item.t;
-      if (norm && !seenNorm.has(norm)) {
-        seenNorm.add(norm);
-        RAW_ADHKAR_DATA.push({
-          id: `Adhkar:remote_${RAW_ADHKAR_DATA.length + 1}`,
-          category: item.category || "ذكر مأثور",
-          ref: item.ref || item.category || "ذكر مأثور",
-          t: item.t,
-          isCustom: false
-        });
-        added++;
-      }
-    });
-    if (typeof persistUserDatasetsToStorage === "function") persistUserDatasetsToStorage();
-    if (typeof rebuildMatcher === "function") rebuildMatcher();
-    if (typeof renderDatasetsSection === "function") renderDatasetsSection();
-    showToast(added > 0 ? `✅ تمت إضافة ${added} ذكراً جديداً من السحابة (الإجمالي: ${RAW_ADHKAR_DATA.length})` : `ℹ️ جميع أذكار السحابة موجودة بالفعل (${RAW_ADHKAR_DATA.length} ذكر)`);
-  } catch (err) {
-    showToast("⚠️ تعذر الاتصال بمستودع الأذكار السحابي حالياً.");
-  }
-}
-
 function searchCorpusUnits(query, categoryFilter = "ALL", limit = 30) {
   if (!activeMatcher || !activeMatcher.units) return [];
   const qRaw = String(query || "").trim();
@@ -604,7 +595,6 @@ window.WahyCorpusLoader = {
   initDynamicCorpus,
   clearAndRedownloadCorpus,
   downloadAllCorporaFromRemote,
-  syncRemoteAdhkarIntoDataset,
   getCorpusEndpointsConfig,
   saveCorpusEndpointsConfig,
   searchCorpusUnits,

@@ -135,6 +135,7 @@ def transcribe_with_groq_chunks(
     chunks: List[Dict[str, Any]],
     api_key: str,
     model_name: str = "whisper-large-v3-turbo",
+    on_chunk_done=None,
 ) -> List[Dict[str, Any]]:
     """
     Transcribe one or more audio chunks via Groq's OpenAI-compatible endpoint
@@ -150,7 +151,7 @@ def transcribe_with_groq_chunks(
     stitched_words: List[Dict[str, Any]] = []
     endpoint = "https://api.groq.com/openai/v1/audio/transcriptions"
 
-    for chunk in chunks:
+    for chunk_idx, chunk in enumerate(chunks):
         chunk_path: Path = chunk["path"]
         offset_sec: float = float(chunk.get("offset_sec") or 0.0)
 
@@ -230,6 +231,9 @@ def transcribe_with_groq_chunks(
                         }
                     )
 
+        if on_chunk_done:
+            on_chunk_done(chunk_idx + 1, len(chunks))
+
     return stitched_words
 
 
@@ -237,6 +241,7 @@ def transcribe_with_local_faster_whisper(
     wav_path: Path,
     model_size: str = "small",  # "small" or "large-v3-turbo"
     prefer_device: str = "cuda",
+    on_segment=None,
 ) -> List[Dict[str, Any]]:
     """
     Run local faster-whisper with `compute_type="int8"` and `word_timestamps=True`.
@@ -269,6 +274,8 @@ def transcribe_with_local_faster_whisper(
             initial_prompt=ARABIC_INITIAL_PROMPT,
         )
         for segment in segments:
+            if on_segment:
+                on_segment(float(segment.end or 0.0))
             if getattr(segment, "words", None):
                 for w in segment.words:
                     extracted_words.append(

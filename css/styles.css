@@ -920,3 +920,142 @@ html.light .ai-diagnostic-box {
   border-color: #d8b4fe !important;
   color: #581c87 !important;
 }
+
+/* Tafrigh preview / stage scroll areas: dark scrollbars instead of the browser's white default */
+#tafrighStage, #tafrighSegList {
+  scrollbar-color: #334155 transparent;
+  scrollbar-width: thin;
+}
+
+/* Tafrigh output: quotations from their source, readable paragraphs */
+.tafrigh-rendered-content .tafrigh-paragraph { margin: 0 0 0.9rem; line-height: 2.1; }
+.tafrigh-quote { font-weight: 600; }
+.tafrigh-quote-quran { color: #6ee7b7; font-family: "Amiri Quran", "Amiri", "Scheherazade New", serif; }
+.tafrigh-quote-hadith { color: #fcd34d; }
+.tafrigh-quote-adhkar { color: #c4b5fd; }
+.tafrigh-ref { font-size: 0.75em; color: #94a3b8; white-space: nowrap; }
+html.light .tafrigh-quote-quran { color: #047857; }
+html.light .tafrigh-quote-hadith { color: #b45309; }
+html.light .tafrigh-quote-adhkar { color: #6d28d9; }
+
+
+/* ==========================================================================
+   Left-to-right interface languages (js/i18n.js sets <html dir="ltr">).
+   Lecture and corpus text stays Arabic, so it keeps right-to-left flow;
+   form fields follow their own content.
+   ========================================================================== */
+html[dir="ltr"] .lecture-pane,
+html[dir="ltr"] .font-arabic-text,
+html[dir="ltr"] .font-quran-text,
+html[dir="ltr"] #videoCaptionOverlay,
+html[dir="ltr"] [data-keep-rtl] {
+  direction: rtl;
+}
+
+html[dir="ltr"] textarea,
+html[dir="ltr"] input[type="text"],
+html[dir="ltr"] input[type="search"],
+html[dir="ltr"] [contenteditable="true"] {
+  unicode-bidi: plaintext;
+}
+
+/* Keep the Arabic column order (lecture on the right, video / inspector on the
+   left) in left-to-right languages too; the columns' own content stays LTR. */
+html[dir="ltr"] #dualWorkspaceGrid,
+html[dir="ltr"] #editorPane_fn_studio {
+  direction: rtl;
+}
+html[dir="ltr"] #dualWorkspaceGrid > *,
+html[dir="ltr"] #editorPane_fn_studio > * {
+  direction: ltr;
+}
+
+/* The Tafrigh panel is mostly UI (labels, buttons, review controls): follow the interface direction,
+   while the Arabic sentences inside it (marked data-no-i18n) take their direction from their own text. */
+html[dir="ltr"] #tafrighStage.lecture-pane {
+  direction: ltr;
+}
+html[dir="ltr"] #tafrighRenderedContent,
+html[dir="ltr"] #tafrighTocBar {
+  direction: rtl;
+}
+html[dir="ltr"] [data-no-i18n] {
+  unicode-bidi: plaintext;
+  text-align: start;
+}
+
+/* ==========================================================================
+   Tafrigh inline review: every sentence of the formatted output is clickable;
+   sentences waiting for review are highlighted, reviewed ones get a quiet mark.
+   ========================================================================== */
+#tafrighRenderedContent .tfg-seg {
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background-color 0.15s ease;
+}
+#tafrighRenderedContent .tfg-seg:hover {
+  background-color: rgba(148, 163, 184, 0.10);
+}
+#tafrighRenderedContent .tfg-needs-review {
+  background-color: rgba(245, 158, 11, 0.12);
+  box-shadow: inset 0 -2px 0 rgba(245, 158, 11, 0.65);
+}
+#tafrighRenderedContent .tfg-reviewed {
+  box-shadow: inset 0 -2px 0 rgba(16, 185, 129, 0.45);
+}
+#tafrighRenderedContent .tfg-active {
+  outline: 2px solid rgba(251, 191, 36, 0.85);
+  outline-offset: 2px;
+}
+#tafrighRenderedContent .tfg-review-card {
+  display: block;
+  margin: 6px 0 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(2, 6, 23, 0.92);
+  border: 1px solid rgba(245, 158, 11, 0.45);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+  font-family: inherit;
+  font-size: 12px;
+  line-height: 1.6;
+  cursor: default;
+}
+#tafrighRenderedContent .tfg-review-card > * + * {
+  margin-top: 6px;
+}
+html[dir="ltr"] #tafrighRenderedContent .tfg-review-card {
+  direction: ltr;
+  text-align: left;
+}
+html:not(.dark) #tafrighRenderedContent .tfg-review-card {
+  background: #ffffff;
+}
+
+/* Split visibility in the Tafrigh output */
+#tafrighRenderedContent .tfg-split-piece {
+  text-decoration: underline dotted rgba(167, 139, 250, 0.85);
+  text-underline-offset: 6px;
+}
+#tafrighRenderedContent .tfg-split-cut::before {
+  content: "✂";
+  color: #a78bfa;
+  font-size: 0.8em;
+  margin-inline: 0.25em;
+}
+#tafrighRenderedContent .tfg-split-skipped::after {
+  content: "✂?";
+  color: #a78bfa;
+  font-size: 0.7em;
+  margin-inline-start: 0.3em;
+  vertical-align: super;
+}
+
+/* Inspector: hadith words outside the matn (chain of narration / takhrij) — shown, dimmed, still selectable */
+.ref-word-chip.outside-matn {
+  opacity: 0.55;
+  font-style: italic;
+  border-style: dashed;
+}
+.ref-word-chip.outside-matn.matched {
+  opacity: 0.9;
+}

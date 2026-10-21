@@ -18,6 +18,7 @@ from ..models import CommentKind, StructuralTag, TextEdit, TranscriptSegment
 from ..schemas import GeminiSingleOutputSchema, GeminiWindowItemSchema, GeminiWindowOutputSchema
 from ..unit_of_work import UnitOfWork
 from .base import BaseAdapter
+from .errors import ModelAPIError, redact_secrets
 
 STATIC_SYSTEM_PREFIX = """
 You are an expert Islamic transcription assistant for the Wahy-Transcriber system.
@@ -35,9 +36,85 @@ NON-NEGOTIABLE GUARDRAILS:
    - "comment": Incidental speech outside substantive explanation (sneeze, student question, interruption, attendee exchange).
 3. COMMENT POLICY: Never delete comments. Tag them as "comment" and provide "commentKind".
 4. INDEX-BASED SPLITTING: If a segment contains mixed roles (e.g. conclusion of paragraph + list intro + first item), set "needsSplitting": true, and provide "splitPoints" using the 0-based word indices [idx] provided in the text.
-5. TYPO CORRECTIONS: If phonetic ASR errors exist, provide "hasTypo": true and "edits": [{"start": char_start, "end": char_end, "replacement": str}]. Do not rewrite wording outside typo spans.
+5. TYPO CORRECTIONS: If ASR errors exist, set "hasTypo": true and give "edits" addressed by the [word_idx] markers:
+   [{"wordStart": i, "wordEnd": j, "original": "<the exact words i..j as written>", "replacement": "<corrected words>", "reason": "..."}].
+   "original" must repeat the words exactly; edits whose "original" does not match are discarded. Never use character offsets.
+   Do not correct words inside Quran/hadith quotations listed in detection_signals (they are displayed from the corpus).
 """
 
+
+GEMINI_BASE_URL = "https://generativelanguage.googleapis.com/v1beta"
+OPENROUTER_CHAT_URL = "https://openrouter.ai/api/v1/chat/completions"
+DEFAULT_OPENROUTER_GEMINI_MODEL = "google/gemini-3.1-flash-lite"
+# Preference order when no model is chosen (or the chosen one does not exist for this key): first hit wins.
+PREFERRED_MODEL_HINTS = ["flash-lite-latest", "3.1-flash-lite", "2.5-flash-lite", "flash-lite", "flash-latest", "flash"]
+
+
+class GeminiAPIError(ModelAPIError):
+    """A Gemini call failed (see ModelAPIError)."""
+
+
+def pick_model(available: List[str], wanted: Optional[str] = None) -> Optional[str]:
+    """Choose a generateContent model from the ListModels names (without the 'models/' prefix)."""
+    names = [n.split("/", 1)[-1] for n in available]
+    if wanted and wanted not in ("auto", "") and wanted in names:
+        return wanted
+    for hint in PREFERRED_MODEL_HINTS:
+        hits = sorted((n for n in names if hint in n and "preview" not in n and "tts" not in n and "image" not in n), reverse=True)
+        if hits:
+            return hits[0]
+    return None
+
+
+def list_gemini_models(api_key: str, client: Optional[httpx.Client] = None) -> List[str]:
+    """Names of the models this key can call with generateContent."""
+    own = client is None
+    client = client or httpx.Client(timeout=20.0)
+    try:
+        out: List[str] = []
+        token = ""
+        for _ in range(5):
+            params = {"pageSize": 200, **({"pageToken": token} if token else {})}
+            resp = client.get(f"{GEMINI_BASE_URL}/models", params=params, headers={"x-goog-api-key": api_key})
+            if resp.status_code != 200:
+                raise GeminiAPIError(f"فشل جلب قائمة النماذج (HTTP {resp.status_code}): {resp.text[:200]}", resp.status_code)
+            data = resp.json()
+            for m in data.get("models", []):
+                if "generateContent" in (m.get("supportedGenerationMethods") or []):
+                    out.append(str(m.get("name", "")).split("/", 1)[-1])
+            token = data.get("nextPageToken", "")
+            if not token:
+                break
+        return out
+    except httpx.HTTPError as exc:
+        raise GeminiAPIError(f"تعذر الاتصال بخادم Gemini: {exc}", None, True) from exc
+    finally:
+        if own:
+            client.close()
+
+
+def parse_model_json(raw: str) -> Dict[str, Any]:
+    """Models sometimes wrap JSON in ``` fences or add chatter; recover the object or raise ValueError."""
+    txt = (raw or "").strip()
+    txt = re.sub(r"^```(?:json)?\s*|\s*```$", "", txt, flags=re.I)
+    try:
+        val = json.loads(txt)
+    except json.JSONDecodeError:
+        a, b = txt.find("{"), txt.rfind("}")
+        if a < 0 or b <= a:
+            raise ValueError(f"رد النموذج ليس JSON صالحاً: {txt[:120]}")
+        val = json.loads(txt[a : b + 1])
+    if isinstance(val, list):
+        val = {"decisions": val}
+    if not isinstance(val, dict):
+        raise ValueError("رد النموذج ليس كائن JSON")
+    return val
+
+
+def normalize_split_points(points: Any, num_tokens: int) -> List[int]:
+    """Models often list 0 (the implicit start) or repeat an index. Drop those; text is never touched."""
+    clean = {p for p in (points or []) if isinstance(p, int) and not isinstance(p, bool) and 0 < p < num_tokens}
+    return sorted(clean)
 
 def annotate_segment_with_word_indices(segment: TranscriptSegment) -> str:
     """Formats segment text with [word_idx] injected before each word."""
@@ -53,19 +130,42 @@ class GeminiAdapter(BaseAdapter):
     def __init__(
         self,
         api_key: Optional[str] = None,
-        model_name: str = "gemini-2.0-flash",
+        model_name: str = "auto",
         typo_strategy: Literal["gated", "always_correct", "asr_confidence_gated"] = "gated",
         mock_response_fn: Optional[Callable[[Dict[str, Any]], Dict[str, Any]]] = None,
         enable_cache: bool = True,
+        transport: Optional[httpx.BaseTransport] = None,
+        max_retries: int = 3,
+        sleep_fn: Callable[[float], None] = time.sleep,
+        openrouter_api_key: Optional[str] = None,
+        openrouter_model: Optional[str] = None,
     ) -> None:
         self.api_key = api_key or os.getenv("GEMINI_API_KEY", "")
+        # When set, every call goes through OpenRouter's chat API instead of Google's (free-tier) endpoint:
+        # no free-plan rate limits / 429 back-off, billed on the OpenRouter account that JEV already uses.
+        self.openrouter_api_key = (openrouter_api_key or "").strip()
+        self.openrouter_model = (openrouter_model or DEFAULT_OPENROUTER_GEMINI_MODEL).strip()
+        self.total_cost_usd = 0.0
         self.model_name = model_name
         self.typo_strategy = typo_strategy
         self.mock_response_fn = mock_response_fn
         self.enable_cache = enable_cache
+        self.transport = transport
+        self.max_retries = max_retries
+        self._sleep = sleep_fn
+        self._model_resolved = False
+        self.request_count: int = 0
         self.cached_tokens_total: int = 0
         self.input_tokens_total: int = 0
         self.output_tokens_total: int = 0
+
+    @property
+    def is_live(self) -> bool:
+        return bool(self.api_key or self.openrouter_api_key)
+
+    @property
+    def provider_label(self) -> str:
+        return f"openrouter:{self.openrouter_model}" if self.openrouter_api_key else f"gemini:{self.model_name}"
 
     def build_dynamic_payload(self, uow: UnitOfWork) -> Dict[str, Any]:
         """Builds dynamic payload from UnitOfWork."""
@@ -95,7 +195,7 @@ class GeminiAdapter(BaseAdapter):
         if self.mock_response_fn:
             return self.mock_response_fn({"prompt": prompt, "model": self.model_name})
 
-        if not self.api_key:
+        if not self.is_live:
             # Fallback heuristic if no API key is provided in testing/offline
             return {
                 "decisions": [
@@ -113,45 +213,140 @@ class GeminiAdapter(BaseAdapter):
                 "usage": {"input_tokens": 100, "output_tokens": 50, "cached_tokens": 0},
             }
 
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/{self.model_name}:generateContent?key={self.api_key}"
-        payload = {
-            "contents": [
-                {
-                    "parts": [
-                        {"text": STATIC_SYSTEM_PREFIX},
-                        {"text": prompt},
-                    ]
-                }
-            ],
-            "generationConfig": {
-                "response_mime_type": "application/json",
-            },
-        }
+        return self._post_openrouter(prompt) if self.openrouter_api_key else self._post_generate(prompt)
 
-        with httpx.Client(timeout=30.0) as client:
-            resp = client.post(url, json=payload)
-            resp.raise_for_status()
-            data = resp.json()
-            raw_text = (
-                data.get("candidates", [{}])[0]
-                .get("content", {})
-                .get("parts", [{}])[0]
-                .get("text", "{}")
-            )
-            parsed = json.loads(raw_text)
-            usage = data.get("usageMetadata", {})
-            return {
-                "parsed": parsed,
-                "usage": {
-                    "input_tokens": usage.get("promptTokenCount", 0),
-                    "output_tokens": usage.get("candidatesTokenCount", 0),
-                    "cached_tokens": usage.get("cachedContentTokenCount", 0),
-                },
-            }
+    def _post_openrouter(self, prompt: str) -> Dict[str, Any]:
+        body = {
+            "model": self.openrouter_model,
+            "temperature": 0.1,
+            "response_format": {"type": "json_object"},
+            "messages": [
+                {"role": "system", "content": STATIC_SYSTEM_PREFIX},
+                {"role": "user", "content": prompt},
+            ],
+        }
+        headers = {
+            "Authorization": f"Bearer {self.openrouter_api_key}",
+            "Content-Type": "application/json",
+            "HTTP-Referer": "https://wahy-transcriber.local",
+            "X-Title": "Wahy Transcriber Tafrigh",
+        }
+        last_exc: Optional[GeminiAPIError] = None
+        for attempt in range(self.max_retries + 1):
+            try:
+                with self._client() as client:
+                    resp = client.post(OPENROUTER_CHAT_URL, json=body, headers=headers)
+                if resp.status_code in (429, 500, 502, 503, 504):
+                    raise GeminiAPIError(f"OpenRouter HTTP {resp.status_code}: {resp.text[:200]}", resp.status_code, True)
+                if resp.status_code != 200:
+                    raise GeminiAPIError(f"OpenRouter HTTP {resp.status_code} ({self.openrouter_model}): {resp.text[:300]}", resp.status_code)
+                data = resp.json()
+                raw_text = ((data.get("choices") or [{}])[0].get("message") or {}).get("content") or ""
+                if not raw_text.strip():
+                    raise GeminiAPIError("رد فارغ من النموذج عبر OpenRouter", None, True)
+                try:
+                    parsed = parse_model_json(raw_text)
+                except ValueError as exc:
+                    raise GeminiAPIError(str(exc), None, True) from exc
+                usage = data.get("usage") or {}
+                self.request_count += 1
+                self.total_cost_usd += float(usage.get("cost") or 0.0)
+                return {
+                    "parsed": parsed,
+                    "usage": {
+                        "input_tokens": usage.get("prompt_tokens", 0),
+                        "output_tokens": usage.get("completion_tokens", 0),
+                        "cached_tokens": (usage.get("prompt_tokens_details") or {}).get("cached_tokens", 0),
+                    },
+                }
+            except httpx.HTTPError as exc:
+                last_exc = GeminiAPIError(f"تعذر الاتصال بـ OpenRouter: {exc}", None, True)
+            except GeminiAPIError as exc:
+                last_exc = exc
+                if not exc.retryable:
+                    raise
+            if attempt < self.max_retries:
+                self._sleep(min(30.0, 1.5 * (2 ** attempt)))
+        raise last_exc or GeminiAPIError("فشل غير معروف في استدعاء OpenRouter")
+
+    def _client(self) -> httpx.Client:
+        return httpx.Client(timeout=90.0, transport=self.transport)
+
+    def resolve_model(self, client: Optional[httpx.Client] = None) -> str:
+        """Make sure self.model_name exists for this key; fall back to the best available Flash-Lite."""
+        own = client is None
+        client = client or self._client()
+        try:
+            available = list_gemini_models(self.api_key, client)
+        finally:
+            if own:
+                client.close()
+        chosen = pick_model(available, self.model_name)
+        if not chosen:
+            raise GeminiAPIError("لا يوجد أي نموذج Gemini متاح لهذا المفتاح يدعم generateContent.", 404)
+        self.model_name = chosen
+        self._model_resolved = True
+        return chosen
+
+    def _post_generate(self, prompt: str) -> Dict[str, Any]:
+        if self.model_name in ("auto", "") and not self._model_resolved:
+            self.resolve_model()
+        payload = {
+            "systemInstruction": {"parts": [{"text": STATIC_SYSTEM_PREFIX}]},
+            "contents": [{"role": "user", "parts": [{"text": prompt}]}],
+            "generationConfig": {"responseMimeType": "application/json", "temperature": 0.1},
+        }
+        last_exc: Optional[GeminiAPIError] = None
+        for attempt in range(self.max_retries + 1):
+            try:
+                with self._client() as client:
+                    resp = client.post(
+                        f"{GEMINI_BASE_URL}/models/{self.model_name}:generateContent",
+                        json=payload,
+                        headers={"x-goog-api-key": self.api_key},
+                    )
+                    if resp.status_code == 404 and not self._model_resolved:
+                        # configured name is unknown to this key: discover a real one once, then retry immediately
+                        self._model_resolved = True
+                        self.resolve_model(client)
+                        continue
+                    if resp.status_code in (429, 500, 502, 503, 504):
+                        raise GeminiAPIError(f"Gemini HTTP {resp.status_code}: {resp.text[:200]}", resp.status_code, True)
+                    if resp.status_code != 200:
+                        raise GeminiAPIError(f"Gemini HTTP {resp.status_code}: {resp.text[:300]}", resp.status_code)
+                    data = resp.json()
+                cand = (data.get("candidates") or [{}])[0]
+                parts = (cand.get("content") or {}).get("parts") or [{}]
+                raw_text = "".join(p.get("text", "") for p in parts)
+                if not raw_text.strip():
+                    raise GeminiAPIError(f"رد فارغ من النموذج (finishReason={cand.get('finishReason')})", None, True)
+                try:
+                    parsed = parse_model_json(raw_text)
+                except ValueError as exc:
+                    raise GeminiAPIError(str(exc), None, True) from exc
+                usage = data.get("usageMetadata", {})
+                self.request_count += 1
+                return {
+                    "parsed": parsed,
+                    "usage": {
+                        "input_tokens": usage.get("promptTokenCount", 0),
+                        "output_tokens": usage.get("candidatesTokenCount", 0),
+                        "cached_tokens": usage.get("cachedContentTokenCount", 0),
+                    },
+                }
+            except httpx.HTTPError as exc:
+                last_exc = GeminiAPIError(f"تعذر الاتصال بخادم Gemini: {exc}", None, True)
+            except GeminiAPIError as exc:
+                last_exc = exc
+                if not exc.retryable:
+                    raise
+            if attempt < self.max_retries:
+                self._sleep(min(30.0, 1.5 * (2 ** attempt)))
+        raise last_exc or GeminiAPIError("فشل غير معروف في استدعاء Gemini")
 
     def classify_uow(self, uow: UnitOfWork) -> List[GeminiWindowItemSchema]:
         """Classifies target segments inside a UnitOfWork."""
-        if not self.api_key and not self.mock_response_fn:
+        if not self.is_live and not self.mock_response_fn:
             return self._offline_classify_uow(uow)
 
         dynamic_data = self.build_dynamic_payload(uow)
@@ -170,7 +365,9 @@ class GeminiAdapter(BaseAdapter):
         decisions_raw = parsed.get("decisions", [])
         items: List[GeminiWindowItemSchema] = []
         for d in decisions_raw:
-            items.append(GeminiWindowItemSchema.model_validate(d))
+            item = GeminiWindowItemSchema.model_validate(d)
+            item.trace = {"provider": "gemini", "model": self.model_name, "raw": d}
+            items.append(item)
 
         return items
 
@@ -272,7 +469,7 @@ class GeminiAdapter(BaseAdapter):
 
     def get_split_points(self, segment: TranscriptSegment, context: Optional[UnitOfWork] = None) -> List[int]:
         """Dedicated request to determine split word indices for a segment."""
-        if not self.api_key and not self.mock_response_fn:
+        if not self.is_live and not self.mock_response_fn:
             pts = []
             for t in segment.tokens:
                 if t.word_index > 0 and t.text in ("وسنذكر", "الأول", "الثاني", "ثم", "فائدة:", "مسألة:"):
@@ -282,26 +479,29 @@ class GeminiAdapter(BaseAdapter):
         annotated = annotate_segment_with_word_indices(segment)
         prompt = (
             f"Segment text with word indices:\n{annotated}\n\n"
-            "This segment contains mixed roles and must be split into distinct subsegments.\n"
-            "Return a JSON object with: {\"splitPoints\": [word_index_1, word_index_2, ...]}\n"
-            "where each word_index is the 0-based index marking the start of a new subsegment."
+            "This segment contains mixed structural roles and must be split into subsegments, one per role.\n"
+            "Return a JSON object: {\"splitPoints\": [i1, i2, ...]} where each index is the 0-based index of the FIRST word of a NEW "
+            "subsegment. Never include 0 (the first subsegment starts there implicitly). Split only where the role changes.\n"
+            "Example: [0] فهذا [1] هو [2] الأصل [3] الأول [4] وسنذكر [5] الآن [6] شروط [7] الصلاة [8] وهي [9] تسعة [10] الأول [11] الإسلام\n"
+            "-> {\"splitPoints\": [4, 10]}  (end of a paragraph | list intro | first list item)"
         )
         res = self._call_model(prompt)
         parsed = res.get("parsed", res)
-        return parsed.get("splitPoints", [])
+        return normalize_split_points(parsed.get("splitPoints", []), len(segment.tokens))
 
-    def get_typo_edits(self, segment: TranscriptSegment, context: Optional[UnitOfWork] = None) -> List[TextEdit]:
-        """Dedicated request to determine character-level typo edits."""
-        if not self.api_key and not self.mock_response_fn:
+    def get_typo_edits(self, segment: TranscriptSegment, context: Optional[UnitOfWork] = None) -> List[Dict[str, Any]]:
+        """Dedicated correction request. Returns raw word-indexed edits; edit_resolver verifies and maps them."""
+        if not self.is_live and not self.mock_response_fn:
             return []
 
         prompt = (
-            f"Segment text:\n{segment.original_text}\n\n"
-            "Identify phonetic ASR transcription errors and return exact character edit spans.\n"
-            "Format: {\"edits\": [{\"start\": int, \"end\": int, \"replacement\": str, \"reason\": str}]}"
+            f"Segment with word indices:\n{annotate_segment_with_word_indices(segment)}\n\n"
+            "Find likely ASR transcription errors (a similar-sounding wrong word, misspelling, wrong word boundary, "
+            "wrong religious term). Return only real errors, as JSON:\n"
+            '{"edits": [{"wordStart": i, "wordEnd": j, "original": "exact words i..j", "replacement": "corrected words", '
+            '"reason": "..."}]}\n'
+            "Address words only by the [index] markers and repeat the original words exactly. Return {\"edits\": []} if none."
         )
         res = self._call_model(prompt)
         parsed = res.get("parsed", res)
-        edits_raw = parsed.get("edits", [])
-        return [TextEdit.model_validate(e) for e in edits_raw]
-
+        return [e for e in parsed.get("edits", []) if isinstance(e, dict)]

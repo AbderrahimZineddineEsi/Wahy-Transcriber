@@ -19,6 +19,7 @@ from __future__ import annotations
 import json
 import os
 import shutil
+import threading
 import traceback
 import uuid
 from pathlib import Path
@@ -50,11 +51,14 @@ from transcriber import (
     transcribe_with_groq_chunks,
     transcribe_with_local_faster_whisper,
 )
+from progress import clear_control, get_control, get_progress, set_control, set_progress
+from corpus_sources import SOURCES as HADITH_SOURCES, CorpusSourceManager
 from laya_engine import laya_verifier
 from laya_converter import convert_verification_records_to_laya_jsonl
 
 try:
     from backend.tafrigh.pipeline import TafrighPipeline
+    from backend.tafrigh.segmenter import SegmentationConfig, segment_transcript
     from backend.tafrigh.schemas import PipelineConfig
     from backend.tafrigh.matn_aligner import MatnConfig
     from backend.tafrigh.outline_repair import run_outline_repair_pass
@@ -68,16 +72,22 @@ try:
         render_to_structured_json,
     )
     from backend.tafrigh.training_store import CanonicalTrainingRecord, TrainingStore
+    from backend.tafrigh.laya_export import build_examples as build_laya_examples, save_run as save_laya_run
     from backend.tafrigh.models import (
         CommentKind,
+        LectureSpan,
+        OutlineState,
         SourcePosition,
         StructuralTag,
         TranscriptSegment,
     )
-    from backend.tafrigh.adapters.gemini_adapter import GeminiAdapter
+    from backend.tafrigh.adapters.gemini_adapter import GeminiAdapter, GeminiAPIError, list_gemini_models, pick_model
+    from backend.tafrigh.adapters.errors import ModelAPIError, redact_secrets
+    from backend.tafrigh.pipeline import TafrighModelError
     from backend.tafrigh.adapters.jev_adapter import JEVAdapter, JEVRequestConfig
 except ImportError:
     from tafrigh.pipeline import TafrighPipeline
+    from tafrigh.segmenter import SegmentationConfig, segment_transcript
     from tafrigh.schemas import PipelineConfig
     from tafrigh.matn_aligner import MatnConfig
     from tafrigh.outline_repair import run_outline_repair_pass
@@ -91,13 +101,18 @@ except ImportError:
         render_to_structured_json,
     )
     from tafrigh.training_store import CanonicalTrainingRecord, TrainingStore
+    from tafrigh.laya_export import build_examples as build_laya_examples, save_run as save_laya_run
     from tafrigh.models import (
         CommentKind,
+        LectureSpan,
+        OutlineState,
         SourcePosition,
         StructuralTag,
         TranscriptSegment,
     )
-    from tafrigh.adapters.gemini_adapter import GeminiAdapter
+    from tafrigh.adapters.gemini_adapter import GeminiAdapter, GeminiAPIError, list_gemini_models, pick_model
+    from tafrigh.adapters.errors import ModelAPIError, redact_secrets
+    from tafrigh.pipeline import TafrighModelError
     from tafrigh.adapters.jev_adapter import JEVAdapter, JEVRequestConfig
 
 
@@ -146,8 +161,8 @@ async def global_diagnostic_exception_handler(request: Request, exc: Exception) 
     payload = {
         "error": True,
         "error_type": classify_exception_type(exc),
-        "message": str(exc) or "حدث خطأ غير متوقع في الخادم الخلفي (FastAPI Backend).",
-        "traceback": traceback.format_exc(),
+        "message": redact_secrets(str(exc)) or "حدث خطأ غير متوقع في الخادم الخلفي (FastAPI Backend).",
+        "traceback": redact_secrets(traceback.format_exc()),
         "context": {
             "endpoint": str(request.url.path),
             "model_selected": ctx_state.get("model_selected", "unknown"),
@@ -182,9 +197,17 @@ async def api_health() -> Dict[str, Any]:
     }
 
 
+@app.get("/api/transcribe/progress/{job_id}")
+def api_transcribe_progress(job_id: str) -> Dict[str, Any]:
+    return get_progress(job_id)
+
+
+# NOTE: plain `def` (not async) so FastAPI runs this blocking pipeline in a worker thread; otherwise the
+# event loop would be stuck for the whole transcription and the progress endpoint could not answer.
 @app.post("/api/transcribe")
-async def api_transcribe(
+def api_transcribe(
     request: Request,
+    job_id: Optional[str] = Form(default=None),
     youtube_url: Optional[str] = Form(default=None),
     model_selected: str = Form(default="groq-whisper-large-v3-turbo"),
     groq_api_key: Optional[str] = Form(default=None),
@@ -208,7 +231,8 @@ async def api_transcribe(
     source_path: Optional[Path] = None
 
     if youtube_url and youtube_url.strip():
-        yt_info = download_youtube_media(youtube_url.strip(), session_id=session_id)
+        set_progress(job_id, "download", 0, "جاري بدء التحميل...")
+        yt_info = download_youtube_media(youtube_url.strip(), session_id=session_id, job_id=job_id)
         source_path = yt_info["video_path"]
         media_url = yt_info["media_url"]
         media_title = yt_info["title"]
@@ -223,6 +247,7 @@ async def api_transcribe(
     else:
         raise ValueError("يرجى تقديم رابط يوتيوب صالح أو رفع ملف فيديو/صوت للتفريغ.")
 
+    set_progress(job_id, "audio", None, "جاري استخراج الصوت وتجهيزه...")
     norm_info = normalize_audio_streams(source_path, session_id=session_id)
     wav_path: Path = norm_info["wav_path"]
     mp3_path: Path = norm_info["mp3_path"]
@@ -230,6 +255,14 @@ async def api_transcribe(
 
     raw_words = []
     actual_model_used = model_selected
+    set_progress(job_id, "transcribe", 0, "جاري التفريغ الصوتي...")
+
+    def on_chunk_done(done: int, total: int) -> None:
+        set_progress(job_id, "transcribe", 100 * done / max(1, total), f"التفريغ: المقطع {done} من {total}")
+
+    def on_segment(end_sec: float) -> None:
+        pct = 100 * end_sec / duration_sec if duration_sec else None
+        set_progress(job_id, "transcribe", pct, "التفريغ المحلي بالبطاقة الرسومية...")
 
     # Execution + Fallback Chain:
     # 1. Groq Cloud API (whisper-large-v3-turbo)
@@ -242,6 +275,7 @@ async def api_transcribe(
                 chunks=chunks,
                 api_key=groq_api_key or "",
                 model_name="whisper-large-v3-turbo",
+                on_chunk_done=on_chunk_done,
             )
             actual_model_used = "groq:whisper-large-v3-turbo"
         except Exception as groq_exc:
@@ -251,13 +285,13 @@ async def api_transcribe(
             try:
                 request.state.diag_context["model_selected"] = "faster-whisper-large-v3-turbo-int8"
                 raw_words = transcribe_with_local_faster_whisper(
-                    wav_path=wav_path, model_size="large-v3-turbo"
+                    wav_path=wav_path, model_size="large-v3-turbo", on_segment=on_segment
                 )
                 actual_model_used = "local:faster-whisper-large-v3-turbo-int8"
             except CUDAOutOfMemoryError:
                 request.state.diag_context["model_selected"] = "faster-whisper-small-int8"
                 raw_words = transcribe_with_local_faster_whisper(
-                    wav_path=wav_path, model_size="small"
+                    wav_path=wav_path, model_size="small", on_segment=on_segment
                 )
                 actual_model_used = "local:faster-whisper-small-int8"
             except Exception:
@@ -266,7 +300,7 @@ async def api_transcribe(
     elif model_selected == "local-turbo-int8":
         try:
             raw_words = transcribe_with_local_faster_whisper(
-                wav_path=wav_path, model_size="large-v3-turbo"
+                wav_path=wav_path, model_size="large-v3-turbo", on_segment=on_segment
             )
             actual_model_used = "local:faster-whisper-large-v3-turbo-int8"
         except CUDAOutOfMemoryError:
@@ -274,13 +308,13 @@ async def api_transcribe(
                 raise
             request.state.diag_context["model_selected"] = "faster-whisper-small-int8"
             raw_words = transcribe_with_local_faster_whisper(
-                wav_path=wav_path, model_size="small"
+                wav_path=wav_path, model_size="small", on_segment=on_segment
             )
             actual_model_used = "local:faster-whisper-small-int8 (OOM fallback)"
 
     elif model_selected == "local-small-int8":
         raw_words = transcribe_with_local_faster_whisper(
-            wav_path=wav_path, model_size="small"
+            wav_path=wav_path, model_size="small", on_segment=on_segment
         )
         actual_model_used = "local:faster-whisper-small-int8"
     else:
@@ -292,9 +326,53 @@ async def api_transcribe(
         model_used=actual_model_used,
         duration_sec=duration_sec,
     )
+    set_progress(job_id, "done", 100, "اكتمل التفريغ")
     result["title"] = media_title
     result["from_cache"] = bool(yt_info.get("from_cache", False)) if (youtube_url and youtube_url.strip()) else False
     return result
+
+
+# --- Selectable hadith corpora (see corpus_sources.py) -------------------------------------------------------
+CORPUS_SOURCES = CorpusSourceManager(PROJECT_ROOT / "data")
+
+
+@app.get("/api/corpus/sources")
+def api_corpus_sources() -> JSONResponse:
+    return JSONResponse({"success": True, "sources": CORPUS_SOURCES.describe()})
+
+
+def _start_corpus_prepare(source_id: str) -> str:
+    job_id = f"corpus_{source_id}_{uuid.uuid4().hex[:6]}"
+    set_progress(job_id, "corpus", 0, "جاري التحضير...")
+
+    def work() -> None:
+        try:
+            summary = CORPUS_SOURCES.prepare(source_id, job_id, lambda pct, msg: set_progress(job_id, "corpus", pct, msg))
+            set_progress(job_id, "done", 100, f"جاهزة: {summary['count']} حديث", details=summary)
+        except Exception as exc:  # reported to the UI through the progress endpoint
+            set_progress(job_id, "error", None, str(exc))
+
+    threading.Thread(target=work, name=job_id, daemon=True).start()
+    return job_id
+
+
+@app.post("/api/corpus/sources/{source_id}/prepare")
+def api_corpus_prepare(source_id: str) -> JSONResponse:
+    if source_id not in HADITH_SOURCES or HADITH_SOURCES[source_id].get("builtin"):
+        return JSONResponse(status_code=404, content={"success": False, "message": "مصدر غير معروف."})
+    return JSONResponse({"success": True, "job_id": _start_corpus_prepare(source_id)})
+
+
+@app.post("/api/corpus/sources/{source_id}/upload")
+async def api_corpus_upload(source_id: str, file: UploadFile = File(...)) -> JSONResponse:
+    """For when the automatic download is blocked: the user downloads the release zip and uploads it here."""
+    if source_id not in HADITH_SOURCES or HADITH_SOURCES[source_id].get("builtin"):
+        return JSONResponse(status_code=404, content={"success": False, "message": "مصدر غير معروف."})
+    try:
+        CORPUS_SOURCES.save_upload(source_id, await file.read())
+    except Exception as exc:
+        return JSONResponse(status_code=400, content={"success": False, "message": f"الملف ليس zip صالحاً: {exc}"})
+    return JSONResponse({"success": True, "job_id": _start_corpus_prepare(source_id)})
 
 
 @app.get("/api/corpus/cache")
@@ -450,13 +528,85 @@ ACTIVE_TAFRIGH_SESSIONS: Dict[str, Dict[str, Any]] = {}
 GLOBAL_TRAINING_STORE = TrainingStore()
 
 
+@app.post("/api/tafrigh/models")
+def api_tafrigh_models(body: Dict[str, Any]) -> JSONResponse:
+    """Models this Gemini key can really call (so the UI never offers a name that 404s)."""
+    key = (body.get("gemini_api_key") or os.getenv("GEMINI_API_KEY", "")).strip()
+    if not key:
+        return JSONResponse({"success": False, "message": "أدخل مفتاح Gemini API أولاً."})
+    try:
+        names = list_gemini_models(key)
+    except GeminiAPIError as exc:
+        return JSONResponse({"success": False, "message": str(exc)})
+    return JSONResponse({"success": True, "models": sorted(names), "recommended": pick_model(names)})
+
+
+def _segmentation_config(raw: Optional[Dict[str, Any]]) -> "SegmentationConfig":
+    raw = raw or {}
+    allowed = {k: raw[k] for k in ("use_punctuation", "pause_sec", "min_words", "max_words") if k in raw}
+    return SegmentationConfig(**allowed)
+
+
+@app.post("/api/tafrigh/segment")
+def api_tafrigh_segment(body: Dict[str, Any]) -> JSONResponse:
+    """Preview: the exact sentences a run would classify (same segmenter, same settings), plus stats."""
+    raw_text = body.get("raw_text") or ""
+    cfg = _segmentation_config(body.get("seg_config"))
+    segs = segment_transcript(
+        raw_text=raw_text,
+        asr_words=body.get("asr_words"),
+        detection_spans=body.get("detection_spans"),
+        # each detected ayah / hadith / dhikr is its own sentence (never merged with commentary, never cut inside)
+        use_detection_boundaries=bool(body.get("use_detection_boundaries", True)),
+        config=cfg,
+    )
+    rows = []
+    for k, sg in enumerate(segs):
+        rows.append({
+            "index": k, "id": sg.id, "text": sg.original_text.strip(),
+            "words": len(sg.original_text.split()),
+            "start_time": sg.source_pos.start_time, "end_time": sg.source_pos.end_time,
+            "cut_reason": sg.cut_reason, "has_detection": bool(sg.detection_signals),
+            "quote_kinds": sorted({str(d.get("type") or "") for d in sg.detection_signals if d.get("type")}),
+        })
+    counts = sorted(r["words"] for r in rows) or [0]
+    reasons: Dict[str, int] = {}
+    for r in rows:
+        reasons[r["cut_reason"] or "end"] = reasons.get(r["cut_reason"] or "end", 0) + 1
+    durs = [r["end_time"] - r["start_time"] for r in rows if r["start_time"] is not None and r["end_time"] is not None]
+    stats = {
+        "sentences": len(rows),
+        "words_total": sum(counts) if rows else 0,
+        "min_words": counts[0], "max_words": counts[-1],
+        "avg_words": round(sum(counts) / max(1, len(rows)), 1),
+        "median_words": counts[len(counts) // 2],
+        "over_cap": sum(1 for c in counts if cfg.max_words and c > cfg.max_words),
+        "avg_duration_sec": round(sum(durs) / len(durs), 1) if durs else None,
+        "cut_reasons": reasons,
+        "quote_sentences": sum(1 for r in rows if r["has_detection"]),
+        "has_timestamps": any(r["start_time"] is not None for r in rows),
+    }
+    return JSONResponse({"success": True, "segments": rows, "stats": stats, "seg_config": cfg.model_dump()})
+
+
+@app.post("/api/tafrigh/control")
+def api_tafrigh_control(body: Dict[str, Any]) -> JSONResponse:
+    job_id = str(body.get("job_id") or "")
+    try:
+        state = set_control(job_id, str(body.get("action") or ""))
+    except ValueError as exc:
+        return JSONResponse(status_code=400, content={"success": False, "message": str(exc)})
+    return JSONResponse({"success": True, "state": state})
+
+
+# Plain `def`: FastAPI runs it in a worker thread so the progress endpoint stays responsive during the run.
 @app.post("/api/tafrigh/run")
-async def api_tafrigh_run(request: Request) -> JSONResponse:
+def api_tafrigh_run(body: Dict[str, Any]) -> JSONResponse:
     """
     Executes the 7-stage AI Tafrigh pipeline.
     Transforms raw ASR transcripts into faithfully structured output with versions and review queue.
     """
-    body = await request.json()
+    job_id = body.get("job_id")
     raw_text = body.get("raw_text")
     segments_raw = body.get("segments")
     asr_words = body.get("asr_words")
@@ -489,6 +639,7 @@ async def api_tafrigh_run(request: Request) -> JSONResponse:
         model_candidate=model_candidate,
         jev_layout=jev_layout,
         typo_strategy=typo_strategy,
+        use_detection_boundaries=bool(body.get("use_detection_boundaries", True)),
     )
 
     initial_segments = None
@@ -512,35 +663,104 @@ async def api_tafrigh_run(request: Request) -> JSONResponse:
 
     gemini_key = body.get("gemini_api_key") or body.get("api_key") or os.getenv("GEMINI_API_KEY", "")
     openrouter_key = body.get("openrouter_api_key") or os.getenv("JEV_API_KEY", "")
-    model_name = body.get("model_name") or "gemini-2.0-flash"
-    # Gemini adapter must always target a valid Gemini model, even when a
-    # non-Gemini model (JEV/OpenRouter or local Laya) is selected as primary.
-    gemini_model_name = model_name if str(model_name).startswith("gemini") else "gemini-2.0-flash"
+    model_name = body.get("model_name") or "auto"
+    # The Gemini adapter must always target a Gemini model, even when JEV/Laya is the primary classifier;
+    # "auto" resolves to the best Flash-Lite this key can actually call (see GeminiAdapter.resolve_model).
+    gemini_model_name = model_name if str(model_name).startswith("gemini") else "auto"
+
+    # Gemini calls (the classifier in Gemini mode; split points and typo fixes in JEV / Laya mode) go through
+    # OpenRouter by default when its key is present: Google's free tier rate-limits them into ~40 s retries.
+    gemini_route = body.get("gemini_route") or ("openrouter" if openrouter_key else "direct")
+    via_openrouter = gemini_route == "openrouter" and bool(openrouter_key)
+    or_gemini_model = (body.get("openrouter_gemini_model") or "").strip()
+    if not or_gemini_model and str(model_name).startswith("gemini"):
+        or_gemini_model = f"google/{model_name}"   # a specific Gemini model picked in the UI, same model via OpenRouter
 
     custom_adapters: Dict[str, Any] = {}
     custom_adapters["gemini"] = GeminiAdapter(
         api_key=gemini_key,
         model_name=gemini_model_name,
         typo_strategy=typo_strategy,
+        openrouter_api_key=openrouter_key if via_openrouter else None,
+        openrouter_model=or_gemini_model or None,
     )
     if openrouter_key:
         jev_cfg = JEVRequestConfig(
             jev_layout=jev_layout,
             execution_order=body.get("jev_execution_order", "parallel"),
         )
-        custom_adapters["jev"] = JEVAdapter(api_key=openrouter_key, config=jev_cfg)
+        jev_model = model_name if "jev" in str(model_name) else "typesafe/jev-1.14"
+        custom_adapters["jev"] = JEVAdapter(api_key=openrouter_key, config=jev_cfg, model=jev_model)
 
     logger = RunLogger(lecture_slug=lecture_slug, label=label)
     pipeline = TafrighPipeline(pipeline_config=pipeline_cfg, matn_config=matn_cfg, adapters=custom_adapters)
 
 
-    # Execute Stages 1 - 5
-    result = pipeline.run(
-        raw_text=raw_text,
-        initial_segments=initial_segments,
-        asr_words=asr_words,
-        detection_spans=detection_spans,
-    )
+    last_pct = {"v": 0.0}
+
+    def on_progress(done: int, total: int, msg: str, info: Optional[Dict[str, Any]] = None) -> None:
+        last_pct["v"] = max(last_pct["v"], min(99.0, 100 * done / max(1, total)))
+        set_progress(job_id, "tafrigh", last_pct["v"], msg, details=info)
+
+    pipeline.on_progress = on_progress
+    pipeline.control = lambda: get_control(job_id)
+    pipeline.segmentation_config = _segmentation_config(body.get("seg_config"))
+    target_range = body.get("target_range")
+    if isinstance(target_range, list) and len(target_range) == 2:
+        target_range = (int(target_range[0]), int(target_range[1]))
+    else:
+        target_range = None
+    set_progress(job_id, "tafrigh", 0, "جاري تقطيع النص ومطابقة المتن...")
+
+    # Execute Stages 1 - 5 in a worker thread so a stop / cancel can answer immediately, even while the
+    # worker is blocked on a slow model request (rate-limit backoff, retries).
+    outcome: Dict[str, Any] = {}
+
+    def _work() -> None:
+        try:
+            outcome["result"] = pipeline.run(
+                raw_text=raw_text,
+                initial_segments=initial_segments,
+                asr_words=asr_words,
+                detection_spans=detection_spans,
+                target_range=target_range,
+            )
+        except Exception as exc:  # re-raised / reported on the request thread below
+            outcome["error"] = exc
+
+    def _discard(message: str) -> JSONResponse:
+        """Nothing from this run is kept: drop its (still empty) run folder too."""
+        try:
+            logger.run_dir.rmdir()
+        except OSError:
+            pass
+        set_progress(job_id, "done", 100, message)
+        return JSONResponse({"success": False, "discarded": True, "message": message})
+
+    worker = threading.Thread(target=_work, name=f"tafrigh-{job_id}", daemon=True)
+    worker.start()
+    try:
+        while worker.is_alive():
+            worker.join(0.3)
+            control = get_control(job_id)
+            if control == "cancel":
+                pipeline.snapshot_result()  # halts the worker; nothing from this run is kept
+                return _discard("تم إلغاء التفريغ دون تطبيق أي تغيير")
+            if control == "stop" and worker.is_alive():
+                outcome["result"] = pipeline.snapshot_result()
+                break
+    finally:
+        clear_control(job_id)
+
+    if "error" in outcome and "result" not in outcome:
+        exc = outcome["error"]
+        if not isinstance(exc, (TafrighModelError, ModelAPIError)):
+            raise exc
+        set_progress(job_id, "error", None, str(exc))
+        return JSONResponse({"success": False, "message": redact_secrets(exc)})
+    result = outcome["result"]
+    if result is None or not result.segments:
+        return _discard("لم تكتمل أي جملة قبل الإيقاف")
 
     for req in result.request_logs:
         logger.log_request(req)
@@ -555,10 +775,12 @@ async def api_tafrigh_run(request: Request) -> JSONResponse:
     report_data = logger.finalize_run(result.run_manifest, result.segments)
 
     # Stage 7: Deterministic Rendering
-    rendered_md = render_to_markdown(result.segments, result.outline_state)
-    rendered_html = render_to_html(result.segments, result.outline_state)
+    qs = body.get("quote_style") or {}
+    render_cfg = RenderConfig(**{k: v for k, v in qs.items() if k in RenderConfig.model_fields and v is not None})
+    rendered_md = render_to_markdown(result.segments, result.outline_state, render_cfg)
+    rendered_html = render_to_html(result.segments, result.outline_state, render_cfg)
     rendered_json = render_to_structured_json(
-        result.segments, result.outline_state, result.lecture_spans
+        result.segments, result.outline_state, result.lecture_spans, render_cfg
     )
 
     run_id = result.run_manifest["run_id"]
@@ -569,10 +791,25 @@ async def api_tafrigh_run(request: Request) -> JSONResponse:
         "manager": review_manager,
         "logger": logger,
         "manifest": result.run_manifest,
+        "render_cfg": render_cfg,
+        "run_dir": str(logger.run_dir),
     }
+    _save_tafrigh_session(ACTIVE_TAFRIGH_SESSIONS[run_id])
+
+    set_progress(job_id, "done", 100, "اكتمل التفريغ الذكي")
+    warnings = []
+    if result.run_manifest.get("adapter_mode") == "offline_heuristic":
+        warnings.append("لم يُدخل مفتاح Gemini: تم التصنيف بقواعد نصية بسيطة وليس بنموذج ذكاء اصطناعي. أدخل المفتاح في إعدادات التدقيق للحصول على نتائج حقيقية.")
+    if result.run_manifest.get("cancelled"):
+        warnings.append(f"تم إيقاف التفريغ بطلب منك بعد معالجة {len(result.segments)} جملة؛ المعروض هو ما اكتمل فقط.")
+    errs = sum(1 for r in result.request_logs if r.get("error"))
+    if errs:
+        warnings.append(f"فشل {errs} طلب إلى النموذج وتم تعليم الجمل المتأثرة للمراجعة.")
 
     return JSONResponse({
         "success": True,
+        "warnings": warnings,
+        "cancelled": bool(result.run_manifest.get("cancelled")),
         "run_id": run_id,
         "markdown": rendered_md,
         "html": rendered_html,
@@ -580,6 +817,59 @@ async def api_tafrigh_run(request: Request) -> JSONResponse:
         "review_items": [item.model_dump() for item in review_manager.get_items()],
         "report": report_data,
     })
+
+
+SESSION_FILE = "session.json"
+
+
+def _save_tafrigh_session(session: Dict[str, Any]) -> None:
+    """Runs live in memory, and `run.sh` reloads the server on every backend change: keep a copy on disk."""
+    run_dir = session.get("run_dir")
+    if not run_dir:
+        return
+    payload = {
+        "run_id": session["manifest"].get("run_id"),
+        "manifest": session["manifest"],
+        "segments": [s.model_dump(mode="json") for s in session["segments"]],
+        "outline_state": session["outline_state"].model_dump(mode="json"),
+        "lecture_spans": [s.model_dump(mode="json") for s in session["lecture_spans"]],
+        "render_cfg": session["render_cfg"].model_dump(mode="json") if session.get("render_cfg") else None,
+        "saved": session.get("saved"),
+    }
+    try:
+        Path(run_dir, SESSION_FILE).write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
+    except OSError:
+        pass
+
+
+def _load_tafrigh_session(run_id: str) -> Optional[Dict[str, Any]]:
+    session = ACTIVE_TAFRIGH_SESSIONS.get(run_id)
+    if session:
+        return session
+    for base in (Path("runs"), Path(__file__).resolve().parent / "runs", PROJECT_ROOT / "runs"):
+        if not base.is_dir():
+            continue
+        for f in base.glob(f"*/{SESSION_FILE}"):
+            try:
+                data = json.loads(f.read_text(encoding="utf-8"))
+            except (OSError, ValueError):
+                continue
+            if data.get("run_id") != run_id:
+                continue
+            segments = [TranscriptSegment.model_validate(x) for x in data["segments"]]
+            session = {
+                "segments": segments,
+                "outline_state": OutlineState.model_validate(data["outline_state"]),
+                "lecture_spans": [LectureSpan.model_validate(x) for x in data["lecture_spans"]],
+                "manager": ReviewQueueManager(segments),
+                "manifest": data["manifest"],
+                "render_cfg": RenderConfig.model_validate(data["render_cfg"]) if data.get("render_cfg") else RenderConfig(),
+                "run_dir": str(f.parent),
+                "saved": data.get("saved"),
+            }
+            ACTIVE_TAFRIGH_SESSIONS[run_id] = session
+            return session
+    return None
 
 
 @app.post("/api/tafrigh/review-action")
@@ -593,9 +883,11 @@ async def api_tafrigh_review_action(request: Request) -> JSONResponse:
     segment_id = body.get("segment_id")
     action = body.get("action", "confirm")
 
-    session = ACTIVE_TAFRIGH_SESSIONS.get(run_id)
+    session = _load_tafrigh_session(run_id)
     if not session:
-        return JSONResponse(status_code=404, content={"error": True, "message": f"Run session '{run_id}' not found."})
+        return JSONResponse(status_code=404, content={
+            "error": True, "success": False,
+            "message": "تعذر العثور على جلسة التفريغ هذه (ربما من قبل التحديث الأخير). أعد تشغيل التفريغ لهذه الجمل."})
 
     manager: ReviewQueueManager = session["manager"]
     segments: List[TranscriptSegment] = session["segments"]
@@ -606,6 +898,8 @@ async def api_tafrigh_review_action(request: Request) -> JSONResponse:
     note = body.get("note")
 
     target_seg = None
+    if segment_id not in manager.segments_by_id:
+        return JSONResponse(status_code=404, content={"success": False, "message": "هذه الجملة غير موجودة في هذا التشغيل."})
     if action == "confirm":
         target_seg = manager.confirm_decision(segment_id, reviewer_id=reviewer_id, note=note)
     elif action == "correct":
@@ -626,44 +920,59 @@ async def api_tafrigh_review_action(request: Request) -> JSONResponse:
     elif action == "reject":
         target_seg = manager.reject_decision(segment_id, reviewer_id=reviewer_id, note=note)
 
-    # Append to canonical training store
-    if target_seg:
-        training_rec = CanonicalTrainingRecord(
-            run_id=run_id,
-            segment_id=target_seg.id,
-            original_text=target_seg.original_text,
-            source_pos=target_seg.source_pos.model_dump(),
-            context_shown={},
-            dynamic_choice_list=[],
-            validation_result={"is_valid": True},
-            final_accepted_decision={
-                "tag": target_seg.final_decision.tag.value if target_seg.final_decision else "paragraph",
-                "level": target_seg.final_decision.level if target_seg.final_decision else None,
-                "parent_id": target_seg.final_decision.parent_id if target_seg.final_decision else None,
-                "edits": [ed.model_dump() for ed in target_seg.versions[-1].edits] if target_seg.versions else [],
-            },
-            review_status={
-                "provenance": (
-                    target_seg.versions[-1].provenance.value
-                    if target_seg.versions
-                    else "human_confirmed"
-                ),
-                "review_action": action,
-                "reviewer_note": note,
-            },
-        )
-        GLOBAL_TRAINING_STORE.append_record(training_rec)
-
-    # Deterministic re-render
-    rendered_md = render_to_markdown(segments, outline_state)
-    rendered_html = render_to_html(segments, outline_state)
+    # Training data is written only by "Save run" (/api/tafrigh/save-run), for the sentences the user picks
+    # Deterministic re-render (and keep the on-disk copy in sync)
+    _save_tafrigh_session(session)
+    rendered_md = render_to_markdown(segments, outline_state, session.get("render_cfg"))
+    rendered_html = render_to_html(segments, outline_state, session.get("render_cfg"))
+    rendered_json = render_to_structured_json(segments, outline_state, lecture_spans, session.get("render_cfg"))
 
     return JSONResponse({
         "success": True,
         "segment_id": segment_id,
         "markdown": rendered_md,
         "html": rendered_html,
+        "structured_json": rendered_json,
         "review_items": [item.model_dump() for item in manager.get_items()],
+    })
+
+
+TAFRIGH_LAYA_DIR = PROJECT_ROOT / "data" / "training_store" / "tafrigh_runs"
+
+
+@app.post("/api/tafrigh/save-run")
+async def api_tafrigh_save_run(request: Request) -> JSONResponse:
+    """Save the chosen sentences of a run (with their current, possibly human-corrected labels) as Laya
+    fine-tuning examples. Re-saving a run rewrites its file, so examples are never duplicated."""
+    body = await request.json()
+    run_id = str(body.get("run_id") or "")
+    session = _load_tafrigh_session(run_id)
+    if not session:
+        return JSONResponse(status_code=404, content={"success": False, "message": "تعذر العثور على جلسة التفريغ هذه."})
+    segments: List[TranscriptSegment] = session["segments"]
+    known = {s.id for s in segments}
+    selected = [sid for sid in (body.get("segment_ids") or []) if sid in known]
+    if not selected:
+        return JSONResponse(status_code=400, content={"success": False, "message": "لم تُحدَّد أي جملة للحفظ."})
+
+    examples = build_laya_examples(run_id, segments, selected)
+    meta = {
+        "lecture_title": body.get("lecture_title") or None,
+        "model_candidate": (session.get("manifest") or {}).get("model_candidate"),
+        "note": body.get("note") or None,
+    }
+    path = save_laya_run(TAFRIGH_LAYA_DIR, run_id, examples, meta)
+    by_source: Dict[str, int] = {}
+    for ex in examples:
+        by_source[ex["label_source"]] = by_source.get(ex["label_source"], 0) + 1
+    session["saved"] = {"segment_ids": selected, "count": len(examples), "path": str(path)}
+    _save_tafrigh_session(session)
+    return JSONResponse({
+        "success": True,
+        "count": len(examples),
+        "sentences": len(selected),
+        "by_source": by_source,
+        "path": str(path.relative_to(PROJECT_ROOT)),
     })
 
 
@@ -708,6 +1017,16 @@ if (PROJECT_ROOT / "js").exists():
     app.mount("/js", StaticFiles(directory=str(PROJECT_ROOT / "js")), name="js")
 if (PROJECT_ROOT / "data").exists():
     app.mount("/data", StaticFiles(directory=str(PROJECT_ROOT / "data")), name="data")
+
+
+@app.middleware("http")
+async def no_cache_frontend_assets(request, call_next):
+    """Force revalidation of the frontend so edited JS/CSS/HTML is never served stale."""
+    response = await call_next(request)
+    path = request.url.path
+    if path == "/" or path.startswith(("/js/", "/css/")):
+        response.headers["Cache-Control"] = "no-cache"
+    return response
 
 
 @app.get("/")

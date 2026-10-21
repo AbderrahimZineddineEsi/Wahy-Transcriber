@@ -877,10 +877,58 @@ function convertFindingToSavedDhikr(findingIdx) {
   showToast("📿 تم تحويل المقتبس إلى ذكر وحفظه في قاعدة الأذكار!");
 }
 
+// The «matching references» of a finding. The engine only records the one it chose, so the list is created on
+// first use with that reference first; references added from the search are appended, never replacing it.
+function getFindingCandidates(det) {
+  if (!det) return [];
+  if (!Array.isArray(det.candidates)) {
+    const unit = activeMatcher?.units?.get(det.unitId);
+    det.candidates = unit
+      ? [{ unitId: unit.unitId, displayRef: unit.displayRef, text: unit.fullText, sourceType: unit.sourceType }]
+      : (det.displayRef ? [{ unitId: det.unitId || `MANUAL:${det.displayRef}`, displayRef: det.displayRef, text: det.canonicalText || "" }] : []);
+  }
+  return det.candidates;
+}
+
+function addReferenceToFinding(findingIdx, unitId, customRefText = "") {
+  const det = currentState.detections[findingIdx];
+  if (!det) return false;
+  const list = getFindingCandidates(det);
+  const unit = unitId ? activeMatcher?.units?.get(unitId) : null;
+  const id = unit ? unit.unitId : `MANUAL:${customRefText.trim()}`;
+  if (!unit && !customRefText.trim()) return false;
+  if (list.some(c => c.unitId === id)) {
+    showToast("ℹ️ هذا المرجع موجود بالفعل في المراجع المطابقة");
+    return false;
+  }
+  pushUndoSnapshot("إضافة مرجع إلى المراجع المطابقة");
+  list.push(unit
+    ? { unitId: unit.unitId, displayRef: unit.displayRef, text: unit.fullText, sourceType: unit.sourceType, addedManually: true }
+    : { unitId: id, displayRef: customRefText.trim(), text: "", addedManually: true });
+  showToast(`📚 أُضيف «${unit ? unit.displayRef : customRefText.trim()}» إلى المراجع المطابقة — المرجع المعتمد لم يتغير`);
+  if (typeof renderFindingInspector === "function") renderFindingInspector();
+  return true;
+}
+
+function removeReferenceFromFinding(findingIdx, unitId) {
+  const det = currentState.detections[findingIdx];
+  if (!det || unitId === det.unitId) return;
+  pushUndoSnapshot("حذف مرجع من المراجع المطابقة");
+  det.candidates = getFindingCandidates(det).filter(c => c.unitId !== unitId);
+  if (typeof renderFindingInspector === "function") renderFindingInspector();
+}
+
 function linkFindingToCorpusUnit(findingIdx, unitId, customRefText = "") {
   const det = currentState.detections[findingIdx];
   if (!det) return;
   pushUndoSnapshot("ربط المقتبس بمرجع من القاعدة");
+
+  getFindingCandidates(det);
+  // keep this reference's word edits so switching back restores them
+  const EDIT_FIELDS = ["canonicalText", "canonicalSegments", "qSegments", "qFullSegments", "refSelection", "snappedToCanonical"];
+  det.refEdits = det.refEdits || {};
+  if (det.unitId) det.refEdits[det.unitId] = Object.fromEntries(EDIT_FIELDS.map(k => [k, det[k]]));
+  const restored = unitId ? det.refEdits[unitId] : null;
 
   const unit = activeMatcher?.units?.get(unitId);
   if (unit) {
@@ -893,20 +941,25 @@ function linkFindingToCorpusUnit(findingIdx, unitId, customRefText = "") {
     det.confidence = 1.0;
 
     const rawTokens = tokenizeText(currentState.rawTranscript);
-    if (rawTokens.length && det.wordEndIdx < rawTokens.length) {
+    if (restored) {
+      Object.assign(det, restored);
+    } else if (rawTokens.length && det.wordEndIdx < rawTokens.length) {
       det.segments = [[det.wordStartIdx, det.wordEndIdx + 1]];
+      det.qFullSegments = undefined;
       recomputeCanonicalForDetection(det, rawTokens);
+      det.snappedToCanonical = false;
     } else {
       det.canonicalText = unit.fullText;
       det.canonicalSegments = [unit.fullText];
     }
   } else if (customRefText) {
+    det.unitId = unitId || det.unitId;
     det.displayRef = customRefText.trim();
     det.reference = customRefText.trim();
   }
 
   recalculateCaptionsFromCurrentFindings();
-  showToast(`🔗 تم ربط المقتبس بالمرجع: ${det.displayRef}`);
+  showToast(`🔗 تم ربط المقتبس بالمرجع: ${det.displayRef}${restored ? " — استُعيدت تعديلاتك السابقة عليه" : ""} (تعديلات المرجع السابق محفوظة إن عدت إليه)`);
 }
 
 function deleteFinding(findingIdx) {
@@ -1027,7 +1080,7 @@ function openCorpusSearchModalForSelection(categorySlug, editExistingFindingIdx 
     const d = currentState.detections[editExistingFindingIdx];
     initialQuery = d.matchedText || "";
     if (previewSpanEl) previewSpanEl.textContent = d.matchedText || "";
-    if (customRefInp) customRefInp.value = d.displayRef || "";
+    if (customRefInp) customRefInp.value = "";
   } else if (currentState.pendingSelectionSpan) {
     initialQuery = currentState.pendingSelectionSpan.text;
     if (previewSpanEl) previewSpanEl.textContent = currentState.pendingSelectionSpan.text;
@@ -1038,6 +1091,11 @@ function openCorpusSearchModalForSelection(categorySlug, editExistingFindingIdx 
 
   if (searchInp) {
     searchInp.value = initialQuery.split(/\s+/).slice(0, 6).join(" ");
+  }
+
+  const commitBtn = document.getElementById("btnCommitCustomRefModal");
+  if (commitBtn) {
+    commitBtn.textContent = editExistingFindingIdx >= 0 ? "➕ إضافة مرجع يدوي إلى المراجع المطابقة" : "✓ حفظ المرجع وتحديث الكابشن";
   }
 
   renderCorpusModalSearchResults();
@@ -1064,15 +1122,27 @@ function renderCorpusModalSearchResults() {
     return;
   }
 
+  const modal = document.getElementById("corpusSearchModal");
+  const editIdx = modal?.getAttribute("data-mode") === "edit" ? parseInt(modal.getAttribute("data-finding-idx") || "-1", 10) : -1;
+  const editDet = editIdx >= 0 ? currentState.detections[editIdx] : null;
+  const includedIds = new Set(editDet ? getFindingCandidates(editDet).map(c => c.unitId) : []);
+
   listEl.innerHTML = hits.map(u => {
+    const isApproved = editDet && editDet.unitId === u.unitId;
+    const isIncluded = includedIds.has(u.unitId);
     const badgeColor = u.sourceType === "QURAN"
       ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/40"
       : (u.sourceType === "HADITH" ? "bg-amber-500/20 text-amber-300 border-amber-500/40" : "bg-violet-500/20 text-violet-300 border-violet-500/40");
     return `
-      <div class="p-3 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-slate-800 hover:border-sky-500/50 transition cursor-pointer flex flex-col gap-1.5"
-           data-pick-unit-id="${escapeHtml(u.unitId)}">
+      <div class="p-3 rounded-xl border transition flex flex-col gap-1.5 ${isIncluded ? "bg-emerald-950/30 border-emerald-500/40 cursor-default" : "bg-slate-900/90 hover:bg-slate-800 border-slate-800 hover:border-sky-500/50 cursor-pointer"}"
+           data-pick-unit-id="${escapeHtml(u.unitId)}" ${isIncluded ? 'data-already-included="1"' : ""}>
         <div class="flex items-center justify-between gap-2">
-          <span class="px-2 py-0.5 rounded text-[11px] font-bold border ${badgeColor}">${escapeHtml(u.displayRef)}</span>
+          <span class="flex items-center gap-1.5">
+            <span class="px-2 py-0.5 rounded text-[11px] font-bold border ${badgeColor}">${escapeHtml(u.displayRef)}</span>
+            ${isApproved ? '<span class="px-1.5 py-0.5 rounded bg-emerald-600/30 text-emerald-200 text-[10px] font-bold">★ المرجع المعتمد</span>'
+              : (isIncluded ? '<span class="px-1.5 py-0.5 rounded bg-emerald-900/60 text-emerald-300 text-[10px] font-bold">✓ مضاف</span>'
+              : (editDet ? '<span class="px-1.5 py-0.5 rounded bg-sky-900/60 text-sky-300 text-[10px] font-bold">➕ إضافة</span>' : ""))}
+          </span>
           <span class="text-[11px] font-mono text-slate-400" dir="ltr">${escapeHtml(u.unitId)}</span>
         </div>
         <div class="text-xs text-slate-200 font-quran-text leading-relaxed">${escapeHtml(u.fullText.slice(0, 220))}${u.fullText.length > 220 ? "..." : ""}</div>
@@ -1082,6 +1152,10 @@ function renderCorpusModalSearchResults() {
 
   listEl.querySelectorAll("[data-pick-unit-id]").forEach(card => {
     card.addEventListener("click", () => {
+      if (card.hasAttribute("data-already-included")) {
+        showToast("ℹ️ هذا المرجع موجود بالفعل في المراجع المطابقة");
+        return;
+      }
       const uid = card.getAttribute("data-pick-unit-id");
       commitModalCorpusSelection(uid);
     });
@@ -1100,7 +1174,9 @@ function commitModalCorpusSelection(pickedUnitId = null) {
   const customRef = customRefInp ? customRefInp.value.trim() : "";
 
   if (mode === "edit" && editIdx >= 0) {
-    linkFindingToCorpusUnit(editIdx, pickedUnitId, customRef);
+    // Add to the matching references (the approved one stays); keep the dialog open to add more
+    if (addReferenceToFinding(editIdx, pickedUnitId, pickedUnitId ? "" : customRef)) renderCorpusModalSearchResults();
+    return;
   } else if (currentState.pendingSelectionSpan) {
     pushUndoSnapshot("إضافة مقتبس يدوي جديد");
     const { wordStartIdx, wordEndIdx } = currentState.pendingSelectionSpan;
@@ -1444,12 +1520,13 @@ function alignAndRetimeWords(oldWords, newWordsList) {
         };
       }
     } else {
+      // new words live inside the time the replaced words occupied (never before the span or after it)
       const tStart = oldStartIdx >= 0
         ? Number(oldWords[oldStartIdx].end)
-        : Math.max(0.0, Number(oldWords[0].start) - 0.35 * newGapLen);
+        : Number(oldWords[0].start);
       const tEnd = oldEndIdx < n
         ? Number(oldWords[oldEndIdx].start)
-        : (Number(oldWords[oldWords.length - 1].end) + 0.35 * newGapLen);
+        : Number(oldWords[oldWords.length - 1].end);
 
       const spanDuration = Math.max(0.08 * newGapLen, tEnd - tStart);
       const step = spanDuration / newGapLen;
@@ -1487,36 +1564,79 @@ function alignAndRetimeWords(oldWords, newWordsList) {
   return resultWords;
 }
 
+/**
+ * Replace words[startIdx..endIdx] (inclusive; endIdx = startIdx - 1 inserts before startIdx) with newText.
+ * - Words outside the span and their timings are untouched; unchanged words inside it keep their own timing
+ *   (alignment runs on the span only, so it stays cheap on hour-long lectures).
+ * - New words share the time window of the words they replace.
+ * - Quotations outside the span are kept as they are (indices shifted), with their manual edits and AI verdicts;
+ *   only the edited span is re-scanned by the engine.
+ */
+function replaceWordRange(startIdx, endIdx, newText, label = "تعديل نص المحاضرة") {
+  const words = currentState.words || [];
+  const s = Math.max(0, Math.min(words.length, startIdx));
+  const e = Math.max(s - 1, Math.min(words.length - 1, endIdx));
+  const oldSpan = words.slice(s, e + 1);
+  const newList = String(newText || "").split(/\s+/).filter(Boolean);
+  if (oldSpan.map(w => w.word).join(" ") === newList.join(" ")) return { changed: false };
+
+  pushUndoSnapshot(label);
+
+  let retimed;
+  if (!newList.length) {
+    retimed = [];
+  } else if (oldSpan.length) {
+    retimed = alignAndRetimeWords(oldSpan, newList);
+  } else {
+    // pure insertion: spread the new words over the silence between the neighbours
+    const t0 = s > 0 ? Number(words[s - 1].end) : 0;
+    const t1 = s < words.length ? Number(words[s].start) : t0 + 0.35 * newList.length;
+    const step = Math.max(0.04, (t1 - t0) / newList.length);
+    retimed = newList.map((w, k) => ({ word: w, start: +(t0 + k * step).toFixed(2), end: +(t0 + (k + 1) * step).toFixed(2) }));
+  }
+  const delta = retimed.length - oldSpan.length;
+  const newEnd = s + retimed.length - 1;             // last index of the edited span after the edit
+
+  // quotations: keep the ones outside the span (shifted), drop the ones that touched it
+  const kept = [];
+  let dropped = 0;
+  for (const d of currentState.detections || []) {
+    if (typeof d.wordStartIdx !== "number") continue;
+    if (d.wordEndIdx < s) kept.push(d);
+    else if (d.wordStartIdx > e) { d.wordStartIdx += delta; d.wordEndIdx += delta; kept.push(d); }
+    else dropped++;
+  }
+
+  words.splice(s, oldSpan.length, ...retimed.map(w => ({ ...w })));
+  currentState.words = words;
+  syncRawTextFromWords();
+
+  // re-scan only the edited span: run the engine on the new text, keep its hits that fall in the span
+  let added = 0;
+  if (retimed.length && activeMatcher) {
+    const lo = Math.max(0, s - 3), hi = Math.min(words.length - 1, newEnd + 3);
+    const fresh = mapDetectionsToWordTimestamps(activeMatcher.detect(currentState.rawTranscript), currentState.words, currentState.rawTranscript);
+    for (const d of fresh) {
+      if (d.wordEndIdx < lo || d.wordStartIdx > hi) continue;
+      if (kept.some(k => d.wordStartIdx <= k.wordEndIdx && k.wordStartIdx <= d.wordEndIdx)) continue;
+      kept.push(d);
+      added++;
+    }
+  }
+  kept.sort((x, y) => x.wordStartIdx - y.wordStartIdx);
+  kept.forEach((d, i) => { d.id = `finding_${i + 1}`; });
+  currentState.detections = kept;
+  recalculateCaptionsFromCurrentFindings();
+  return { changed: true, oldCount: oldSpan.length, newCount: retimed.length, dropped, added };
+}
+
 function updateSingleWordInLecture(wordIdx, newWordText) {
   if (wordIdx < 0 || wordIdx >= (currentState.words || []).length) return;
   const oldWord = currentState.words[wordIdx].word;
   const cleanWord = String(newWordText || "").trim();
   if (!cleanWord || cleanWord === oldWord) return;
-
-  pushUndoSnapshot("تعديل كلمة في نص المحاضرة");
-
-  const newWordsParts = cleanWord.split(/\s+/).filter(Boolean);
-  if (newWordsParts.length === 1) {
-    currentState.words[wordIdx].word = newWordsParts[0];
-  } else {
-    const origStart = currentState.words[wordIdx].start;
-    const origEnd = currentState.words[wordIdx].end;
-    const step = (origEnd - origStart) / newWordsParts.length;
-    const replacement = newWordsParts.map((w, idx) => ({
-      id: wordIdx + idx,
-      word: w,
-      start: Number((origStart + idx * step).toFixed(2)),
-      end: Number((origStart + (idx + 1) * step).toFixed(2)),
-      char_start: 0,
-      char_end: 0
-    }));
-    currentState.words.splice(wordIdx, 1, ...replacement);
-    currentState.words.forEach((w, i) => { w.id = i; });
-  }
-
-  syncRawTextFromWords();
-  runDetectionAndBuildCaptions();
-  showToast(`✅ تم تصحيح الكلمة (${oldWord} ➔ ${cleanWord}) وتحديث الكابشن تلقائياً`);
+  replaceWordRange(wordIdx, wordIdx, cleanWord, "تعديل كلمة في نص المحاضرة");
+  showToast(`✅ تم تصحيح الكلمة (${oldWord} ➔ ${cleanWord}) مع الحفاظ على التوقيت`);
 }
 
 function applyLectureTextEdits(newText) {
@@ -1525,19 +1645,69 @@ function applyLectureTextEdits(newText) {
     showToast("⚠️ نص المحاضرة فارغ.");
     return;
   }
+  // only the changed middle is re-timed: strip the unchanged words at both ends first
+  const oldW = (currentState.words || []).map(w => w.word);
+  const newW = clean.split(/\s+/).filter(Boolean);
+  let pre = 0;
+  while (pre < oldW.length && pre < newW.length && oldW[pre] === newW[pre]) pre++;
+  let suf = 0;
+  while (suf < oldW.length - pre && suf < newW.length - pre && oldW[oldW.length - 1 - suf] === newW[newW.length - 1 - suf]) suf++;
+  const res = replaceWordRange(pre, oldW.length - 1 - suf, newW.slice(pre, newW.length - suf).join(" "), "تعديل نص المحاضرة الكامل");
+  if (typeof switchEditorSubMode === "function") switchEditorSubMode("fn_studio");
+  if (!res.changed) { showToast("لم يتغير شيء في النص."); return; }
+  showToast(`✅ تم حفظ التعديل: ${res.oldCount} ➔ ${res.newCount} كلمة، مع الحفاظ على توقيت بقية المحاضرة`);
+}
 
-  pushUndoSnapshot("تعديل نص المحاضرة وتحديث الكابشن");
-  const newWordsList = clean.split(/\s+/).filter(Boolean);
-  const alignedWords = alignAndRetimeWords(currentState.words, newWordsList);
+/** Editor: rewrite the words selected in the lecture (opened from the floating selection toolbar). */
+function openSpanEditModal(startIdx, endIdx) {
+  const modal = document.getElementById("spanEditModal");
+  const words = currentState.words || [];
+  if (!modal || startIdx < 0 || endIdx < startIdx || endIdx >= words.length) return;
+  document.getElementById("floatingSelectionToolbar")?.classList.add("hidden");
+  const text = words.slice(startIdx, endIdx + 1).map(w => w.word).join(" ");
+  modal.dataset.start = String(startIdx);
+  modal.dataset.end = String(endIdx);
+  document.getElementById("spanEditOriginal").textContent = text;
+  document.getElementById("spanEditInfo").textContent =
+    `الكلمات ${startIdx + 1}–${endIdx + 1} (${endIdx - startIdx + 1} كلمة) • ` +
+    `\u2066${formatSecondsToShortTime(words[startIdx].start)} → ${formatSecondsToShortTime(words[endIdx].end)}\u2069`;  // LTR isolate: reads start → end in RTL text
+  const ta = document.getElementById("spanEditText");
+  ta.value = text;
+  modal.classList.remove("hidden");
+  modal.classList.add("flex");
+  setTimeout(() => ta.focus(), 30);
+}
 
-  currentState.words = alignedWords;
-  syncRawTextFromWords();
+function closeSpanEditModal() {
+  const modal = document.getElementById("spanEditModal");
+  modal?.classList.add("hidden");
+  modal?.classList.remove("flex");
+  const v = document.getElementById("wahyVideoPlayer");
+  if (v && v.__spanStop) { v.removeEventListener("timeupdate", v.__spanStop); v.__spanStop = null; }
+}
 
-  runDetectionAndBuildCaptions();
-  if (typeof switchEditorSubMode === "function") {
-    switchEditorSubMode("fn_studio");
-  }
-  showToast(`✅ تم حفظ تعديلات المحاضرة (${alignedWords.length} كلمة) مع الحفاظ على التوقيت اللحظي للكلمات!`);
+function playSelectedSpanAudio() {
+  const modal = document.getElementById("spanEditModal");
+  const v = document.getElementById("wahyVideoPlayer");
+  const words = currentState.words || [];
+  const s = parseInt(modal?.dataset.start || "-1", 10), e = parseInt(modal?.dataset.end || "-1", 10);
+  if (!v || !v.src || s < 0) { showToast("لا يوجد فيديو/صوت مرتبط بهذه المحاضرة."); return; }
+  const endT = Number(words[e].end) + 0.3;
+  if (v.__spanStop) v.removeEventListener("timeupdate", v.__spanStop);
+  v.__spanStop = () => { if (v.currentTime >= endT) { v.pause(); v.removeEventListener("timeupdate", v.__spanStop); v.__spanStop = null; } };
+  v.addEventListener("timeupdate", v.__spanStop);
+  v.currentTime = Math.max(0, Number(words[s].start) - 0.2);
+  v.play().catch(() => {});
+}
+
+function applySpanEditModal() {
+  const modal = document.getElementById("spanEditModal");
+  const s = parseInt(modal.dataset.start, 10), e = parseInt(modal.dataset.end, 10);
+  const res = replaceWordRange(s, e, document.getElementById("spanEditText").value, "تعديل مقطع من نص المحاضرة");
+  closeSpanEditModal();
+  if (!res.changed) { showToast("لم يتغير شيء."); return; }
+  const extra = res.dropped || res.added ? ` • مقتبسات: حُذف ${res.dropped}، أُضيف ${res.added}` : "";
+  showToast(`✅ تم التعديل: ${res.oldCount} ➔ ${res.newCount} كلمة، والتوقيت محفوظ لبقية المحاضرة${extra}`);
 }
 
 function toggleLectureEditMode(forceState = null) {
@@ -1589,23 +1759,72 @@ window.WahyEditor = {
 // Module 12: Reference Word Substitution & Deletion Intent Telemetry
 // =============================================================================
 
-function applyReferenceWordsToTranscript(det, selectedWordIndices) {
+/**
+ * Where a hadith's matn (the words the engine compares) sits inside its full text (with the chain of narration
+ * before it and the takhrij after it). null when the unit is not a hadith or the matn can't be located: callers
+ * then show the matn only. Cached on the unit (units are rebuilt with the matcher).
+ */
+function getUnitFullWordView(unit) {
+  if (!unit) return null;
+  if (unit._fullView !== undefined) return unit._fullView;
+  let view = null;
+  const matn = unit.vocalizedWords || [];
+  if (unit.sourceType === "HADITH" && unit.fullText && matn.length && typeof tokenizeText === "function") {
+    const expanded = typeof expandHonorificLigatures === "function" ? expandHonorificLigatures(unit.fullText) : unit.fullText;
+    const full = tokenizeText(expanded);
+    const norm = w => (typeof normalizeArabic === "function" ? normalizeArabic(w) : w);
+    const mNorm = matn.map(norm);
+    const probe = Math.min(4, mNorm.length);
+    for (let k = 0; k + probe <= full.length; k++) {
+      let ok = true;
+      for (let i = 0; i < probe; i++) {
+        if (full[k + i].norm !== mNorm[i]) { ok = false; break; }
+      }
+      if (ok) {
+        view = { words: full.map(t => t.raw), norms: full.map(t => t.norm), matnStart: k, matnEnd: Math.min(full.length, k + mNorm.length) };
+        break;
+      }
+    }
+    if (view && view.matnStart === 0 && view.matnEnd >= view.words.length) view = null; // nothing outside the matn
+  }
+  unit._fullView = view;
+  return view;
+}
+
+/** The full hadith text shaped like a unit, so alignTranscriptSegToUnit can match spoken words against it. */
+function fullTextAlignmentUnit(unit, view) {
+  return { sourceType: unit.sourceType, unitId: unit.unitId, normWords: view.norms, vocalizedWords: view.words };
+}
+
+/**
+ * Use the chosen reference words as the quote's canonical text.
+ * selectedWordIndices index `wordsOverride` when given (the full hadith, see getUnitFullWordView), otherwise the
+ * unit's matn words; `matnOffset` maps them back to matn positions for qSegments.
+ */
+function applyReferenceWordsToTranscript(det, selectedWordIndices, wordsOverride = null, matnOffset = 0) {
   if (!det || !Array.isArray(selectedWordIndices) || !selectedWordIndices.length) return;
   pushUndoSnapshot("تطبيق كلمات المرجع على النص");
 
   const unit = (typeof activeMatcher === "object" && activeMatcher?.units && det.unitId)
     ? activeMatcher.units.get(det.unitId)
     : null;
-  const words = unit ? (unit.vocalizedWords || unit.fullText.split(/\s+/)) : (det.canonicalText || "").split(/\s+/);
-  const chosenWords = selectedWordIndices.map(i => words[i]).filter(Boolean);
+  const matnWords = unit ? (unit.vocalizedWords || unit.fullText.split(/\s+/)) : (det.canonicalText || "").split(/\s+/);
+  const words = wordsOverride || matnWords;
+  const sorted = [...selectedWordIndices].sort((a, b) => a - b);
+  const chosenWords = sorted.map(i => words[i]).filter(Boolean);
   if (!chosenWords.length) return;
 
   const newSpanText = chosenWords.join(" ");
   det.canonicalText = newSpanText;
   det.canonicalSegments = [newSpanText];
 
-  const sorted = [...selectedWordIndices].sort((a, b) => a - b);
-  det.qSegments = [[sorted[0], sorted[sorted.length - 1] + 1]];
+  // qSegments live in matn positions: words chosen from the chain of narration / takhrij are clamped to the matn edges
+  const qs = Math.max(0, Math.min(matnWords.length, sorted[0] - matnOffset));
+  const qe = Math.max(0, Math.min(matnWords.length, sorted[sorted.length - 1] - matnOffset + 1));
+  if (qe > qs) det.qSegments = [[qs, qe]];
+  // exact choice, in the positions of the words the grid shows (full hadith when wordsOverride is given)
+  det.refSelection = { unitId: det.unitId, full: Boolean(wordsOverride), indices: sorted };
+  if (wordsOverride) det.qFullSegments = [[sorted[0], sorted[sorted.length - 1] + 1]];
   det.snappedToCanonical = true;
 
   recalculateCaptionsFromCurrentFindings();

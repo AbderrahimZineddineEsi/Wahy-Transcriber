@@ -23,6 +23,8 @@ import uuid
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+from progress import set_progress
+
 try:
     import yt_dlp  # type: ignore
 except ImportError:
@@ -103,7 +105,30 @@ def get_cached_youtube_media(youtube_url: str) -> Optional[Dict[str, Any]]:
             pass
     return None
 
-def download_youtube_media(youtube_url: str, session_id: Optional[str] = None) -> Dict[str, Any]:
+def _make_download_hook(job_id: Optional[str]):
+    """yt-dlp downloads video and audio as separate files: map them onto one 0-100 bar."""
+    seen = {"files": 0, "last": None}
+
+    def hook(d: Dict[str, Any]) -> None:
+        name = d.get("filename")
+        if name != seen["last"]:
+            seen["last"] = name
+            seen["files"] += 1
+        if d.get("status") == "downloading":
+            total = d.get("total_bytes") or d.get("total_bytes_estimate") or 0
+            frac = (d.get("downloaded_bytes") or 0) / total if total else 0.0
+            # first file (video) = 0-80%, second (audio) = 80-100%
+            pct = frac * 80 if seen["files"] <= 1 else 80 + frac * 20
+            speed = d.get("speed")
+            extra = f" — {speed / 1048576:.1f} MB/s" if speed else ""
+            set_progress(job_id, "download", pct, f"جاري تحميل الفيديو {int(pct)}%{extra}")
+        elif d.get("status") == "finished" and seen["files"] >= 2:
+            set_progress(job_id, "download", 100, "اكتمل التحميل")
+
+    return hook
+
+
+def download_youtube_media(youtube_url: str, session_id: Optional[str] = None, job_id: Optional[str] = None) -> Dict[str, Any]:
     """
     Download best MP4 video up to 720p for local playback in the UI player,
     using the yt_dlp Python library directly for rich exception capture.
@@ -115,6 +140,7 @@ def download_youtube_media(youtube_url: str, session_id: Optional[str] = None) -
 
     cached = get_cached_youtube_media(youtube_url)
     if cached is not None:
+        set_progress(job_id, "download", 100, "الفيديو محمّل مسبقاً (من الذاكرة المؤقتة)")
         return cached
 
     sid = session_id or uuid.uuid4().hex[:10]
@@ -127,6 +153,7 @@ def download_youtube_media(youtube_url: str, session_id: Optional[str] = None) -
         "noplaylist": True,
         "quiet": True,
         "no_warnings": True,
+        "progress_hooks": [_make_download_hook(job_id)],
     }
 
     try:

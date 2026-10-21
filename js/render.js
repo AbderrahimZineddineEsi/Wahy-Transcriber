@@ -133,6 +133,7 @@ function buildLectureHtmlContent(isEditorMode = false) {
   const searchQ = (currentState.lectureSearchQuery || "").trim();
   const prefs = getOutputDisplayPrefs();
 
+  const groupRefMap = typeof buildAyahGroupRefMap === "function" ? buildAyahGroupRefMap(currentState.detections, prefs) : new Map();
   const findingStartMap = new Map();
   (currentState.detections || []).forEach((det, dIdx) => {
     if (typeof det.wordStartIdx === "number") {
@@ -224,9 +225,28 @@ function buildLectureHtmlContent(isEditorMode = false) {
         }
       }
 
+      // Which text a quote shows. Display: the reference text once snapped to it. Editor: the spoken words, unless
+      // a toggle asks for the reference text («الرسم القياسي») or the whole source («المتن كاملاً»), or the user
+      // applied reference words to this quote (shown, so the edit is visible where it was made).
+      let shownText = null;
+      let shownTitle = "";
+      if (isEditorMode) {
+        const unitForFull = currentState.editorViewFullCanonicalSpan && activeMatcher?.units ? activeMatcher.units.get(det.unitId) : null;
+        if (currentState.editorViewFullCanonicalSpan && (unitForFull?.fullText || det.canonicalText)) {
+          shownText = unitForFull?.fullText || det.canonicalText;
+          shownTitle = "المتن كاملاً من المصدر";
+        } else if ((currentState.editorViewRasmQiyasi || det.snappedToCanonical) && det.canonicalText) {
+          shownText = det.canonicalText;
+          shownTitle = det.snappedToCanonical ? "نص المرجع المطبَّق على هذا المقتبس" : "الرسم القياسي";
+        }
+      } else if (det.snappedToCanonical && det.canonicalText) {
+        shownText = det.canonicalText;
+      }
+
       let innerWordsHtml = "";
-      if (!isEditorMode && det.snappedToCanonical && det.canonicalText) {
-        innerWordsHtml = `<span class="font-bold">${escapeHtml(det.canonicalText)}</span>`;
+      if (shownText) {
+        innerWordsHtml = `<span class="font-bold${isEditorMode ? " editor-canonical-text" : ""}"${shownTitle ? ` title="${escapeHtml(shownTitle)}"` : ""}>${escapeHtml(shownText)}</span>`
+          + (isEditorMode && det.snappedToCanonical && !currentState.editorViewFullCanonicalSpan ? ' <span class="text-[10px] align-super text-sky-300" title="نص المرجع المطبَّق على هذا المقتبس">✨</span>' : "");
       } else {
         const spanWordHtmls = [];
         for (let k = i; k <= endW; k++) {
@@ -244,7 +264,7 @@ function buildLectureHtmlContent(isEditorMode = false) {
         innerWordsHtml = spanWordHtmls.join(" ");
       }
 
-      const refText = det.displayRef || det.reference || "";
+      const refText = groupRefMap.has(det) ? groupRefMap.get(det) : (det.displayRef || det.reference || "");
       const showBadge = (fType === "ayah" && prefs.showQuranSource !== false) ||
                         (fType === "hadith" && prefs.showHadithSource !== false) ||
                         (fType === "dhikr" && prefs.showAdhkarTag !== false);
@@ -318,6 +338,7 @@ function renderFormattedLectureView() {
         seekToMediaTimestamp(det.startTime, false);
       }
       selectFindingForEdit(fIdx, false);
+      showDisplayFindingPopover(fIdx, citEl);
     });
   });
 
@@ -342,6 +363,109 @@ function renderFormattedLectureView() {
   if (currentState.activeSection === "editor") {
     renderEditorLectureStage();
   }
+}
+
+/**
+ * Floating popover shown when clicking a finding in the Display section.
+ * Lives on <body> so lecture re-renders don't destroy it.
+ */
+function showDisplayFindingPopover(findingIdx, anchorEl) {
+  const det = currentState.detections[findingIdx];
+  if (!det || !anchorEl) return;
+
+  let pop = document.getElementById("displayFindingPopover");
+  if (!pop) {
+    pop = document.createElement("div");
+    pop.id = "displayFindingPopover";
+    pop.className = "fixed z-40 w-72 rounded-xl bg-slate-900/95 border border-slate-700 shadow-2xl p-3 space-y-2 text-xs font-arabic-ui";
+    pop.setAttribute("dir", "rtl");
+    document.body.appendChild(pop);
+
+    document.addEventListener("click", (e) => {
+      if (!pop.contains(e.target) && !e.target.closest("[data-finding-idx]")) pop.classList.add("hidden");
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") pop.classList.add("hidden");
+    });
+    window.addEventListener("scroll", () => pop.classList.add("hidden"), true);
+  }
+
+  const ai = det.aiVerification || {};
+  let aiBadge = '<span class="px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 text-[10px]">⚪ غير مفحوص</span>';
+  if (ai.status === "VERIFIED") {
+    aiBadge = ai.verdict === "CORRECT"
+      ? '<span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-bold">🟢 مقبول</span>'
+      : (ai.verdict === "FALSE"
+          ? '<span class="px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 text-[10px] font-bold">🔴 مستبعد</span>'
+          : '<span class="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-[10px] font-bold">🟡 غير متأكد</span>');
+  } else if (ai.status === "PENDING") {
+    aiBadge = '<span class="px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-300 text-[10px] font-bold animate-pulse">⏳ قيد الفحص</span>';
+  } else if (ai.status === "ERROR") {
+    aiBadge = '<span class="px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 text-[10px] font-bold">⚠️ خطأ</span>';
+  }
+
+  pop.innerHTML = `
+    <div class="flex items-start justify-between gap-2">
+      <div class="overflow-hidden">
+        <div class="font-bold text-emerald-300 truncate">${escapeHtml(det.displayRef || det.reference || "مقتبس")}</div>
+        <div class="font-mono text-[10px] text-slate-500" dir="ltr">${formatSecondsToShortTime(det.startTime)} → ${formatSecondsToShortTime(det.endTime)}</div>
+      </div>
+      ${aiBadge}
+    </div>
+    <div class="grid grid-cols-2 gap-1.5 pt-1">
+      <button type="button" data-pop-action="play" class="px-2 py-1.5 rounded-lg bg-sky-600/20 hover:bg-sky-600/35 text-sky-300 border border-sky-500/40 font-bold transition">▶ استماع</button>
+      <button type="button" data-pop-action="edit" class="px-2 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold transition">✏️ فتح في المحرر</button>
+    </div>
+  `;
+
+  pop.querySelector('[data-pop-action="play"]').addEventListener("click", () => {
+    seekToMediaTimestamp(det.startTime || 0, true);
+  });
+  pop.querySelector('[data-pop-action="edit"]').addEventListener("click", () => {
+    pop.classList.add("hidden");
+    openFindingInEditor(findingIdx);
+  });
+
+  // Position below the citation, clamped to viewport
+  pop.classList.remove("hidden");
+  const r = anchorEl.getBoundingClientRect();
+  const popW = pop.offsetWidth;
+  const popH = pop.offsetHeight;
+  let left = r.left + r.width / 2 - popW / 2;
+  left = Math.max(8, Math.min(left, window.innerWidth - popW - 8));
+  let top = r.bottom + 6;
+  if (top + popH > window.innerHeight - 8) top = Math.max(8, r.top - popH - 6);
+  pop.style.left = `${left}px`;
+  pop.style.top = `${top}px`;
+}
+
+/**
+ * Jump to the Display screen at the given finding: synced-text tab, scrolled to it, highlighted, media at its time.
+ */
+function openFindingInDisplay(findingIdx) {
+  const det = currentState.detections[findingIdx];
+  switchMainSection("display");
+  if (typeof switchLectureStageTab === "function") switchLectureStageTab("sync");
+  if (!det) return;
+  currentState.selectedPredIndex = findingIdx;
+  if (typeof det.startTime === "number") seekToMediaTimestamp(det.startTime, false);
+  const el = document.querySelector(`#formattedLectureStage [data-finding-idx="${findingIdx}"]`);
+  if (!el) return;
+  highlightSelectedFindingInDOM(findingIdx);
+  el.scrollIntoView({ behavior: "smooth", block: "center" });
+  el.classList.add("ring-2", "ring-sky-400");
+  setTimeout(() => el.classList.remove("ring-2", "ring-sky-400"), 2200);
+}
+
+/**
+ * Jump to the Smart Editor (FN Studio pane) with the given finding open in the Inspector.
+ */
+function openFindingInEditor(findingIdx) {
+  switchMainSection("editor");
+  switchEditorSubMode("fn_studio");
+  selectFindingForEdit(findingIdx, false);
+  const citEl = document.querySelector(`#editorLectureStage [data-finding-idx="${findingIdx}"]`);
+  if (citEl) citEl.scrollIntoView({ behavior: "smooth", block: "center" });
 }
 
 /**
@@ -474,30 +598,54 @@ function renderFindingInspector() {
     });
   }
 
+  // Hadith: show the whole text (chain of narration + matn + takhrij); the engine only compares the matn,
+  // so the words around it are dimmed but still selectable. Chip indices are positions in `chipWords`.
+  const fullView = typeof getUnitFullWordView === "function" ? getUnitFullWordView(unit) : null;
+  const chipWords = fullView ? fullView.words : unitWords;
+  const matnOffset = fullView ? fullView.matnStart : 0;
+  // what is selected: the exact words applied by hand, else the aligned span in the full text, else the matn span
+  let selectedChips;
+  if (det.refSelection && det.refSelection.unitId === det.unitId && det.refSelection.full === Boolean(fullView)) {
+    selectedChips = new Set(det.refSelection.indices);
+  } else if (fullView && Array.isArray(det.qFullSegments)) {
+    selectedChips = new Set();
+    det.qFullSegments.forEach(([a, b]) => { for (let i = a; i < b; i++) selectedChips.add(i); });
+  } else {
+    selectedChips = new Set([...activeUnitIndices].map(i => i + matnOffset));
+  }
+
   let chipHtml = "";
-  if (unitWords && unitWords.length) {
-    chipHtml = unitWords.map((word, wIdx) => {
-      const isMatched = activeUnitIndices.has(wIdx);
-      const chipClass = isMatched ? "matched" : "unmatched";
-      return `<span class="ref-word-chip ${chipClass}" data-ref-word-idx="${wIdx}" title="انقر لتحديد أو استبعاد هذه الكلمة">${escapeHtml(word)}</span>`;
+  if (chipWords && chipWords.length) {
+    chipHtml = chipWords.map((word, wIdx) => {
+      const outside = fullView && (wIdx < fullView.matnStart || wIdx >= fullView.matnEnd);
+      const chipClass = (selectedChips.has(wIdx) ? "matched" : "unmatched") + (outside ? " outside-matn" : "");
+      const title = outside ? "خارج المتن (سند أو تخريج): لا يقارنه المحرك حالياً، ويمكنك اختياره يدوياً" : "انقر لتحديد أو استبعاد هذه الكلمة";
+      return `<span class="ref-word-chip ${chipClass}" data-ref-word-idx="${wIdx}" title="${title}">${escapeHtml(word)}</span>`;
     }).join("");
   }
 
-  // Multi-candidates accordion items
-  const candidates = Array.isArray(det.candidates) ? det.candidates : (unit ? [{ unitId: unit.unitId, displayRef: unit.displayRef, text: unit.fullText, score: det.totalScore || 90 }] : []);
+  // Multi-candidates accordion items: the approved reference first, then the ones added from the search
+  const candidates = typeof getFindingCandidates === "function" ? getFindingCandidates(det)
+    : (unit ? [{ unitId: unit.unitId, displayRef: unit.displayRef, text: unit.fullText }] : []);
   let candidatesHtml = "";
   if (candidates.length > 0) {
-    candidatesHtml = candidates.map(c => `
-      <div class="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-sky-500/50 flex items-center justify-between gap-2 transition" data-set-cand-id="${escapeHtml(c.unitId)}">
-        <div class="overflow-hidden">
-          <div class="font-bold text-xs text-sky-200">${escapeHtml(c.displayRef || c.reference || "مرجع بديل")}</div>
-          <div class="text-[11px] text-slate-400 font-quran-text truncate max-w-xs">${escapeHtml(c.text || c.fullText || "")}</div>
+    candidatesHtml = candidates.map(c => {
+      const approved = c.unitId === det.unitId;
+      return `
+      <div class="p-2.5 rounded-xl border flex items-center justify-between gap-2 transition ${approved ? "bg-emerald-950/30 border-emerald-500/40" : "bg-slate-900/90 border-slate-800 hover:border-sky-500/50"}" data-set-cand-id="${escapeHtml(c.unitId)}">
+        <div class="overflow-hidden flex-1 min-w-0">
+          <div class="font-bold text-xs text-sky-200">${escapeHtml(c.displayRef || c.reference || "مرجع بديل")}${c.addedManually ? ' <span class="text-[10px] text-slate-400 font-normal">(أضفته يدوياً)</span>' : ""}${det.refEdits?.[c.unitId] && c.unitId !== det.unitId ? ' <span class="text-[10px] text-sky-300 font-normal" title="لديك تعديلات محفوظة على هذا المرجع">✨ له تعديلات محفوظة</span>' : ""}</div>
+          <div class="cand-text text-[11px] text-slate-400 font-quran-text truncate max-w-xs">${escapeHtml(c.text || c.fullText || "")}</div>
+          ${(c.text || c.fullText) ? '<button type="button" class="btnExpandCandidateRef text-[10px] text-sky-300 hover:text-sky-200 underline">👁 عرض النص كاملاً</button>' : ""}
         </div>
-        <button type="button" class="btnPickCandidateRef px-2.5 py-1 rounded-lg bg-emerald-600/30 hover:bg-emerald-600 text-emerald-200 border border-emerald-500/40 text-[11px] font-bold shrink-0 transition" data-unit-id="${escapeHtml(c.unitId)}">
-          ✓ اعتماد هذا المرجع
-        </button>
-      </div>
-    `).join("");
+        ${approved
+          ? '<span class="px-2.5 py-1 rounded-lg bg-emerald-600/30 text-emerald-200 text-[11px] font-bold shrink-0">★ المرجع المعتمد</span>'
+          : `<span class="flex items-center gap-1 shrink-0">
+               <button type="button" class="btnPickCandidateRef px-2.5 py-1 rounded-lg bg-emerald-600/30 hover:bg-emerald-600 text-emerald-200 border border-emerald-500/40 text-[11px] font-bold transition" data-unit-id="${escapeHtml(c.unitId)}" data-ref-label="${escapeHtml(c.displayRef || "")}">✓ اعتماد هذا المرجع</button>
+               ${c.addedManually ? `<button type="button" class="btnRemoveCandidateRef px-2 py-1 rounded-lg bg-slate-800 hover:bg-rose-900/60 text-slate-400 hover:text-rose-200 text-[11px]" data-unit-id="${escapeHtml(c.unitId)}" title="إزالة من المراجع المطابقة">✕</button>` : ""}
+             </span>`}
+      </div>`;
+    }).join("");
   }
 
   panel.innerHTML = `
@@ -511,6 +659,9 @@ function renderFindingInspector() {
           <button type="button" data-set-cat="dhikr" class="px-2.5 py-1 rounded-lg font-bold border transition ${fType === "dhikr" ? "bg-violet-600 text-white border-violet-400 shadow-sm" : "bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700"}">ذكر</button>
         </div>
         <div class="flex items-center gap-1.5">
+          <button type="button" id="btnInspectorShowInDisplay" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-bold transition flex items-center gap-1" title="الانتقال إلى شاشة العرض عند هذا المقتبس">
+            🎬 عرض في شاشة العرض
+          </button>
           <button type="button" id="btnInspectorPlayQuote" class="px-2.5 py-1 rounded-lg bg-sky-600/20 hover:bg-sky-600/35 text-sky-300 border border-sky-500/40 font-bold transition flex items-center gap-1" title="الاستماع لتوقيت هذا المقتبس">
             ▶ استماع
           </button>
@@ -556,7 +707,7 @@ function renderFindingInspector() {
         <!-- Collapsible Candidate References Accordion -->
         <div id="inspectorAllCandidatesAccordion" class="hidden rounded-xl bg-slate-900 border border-slate-800 p-2.5 space-y-2">
           <div class="text-[11px] font-bold text-slate-300">المراجع البديلة المكتشفة في القاعدة:</div>
-          <div class="space-y-1.5 max-h-48 overflow-y-auto pr-1">
+          <div class="space-y-1.5 max-h-96 overflow-y-auto pr-1">
             ${candidatesHtml || '<div class="text-slate-500 text-center py-2">لا توجد مراجع بديلة مسجلة لهذا الموضع.</div>'}
           </div>
         </div>
@@ -566,10 +717,10 @@ function renderFindingInspector() {
           <div class="flex items-center justify-between text-[11px] text-slate-300">
             <span class="font-bold flex items-center gap-1">
               <span>📖</span>
-              <span>المتن الكامل للمرجع (حدد الكلمات المراد استبدالها أو تضمينها بالدرس):</span>
+              <span>${fullView ? "النص الكامل للحديث مع السند (حدد الكلمات المراد تضمينها بالدرس):" : "المتن الكامل للمرجع (حدد الكلمات المراد استبدالها أو تضمينها بالدرس):"}</span>
             </span>
             <span class="px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-400 font-mono text-[10px] font-bold">
-              تطابق: ${activeUnitIndices.size} / ${unitWords.length} كلمة
+              تطابق: ${selectedChips.size} / ${chipWords.length} كلمة
             </span>
           </div>
 
@@ -577,6 +728,7 @@ function renderFindingInspector() {
             ${chipHtml || '<div class="text-slate-400 p-2">لا يتوفر متن كامل مسجل لهذا المرجع.</div>'}
           </div>
 
+          ${fullView ? `<div class="text-[10px] text-slate-400"><span class="ref-word-chip unmatched outside-matn">…</span> <span>الكلمات الباهتة سند أو تخريج خارج المتن الذي يقارنه المحرك؛ يمكنك اختيارها يدوياً.</span></div>` : ""}
           <div class="flex items-center justify-between pt-2 border-t border-slate-800/80">
             <div class="text-[10px] text-slate-400">يمكنك اختيار أي كلمات من المتن حتى لو لم تكن في النص المنطوق.</div>
             <button type="button" id="btnApplyCustomRefSpan" class="px-3 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow transition">
@@ -636,8 +788,18 @@ function renderFindingInspector() {
                 : (det.aiVerification.verdict === "FALSE"
                     ? '<span class="px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 text-[10px] font-bold">🔴 مستبعد / كلام عادي</span>'
                     : '<span class="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-[10px] font-bold">🟡 غير متأكد</span>'))
-            : '<span class="px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 text-[10px]">⚪ غير مفحوص بعد</span>'}
+            : (det.aiVerification?.status === "PENDING"
+                ? '<span class="px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-300 text-[10px] font-bold animate-pulse">⏳ قيد الفحص...</span>'
+                : (det.aiVerification?.status === "ERROR"
+                    ? '<span class="px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 text-[10px] font-bold">⚠️ فشل الفحص</span>'
+                    : '<span class="px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 text-[10px]">⚪ غير مفحوص بعد</span>'))}
         </div>
+
+        ${det.aiVerification?.status === "ERROR" && det.aiVerification.reason ? `
+          <div class="p-2 rounded-lg bg-rose-950/40 border border-rose-500/30 text-[11px] text-rose-200 leading-relaxed">
+            ${escapeHtml(det.aiVerification.reason)}
+          </div>
+        ` : ""}
 
         ${det.aiVerification?.status === "VERIFIED" ? `
           <div class="p-2.5 rounded-lg bg-slate-900 border border-slate-800 text-xs space-y-1.5">
@@ -652,6 +814,18 @@ function renderFindingInspector() {
             ` : ""}
           </div>
         ` : ""}
+
+        <!-- Run / Re-run AI verification on this finding only, ⚙️ opens model & prompt options -->
+        <div class="flex items-stretch gap-1.5">
+        <button type="button" id="btnInspectorRunAiVerification" ${det.aiVerification?.status === "PENDING" ? "disabled" : ""} class="flex-1 px-3 py-1.5 rounded-xl bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 text-white text-xs font-bold shadow-md transition flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed">
+          ${det.aiVerification?.status === "PENDING"
+            ? "<span>⏳</span><span>جاري التدقيق...</span>"
+            : (det.aiVerification?.status === "VERIFIED" || det.aiVerification?.status === "ERROR"
+                ? "<span>🔁</span><span>إعادة التدقيق الذكي لهذا المقتبس</span>"
+                : "<span>🤖</span><span>تطبيق التدقيق الذكي على هذا المقتبس</span>")}
+        </button>
+        <button type="button" id="btnInspectorAiOptions" class="px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-sm transition" title="خيارات الطلب: النموذج والموجّه">⚙️</button>
+        </div>
 
         <!-- Deep Link to Tab 5 (AI & Logs) -->
         <div class="flex items-center justify-between gap-2 pt-1">
@@ -692,6 +866,7 @@ function renderFindingInspector() {
     });
   });
 
+  panel.querySelector("#btnInspectorShowInDisplay")?.addEventListener("click", () => openFindingInDisplay(idx));
   panel.querySelector("#btnInspectorPlayQuote")?.addEventListener("click", () => {
     seekToMediaTimestamp(det.startTime || 0, true);
   });
@@ -717,9 +892,23 @@ function renderFindingInspector() {
     btn.addEventListener("click", () => {
       const uId = btn.getAttribute("data-unit-id");
       if (uId && typeof linkFindingToCorpusUnit === "function") {
-        linkFindingToCorpusUnit(idx, uId);
+        linkFindingToCorpusUnit(idx, uId, btn.getAttribute("data-ref-label") || "");
       }
     });
+  });
+  panel.querySelectorAll(".btnExpandCandidateRef").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const txt = btn.parentElement.querySelector(".cand-text");
+      const open = txt.classList.toggle("truncate");
+      txt.classList.toggle("max-w-xs", open);
+      txt.classList.toggle("whitespace-normal", !open);
+      txt.classList.toggle("leading-loose", !open);
+      txt.classList.toggle("text-slate-200", !open);
+      btn.textContent = open ? "👁 عرض النص كاملاً" : "▲ طي النص";
+    });
+  });
+  panel.querySelectorAll(".btnRemoveCandidateRef").forEach(btn => {
+    btn.addEventListener("click", () => removeReferenceFromFinding(idx, btn.getAttribute("data-unit-id")));
   });
 
   // Boundary Shift Controls
@@ -733,12 +922,12 @@ function renderFindingInspector() {
   chips.forEach(chip => {
     chip.addEventListener("click", () => {
       const wIdx = parseInt(chip.getAttribute("data-ref-word-idx"), 10);
-      if (activeUnitIndices.has(wIdx)) {
-        activeUnitIndices.delete(wIdx);
+      if (selectedChips.has(wIdx)) {
+        selectedChips.delete(wIdx);
         chip.classList.remove("matched");
         chip.classList.add("unmatched");
       } else {
-        activeUnitIndices.add(wIdx);
+        selectedChips.add(wIdx);
         chip.classList.add("matched");
         chip.classList.remove("unmatched");
       }
@@ -747,7 +936,17 @@ function renderFindingInspector() {
 
   panel.querySelector("#btnApplyCustomRefSpan")?.addEventListener("click", () => {
     if (typeof applyReferenceWordsToTranscript === "function") {
-      applyReferenceWordsToTranscript(det, Array.from(activeUnitIndices).sort((a,b)=>a-b));
+      applyReferenceWordsToTranscript(det, Array.from(selectedChips).sort((a, b) => a - b), fullView ? chipWords : null, matnOffset);
+    }
+  });
+
+  panel.querySelector("#btnInspectorAiOptions")?.addEventListener("click", () => {
+    if (typeof openAiRequestOptions === "function") openAiRequestOptions({ mode: "single", findingIdx: idx });
+  });
+
+  panel.querySelector("#btnInspectorRunAiVerification")?.addEventListener("click", () => {
+    if (typeof window.triggerAiVerification === "function") {
+      window.triggerAiVerification([idx]);
     }
   });
 
@@ -1417,6 +1616,8 @@ function renderAllViews() {
     updateFnRangeVisualHighlight();
   }
   updateVideoCaptionOverlay(currentState.currentTime);
+  if (typeof updateAiLaunchButtonLabel === "function") updateAiLaunchButtonLabel();
+  if (typeof scheduleSessionAutosave === "function") scheduleSessionAutosave();
 }
 
 // -----------------------------------------------------------------------------
@@ -1545,7 +1746,7 @@ function updateAiMetricsUI() {
   setEl("aiMetricTotalReq", `${m.successfulRequests || 0} / ${m.totalRequests || 0} طلب`);
   setEl("aiMetricFullTime", `${((m.requestsFullTimeMs || 0) / 1000).toFixed(2)} s`);
   setEl("aiMetricAvgTime", `${m.avgRequestTimeMs || 0} ms`);
-  setEl("aiMetricTotalTokens", `${(m.totalContextTokens || 0).toLocaleString()} توكن (${(m.totalContextChars || 0).toLocaleString()} حرف)`);
+  setEl("aiMetricTotalTokens", `${(m.totalContextTokens || 0).toLocaleString("en")} توكن (${(m.totalContextChars || 0).toLocaleString("en")} حرف)`);
   setEl("aiMetricAvgContext", `${m.avgContextTokensPerRequest || 0} توكن/طلب`);
   setEl("aiMetricVerdicts", `🟢 ${m.verdictCounts?.CORRECT || 0} | 🔴 ${m.verdictCounts?.FALSE || 0} | 🟡 ${m.verdictCounts?.NOT_SURE || 0}`);
   setEl("aiMetricCost", `$${Number(m.estimatedTotalCostUsd || 0).toFixed(5)}`);
@@ -1881,118 +2082,582 @@ function renderTafrighOutput(tafrighData) {
     }
   }
 
-  // 2. Render Human Review Queue Banner
+  // 2. Review happens inline in the formatted text; above it only a one-line status bar
   if (reviewQueueWrap) {
-    if (reviewItems.length > 0) {
-      reviewQueueWrap.innerHTML = `
-        <div class="p-4 rounded-xl bg-amber-950/40 border border-amber-500/40 text-amber-200">
-          <div class="flex items-center justify-between mb-2">
-            <strong class="text-sm font-bold flex items-center gap-2">
-              <span>⚠️</span>
-              <span>طابور المراجعة البشرية (${reviewItems.length} فقرة تتطلب التحقق):</span>
-            </strong>
-            <span class="text-[10px] text-amber-400/80">انقر تأكيد أو تراجع لتحديث الهيكل فوراً</span>
-          </div>
-          <div class="space-y-2 max-h-60 overflow-y-auto no-scrollbar">
-            ${reviewItems.map(item => `
-              <div class="p-2.5 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-between gap-3 text-xs" id="review_row_${item.segment_id}">
-                <div class="flex-1">
-                  <span class="font-mono text-sky-400 font-bold ml-1">${item.segment_id}</span>
-                  <span class="text-slate-300">${escapeHtml(item.active_text || item.original_text || "")}</span>
-                  <div class="text-[10px] text-amber-400 mt-1">${(item.review_flags || []).join(' • ')}</div>
-                </div>
-                <div class="flex items-center gap-1.5 shrink-0">
-                  <button type="button" class="btn-tafrigh-confirm px-2.5 py-1 rounded-lg bg-emerald-600/30 text-emerald-300 hover:bg-emerald-600/50 font-bold transition" data-run-id="${runId}" data-seg-id="${item.segment_id}">تأكيد ✓</button>
-                  <button type="button" class="btn-tafrigh-reject px-2.5 py-1 rounded-lg bg-rose-600/30 text-rose-300 hover:bg-rose-600/50 font-bold transition" data-run-id="${runId}" data-seg-id="${item.segment_id}">تراجع ✕</button>
-                </div>
-              </div>
-            `).join('')}
-          </div>
-        </div>
-      `;
-      reviewQueueWrap.classList.remove("hidden");
-
-      reviewQueueWrap.querySelectorAll(".btn-tafrigh-confirm").forEach(btn => {
-        btn.addEventListener("click", async () => {
-          const segId = btn.getAttribute("data-seg-id");
-          const rId = btn.getAttribute("data-run-id");
-          await executeTafrighReviewAction(rId, segId, "confirm");
-        });
-      });
-
-      reviewQueueWrap.querySelectorAll(".btn-tafrigh-reject").forEach(btn => {
-        btn.addEventListener("click", async () => {
-          const segId = btn.getAttribute("data-seg-id");
-          const rId = btn.getAttribute("data-run-id");
-          await executeTafrighReviewAction(rId, segId, "reject");
-        });
-      });
-    } else {
-      reviewQueueWrap.innerHTML = "";
-      reviewQueueWrap.classList.add("hidden");
-    }
+    reviewQueueWrap.innerHTML = reviewItems.length
+      ? `<div class="flex flex-wrap items-center justify-between gap-2 px-3 py-2 rounded-xl bg-amber-950/40 border border-amber-500/40 text-amber-200 text-xs">
+           <span><strong>⚠️ ${reviewItems.length} جمل تحتاج مراجعة</strong> — <span>مظلَّلة في النص أدناه. انقر أي جملة لمراجعتها أو تغيير وسمها.</span></span>
+           <button type="button" id="btnTafrighStartReview" class="px-3 py-1 rounded-lg bg-amber-500/25 hover:bg-amber-500/40 text-amber-100 font-bold">▶ ابدأ المراجعة</button>
+         </div>`
+      : `<div class="px-3 py-1.5 rounded-xl bg-slate-900/70 border border-slate-800 text-slate-400 text-[11px]">✓ <span>لا توجد جمل بحاجة لمراجعة. انقر أي جملة في النص لتغيير وسمها.</span></div>`;
+    reviewQueueWrap.classList.remove("hidden");
+    reviewQueueWrap.querySelector("#btnTafrighStartReview")?.addEventListener("click", () => {
+      setTafrighResultsView("text");
+      const first = reviewItems[0]?.segment_id;
+      if (first) openTafrighInlineReview(first);
+    });
   }
 
-  // 3. Render Semantic HTML Structure
+  // 3. Render Semantic HTML Structure, then make every sentence reviewable in place
   if (renderedContent) {
     renderedContent.innerHTML = html;
+    decorateTafrighReviewInline(tafrighData);
+  }
+
+  // 4. Run summary + per-sentence decisions
+  updateTafrighSavedBadge();
+  renderTafrighRunSummary(tafrighData);
+  renderTafrighDetails(tafrighData);
+  // stay on the details tab when re-rendering after a review action
+  setTafrighResultsView(document.getElementById("tafrighDetailsView")?.classList.contains("hidden") === false ? "details" : "text");
+}
+
+// value = tag[:heading level], as sent to /api/tafrigh/review-action
+const TAFRIGH_TAG_OPTIONS = [
+  ["paragraph", "فقرة"], ["continuation", "تكملة لما قبلها"], ["heading:1", "عنوان رئيسي"], ["heading:2", "عنوان فرعي"],
+  ["heading:3", "عنوان مستوى 3"], ["list_intro", "تمهيد قائمة"], ["list_item", "عنصر قائمة"], ["comment", "تعليق عارض"], ["matn_section", "متن"]
+];
+const TAFRIGH_REASON_AR = {
+  low_confidence: "ثقة النموذج منخفضة",
+  EDIT_REJECTED: "رُفض تصحيح اقترحه النموذج",
+  EDIT_CAP_EXCEEDED: "تصحيح يغير النص أكثر من المسموح",
+  SPLIT_VALIDATION_FAILED: "تعذر تقسيم الجملة",
+  INVALID_TRANSITION_FALLBACK: "وسم غير صالح في هذا الموضع (حُوِّل إلى فقرة)",
+  MODEL_ERROR: "فشل طلب النموذج لهذه الجملة",
+  WINDOW_FALLBACK_USED: "أُعيدت معالجتها جملةً جملة",
+  OUTLINE_REPAIR_REVIEW: "عدّلها إصلاح الفهرس",
+  FROM_SPLIT: null
+};
+const TAFRIGH_SOURCE_BADGE = {
+  human_corrected: '<span class="px-1.5 py-0.5 rounded bg-sky-900/70 text-sky-200 border border-sky-500/30">✏️ مصحَّح</span>',
+  human_confirmed: '<span class="px-1.5 py-0.5 rounded bg-emerald-900/70 text-emerald-200 border border-emerald-500/30">✓ مؤكَّد</span>',
+  model: '<span class="px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700">🤖 النموذج</span>'
+};
+
+function tafrighLabelSource(sg) {
+  const action = sg.trace?.review?.action;
+  return action === "confirm" ? "human_confirmed" : (action === "correct" || action === "revert_edits") ? "human_corrected" : "model";
+}
+
+function tafrighModelConfidence(sg) {
+  const dec = sg.trace?.decision || sg.trace?.split_from?.decision || {};
+  const c = dec.answers?.tag?.confidence;
+  return typeof c === "number" ? c : null;
+}
+
+const TAFRIGH_TAG_AR = {
+  paragraph: "فقرة", heading: "عنوان", list_intro: "تمهيد قائمة", list_item: "عنصر قائمة",
+  matn_section: "متن", continuation: "تكملة", comment: "تعليق عارض"
+};
+const TAFRIGH_REJECT_AR = {
+  char_offsets_without_quoted_original: "مواضع بالحروف دون ذكر الكلمة الأصلية (غير موثوق)",
+  quoted_original_does_not_match_text: "الكلمة التي ذكرها النموذج غير موجودة في هذا الموضع",
+  inside_detected_quotation: "داخل آية/حديث مكتشف (يُعرض من المصدر)",
+  word_index_out_of_range: "رقم كلمة خارج الجملة",
+  bad_word_index: "رقم كلمة غير صالح",
+  out_of_bounds: "خارج حدود الجملة",
+  no_change: "لا تغيير",
+  replacement_too_different: "الاستبدال يختلف كثيراً عن الأصل",
+  overlaps_another_edit: "يتداخل مع تصحيح آخر"
+};
+const TAFRIGH_CUT_AR = { punctuation: "ترقيم", comma: "فاصلة", pause: "سكتة", length: "طول", detection: "اقتباس", end: "نهاية النص" };
+
+// --- Split visibility: when the classifier asked for a split, what happened, and who did what ---
+const TAFRIGH_SPLIT_SKIP_AR = {
+  too_short: "الجملة قصيرة (أقل من 6 كلمات) فلا تُقسَّم",
+  from_split: "هي جزء من تقسيم سابق، والأجزاء لا يُعاد تقسيمها",
+  no_points: "لم يُرجع Gemini أي نقطة قطع",
+  inside_quote: "كل نقاط القطع المقترحة كانت داخل آية أو حديث فحُذفت",
+  invalid: "نقاط القطع المقترحة غير صالحة"
+};
+
+function tafrighProviderName(p) {
+  return { jev: "JEV", gemini: "Gemini", laya: "Laya" }[String(p || "").toLowerCase()] || (p ? String(p) : "");
+}
+
+function tafrighPointsByLabel(v) {
+  if (!v || v === "model_decision") return "قرار النموذج المصنِّف نفسه";
+  if (v.startsWith("openrouter:")) return `Gemini عبر OpenRouter (${v.slice("openrouter:google/".length) || v.slice(11)})`;
+  if (v === "gemini") return "Gemini";   // runs from before the route was recorded
+  if (v.startsWith("gemini:")) return `Gemini مباشرة عبر Google (${v.slice(7)})`;
+  return v;
+}
+
+function tafrighSplitProb(decision) {
+  const ns = decision?.answers?.needsSplitting;
+  const p = ns?.probabilities?.true ?? (ns?.choice === "true" ? ns?.confidence : null);
+  return typeof p === "number" ? Math.round(p * 100) : null;
+}
+
+// "split asked but not applied" or "piece k/n of a split" — null when the sentence has nothing to do with splitting
+function tafrighSplitInfo(sg) {
+  const tr = sg.trace || {};
+  if (tr.split_from) return { kind: "piece", ...tr.split_from };
+  const out = tr.split_outcome;
+  if (out && out.status !== "applied") return { kind: "skipped", ...out, decision: tr.decision };
+  return null;
+}
+
+function tafrighSplitCardHtml(sg) {
+  const info = tafrighSplitInfo(sg);
+  if (!info) return "";
+  if (info.kind === "piece") {
+    const asker = tafrighProviderName(info.decision?.provider) || "النموذج";
+    const prob = tafrighSplitProb(info.decision);
+    const used = new Set(info.split?.used || []);
+    const words = String(info.text || "").split(/\s+/).filter(Boolean);
+    const marked = words.map((w, i) => (used.has(i) ? '<b class="text-violet-300"> ✂ </b>' : "") + escapeHtml(w)).join(" ");
+    return `
+      <div class="p-2 rounded-lg bg-violet-950/40 border border-violet-500/30 text-[11px] space-y-1">
+        <div class="font-bold text-violet-200">✂️ <span>جزء</span> ${info.piece ? `<span class="font-mono">${info.piece}/${info.pieces}</span>` : ""} <span>من جملة قُسِّمت</span></div>
+        <div class="text-slate-300"><span>طلب التقسيم:</span> <b>${escapeHtml(asker)}</b>${prob !== null ? ` <span class="font-mono text-slate-400">(${prob}%)</span>` : ""} • <span>نقاط القطع من:</span> <b>${escapeHtml(tafrighPointsByLabel(info.split?.points_by || (info.split?.source === "gemini_split_request" ? "gemini" : "model_decision")))}</b></div>
+        <div class="text-slate-400"><span>الجملة الأصلية:</span> <span data-no-i18n class="text-slate-200">${marked}</span></div>
+        <div class="text-slate-400"><span>وسم هذا الجزء أعطاه:</span> <b class="text-slate-200">${escapeHtml(tafrighProviderName(sg.trace?.decision?.provider) || "—")}</b> <span>(أُعيد تصنيف كل جزء وحده بعد التقسيم)</span></div>
+      </div>`;
+  }
+  const asker = tafrighProviderName(info.decision?.provider) || "النموذج";
+  const prob = tafrighSplitProb(info.decision);
+  return `
+    <div class="p-2 rounded-lg bg-violet-950/30 border border-violet-500/25 text-[11px] space-y-1">
+      <div class="font-bold text-violet-200">✂️ <b>${escapeHtml(asker)}</b> <span>طلب تقسيم هذه الجملة</span>${prob !== null ? ` <span class="font-mono text-slate-400">(${prob}%)</span>` : ""} <span>— لكنها لم تُقسَّم</span></div>
+      <div class="text-slate-300"><span>السبب:</span> ${escapeHtml(TAFRIGH_SPLIT_SKIP_AR[info.why] || info.why || "—")}${(info.proposed || []).length ? ` <span class="text-slate-500">(<span>نقاط مقترحة:</span> <span class="font-mono">${info.proposed.join(", ")}</span>)</span>` : ""}</div>
+      <div class="text-slate-400">بقي الوسم الذي أعطاه المصنِّف للجملة كاملة.</div>
+    </div>`;
+}
+
+// After a review action the output is re-rendered; this says which sentence's card to open next
+let tafrighPendingReviewAfter = null;
+
+function decorateTafrighReviewInline(data) {
+  const box = document.getElementById("tafrighRenderedContent");
+  if (!box) return;
+  const segs = data.structured_json?.segments || [];
+  const review = new Set((data.review_items || []).map(i => i.segment_id));
+  segs.forEach(sg => {
+    const el = document.getElementById(sg.id);
+    if (!el || !box.contains(el)) return;
+    el.classList.add("tfg-seg");
+    el.dataset.tfgSeg = sg.id;
+    el.classList.toggle("tfg-needs-review", review.has(sg.id));
+    el.classList.toggle("tfg-reviewed", tafrighLabelSource(sg) !== "model");
+    const split = tafrighSplitInfo(sg);
+    el.classList.toggle("tfg-split-piece", split?.kind === "piece");
+    el.classList.toggle("tfg-split-cut", split?.kind === "piece" && (split.piece || 1) > 1);
+    el.classList.toggle("tfg-split-skipped", split?.kind === "skipped");
+  });
+  box.onclick = (e) => {
+    if (e.target.closest(".tfg-review-card")) return;
+    const el = e.target.closest(".tfg-seg");
+    if (el) openTafrighInlineReview(el.dataset.tfgSeg);
+  };
+  if (tafrighPendingReviewAfter) {
+    const after = tafrighPendingReviewAfter;
+    tafrighPendingReviewAfter = null;
+    const order = segs.map(sg => sg.id);
+    const from = order.indexOf(after);
+    const next = order.slice(from + 1).concat(order.slice(0, Math.max(0, from))).find(id => review.has(id));
+    if (next) openTafrighInlineReview(next);
+    else showToast("✅ تمت مراجعة كل الجمل المحتاجة للمراجعة");
   }
 }
 
-async function executeTafrighReviewAction(runId, segmentId, action) {
-  try {
-    let apiBase = "";
-    if (window.location.protocol === "file:" || window.location.port === "8089") {
-      apiBase = "http://127.0.0.1:8000";
-    }
-    let url = `${apiBase}/api/tafrigh/review-action`;
-    let res;
-    try {
-      res = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ run_id: runId, segment_id: segmentId, action })
-      });
-    } catch (netErr) {
-      if (!apiBase) {
-        url = `http://127.0.0.1:8000/api/tafrigh/review-action`;
-        res = await fetch(url, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ run_id: runId, segment_id: segmentId, action })
+function openTafrighInlineReview(segId) {
+  const data = currentState.tafrigh?.data;
+  const box = document.getElementById("tafrighRenderedContent");
+  const el = document.getElementById(segId);
+  if (!data || !box || !el || !box.contains(el)) return;
+  box.querySelectorAll(".tfg-review-card").forEach(c => c.remove());
+  box.querySelectorAll(".tfg-active").forEach(c => c.classList.remove("tfg-active"));
+
+  const segs = data.structured_json?.segments || [];
+  const k = segs.findIndex(sg => sg.id === segId);
+  const sg = segs[k];
+  if (!sg) return;
+  const runId = data.run_id || "";
+  const reviewItems = data.review_items || [];
+  const item = reviewItems.find(i => i.segment_id === segId);
+  const src = tafrighLabelSource(sg);
+  const cur = sg.tag === "heading" ? `heading:${sg.level || 1}` : sg.tag;
+  const tagLabel = (TAFRIGH_TAG_AR[sg.tag] || sg.tag) + (sg.level ? ` ${sg.level}` : "");
+  const opts = TAFRIGH_TAG_OPTIONS.some(([v]) => v === cur) ? TAFRIGH_TAG_OPTIONS : [...TAFRIGH_TAG_OPTIONS, [cur, tagLabel]];
+  const tagAnswer = (sg.trace?.decision || sg.trace?.split_from?.decision || {}).answers?.tag || {};
+  const probs = Object.entries(tagAnswer.probabilities || {}).filter(([, v]) => v >= 0.02).sort((a, b) => b[1] - a[1]).slice(0, 4)
+    .map(([key, v]) => {
+      const label = key.startsWith("heading_") ? `${TAFRIGH_TAG_AR.heading} ${key.split("_")[1] || ""}` : (TAFRIGH_TAG_AR[key] || key);
+      return `<span class="px-1.5 py-0.5 rounded bg-slate-800 text-slate-300"><span>${escapeHtml(label)}</span> <span class="font-mono">${Math.round(v * 100)}%</span></span>`;
+    }).join(" ");
+  const reasons = (item?.reasons || []).map(r => TAFRIGH_REASON_AR[r]).filter(Boolean);
+  const remaining = reviewItems.filter(i => i.segment_id !== segId).length;
+
+  const card = document.createElement("div");
+  card.className = "tfg-review-card";
+  card.setAttribute("data-i18n-ui", "");
+  card.innerHTML = `
+    <div class="flex flex-wrap items-center gap-1.5 text-[11px]">
+      <span class="font-mono text-slate-500">#${k + 1}</span>
+      <span class="px-2 py-0.5 rounded-lg bg-amber-600/20 text-amber-200 font-bold">${escapeHtml(tagLabel)}</span>
+      ${TAFRIGH_SOURCE_BADGE[src]}
+      ${sg.trace?.decision?.provider ? `<span class="text-slate-500"><span>صنّفها:</span> ${escapeHtml(tafrighProviderName(sg.trace.decision.provider))}</span>` : ""}
+      ${item ? '<span class="text-amber-300">⚠️ للمراجعة</span>' : ""}
+      <button type="button" data-tfg-close class="ms-auto px-1.5 text-slate-400 hover:text-white" title="إغلاق">✕</button>
+    </div>
+    ${reasons.length ? `<div class="text-[11px] text-amber-300">${reasons.map(r => `<span>${escapeHtml(r)}</span>`).join(" • ")}</div>` : ""}
+    ${tafrighSplitCardHtml(sg)}
+    ${probs ? `<div class="flex flex-wrap items-center gap-1 text-[10px]"><span class="text-slate-400">احتمالات النموذج:</span> ${probs}</div>` : ""}
+    ${sg.corrected_text ? `<div class="text-[11px] text-slate-400"><span>الأصل قبل التصحيح الإملائي:</span> <span data-no-i18n class="text-slate-300">${escapeHtml(sg.original_text.trim())}</span></div>` : ""}
+    <div class="flex flex-wrap items-center gap-1.5 text-[11px]">
+      <span class="text-slate-400">الوسم:</span>
+      <select data-tfg-relabel class="bg-slate-950 border border-slate-700 rounded-lg px-2 py-1 text-slate-200">
+        ${opts.map(([v, l]) => `<option value="${v}" ${v === cur ? "selected" : ""}>${l}</option>`).join("")}
+      </select>
+      ${src === "model" || item ? '<button type="button" data-tfg-confirm class="px-2.5 py-1 rounded-lg bg-emerald-600/25 hover:bg-emerald-600/45 text-emerald-200 border border-emerald-500/40 font-bold">✓ الوسم صحيح</button>' : ""}
+      ${item?.has_typo_versions ? '<button type="button" data-tfg-revert class="px-2.5 py-1 rounded-lg bg-rose-600/20 hover:bg-rose-600/40 text-rose-200 border border-rose-500/40 font-bold">↩️ إلغاء التصحيح الإملائي</button>' : ""}
+      ${remaining ? `<button type="button" data-tfg-next class="ms-auto px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold"><span>التالي للمراجعة</span> <span class="font-mono">(${remaining})</span></button>` : ""}
+    </div>`;
+
+  // A card is a block: put it after the sentence's block (a continuation is an inline span inside a paragraph)
+  const block = el.closest("p, li, h1, h2, h3, h4, h5, h6, aside, .tafrigh-matn-block") || el;
+  block.insertAdjacentElement("afterend", card);
+  el.classList.add("tfg-active");
+  card.scrollIntoView({ behavior: "smooth", block: "nearest" });
+
+  const advance = () => { tafrighPendingReviewAfter = segId; };
+  card.querySelector("[data-tfg-close]")?.addEventListener("click", () => { card.remove(); el.classList.remove("tfg-active"); });
+  card.querySelector("[data-tfg-relabel]")?.addEventListener("change", (e) => {
+    const [tag, level] = e.target.value.split(":");
+    advance();
+    executeTafrighReviewAction(runId, segId, "correct", { corrected_tag: tag, corrected_level: level ? parseInt(level, 10) : null });
+  });
+  card.querySelector("[data-tfg-confirm]")?.addEventListener("click", () => { advance(); executeTafrighReviewAction(runId, segId, "confirm"); });
+  card.querySelector("[data-tfg-revert]")?.addEventListener("click", () => executeTafrighReviewAction(runId, segId, "reject"));
+  card.querySelector("[data-tfg-next]")?.addEventListener("click", () => {
+    const order = segs.map(x => x.id);
+    const flagged = new Set(reviewItems.map(i => i.segment_id));
+    const next = order.slice(k + 1).concat(order.slice(0, k)).find(id => flagged.has(id));
+    if (next) openTafrighInlineReview(next);
+  });
+}
+
+function setTafrighResultsView(view) {
+  document.getElementById("tafrighRenderedContent")?.classList.toggle("hidden", view !== "text");
+  document.getElementById("tafrighDetailsView")?.classList.toggle("hidden", view !== "details");
+  document.querySelectorAll(".tafrigh-view-tab").forEach(b => {
+    const on = b.getAttribute("data-tafrigh-view") === view;
+    b.className = "tafrigh-view-tab px-3 py-1.5 rounded-xl text-xs border " +
+      (on ? "font-bold bg-amber-600/25 text-amber-200 border-amber-500/50" : "font-semibold bg-slate-900 text-slate-300 border-slate-800");
+  });
+}
+
+function renderTafrighRunSummary(data) {
+  const box = document.getElementById("tafrighRunSummary");
+  if (!box) return;
+  const segs = data.structured_json?.segments || [];
+  const rep = data.report || {};
+  const tags = {};
+  let acc = 0, rej = 0, covered = 0, quotes = 0;
+  segs.forEach(sg => {
+    tags[sg.tag] = (tags[sg.tag] || 0) + 1;
+    acc += (sg.trace?.edits?.accepted || []).length;
+    (sg.trace?.edits?.rejected || []).forEach(r => { if (r.why === "inside_detected_quotation") covered++; else rej++; });
+    quotes += (sg.quotes || []).length;
+  });
+  const chip = (t, cls = "bg-slate-800 text-slate-200") => `<span class="px-2 py-0.5 rounded-lg ${cls}">${t}</span>`;
+  box.innerHTML = [
+    chip(`${segs.length} جملة`, "bg-amber-600/20 text-amber-200"),
+    ...Object.entries(tags).map(([k, v]) => chip(`${TAFRIGH_TAG_AR[k] || k}: ${v}`)),
+    chip(`اقتباسات: ${quotes}`, "bg-emerald-900/60 text-emerald-200"),
+    ...(() => {
+      const parents = new Set(segs.filter(sg => sg.trace?.split_from).map(sg => sg.trace.split_from.id));
+      const pieces = segs.filter(sg => sg.trace?.split_from).length;
+      const skipped = segs.filter(sg => tafrighSplitInfo(sg)?.kind === "skipped").length;
+      return parents.size || skipped
+        ? [chip(`✂️ قُسِّمت ${parents.size} جملة إلى ${pieces} جزء${skipped ? ` • طُلب ولم يُطبَّق: ${skipped}` : ""}`, "bg-violet-900/60 text-violet-200")]
+        : [];
+    })(),
+    chip(`تصحيحات مقبولة: ${acc}`, "bg-sky-900/60 text-sky-200"),
+    chip(`مرفوضة: ${rej}`, rej ? "bg-rose-900/60 text-rose-200" : "bg-slate-800 text-slate-300"),
+    ...(covered ? [chip(`تصحيحات داخل اقتباس (معروض من المصدر): ${covered}`, "bg-slate-800 text-slate-400")] : []),
+    chip(`طلبات: ${rep.total_requests ?? "—"}`),
+    chip(`التكلفة: $${(rep.total_cost_usd || 0).toFixed(5)}`),
+    chip(`الزمن: ${rep.wall_clock_seconds ?? "—"}ث`)
+  ].join("");
+}
+
+function renderTafrighDetails(data) {
+  const box = document.getElementById("tafrighDetailsView");
+  if (!box) return;
+  const segs = data.structured_json?.segments || [];
+  const runId = data.run_id || "";
+  const pct = c => (typeof c === "number" ? ` <span class="text-slate-500">${Math.round(c * 100)}%</span>` : "");
+  const LABEL = v => {
+    v = String(v);
+    if (v.startsWith("heading_")) return `عنوان ${v.split("_")[1] || ""}`.trim();
+    return TAFRIGH_TAG_AR[v] || (v === "true" ? "نعم" : v === "false" ? "لا" : v);
+  };
+  const dist = a => {
+    const p = a && a.probabilities ? Object.entries(a.probabilities).filter(([, v]) => v >= 0.01).sort((x, y) => y[1] - x[1]) : [];
+    return p.length > 1 ? ` <span class="text-slate-500">(${p.map(([k, v]) => `${escapeHtml(LABEL(k))} ${Math.round(v * 100)}%`).join(" / ")})</span>` : pct(a && a.confidence);
+  };
+  const yesNo = v => (v === "true" ? "نعم" : v === "false" ? "لا" : escapeHtml(String(v ?? "—")));
+  box.innerHTML = segs.map((sg, k) => {
+    const tr = sg.trace || {};
+    const dec = tr.decision || tr.split_from?.decision || {};
+    const ans = dec.answers || {};
+    const t = typeof sg.start_time === "number" ? formatSecondsToShortTime(sg.start_time) : "";
+    const tagLabel = (TAFRIGH_TAG_AR[sg.tag] || sg.tag) + (sg.level ? ` ${sg.level}` : "");
+    const answers = Object.keys(ans).length
+      ? `<div class="flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-slate-300">
+           ${ans.tag ? `<span>الوسم المقترح: <b>${escapeHtml(LABEL(ans.tag.choice))}</b>${dist(ans.tag)}</span>` : ""}
+           ${ans.needsSplitting ? `<span>يحتاج تقسيماً: <b>${yesNo(ans.needsSplitting.choice)}</b>${dist(ans.needsSplitting)}</span>` : ""}
+           ${ans.hasTypo ? `<span>فيه خطأ تفريغ: <b>${yesNo(ans.hasTypo.choice)}</b>${dist(ans.hasTypo)}</span>` : ""}
+           ${dec.latency_ms ? `<span class="text-slate-500">${Math.round(dec.latency_ms)}ms</span>` : ""}
+         </div>`
+      : (dec.raw ? `<div class="text-[11px] text-slate-400 font-mono" dir="ltr">${escapeHtml(JSON.stringify(dec.raw).slice(0, 300))}</div>` : "");
+    const split = tafrighSplitCardHtml(sg);
+    const ed = tr.edits || {};
+    const edits = [
+      ...(ed.accepted || []).map(e => `<div class="text-[11px] text-sky-200">✔ تصحيح: <s class="text-slate-500">${escapeHtml(e.original || "")}</s> ← <b>${escapeHtml(e.replacement)}</b>${e.reason ? ` <span class="text-slate-500">(${escapeHtml(e.reason)})</span>` : ""}</div>`),
+      ...(ed.rejected || []).map(e => e.why === "inside_detected_quotation"
+        ? `<div class="text-[11px] text-slate-400">◌ لم يُطبَّق: ${escapeHtml(e.original || e.span || "")} ← ${escapeHtml(e.replacement || "")} — ${escapeHtml(TAFRIGH_REJECT_AR[e.why])}</div>`
+        : `<div class="text-[11px] text-rose-300">✘ رُفض: ${escapeHtml(e.original || e.span || "")} ← ${escapeHtml(e.replacement || "")} — ${escapeHtml(TAFRIGH_REJECT_AR[e.why] || e.why)}</div>`)
+    ].join("");
+    const quotes = (sg.quotes || []).map(q =>
+      `<span class="px-1.5 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-500/30">${q.kind === "quran" ? "آية" : q.kind === "hadith" ? "حديث" : "ذكر"}: ${escapeHtml(q.ref)}${q.band === "CANDIDATE" ? "؟" : ""}</span>`).join(" ");
+    const flags = (sg.review_flags || []).map(f => `<span class="px-1.5 py-0.5 rounded bg-rose-950 text-rose-300 border border-rose-500/30">${escapeHtml(f)}</span>`).join(" ");
+    return `
+      <div class="rounded-xl border border-slate-800 bg-slate-950/70 p-3 space-y-1.5" id="detail_${escapeHtml(sg.id)}">
+        <div class="flex flex-wrap items-center gap-2 text-[11px]">
+          <span class="font-mono text-slate-500">#${k + 1}</span>
+          <span class="px-2 py-0.5 rounded-lg bg-amber-600/20 text-amber-200 font-bold">${escapeHtml(tagLabel)}</span>
+          ${sg.comment_kind ? `<span class="text-slate-400">(${escapeHtml(sg.comment_kind)})</span>` : ""}
+          <span class="text-slate-500">${escapeHtml(dec.provider || "")}</span>
+          <span class="text-slate-500">نهاية الجملة: ${escapeHtml(TAFRIGH_CUT_AR[sg.cut_reason] || sg.cut_reason || "—")}</span>
+          <span class="font-mono text-slate-600 mr-auto" dir="ltr">${t}</span>
+        </div>
+        <div class="text-sm text-slate-100 leading-loose" data-no-i18n>${escapeHtml(sg.display_text || sg.text || "")}</div>
+        ${sg.corrected_text ? `<div class="text-[11px] text-slate-500"><span>الأصل:</span> <span data-no-i18n>${escapeHtml(sg.original_text.trim())}</span></div>` : ""}
+        <div class="flex flex-wrap items-center gap-1.5 text-[11px] pt-1 border-t border-slate-800/70">
+          <span class="text-slate-400">الوسم:</span>
+          <select class="sel-tafrigh-relabel bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-slate-200" data-seg-id="${escapeHtml(sg.id)}">
+            ${(() => {
+              const cur = sg.tag === "heading" ? `heading:${sg.level || 1}` : sg.tag;
+              const opts = TAFRIGH_TAG_OPTIONS.some(([v]) => v === cur) ? TAFRIGH_TAG_OPTIONS : [...TAFRIGH_TAG_OPTIONS, [cur, tagLabel]];
+              return opts.map(([v, l]) => `<option value="${v}" ${v === cur ? "selected" : ""}>${l}</option>`).join("");
+            })()}
+          </select>
+          ${tafrighLabelSource(sg) === "model" ? `<button type="button" class="btn-tafrigh-confirm-label px-2 py-1 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-300 border border-emerald-500/30 font-bold" data-seg-id="${escapeHtml(sg.id)}" title="الوسم صحيح كما هو">✓ تأكيد</button>` : ""}
+          ${TAFRIGH_SOURCE_BADGE[tafrighLabelSource(sg)]}
+        </div>
+        ${answers}${split}${edits}
+        ${quotes || flags ? `<div class="flex flex-wrap gap-1 text-[10px]">${quotes} ${flags}</div>` : ""}
+      </div>`;
+  }).join("") || `<div class="p-4 text-center text-slate-400 text-xs">لا توجد جمل.</div>`;
+
+  box.querySelectorAll(".sel-tafrigh-relabel").forEach(sel => sel.addEventListener("change", () => {
+    const [tag, level] = sel.value.split(":");
+    executeTafrighReviewAction(runId, sel.getAttribute("data-seg-id"), "correct",
+      { corrected_tag: tag, corrected_level: level ? parseInt(level, 10) : null });
+  }));
+  box.querySelectorAll(".btn-tafrigh-confirm-label").forEach(btn => btn.addEventListener("click", () => {
+    executeTafrighReviewAction(runId, btn.getAttribute("data-seg-id"), "confirm");
+  }));
+}
+
+// -----------------------------------------------------------------------------
+// Save run → Laya fine-tuning examples (only the sentences the user picks)
+// -----------------------------------------------------------------------------
+
+function updateTafrighSavedBadge() {
+  const badge = document.getElementById("lblTafrighSavedBadge");
+  if (!badge) return;
+  const runId = currentState.tafrigh?.data?.run_id;
+  const saved = runId && currentState.tafrigh?.savedRuns?.[runId];
+  badge.classList.toggle("hidden", !saved);
+  if (saved) badge.textContent = `✓ ${saved.sentences}`;
+}
+
+function openSaveTafrighRunModal() {
+  const data = currentState.tafrigh?.data;
+  const segs = data?.structured_json?.segments || [];
+  if (!data?.run_id || !segs.length) {
+    showToast("⚠️ لا يوجد تفريغ لحفظه بعد.");
+    return;
+  }
+  const runId = data.run_id;
+  const needsReview = new Set((data.review_items || []).map(i => i.segment_id));
+  const prevSaved = currentState.tafrigh.savedRuns?.[runId];
+  // Default: everything except sentences still waiting for review (uncertain labels make poor training data)
+  let picked = new Set(prevSaved ? prevSaved.segmentIds : segs.filter(sg => !needsReview.has(sg.id)).map(sg => sg.id));
+
+  let modal = document.getElementById("modalSaveTafrighRun");
+  if (!modal) {
+    modal = document.createElement("div");
+    modal.id = "modalSaveTafrighRun";
+    modal.className = "hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm items-center justify-center p-4";
+    document.body.appendChild(modal);
+    modal.addEventListener("click", e => { if (e.target === modal) closeSaveTafrighRunModal(); });
+  }
+
+  const sourceCount = list => list.reduce((acc, sg) => { const k = tafrighLabelSource(sg); acc[k] = (acc[k] || 0) + 1; return acc; }, {});
+  const quick = [
+    ["all", "الكل"], ["none", "لا شيء"], ["invert", "عكس التحديد"], ["human", "راجعتها أنت فقط"],
+    ["corrected", "المصحَّحة فقط"], ["confident", "ثقة النموذج ≥ 85%"], ["no_review", "استبعاد ما يحتاج مراجعة"]
+  ];
+
+  const render = () => {
+    const chosen = segs.filter(sg => picked.has(sg.id));
+    const counts = sourceCount(chosen);
+    modal.innerHTML = `
+      <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-3xl w-full shadow-2xl flex flex-col max-h-[90vh] text-xs">
+        <div class="flex items-start justify-between gap-3 border-b border-slate-800 px-5 py-3">
+          <div>
+            <h3 class="text-sm font-bold text-white">💾 حفظ التشغيل لتدريب Laya</h3>
+            <p class="text-[11px] text-slate-400 mt-0.5">اختر الجمل التي تُحفظ كأمثلة تدريب. تُحفظ بوسمها الحالي (بعد تعديلاتك) مع ما رآه النموذج بالضبط من سياق وخيارات.</p>
+          </div>
+          <button type="button" data-save-close class="text-slate-400 hover:text-white text-base">✕</button>
+        </div>
+        <div class="px-5 pt-3 space-y-2">
+          <div class="flex flex-wrap gap-1.5">
+            ${quick.map(([id, l]) => `<button type="button" data-save-quick="${id}" class="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200">${l}</button>`).join("")}
+          </div>
+          <div class="flex flex-wrap items-center gap-2 text-[11px] text-slate-400">
+            <span>محدد <strong class="text-sky-300 font-mono">${chosen.length}</strong> من ${segs.length}</span>
+            <span>•</span>${TAFRIGH_SOURCE_BADGE.human_corrected}<span class="font-mono">${counts.human_corrected || 0}</span>
+            ${TAFRIGH_SOURCE_BADGE.human_confirmed}<span class="font-mono">${counts.human_confirmed || 0}</span>
+            ${TAFRIGH_SOURCE_BADGE.model}<span class="font-mono">${counts.model || 0}</span>
+          </div>
+          ${prevSaved ? `<div class="p-2 rounded-lg bg-sky-950/40 border border-sky-500/30 text-sky-200 text-[11px]">ℹ️ هذا التشغيل محفوظ مسبقاً؛ الحفظ مجدداً يستبدل الحفظ السابق ولا يكرر الأمثلة.</div>` : ""}
+        </div>
+        <div class="flex-1 overflow-y-auto px-5 py-3 space-y-1">
+          ${segs.map((sg, k) => {
+            const conf = tafrighModelConfidence(sg);
+            const tagLabel = (TAFRIGH_TAG_AR[sg.tag] || sg.tag) + (sg.level ? ` ${sg.level}` : "");
+            return `
+            <label class="flex items-start gap-2 p-2 rounded-xl border cursor-pointer ${picked.has(sg.id) ? "bg-slate-950 border-slate-700" : "bg-slate-950/40 border-slate-800 opacity-60"}">
+              <input type="checkbox" data-save-seg="${escapeHtml(sg.id)}" ${picked.has(sg.id) ? "checked" : ""} class="mt-1 accent-emerald-500" />
+              <span class="font-mono text-[10px] text-slate-500 w-6 shrink-0 pt-0.5">${k + 1}</span>
+              <span class="flex-1 min-w-0 space-y-1">
+                <span class="flex flex-wrap items-center gap-1.5 text-[10px]">
+                  <span class="px-1.5 py-0.5 rounded bg-amber-600/20 text-amber-200 font-bold">${escapeHtml(tagLabel)}</span>
+                  ${TAFRIGH_SOURCE_BADGE[tafrighLabelSource(sg)]}
+                  ${conf !== null ? `<span class="font-mono ${conf < 0.7 ? "text-rose-300" : "text-slate-500"}">${Math.round(conf * 100)}%</span>` : ""}
+                  ${needsReview.has(sg.id) ? '<span class="text-amber-400">⚠️ للمراجعة</span>' : ""}
+                </span>
+                <span class="block text-slate-300 leading-relaxed line-clamp-2" data-no-i18n>${escapeHtml(sg.display_text || sg.text || "")}</span>
+              </span>
+            </label>`;
+          }).join("")}
+        </div>
+        <div class="border-t border-slate-800 px-5 py-3 space-y-2">
+          <input type="text" id="inpSaveTafrighNote" placeholder="ملاحظة على هذا الحفظ (اختياري)..." class="w-full rounded-lg bg-slate-950 border border-slate-800 px-2.5 py-1.5 text-slate-200 focus:outline-none focus:border-emerald-500" />
+          <div class="flex items-center justify-end gap-2">
+            <button type="button" data-save-close class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold">إلغاء</button>
+            <button type="button" id="btnConfirmSaveTafrighRun" ${chosen.length ? "" : "disabled"} class="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold disabled:opacity-50 disabled:cursor-not-allowed">💾 حفظ ${chosen.length} جملة</button>
+          </div>
+        </div>
+      </div>`;
+
+    const note = modal.querySelector("#inpSaveTafrighNote");
+    if (note) note.value = modal.__note || "";
+    note?.addEventListener("input", () => { modal.__note = note.value; });
+    modal.querySelectorAll("[data-save-close]").forEach(b => b.addEventListener("click", closeSaveTafrighRunModal));
+    modal.querySelectorAll("[data-save-seg]").forEach(cb => cb.addEventListener("change", () => {
+      const id = cb.getAttribute("data-save-seg");
+      if (cb.checked) picked.add(id); else picked.delete(id);
+      const scroll = modal.querySelector(".overflow-y-auto")?.scrollTop;
+      render();
+      const list = modal.querySelector(".overflow-y-auto");
+      if (list && scroll != null) list.scrollTop = scroll;
+    }));
+    modal.querySelectorAll("[data-save-quick]").forEach(b => b.addEventListener("click", () => {
+      const kind = b.getAttribute("data-save-quick");
+      const by = {
+        all: () => segs.map(sg => sg.id),
+        none: () => [],
+        invert: () => segs.filter(sg => !picked.has(sg.id)).map(sg => sg.id),
+        human: () => segs.filter(sg => tafrighLabelSource(sg) !== "model").map(sg => sg.id),
+        corrected: () => segs.filter(sg => tafrighLabelSource(sg) === "human_corrected").map(sg => sg.id),
+        confident: () => segs.filter(sg => tafrighLabelSource(sg) !== "model" || (tafrighModelConfidence(sg) ?? 0) >= 0.85).map(sg => sg.id),
+        no_review: () => [...picked].filter(id => !needsReview.has(id))
+      }[kind];
+      if (by) picked = new Set(by());
+      render();
+    }));
+    modal.querySelector("#btnConfirmSaveTafrighRun")?.addEventListener("click", async (e) => {
+      e.target.disabled = true;
+      const ids = segs.filter(sg => picked.has(sg.id)).map(sg => sg.id);
+      try {
+        const res = await fetch("/api/tafrigh/save-run", {
+          method: "POST", headers: { "Content-Type": "application/json" }, trapError: false,
+          body: JSON.stringify({ run_id: runId, segment_ids: ids, note: modal.__note || "", lecture_title: currentState.lectureTitle || "" })
         });
-      } else {
-        throw netErr;
+        const out = await res.json();
+        if (!out.success) {
+          showToast(`❌ ${out.message || "تعذر حفظ التشغيل"}`);
+          e.target.disabled = false;
+          return;
+        }
+        currentState.tafrigh.savedRuns = currentState.tafrigh.savedRuns || {};
+        currentState.tafrigh.savedRuns[runId] = { segmentIds: ids, sentences: out.sentences, count: out.count, path: out.path };
+        updateTafrighSavedBadge();
+        closeSaveTafrighRunModal();
+        showToast(`💾 تم حفظ ${out.count} مثال تدريب في ${out.path}`);
+      } catch (err) {
+        console.error("Save tafrigh run error:", err);
+        showToast("❌ تعذر الاتصال بالخادم");
+        e.target.disabled = false;
       }
-    }
+    });
+  };
+
+  modal.__note = prevSaved?.note || "";
+  render();
+  modal.classList.remove("hidden");
+  modal.classList.add("flex");
+}
+
+function closeSaveTafrighRunModal() {
+  const modal = document.getElementById("modalSaveTafrighRun");
+  if (!modal) return;
+  modal.classList.add("hidden");
+  modal.classList.remove("flex");
+}
+
+async function executeTafrighReviewAction(runId, segmentId, action, extra = {}) {
+  try {
+    const res = await fetch("/api/tafrigh/review-action", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ run_id: runId, segment_id: segmentId, action, ...extra }),
+      trapError: false
+    });
     const data = await res.json();
-    if (data.success) {
-      renderTafrighOutput({
-        run_id: runId,
-        markdown: data.markdown,
-        html: data.html,
-        review_items: data.review_items,
-        structured_json: currentState.tafrigh?.data?.structured_json
-      });
-      if (typeof showToast === "function") {
-        showToast(action === "confirm" ? "✅ تم اعتماد القرار بنجاح" : "↩️ تم التراجع وتحديث الهيكل");
-      }
-    } else {
-      if (typeof showToast === "function") {
-        showToast("❌ تعذر تنفيذ إجراء المراجعة");
-      }
+    if (!data.success) {
+      showToast(`❌ ${data.message || "تعذر تنفيذ إجراء المراجعة"}`);
+      return;
     }
+    const prev = currentState.tafrigh?.data || {};
+    renderTafrighOutput({
+      ...prev,
+      run_id: runId,
+      markdown: data.markdown,
+      html: data.html,
+      review_items: data.review_items,
+      structured_json: data.structured_json || prev.structured_json
+    });
+    const msg = { confirm: "✅ تم اعتماد الوسم", correct: "✏️ تم تصحيح الوسم وتحديث النص", reject: "↩️ أُلغي التصحيح الإملائي" }[action];
+    showToast(`${msg} • متبقٍ للمراجعة: ${(data.review_items || []).length}`);
   } catch (err) {
     console.error("Tafrigh review action error:", err);
-    if (typeof showToast === "function") {
-      showToast("❌ خطأ في الاتصال بالخادم الخلفي");
-    }
+    showToast("❌ تعذر الاتصال بالخادم");
   }
 }
 
 window.switchLectureStageTab = switchLectureStageTab;
 window.renderTafrighOutput = renderTafrighOutput;
 window.executeTafrighReviewAction = executeTafrighReviewAction;
+window.openSaveTafrighRunModal = openSaveTafrighRunModal;
+window.openTafrighInlineReview = openTafrighInlineReview;
 window.updateAiMetricsUI = updateAiMetricsUI;
 
 window.renderAiRequestLogsTable = renderAiRequestLogsTable;
@@ -2119,7 +2784,7 @@ async function renderTrainingDataHub() {
     const text = rec.state?.matched_span_in_lecture || rec.state?.canonical_corpus_text || "";
     const aiChoice = rec.initial_system_prediction?.verdict || rec.answers?.verdict?.choice || "—";
     const goldChoice = rec.human_gold_resolution?.verdict || (rec.meta?.human_verified ? rec.answers?.verdict?.choice : "—");
-    const dateStr = rec.meta?.converted_at ? new Date(rec.meta.converted_at * 1000).toLocaleTimeString("ar-SA") : "الآن";
+    const dateStr = rec.meta?.converted_at ? new Date(rec.meta.converted_at * 1000).toLocaleTimeString((typeof WahyI18n === "object" ? WahyI18n.dateLocale() : "ar-u-nu-latn")) : "الآن";
 
     return `
       <tr class="hover:bg-slate-900/60 transition">

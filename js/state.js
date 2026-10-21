@@ -35,50 +35,27 @@ function rebuildSurahNameLookup() {
 }
 rebuildSurahNameLookup();
 
-// Core 42 Prophetic Adhkar & Duas (from Wahy-Finder) so Adhkar Studio works immediately & can reset to defaults
+// Built-in adhkar: only the best-known short adhkar. Longer du'as and collections are added by the user in the
+// Adhkar studio (their additions are marked isCustom and kept across updates).
 const BUILTIN_ADHKAR_DATA = [
-  { id: "Adhkar:1", category: "الاستغفار والتوبة", ref: "سيد الاستغفار (صحيح البخاري 6306)", t: "اللَّهُمَّ أَنْتَ رَبِّي لَا إِلَٰهَ إِلَّا أَنْتَ خَلَقْتَنِي وَأَنَا عَبْدُكَ وَأَنَا عَلَىٰ عَهْدِكَ وَوَعْدِكَ مَا اسْتَطَعْتُ أَعُوذُ بِكَ مِنْ شَرِّ مَا صَنَعْتُ أَبُوءُ لَكَ بِنِعْمَتِكَ عَلَيَّ وَأَبُوءُ لَكَ بِذَنْبِي فَاغْفِرْ لِي فَإِنَّهُ لَا يَغْفِرُ الذُّنُوبَ إِلَّا أَنْتَ" },
-  { id: "Adhkar:2", category: "الاستغفار والتوبة", ref: "استغفار التوبة (سنن أبي داود 1517)", t: "أَسْتَغْفِرُ اللَّهَ الَّذِي لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ وَأَتُوبُ إِلَيْهِ" },
-  { id: "Adhkar:3", category: "الاستغفار والتوبة", ref: "استغفار الكفارة (صحيح مسلم 2702)", t: "أَسْتَغْفِرُ اللَّهَ الْعَظِيمَ الَّذِي لَا إِلَٰهَ إِلَّا هُوَ الْحَيَّ الْقَيُّومَ وَأَتُوبُ إِلَيْهِ" },
-  { id: "Adhkar:4", category: "كفارة المجلس", ref: "كفارة المجلس (سنن أبي داود 4859)", t: "سُبْحَانَكَ اللَّهُمَّ وَبِحَمْدِكَ أَشْهَدُ أَنْ لَا إِلَٰهَ إِلَّا أَنْتَ أَسْتَغْفِرُكَ وَأَتُوبُ إِلَيْهِ" },
-  { id: "Adhkar:5", category: "كفارة المجلس", ref: "كفارة المجلس (رواية النسائي 1344)", t: "سُبْحَانَكَ اللَّهُمَّ وَبِحَمْدِكَ أَشْهَدُ أَنْ لَا إِلَٰهَ إِلَّا أَنْتَ أَسْتَغْفِرُكَ وَأَتُوبُ إِلَيْكَ" },
-  { id: "Adhkar:6", category: "التهليل والتسبيح", ref: "التهليل الجامع (صحيح البخاري 3293)", t: "لَا إِلَٰهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَىٰ كُلِّ شَيْءٍ قَدِيرٌ" },
-  { id: "Adhkar:7", category: "أذكار الصباح والمساء", ref: "تهليل الصباح والمساء (سنن أبي داود 5069)", t: "لَا إِلَٰهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ يُحْيِي وَيُمِيتُ وَهُوَ عَلَىٰ كُلِّ شَيْءٍ قَدِيرٌ" },
-  { id: "Adhkar:8", category: "التهليل والتسبيح", ref: "الباقيات الصالحات (صحيح مسلم 2137)", t: "سُبْحَانَ اللَّهِ وَالْحَمْدُ لِلَّهِ وَلَا إِلَٰهَ إِلَّا اللَّهُ وَاللَّهُ أَكْبَرُ وَلَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ الْعَلِيِّ الْعَظِيمِ" },
-  { id: "Adhkar:9", category: "أذكار الصباح والمساء", ref: "التسبيح المضاعف (صحيح مسلم 2726)", t: "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ عَدَدَ خَلْقِهِ وَرِضَا نَفْسِهِ وَزِنَةَ عَرْشِهِ وَمِدَادَ كَلِمَاتِهِ" },
-  { id: "Adhkar:10", category: "التهليل والتسبيح", ref: "كلمتان حبيبتان إلى الرحمن (صحيح البخاري 6406)", t: "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ سُبْحَانَ اللَّهِ الْعَظِيمِ" },
-  { id: "Adhkar:11", category: "أذكار الصلاة", ref: "أذكار بعد السلام من الصلاة (صحيح مسلم 593)", t: "اللَّهُمَّ أَنْتَ السَّلَامُ وَمِنْكَ السَّلَامُ تَبَارَكْتَ يَا ذَا الْجَلَالِ وَالْإِكْرَامِ" },
-  { id: "Adhkar:12", category: "أذكار الصلاة", ref: "الذكر عقب الوتر (سنن النسائي 1732)", t: "سُبْحَانَ الْمَلِكِ الْقُدُّوسِ رَبِّ الْمَلَائِكَةِ وَالرُّوحِ" },
-  { id: "Adhkar:13", category: "أذكار الصلاة", ref: "دعاء الإعانة على الذكر والشكر (سنن أبي داود 1522)", t: "اللَّهُمَّ أَعِنِّي عَلَىٰ ذِكْرِكَ وَشُكْرِكَ وَحُسْنِ عِبَادَتِكَ" },
-  { id: "Adhkar:14", category: "أدعية الكرب والهم", ref: "دعاء الكرب العظيم (صحيح البخاري 6346)", t: "لَا إِلَٰهَ إِلَّا اللَّهُ الْعَظِيمُ الْحَلِيمُ لَا إِلَٰهَ إِلَّا اللَّهُ رَبُّ الْعَرْشِ الْعَظِيمِ لَا إِلَٰهَ إِلَّا اللَّهُ رَبُّ السَّمَاوَاتِ وَرَبُّ الْأَرْضِ وَرَبُّ الْعَرْشِ الْكَرِيمِ" },
-  { id: "Adhkar:15", category: "أدعية الكرب والهم", ref: "دعاء تفريج الكرب (سنن أبي داود 5090)", t: "اللَّهُمَّ رَحْمَتَكَ أَرْجُو فَلَا تَكِلْنِي إِلَىٰ نَفْسِي طَرْفَةَ عَيْنٍ وَأَصْلِحْ لِي شَأْنِي كُلَّهُ لَا إِلَٰهَ إِلَّا أَنْتَ" },
-  { id: "Adhkar:16", category: "أدعية الكرب والهم", ref: "الاستغاثة برحمة الله (الترمذي 3524)", t: "يَا حَيُّ يَا قَيُّومُ بِرَحْمَتِكَ أَسْتَغِيثُ أَصْلِحْ لِي شَأْنِي كُلَّهُ وَلَا تَكِلْنِي إِلَىٰ نَفْسِي طَرْفَةَ عَيْنٍ" },
-  { id: "Adhkar:17", category: "أذكار الصباح والمساء", ref: "التعوذ بكلمات الله التامات (صحيح مسلم 2708)", t: "أَعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّاتِ مِنْ شَرِّ مَا خَلَقَ" },
-  { id: "Adhkar:18", category: "أذكار الصباح والمساء", ref: "ذكر الحفظ صباحاً ومساءً (سنن أبي داود 5088)", t: "بِسْمِ اللَّهِ الَّذِي لَا يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الْأَرْضِ وَلَا فِي السَّمَاءِ وَهُوَ السَّمِيعُ الْعَلِيمُ" },
-  { id: "Adhkar:19", category: "أذكار الصباح والمساء", ref: "الرضا بالله رباً وبالإسلام ديناً (سنن أبي داود 5072)", t: "رَضِيتُ بِاللَّهِ رَبًّا وَبِالْإِسْلَامِ دِينًا وَبِمُحَمَّدٍ صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ نَبِيًّا وَرَسُولًا" },
-  { id: "Adhkar:20", category: "أدعية جامعة", ref: "سؤال العفو والعافية (سنن ابن ماجه 3871)", t: "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْعَفْوَ وَالْعَافِيَةَ فِي الدُّنْيَا وَالْآخِرَةِ اللَّهُمَّ إِنِّي أَسْأَلُكَ الْعَفْوَ وَالْعَافِيَةَ فِي دِينِي وَدُنْيَايَ وَأَهْلِي وَمَالِي" },
-  { id: "Adhkar:21", category: "أدعية جامعة", ref: "دعاء ليلة القدر (جامع الترمذي 3513)", t: "اللَّهُمَّ إِنَّكَ عَفُوٌّ تُحِبُّ الْعَفْوَ فَاعْفُ عَنِّي" },
-  { id: "Adhkar:22", category: "أدعية جامعة", ref: "سؤال الهدى والتقى والعفاف والغنى (صحيح مسلم 2721)", t: "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْهُدَىٰ وَالتُّقَىٰ وَالْعَفَافَ وَالْغِنَىٰ" },
-  { id: "Adhkar:23", category: "أدعية جامعة", ref: "دعاء تثبيت القلوب (جامع الترمذي 2140)", t: "يَا مُقَلِّبَ الْقُلُوبِ ثَبِّتْ قَلْبِي عَلَىٰ دِينِكَ" },
-  { id: "Adhkar:24", category: "أدعية جامعة", ref: "دعاء تصريف القلوب على الطاعة (صحيح مسلم 2654)", t: "اللَّهُمَّ مُصَرِّفَ الْقُلُوبِ صَرِّفْ قُلُوبَنَا عَلَىٰ طَاعَتِكَ" },
-  { id: "Adhkar:25", category: "أدعية الكرب والهم", ref: "الاستعاذة من العجز والكسل والهم (صحيح البخاري 6369)", t: "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْهَمِّ وَالْحَزَنِ وَالْعَجْزِ وَالْكَسَلِ وَالْبُخْلِ وَالْجُبْنِ وَضَلَعِ الدَّيْنِ وَغَلَبَةِ الرِّجَالِ" },
-  { id: "Adhkar:26", category: "أدعية جامعة", ref: "الاستعاذة من علم لا ينفع (صحيح مسلم 2722)", t: "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنْ عِلْمٍ لَا يَنْفَعُ وَمِنْ قَلْبٍ لَا يَخْشَعُ وَمِنْ نَفْسٍ لَا تَشْبَعُ وَمِنْ دَعْوَةٍ لَا يُسْتَجَابُ لَهَا" },
-  { id: "Adhkar:27", category: "أذكار الصباح والمساء", ref: "سؤال العلم النافع والرزق الطيب (سنن ابن ماجه 925)", t: "اللَّهُمَّ إِنِّي أَسْأَلُكَ عِلْمًا نَافِعًا وَرِزْقًا طَيِّبًا وَعَمَلًا مُتَقَبَّلًا" },
-  { id: "Adhkar:28", category: "أدعية جامعة", ref: "الاستعاذة من زوال النعمة (صحيح مسلم 2739)", t: "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنْ زَوَالِ نِعْمَتِكَ وَتَحَوُّلِ عَافِيَتِكَ وَفُجَاءَةِ نِقْمَتِكَ وَجَمِيعِ سَخَطِكَ" },
-  { id: "Adhkar:29", category: "أذكار الصباح والمساء", ref: "دعاء الصباح والمساء (صحيح مسلم 2723)", t: "أَصْبَحْنَا وَأَصْبَحَ الْمُلْكُ لِلَّهِ وَالْحَمْدُ لِلَّهِ لَا إِلَٰهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ" },
-  { id: "Adhkar:30", category: "أذكار الصباح والمساء", ref: "دعاء الفطرة في الصباح (مسند أحمد 15360)", t: "أَصْبَحْنَا عَلَىٰ فِطْرَةِ الْإِسْلَامِ وَعَلَىٰ كَلِمَةِ الْإِخْلَاصِ وَعَلَىٰ دِينِ نَبِيِّنَا مُحَمَّدٍ صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ وَعَلَىٰ مِلَّةِ أَبِينَا إِبْرَاهِيمَ حَنِيفًا مُسْلِمًا وَمَا كَانَ مِنَ الْمُشْرِكِينَ" },
-  { id: "Adhkar:31", category: "أذكار الصلاة", ref: "دعاء الاستفتاح (سنن أبي داود 775)", t: "سُبْحَانَكَ اللَّهُمَّ وَبِحَمْدِكَ وَتَبَارَكَ اسْمُكَ وَتَعَالَىٰ جَدُّكَ وَلَا إِلَٰهَ غَيْرُكَ" },
-  { id: "Adhkar:32", category: "أذكار الصلاة", ref: "الاستعاذة قبل السلام (صحيح مسلم 588)", t: "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنْ عَذَابِ جَهَنَّمَ وَمِنْ عَذَابِ الْقَبْرِ وَمِنْ فِتْنَةِ الْمَحْيَا وَالْمَمَاتِ وَمِنْ شَرِّ فِتْنَةِ الْمَسِيحِ الدَّجَّالِ" },
-  { id: "Adhkar:33", category: "أذكار الصلاة", ref: "الصلاة الإبراهيمية (صحيح البخاري 3370)", t: "اللَّهُمَّ صَلِّ عَلَىٰ مُحَمَّدٍ وَعَلَىٰ آلِ مُحَمَّدٍ كَمَا صَلَّيْتَ عَلَىٰ إِبْرَاهِيمَ وَعَلَىٰ آلِ إِبْرَاهِيمَ إِنَّكَ حَمِيدٌ مَجِيدٌ" },
-  { id: "Adhkar:34", category: "أذكار الصلاة", ref: "التشهد في الصلاة (صحيح البخاري 831)", t: "التَّحِيَّاتُ لِلَّهِ وَالصَّلَوَاتُ وَالطَّيِّبَاتُ السَّلَامُ عَلَيْكَ أَيُّهَا النَّبِيُّ وَرَحْمَةُ اللَّهِ وَبَرَكَاتُهُ السَّلَامُ عَلَيْنَا وَعَلَىٰ عِبَادِ اللَّهِ الصَّالِحِينَ" },
-  { id: "Adhkar:35", category: "أذكار الصلاة", ref: "دعاء القنوت (سنن أبي داود 1425)", t: "اللَّهُمَّ اهْدِنِي فِيمَنْ هَدَيْتَ وَعَافِنِي فِيمَنْ عَافَيْتَ وَتَوَلَّنِي فِيمَنْ تَوَلَّيْتَ وَبَارِكْ لِي فِيمَا أَعْطَيْتَ وَقِنِي شَرَّ مَا قَضَيْتَ" },
-  { id: "Adhkar:36", category: "أذكار الصلاة", ref: "الذكر بعد الصلاة (صحيح البخاري 844)", t: "لَا إِلَٰهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَىٰ كُلِّ شَيْءٍ قَدِيرٌ اللَّهُمَّ لَا مَانِعَ لِمَا أَعْطَيْتَ وَلَا مُعْطِيَ لِمَا مَنَعْتَ وَلَا يَنْفَعُ ذَا الْجَدِّ مِنْكَ الْجَدُّ" },
-  { id: "Adhkar:37", category: "أدعية جامعة", ref: "سؤال الجنة والاستعاذة من النار (سنن أبي داود 792)", t: "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْجَنَّةَ وَأَعُوذُ بِكَ مِنَ النَّارِ" },
-  { id: "Adhkar:38", category: "أدعية جامعة", ref: "سؤال الجنة وما قرب إليها (سنن ابن ماجه 3846)", t: "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْجَنَّةَ وَمَا قَرَّبَ إِلَيْهَا مِنْ قَوْلٍ أَوْ عَمَلٍ وَأَعُوذُ بِكَ مِنَ النَّارِ وَمَا قَرَّبَ إِلَيْهَا مِنْ قَوْلٍ أَوْ عَمَلٍ" },
-  { id: "Adhkar:39", category: "الاستغفار والتوبة", ref: "التوبة والاستغفار المأثور (صحيح البخاري 6307)", t: "رَبِّ اغْفِرْ لِي وَتُبْ عَلَيَّ إِنَّكَ أَنْتَ التَّوَّابُ الرَّحِيمُ" },
-  { id: "Adhkar:40", category: "أدعية جامعة", ref: "دعاء الاستخارة (صحيح البخاري 1166)", t: "اللَّهُمَّ إِنِّي أَسْتَخِيرُكَ بِعِلْمِكَ وَأَسْتَقْدِرُكَ بِقُدْرَتِكَ وَأَسْأَلُكَ مِنْ فَضْلِكَ الْعَظِيمِ" },
-  { id: "Adhkar:41", category: "أذكار اليوم والليلة", ref: "دعاء الخروج من المنزل (سنن أبي داود 5095)", t: "بِسْمِ اللَّهِ تَوَكَّلْتُ عَلَى اللَّهِ وَلَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ" },
-  { id: "Adhkar:42", category: "أذكار الحج والعمرة", ref: "تلبية الحج والعمرة (صحيح البخاري 1549)", t: "لَبَّيْكَ اللَّهُمَّ لَبَّيْكَ لَبَّيْكَ لَا شَرِيكَ لَكَ لَبَّيْكَ إِنَّ الْحَمْدَ وَالنِّعْمَةَ لَكَ وَالْمُلْكَ لَا شَرِيكَ لَكَ" }
+  { id: "Adhkar:tahlil", category: "التهليل", ref: "التهليل", t: "لَا إِلَٰهَ إِلَّا اللَّهُ" },
+  { id: "Adhkar:tahlil_full", category: "التهليل", ref: "التهليل الجامع", t: "لَا إِلَٰهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَىٰ كُلِّ شَيْءٍ قَدِيرٌ" },
+  { id: "Adhkar:tasbih", category: "التسبيح", ref: "التسبيح", t: "سُبْحَانَ اللَّهِ" },
+  { id: "Adhkar:tasbih_hamd", category: "التسبيح", ref: "التسبيح والتحميد", t: "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ" },
+  { id: "Adhkar:tasbih_azim", category: "التسبيح", ref: "التسبيح", t: "سُبْحَانَ اللَّهِ الْعَظِيمِ" },
+  { id: "Adhkar:kalimatan", category: "التسبيح", ref: "كلمتان حبيبتان إلى الرحمن", t: "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ سُبْحَانَ اللَّهِ الْعَظِيمِ" },
+  { id: "Adhkar:tahmid", category: "التحميد", ref: "التحميد", t: "الْحَمْدُ لِلَّهِ" },
+  { id: "Adhkar:takbir", category: "التكبير", ref: "التكبير", t: "اللَّهُ أَكْبَرُ" },
+  { id: "Adhkar:baqiyat", category: "الباقيات الصالحات", ref: "الباقيات الصالحات", t: "سُبْحَانَ اللَّهِ وَالْحَمْدُ لِلَّهِ وَلَا إِلَٰهَ إِلَّا اللَّهُ وَاللَّهُ أَكْبَرُ" },
+  { id: "Adhkar:hawqala", category: "الحوقلة", ref: "الحوقلة", t: "لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ" },
+  { id: "Adhkar:istighfar", category: "الاستغفار", ref: "الاستغفار", t: "أَسْتَغْفِرُ اللَّهَ" },
+  { id: "Adhkar:istighfar_tawba", category: "الاستغفار", ref: "الاستغفار والتوبة", t: "أَسْتَغْفِرُ اللَّهَ وَأَتُوبُ إِلَيْهِ" },
+  { id: "Adhkar:basmala", category: "البسملة", ref: "البسملة", t: "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ" },
+  { id: "Adhkar:istiadha", category: "الاستعاذة", ref: "الاستعاذة", t: "أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ" },
+  { id: "Adhkar:hasbala", category: "الحسبلة", ref: "الحسبلة", t: "حَسْبُنَا اللَّهُ وَنِعْمَ الْوَكِيلُ" },
+  { id: "Adhkar:istirja", category: "الاسترجاع", ref: "الاسترجاع", t: "إِنَّا لِلَّهِ وَإِنَّا إِلَيْهِ رَاجِعُونَ" },
+  { id: "Adhkar:salat_nabi", category: "الصلاة على النبي", ref: "الصلاة على النبي ﷺ", t: "اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَىٰ نَبِيِّنَا مُحَمَّدٍ" },
+  { id: "Adhkar:mashallah", category: "أذكار متفرقة", ref: "ما شاء الله", t: "مَا شَاءَ اللَّهُ لَا قُوَّةَ إِلَّا بِاللَّهِ" }
 ];
 
 let RAW_QURAN_DATA = [];
@@ -87,7 +64,8 @@ let RAW_ADHKAR_DATA = BUILTIN_ADHKAR_DATA.map(x => ({ ...x }));
 let RAW_OUTSIDE_HADITH_DATA = [];
 const PRESET_LECTURES = {};
 
-const LS_CUSTOM_ADHKAR_KEY = "wahyTranscriber_adhkarDataset_v21";
+const LS_CUSTOM_ADHKAR_KEY = "wahyTranscriber_adhkarDataset_v22";
+const LS_CUSTOM_ADHKAR_KEY_V21 = "wahyTranscriber_adhkarDataset_v21"; // held built-ins + 300+ downloaded adhkar
 const LS_OUTSIDE_HADITH_KEY = "wahyTranscriber_outsideHadith_v21";
 const LS_OUTPUT_PREFS_KEY = "wahyTranscriber_outputPrefs_v21";
 
@@ -207,6 +185,9 @@ let currentState = {
     targetScope: "HADITH_AND_CANDIDATES", // "ALL" | "HADITH_ONLY" | "HADITH_AND_CANDIDATES"
     contextWindowWords: 25,
     activeProvider: "gemini",             // "gemini" | "openrouter_jev" | "openrouter_chat" | "local_laya"
+    promptConfig: null,                   // User prompt tuning; defaults live in WahyAiVerifier.DEFAULT_PROMPT_CONFIG
+    selectionMode: "scope",               // "scope" | "manual" (per-lecture, not persisted)
+    manualSelectedIds: [],                // detection ids picked in the request-options panel
 
     // Provider 1: Google Gemini API (Free Plan / Paid Tier)
     geminiApiKey: "",
@@ -276,6 +257,12 @@ function loadSavedUserDatasetsAndPrefs() {
       if (Array.isArray(parsed) && parsed.length > 0) {
         RAW_ADHKAR_DATA = parsed;
       }
+    } else {
+      // Migrate once from v21: keep only what the user added themselves, on top of the new built-in list
+      const old = JSON.parse(localStorage.getItem(LS_CUSTOM_ADHKAR_KEY_V21) || "null");
+      const mine = Array.isArray(old) ? old.filter(x => x && x.isCustom) : [];
+      RAW_ADHKAR_DATA = [...mine, ...BUILTIN_ADHKAR_DATA.map(x => ({ ...x }))];
+      localStorage.setItem(LS_CUSTOM_ADHKAR_KEY, JSON.stringify(RAW_ADHKAR_DATA));
     }
   } catch (e) {}
 
@@ -333,7 +320,8 @@ function saveAiConfigToStorage() {
       layaCheckpoint: currentState.aiVerification.layaCheckpoint,
       layaDevice: currentState.aiVerification.layaDevice,
       layaCustomCheckpointPath: currentState.aiVerification.layaCustomCheckpointPath,
-      visibilityFilter: currentState.aiVerification.visibilityFilter
+      visibilityFilter: currentState.aiVerification.visibilityFilter,
+      promptConfig: currentState.aiVerification.promptConfig
     };
     localStorage.setItem(LS_AI_CONFIG_KEY, JSON.stringify(cfg));
   } catch (e) {}
@@ -676,16 +664,25 @@ function recomputeCanonicalForDetection(det, rawTokens) {
     return;
   }
   const tNorms = rawTokens.map(t => t.norm);
-  const newQSegs = [];
+  // Hadith: align against the full text (chain of narration + matn + takhrij), so spoken words that belong to
+  // the chain (e.g. after extending the start by hand) are matched and kept, not just the matn the engine compares.
+  const view = typeof getUnitFullWordView === "function" ? getUnitFullWordView(unit) : null;
+  const target = view ? fullTextAlignmentUnit(unit, view) : unit;
+  const off = view ? view.matnStart : 0;
+  const matnLen = unit.vocalizedWords.length;
+  const fullSegs = [];
   const newCanonSegs = [];
   for (let idx = 0; idx < det.segments.length; idx++) {
     const [s, e] = det.segments[idx];
-    const prevHintQS = (det.qSegments && det.qSegments[idx]) ? det.qSegments[idx][0] : null;
-    const [bestQS, bestQE] = alignTranscriptSegToUnit(tNorms, s, e, unit, prevHintQS);
-    newQSegs.push([bestQS, bestQE]);
-    newCanonSegs.push(unit.vocalizedWords.slice(bestQS, bestQE).join(" "));
+    const prevHint = det.qFullSegments?.[idx]?.[0] ?? (det.qSegments?.[idx] ? det.qSegments[idx][0] + off : null);
+    const [bestQS, bestQE] = alignTranscriptSegToUnit(tNorms, s, e, target, prevHint);
+    fullSegs.push([bestQS, bestQE]);
+    newCanonSegs.push(target.vocalizedWords.slice(bestQS, bestQE).join(" "));
   }
-  det.qSegments = newQSegs;
+  // qSegments stay in matn positions for the rest of the app (clamped to the matn)
+  det.qSegments = fullSegs.map(([a, b]) => [Math.max(0, Math.min(matnLen, a - off)), Math.max(0, Math.min(matnLen, b - off))]);
+  det.qFullSegments = view ? fullSegs : undefined;
+  det.refSelection = undefined;   // the span changed: the manual word choice no longer applies
   det.canonicalSegments = newCanonSegs;
   det.canonicalText = newCanonSegs.join(" ");
 }
@@ -705,13 +702,26 @@ function rebuildMatcher() {
   const activeAdhkar = currentState.adhkarEnabled !== false ? RAW_ADHKAR_DATA : [];
   const activeOutside = currentState.outsideCorpusEnabled !== false ? RAW_OUTSIDE_HADITH_DATA : [];
 
-  activeMatcher = new QuotationMatcherJS(
-    RAW_QURAN_DATA,
-    RAW_HADITH_DATA,
-    params,
-    activeAdhkar,
-    activeOutside
-  );
+  // Engine v4 is opt-in: localStorage.wahyEngine = "v4" (or "v3" to switch back). Falls back to v3 if v4 fails to build.
+  let engineChoice = "v3";
+  try { engineChoice = localStorage.getItem("wahyEngine") || "v3"; } catch (e) { /* storage blocked */ }
+  activeMatcher = null;
+  if (engineChoice === "v4" && typeof WahyEngine !== "undefined") {
+    try {
+      activeMatcher = new WahyEngine(RAW_QURAN_DATA, RAW_HADITH_DATA, params, activeAdhkar, activeOutside);
+    } catch (e) {
+      console.error("WahyEngine v4 failed to initialise, falling back to v3", e);
+    }
+  }
+  if (!activeMatcher) {
+    activeMatcher = new QuotationMatcherJS(
+      RAW_QURAN_DATA,
+      RAW_HADITH_DATA,
+      params,
+      activeAdhkar,
+      activeOutside
+    );
+  }
 
   const countBadge = document.getElementById("corpusCountLabel");
   if (countBadge) {
@@ -743,6 +753,10 @@ function runDetectionAndBuildCaptions(options = {}) {
   if (!activeMatcher) rebuildMatcher();
 
   if (options.rawText !== undefined) {
+    // a new transcript is a new saved session (re-running the engine on the same text keeps the same one)
+    currentState.currentLectureId = null;
+    currentState.lectureCreatedAt = null;
+    currentState.isDemoSession = false;
     const cleanText = String(options.rawText || "").trim();
     currentState.rawText = cleanText;
     currentState.rawTranscript = cleanText;
@@ -874,7 +888,7 @@ function openWahyLecturesDB() {
     if (!window.indexedDB) {
       return reject(new Error("IndexedDB غير مدعوم في هذا المتصفح."));
     }
-    const req = window.indexedDB.open(IDB_LECTURES_DB_NAME, 1);
+    const req = window.indexedDB.open(IDB_LECTURES_DB_NAME, 2);   // v2: an older DB of this name may exist without the store
     req.onupgradeneeded = (e) => {
       const db = e.target.result;
       if (!db.objectStoreNames.contains(IDB_LECTURES_STORE_NAME)) {
@@ -949,6 +963,10 @@ async function loadLectureSession(sessionId) {
           currentState.detections = Array.isArray(item.detections) ? item.detections : [];
           currentState.captions = Array.isArray(item.captions) ? item.captions : [];
           currentState.tafrighResult = item.tafrighResult || null;
+          currentState.selectedPredIndex = -1;
+          currentState.selectedCaptionIndex = -1;
+          currentState.undoStack = [];
+          currentState.isDemoSession = false;
           resolve(item);
         } else {
           reject(new Error("لم يتم العثور على الجلسة"));
@@ -993,6 +1011,77 @@ async function deleteSavedLectureSession(sessionId) {
     });
   } catch (err) {
     console.error("Failed to delete lecture session:", err);
+    return false;
+  }
+}
+
+
+// -----------------------------------------------------------------------------
+// Autosave / restore: the working session survives a page refresh
+// -----------------------------------------------------------------------------
+const MAX_SAVED_LECTURE_SESSIONS = 10;
+let _autosaveTimer = null;
+let _autosavePending = false;
+
+function scheduleSessionAutosave() {
+  if (currentState.isDemoSession || !(currentState.words || []).length) return;
+  _autosavePending = true;
+  clearTimeout(_autosaveTimer);
+  _autosaveTimer = setTimeout(flushSessionAutosave, 700);
+}
+
+async function flushSessionAutosave() {
+  clearTimeout(_autosaveTimer);
+  if (currentState.isDemoSession) { _autosavePending = false; return; }
+  if (!_autosavePending) return;
+  _autosavePending = false;
+  const saved = await saveCurrentLectureSession();
+  if (!saved) { _autosavePending = true; return; }
+  if (typeof renderSavedLecturesList === "function") renderSavedLecturesList();   // keep the "unsaved" flag so the refresh warning stays on
+  try {
+    const all = await listSavedLectureSessions();      // newest first
+    for (const old of all.slice(MAX_SAVED_LECTURE_SESSIONS)) await deleteSavedLectureSession(old.id);
+  } catch (e) { /* pruning is best effort */ }
+}
+
+/** Load the most recently edited saved session into currentState. Returns it, or null when none exists. */
+async function restoreLatestLectureSession() {
+  const list = await listSavedLectureSessions();
+  const latest = list.find(x => Array.isArray(x.words) && x.words.length);
+  if (!latest) return null;
+  return await loadLectureSession(latest.id);
+}
+
+window.addEventListener("beforeunload", (e) => {
+  if (!_autosavePending) return;
+  flushSessionAutosave();
+  e.preventDefault();      // an edit is still being written: ask before the page goes away
+  e.returnValue = "";
+});
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "hidden") flushSessionAutosave();
+});
+
+async function renameSavedLectureSession(sessionId, newTitle) {
+  try {
+    const db = await openWahyLecturesDB();
+    return await new Promise((resolve, reject) => {
+      const tx = db.transaction([IDB_LECTURES_STORE_NAME], "readwrite");
+      const store = tx.objectStore(IDB_LECTURES_STORE_NAME);
+      const getReq = store.get(sessionId);
+      getReq.onsuccess = () => {
+        const item = getReq.result;
+        if (!item) return resolve(false);
+        item.title = newTitle;
+        item.updated_at = new Date().toISOString();
+        const putReq = store.put(item);
+        putReq.onsuccess = () => resolve(true);
+        putReq.onerror = () => reject(putReq.error);
+      };
+      getReq.onerror = () => reject(getReq.error);
+    });
+  } catch (err) {
+    console.error("Failed to rename lecture session:", err);
     return false;
   }
 }

@@ -28,6 +28,50 @@ function switchInputSourceTab(tabName) {
   });
 }
 
+// Overall bar = weighted stages; each stage reports 0-100 (or null when its length is unknown)
+const TRANSCRIBE_STAGE_WEIGHTS = [["download", 35], ["audio", 10], ["transcribe", 45], ["engine", 10]];
+let _transcribeProgressTimer = null;
+
+function setTranscriptionProgress(stage, stagePct, message) {
+  const order = TRANSCRIBE_STAGE_WEIGHTS.map(x => x[0]);
+  const idx = order.indexOf(stage);
+  if (idx < 0) return;
+  let overall = 0;
+  TRANSCRIBE_STAGE_WEIGHTS.forEach(([name, w], k) => {
+    if (k < idx) overall += w;
+    else if (k === idx) overall += w * ((stagePct == null ? 0 : stagePct) / 100);
+  });
+  const pct = Math.round(overall);
+  const bar = document.getElementById("transcriptionProgressBar");
+  const pctEl = document.getElementById("transcriptionPercent");
+  const txt = document.getElementById("transcriptionStatusText");
+  if (bar) { bar.style.width = `${pct}%`; bar.classList.toggle("animate-pulse", stagePct == null); }
+  if (pctEl) pctEl.textContent = `${pct}%`;
+  if (txt && message) txt.textContent = message;
+  document.querySelectorAll("#transcriptionStages [data-stage]").forEach(el => {
+    const k = order.indexOf(el.getAttribute("data-stage"));
+    el.className = k < idx ? "text-emerald-400 font-bold" : (k === idx ? "text-sky-200 font-bold" : "");
+  });
+}
+
+function startTranscriptionProgressPolling(jobId) {
+  stopTranscriptionProgressPolling();
+  _transcribeProgressTimer = setInterval(async () => {
+    try {
+      const r = await fetch(`/api/transcribe/progress/${jobId}`, { trapError: false });
+      if (!r.ok) return;
+      const d = await r.json();
+      if (d.stage && d.stage !== "unknown" && d.stage !== "done" && d.stage !== "error") {
+        setTranscriptionProgress(d.stage, d.percent, d.message);
+      }
+    } catch (e) { /* polling is best effort */ }
+  }, 600);
+}
+
+function stopTranscriptionProgressPolling() {
+  if (_transcribeProgressTimer) { clearInterval(_transcribeProgressTimer); _transcribeProgressTimer = null; }
+}
+
 function setTranscriptionBusyUI(isBusy, statusMessage = "") {
   const banner = document.getElementById("transcriptionStatusBanner");
   const txt = document.getElementById("transcriptionStatusText");
@@ -38,9 +82,98 @@ function setTranscriptionBusyUI(isBusy, statusMessage = "") {
     if (isBusy) banner.classList.remove("hidden");
     else banner.classList.add("hidden");
   }
+  if (isBusy) setTranscriptionProgress("download", 0);
+  else stopTranscriptionProgressPolling();
   if (txt && statusMessage) txt.textContent = statusMessage;
   if (btnYt) btnYt.disabled = isBusy;
   if (btnMedia) btnMedia.disabled = isBusy;
+}
+
+
+// -----------------------------------------------------------------------------
+// Saved lectures: apply a session loaded into currentState, and the manager list
+// -----------------------------------------------------------------------------
+function applyRestoredSessionToUi() {
+  const ta = document.getElementById("textareaFastPathInput");
+  if (ta) ta.value = currentState.rawTranscript || "";
+  const titleInp = document.getElementById("inpLectureTitle");
+  if (titleInp) titleInp.value = currentState.lectureTitle || "";
+  attachMediaUrlToPlayer(currentState.mediaUrl, currentState.lectureTitle);
+  if (!currentState.captions.length) {
+    currentState.captions = buildSmartCaptions(currentState.words, currentState.detections, currentState.outputPrefs);
+  }
+  renderAllViews();
+  switchMainSection("display");
+}
+
+async function renderSavedLecturesList() {
+  const box = document.getElementById("savedLecturesList");
+  if (!box) return;
+  const list = (await listSavedLectureSessions()).filter(x => Array.isArray(x.words) && x.words.length);
+  if (!list.length) {
+    box.innerHTML = `<div class="text-xs text-slate-500 py-3 text-center">لا توجد محاضرات محفوظة بعد — ستُضاف هنا تلقائياً بعد كل تفريغ.</div>`;
+    return;
+  }
+  const fmt = iso => { try { return new Date(iso).toLocaleString((typeof WahyI18n === "object" ? WahyI18n.dateLocale() : "ar-u-nu-latn"), { dateStyle: "medium", timeStyle: "short" }); } catch (e) { return ""; } };
+  box.innerHTML = list.map(x => {
+    const isCurrent = x.id === currentState.currentLectureId;
+    const st = x.stats || {};
+    return `
+      <div class="flex flex-wrap items-center gap-2 rounded-2xl border px-3 py-2.5 ${isCurrent ? "bg-emerald-950/40 border-emerald-500/50" : "bg-slate-950 border-slate-800"}" data-lecture-id="${escapeHtml(x.id)}">
+        <div class="flex-1 min-w-[200px]">
+          <div class="text-sm font-bold text-slate-100 truncate">${isCurrent ? "● " : ""}${escapeHtml(x.title || "بدون عنوان")}</div>
+          <div class="text-[11px] text-slate-400">${escapeHtml(fmt(x.updated_at))} • ${st.wordsCount || 0} كلمة • ${st.detectionsCount || 0} مقتبس${x.mediaUrl ? " • 🎬 فيديو" : ""}</div>
+        </div>
+        <button type="button" data-lec-act="open" class="px-3 py-1.5 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/35 text-emerald-300 border border-emerald-500/40 text-[11px] font-bold transition">فتح</button>
+        <button type="button" data-lec-act="rename" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-[11px] font-bold transition">إعادة تسمية</button>
+        <button type="button" data-lec-act="delete" class="px-3 py-1.5 rounded-xl bg-rose-600/15 hover:bg-rose-600/30 text-rose-300 border border-rose-500/40 text-[11px] font-bold transition">حذف</button>
+      </div>`;
+  }).join("");
+}
+
+function initSavedLecturesManager() {
+  document.getElementById("savedLecturesList")?.addEventListener("click", async (e) => {
+    const btn = e.target.closest("[data-lec-act]");
+    const row = e.target.closest("[data-lecture-id]");
+    if (!btn || !row) return;
+    const id = row.getAttribute("data-lecture-id");
+    const act = btn.getAttribute("data-lec-act");
+    if (act === "open") {
+      await flushSessionAutosave();                      // never lose pending edits of the lecture we are leaving
+      if (await loadLectureSession(id)) {
+        applyRestoredSessionToUi();
+        renderSavedLecturesList();
+        showToast(`📂 تم فتح «${currentState.lectureTitle}»`);
+      }
+    } else if (act === "rename") {
+      const cur = row.querySelector(".font-bold")?.textContent.replace(/^● /, "") || "";
+      const name = (prompt("العنوان الجديد للمحاضرة:", cur) || "").trim();
+      if (!name) return;
+      await renameSavedLectureSession(id, name);
+      if (id === currentState.currentLectureId) {
+        currentState.lectureTitle = name;
+        const titleInp = document.getElementById("inpLectureTitle");
+        if (titleInp) titleInp.value = name;
+      }
+      renderSavedLecturesList();
+    } else if (act === "delete") {
+      if (!confirm("حذف هذه المحاضرة المحفوظة؟ لا يمكن التراجع.")) return;
+      await deleteSavedLectureSession(id);
+      if (id === currentState.currentLectureId) { currentState.currentLectureId = null; currentState.lectureCreatedAt = null; }
+      renderSavedLecturesList();
+    }
+  });
+  document.getElementById("btnClearAllLectures")?.addEventListener("click", async () => {
+    if (!confirm("حذف جميع المحاضرات المحفوظة؟ لا يمكن التراجع.")) return;
+    for (const x of await listSavedLectureSessions()) await deleteSavedLectureSession(x.id);
+    currentState.currentLectureId = null; currentState.lectureCreatedAt = null;
+    renderSavedLecturesList();
+  });
+  // keep the saved title in sync when the user edits the title field
+  document.getElementById("inpLectureTitle")?.addEventListener("change", (e) => {
+    currentState.lectureTitle = e.target.value.trim() || currentState.lectureTitle;
+    scheduleSessionAutosave();
+  });
 }
 
 function attachMediaUrlToPlayer(mediaUrl, title = "") {
@@ -80,7 +213,9 @@ async function handleBackendTranscribeRequest({ youtubeUrl = "", mediaFile = nul
     localStorage.setItem(LS_MODEL_KEY, modelSel);
   } catch (e) {}
 
+  const jobId = "job_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
   const formData = new FormData();
+  formData.append("job_id", jobId);
   formData.append("model_selected", modelSel);
   formData.append("groq_api_key", groqKey);
   formData.append("auto_fallback", String(autoFallback));
@@ -94,6 +229,7 @@ async function handleBackendTranscribeRequest({ youtubeUrl = "", mediaFile = nul
       : "جاري معالجة الملف الصوتي/المرئي وتفريغه مع التوقيت اللحظي للكلمات..."
   );
 
+  startTranscriptionProgressPolling(jobId);
   try {
     const resp = await fetch("/api/transcribe", {
       method: "POST",
@@ -107,7 +243,9 @@ async function handleBackendTranscribeRequest({ youtubeUrl = "", mediaFile = nul
     }
 
     const data = await resp.json();
-    setTranscriptionBusyUI(false);
+    stopTranscriptionProgressPolling();
+    setTranscriptionProgress("engine", 0, "جاري تشغيل محرك الكشف عن الآيات والأحاديث...");
+    await new Promise(r => setTimeout(r, 30));   // let the bar paint before the synchronous engine run
 
     if (data.media_url) {
       attachMediaUrlToPlayer(data.media_url, data.title || "محاضرة مفرّغة");
@@ -121,6 +259,9 @@ async function handleBackendTranscribeRequest({ youtubeUrl = "", mediaFile = nul
       words: Array.isArray(data.words) ? data.words : []
     });
 
+    setTranscriptionProgress("engine", 100, "اكتمل");
+    setTranscriptionBusyUI(false);
+    renderSavedLecturesList();
     switchMainSection("display");
     showToast(`✅ اكتمل التفريغ (${data.model_used || modelSel}): ${currentState.words.length} كلمة و ${currentState.detections.length} مقتبس`);
   } catch (err) {
@@ -230,6 +371,8 @@ window.addEventListener("DOMContentLoaded", () => {
     try { window.lucide.createIcons(); } catch (_) {}
   }
 
+  initSavedLecturesManager();
+
   // Restore Theme
   try {
     const savedTheme = localStorage.getItem(LS_THEME_KEY) || "dark";
@@ -268,7 +411,10 @@ window.addEventListener("DOMContentLoaded", () => {
     switchMainSection("input");
   });
   document.getElementById("btnQuickGoToDisplayFromEditor")?.addEventListener("click", () => {
-    switchMainSection("display");
+    // land on the quote being edited, if any
+    const sel = currentState.selectedPredIndex;
+    if (sel >= 0 && sel < currentState.detections.length && typeof openFindingInDisplay === "function") openFindingInDisplay(sel);
+    else switchMainSection("display");
   });
 
   // Editor Sub-Mode Switchers (FN Studio & Inspector vs Full Text Editor vs Captions Timeline)
@@ -377,7 +523,7 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 
   // Export & Formatting Modal
-  document.getElementById("btnOpenExportModal")?.addEventListener("click", () => {
+  const openFormattingModal = () => {
     const prefs = getOutputDisplayPrefs();
     const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val; };
     const setChk = (id, val) => { const el = document.getElementById(id); if (el) el.checked = Boolean(val); };
@@ -390,8 +536,11 @@ window.addEventListener("DOMContentLoaded", () => {
     setChk("chkPrefShowQuranRef", prefs.showQuranSource !== false);
     setChk("chkPrefShowHadithRef", prefs.showHadithSource !== false);
     setChk("chkPrefShowAdhkarRef", prefs.showAdhkarTag !== false);
+    setChk("chkPrefGroupAyat", prefs.groupContiguousAyat !== false);
     openModalById("exportModal");
-  });
+  };
+  document.getElementById("btnOpenExportModal")?.addEventListener("click", openFormattingModal);
+  document.getElementById("btnToggleDisplayFormattingPanel")?.addEventListener("click", openFormattingModal);
   document.getElementById("btnCloseExportModal")?.addEventListener("click", () => closeModalById("exportModal"));
   document.getElementById("exportModal")?.addEventListener("click", (e) => {
     if (e.target.id === "exportModal") closeModalById("exportModal");
@@ -407,7 +556,8 @@ window.addEventListener("DOMContentLoaded", () => {
       adhkarBracketClose: document.getElementById("inpPrefAdhkarClose")?.value ?? "〗",
       showQuranSource: document.getElementById("chkPrefShowQuranRef")?.checked !== false,
       showHadithSource: document.getElementById("chkPrefShowHadithRef")?.checked !== false,
-      showAdhkarTag: document.getElementById("chkPrefShowAdhkarRef")?.checked !== false
+      showAdhkarTag: document.getElementById("chkPrefShowAdhkarRef")?.checked !== false,
+      groupContiguousAyat: document.getElementById("chkPrefGroupAyat")?.checked !== false
     });
     recalculateCaptionsFromCurrentFindings();
     showToast("✅ تم حفظ تفضيلات الأقواس والعزو وتحديث العرض والكابشن");
@@ -418,11 +568,10 @@ window.addEventListener("DOMContentLoaded", () => {
     const cfg = getCorpusEndpointsConfig();
     const customInp = document.getElementById("inpCustomCorpusUrl");
     const quranInp = document.getElementById("inpQuranUthmaniUrl");
-    const adhkarInp = document.getElementById("inpAdhkarMirrorUrl");
     if (customInp) customInp.value = cfg.customCorpusJsonUrl || "";
     if (quranInp) quranInp.value = cfg.quranUthmaniUrl || "";
-    if (adhkarInp) adhkarInp.value = cfg.adhkarMirrorUrl || "";
     openModalById("settingsModal");
+    if (typeof renderHadithCorpusSettings === "function") renderHadithCorpusSettings();
   });
   document.getElementById("btnCloseSettingsModal")?.addEventListener("click", () => closeModalById("settingsModal"));
   document.getElementById("settingsModal")?.addEventListener("click", (e) => {
@@ -450,11 +599,9 @@ window.addEventListener("DOMContentLoaded", () => {
   document.getElementById("btnSaveCorpusSettings")?.addEventListener("click", async () => {
     const customUrl = document.getElementById("inpCustomCorpusUrl")?.value?.trim() || "";
     const quranUrl = document.getElementById("inpQuranUthmaniUrl")?.value?.trim() || DEFAULT_CORPUS_ENDPOINTS.quranUthmaniUrl;
-    const adhkarUrl = document.getElementById("inpAdhkarMirrorUrl")?.value?.trim() || DEFAULT_CORPUS_ENDPOINTS.adhkarMirrorUrl;
     saveCorpusEndpointsConfig({
       customCorpusJsonUrl: customUrl,
-      quranUthmaniUrl: quranUrl,
-      adhkarMirrorUrl: adhkarUrl
+      quranUthmaniUrl: quranUrl
     });
     closeModalById("settingsModal");
     await clearAndRedownloadCorpus();
@@ -566,6 +713,28 @@ window.addEventListener("DOMContentLoaded", () => {
     handleTextFastPathExecution(sampleText, "محاضرة تجريبية — آيات وأحاديث وأذكار", true);
   });
 
+  // Edit selected words (selection toolbar -> dialog)
+  document.getElementById("btnFloatingEditSpan")?.addEventListener("click", () => {
+    const sp = currentState.pendingSelectionSpan;
+    if (sp) openSpanEditModal(sp.wordStartIdx, sp.wordEndIdx);
+  });
+  document.getElementById("btnSpanEditApply")?.addEventListener("click", applySpanEditModal);
+  document.getElementById("btnSpanEditCancel")?.addEventListener("click", closeSpanEditModal);
+  document.getElementById("btnSpanEditDelete")?.addEventListener("click", () => {
+    const n = (document.getElementById("spanEditOriginal")?.textContent || "").split(/\s+/).filter(Boolean).length;
+    if (!confirm(`حذف ${n} كلمة من نص المحاضرة؟ (يمكن التراجع)`)) return;
+    document.getElementById("spanEditText").value = "";
+    applySpanEditModal();
+  });
+  document.getElementById("btnSpanEditPlay")?.addEventListener("click", playSelectedSpanAudio);
+  document.getElementById("spanEditModal")?.addEventListener("click", (e) => {
+    if (e.target.id === "spanEditModal") closeSpanEditModal();
+  });
+  document.getElementById("spanEditText")?.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) applySpanEditModal();
+    if (e.key === "Escape") closeSpanEditModal();
+  });
+
   // Full Lecture Text Editor Actions
   document.getElementById("btnApplyLectureEdit")?.addEventListener("click", () => {
     const textVal = document.getElementById("inpLectureFullEditor")?.value || "";
@@ -596,184 +765,407 @@ window.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  async function triggerRunAiTafrigh() {
-    let rawText = (currentState.words && currentState.words.length)
-      ? currentState.words.map(w => w.word).join(" ")
-      : (currentState.rawText || "");
+  // ---------------------------------------------------------------------------
+  // AI Tafrigh: preview (default view) -> run with live details, pause and cancel -> results
+  // ---------------------------------------------------------------------------
+  const tfg = { preview: null, jobId: null, paused: false, previewTimer: null };
 
-    if (!rawText.trim()) {
-      const fastPathVal = document.getElementById("textareaFastPathInput")?.value || "";
-      const mainInputVal = document.getElementById("mainTranscriptInput")?.value || "";
-      const editorVal = document.getElementById("lectureTranscriptEditor")?.value || "";
-      rawText = (fastPathVal || mainInputVal || editorVal).trim();
-    }
+  const tfgEl = id => document.getElementById(id);
+  const fmtSec = s => {
+    if (s == null || !isFinite(s)) return "—";
+    s = Math.max(0, Math.round(s));
+    return s >= 60 ? `${Math.floor(s / 60)}د ${String(s % 60).padStart(2, "0")}ث` : `${s}ث`;
+  };
+  const TAG_AR = {
+    paragraph: "فقرة", heading: "عنوان", list_intro: "تمهيد قائمة", list_item: "عنصر قائمة",
+    matn_section: "متن", continuation: "تكملة", comment: "تعليق عارض"
+  };
+  const CUT_AR = { punctuation: "ترقيم", pause: "سكتة", length: "طول", detection: "اقتباس", end: "نهاية النص" };
 
-    if (typeof switchLectureStageTab === "function") {
-      switchLectureStageTab("tafrigh");
-    }
+  function tafrighShow(view) {
+    ["tafrighEmptyState", "tafrighProgressWrap", "tafrighErrorWrap", "tafrighResultsView"].forEach(id => {
+      tfgEl(id)?.classList.toggle("hidden", id !== view);
+    });
+  }
 
-    const emptyState = document.getElementById("tafrighEmptyState");
-    const progressWrap = document.getElementById("tafrighProgressWrap");
-    const progressBar = document.getElementById("tafrighProgressBar");
-    const progressTitle = document.getElementById("tafrighProgressTitle");
-    const progressSubtitle = document.getElementById("tafrighProgressSubtitle");
-    const errorWrap = document.getElementById("tafrighErrorWrap");
-    const errorMessage = document.getElementById("tafrighErrorMessage");
-    const resultsView = document.getElementById("tafrighResultsView");
+  // The Tafrigh input is the current session, not the original raw transcript: the text is rebuilt from the
+  // current words (manual text edits included) and every quote (engine-detected or added by hand) is placed by
+  // its word range, so the segmenter can make each ayah / hadith / dhikr its own sentence.
+  function tafrighSource() {
+    if (typeof syncRawTextFromWords === "function") syncRawTextFromWords();
+    const words = currentState.words || [];
+    const text = currentState.rawTranscript || "";
+    const spans = (currentState.detections || [])
+      .filter(d => d.aiVerification?.verdict !== "FALSE")          // rejected by the AI verifier: not a quote
+      .filter(d => words[d.wordStartIdx] && words[d.wordEndIdx] && d.wordEndIdx >= d.wordStartIdx)
+      .map(d => ({
+        start: words[d.wordStartIdx].char_start, end: words[d.wordEndIdx].char_end,
+        type: d.sourceType === "QURAN" ? "quran" : (d.sourceType === "HADITH" ? "hadith" : "adhkar"),
+        unit_id: d.unitId, ref: d.displayRef || d.reference || "", band: d.confidenceBand || "",
+        canonical: d.canonicalText || (Array.isArray(d.canonicalSegments) ? d.canonicalSegments.join(" ") : "")
+      }))
+      .filter(sp => sp.end > sp.start);
+    return {
+      raw_text: text,
+      asr_words: words.map(w => ({ start: w.start, end: w.end, char_start: w.char_start, char_end: w.char_end })),
+      detection_spans: spans,
+      use_detection_boundaries: true
+    };
+  }
 
-    if (!rawText.trim()) {
-      showToast("⚠️ لا يوجد نص تفريغ حالياً للبدء بمرحلة التفريغ الذكي");
-      if (emptyState) emptyState.classList.remove("hidden");
-      if (progressWrap) progressWrap.classList.add("hidden");
-      if (resultsView) resultsView.classList.add("hidden");
+  function renderTafrighSourceInfo(src) {
+    const el = tfgEl("lblTafrighSourceInfo");
+    if (!el) return;
+    const by = src.detection_spans.reduce((acc, sp) => { acc[sp.type] = (acc[sp.type] || 0) + 1; return acc; }, {});
+    const engine = typeof WahyEngine !== "undefined" && activeMatcher instanceof WahyEngine ? "v4" : "v3";
+    el.textContent = `${(currentState.words || []).length} كلمة • ﴿ ${by.quran || 0} آية • « ${by.hadith || 0} حديث • 〖 ${by.adhkar || 0} ذكر — كل مقتبس جملة مستقلة • يشمل تعديلاتك اليدوية • المحرك: ${engine}`;
+    const sel = tfgEl("selTafrighEngine");
+    if (sel && document.activeElement !== sel) sel.value = engine;
+  }
+
+  function tafrighQuoteStyle() {
+    const p = typeof getOutputDisplayPrefs === "function" ? getOutputDisplayPrefs() : {};
+    return {
+      quran_open: p.quranBracketOpen ?? "﴿", quran_close: p.quranBracketClose ?? "﴾",
+      hadith_open: p.hadithBracketOpen ?? "«", hadith_close: p.hadithBracketClose ?? "»",
+      adhkar_open: p.adhkarBracketOpen ?? "〖", adhkar_close: p.adhkarBracketClose ?? "〗",
+      show_quote_refs: p.showQuranSource !== false
+    };
+  }
+
+  function tafrighSegConfig() {
+    return {
+      pause_sec: parseFloat(tfgEl("inpSegPause")?.value || "0.7"),
+      min_words: parseInt(tfgEl("inpSegMin")?.value || "2", 10),
+      max_words: parseInt(tfgEl("inpSegMax")?.value || "40", 10),
+      use_punctuation: tfgEl("chkSegPunct")?.checked !== false
+    };
+  }
+
+  function tafrighRange() {
+    const n = tfg.preview ? tfg.preview.segments.length : 0;
+    let from = Math.max(1, Math.min(n, parseInt(tfgEl("inpTafrighFrom")?.value || "1", 10) || 1));
+    let to = Math.max(from, Math.min(n, parseInt(tfgEl("inpTafrighTo")?.value || String(n), 10) || n));
+    return { from, to, count: n ? to - from + 1 : 0 };
+  }
+
+  async function openTafrighPrep() {
+    if (typeof switchLectureStageTab === "function") switchLectureStageTab("tafrigh");
+    tafrighShow("tafrighEmptyState");
+    await refreshTafrighPreview();
+  }
+
+  async function refreshTafrighPreview() {
+    const list = tfgEl("tafrighSegList");
+    const src = tafrighSource();
+    renderTafrighSourceInfo(src);
+    if (!src.raw_text.trim()) {
+      if (list) list.innerHTML = `<div class="p-4 text-center text-slate-400">لا يوجد نص محاضرة بعد — أدخل نصاً أو رابطاً أولاً.</div>`;
+      tfg.preview = null;
+      renderTafrighStats();
       return;
     }
-
-    const btnTop = document.getElementById("btnRunAiTafrigh");
-    const btnEmpty = document.getElementById("btnRunTafrighFromEmpty");
-    const btnRerun = document.getElementById("btnRerunTafrigh");
-
-    if (btnTop) {
-      btnTop.disabled = true;
-      btnTop.innerHTML = `⏳ جاري التفريغ...`;
-    }
-    if (btnEmpty) {
-      btnEmpty.disabled = true;
-      btnEmpty.innerHTML = `⏳ جاري المعالجة...`;
-    }
-    if (btnRerun) {
-      btnRerun.disabled = true;
-      btnRerun.innerHTML = `⏳ جاري التحديث...`;
-    }
-
-    if (emptyState) emptyState.classList.add("hidden");
-    if (errorWrap) errorWrap.classList.add("hidden");
-    if (resultsView) resultsView.classList.add("hidden");
-    if (progressWrap) progressWrap.classList.remove("hidden");
-    if (progressBar) progressBar.style.width = "20%";
-
-    showToast("⏳ جاري تشغيل مرحلة التفريغ الذكي (AI Tafrigh)...");
-
-    const steps = [
-      { width: "35%", title: "جاري تقطيع الجمل وفحص الفواصل...", sub: "تحليل الحدود الطبيعية للكلام العربي" },
-      { width: "55%", title: "جاري استخراج المتون وعزلها عن الشرح...", sub: "مطابقة النصوص المروية وحمايتها بدقة مطلقة" },
-      { width: "75%", title: "جاري هيكلة العناوين وتصنيف الاستطرادات...", sub: "توليد شجرة الأبواب والفصول وحواشي الأسئلة" },
-      { width: "90%", title: "جاري التدقيق النهائي وتوليد المستند...", sub: "فحص قيود السلامة وبناء العرض النهائي" }
-    ];
-    let stepIdx = 0;
-    const progressInterval = setInterval(() => {
-      if (stepIdx < steps.length) {
-        if (progressBar) progressBar.style.width = steps[stepIdx].width;
-        if (progressTitle) progressTitle.textContent = steps[stepIdx].title;
-        if (progressSubtitle) progressSubtitle.textContent = steps[stepIdx].sub;
-        stepIdx++;
-      }
-    }, 450);
-
-    const restoreButtons = () => {
-      clearInterval(progressInterval);
-      if (btnTop) {
-        btnTop.disabled = false;
-        btnTop.innerHTML = `📑 التفريغ الذكي (AI Tafrigh)`;
-      }
-      if (btnEmpty) {
-        btnEmpty.disabled = false;
-        btnEmpty.innerHTML = `<span>🚀</span><span>بدء التفريغ وهيكلة المتن والشرح الآن</span>`;
-      }
-      if (btnRerun) {
-        btnRerun.disabled = false;
-        btnRerun.innerHTML = `<span>🔄 إعادة المعالجة</span>`;
-      }
-    };
-
+    if (list) list.innerHTML = `<div class="p-4 text-center text-slate-400">⏳ جاري تقطيع الجمل...</div>`;
     try {
-      let apiBase = "";
-      if (window.location.protocol === "file:" || window.location.port === "8089") {
-        apiBase = "http://127.0.0.1:8000";
-      }
-
-      const geminiKey = currentState?.aiVerification?.geminiApiKey || localStorage.getItem("wahy_gemini_api_key") || "";
-      const openRouterKey = currentState?.aiVerification?.openRouterApiKey || localStorage.getItem("wahy_openrouter_api_key") || "";
-      const modeSel = document.querySelector('input[name="tafrighMode"]:checked')?.value || currentState.tafrighConfig?.mode || "per_sentence";
-      const modelCandidate = document.getElementById("selTafrighModel")?.value || currentState.tafrighConfig?.model || "gemini-3.5-flash-lite";
-      const typoStrat = document.getElementById("selTafrighTypoStrategy")?.value || currentState.tafrighConfig?.typoStrategy || "gated";
-      const scopeVal = document.querySelector('input[name="tafrighScope"]:checked')?.value || currentState.tafrighConfig?.scope || "full";
-
-      let textToProcess = rawText;
-      if (scopeVal === "slice") {
-        textToProcess = rawText.split(/[.؟!\n]+/).slice(0, 20).join(".\n") + ".";
-      }
-
-      const payload = {
-        raw_text: textToProcess,
-        processing_mode: modeSel,
-        model_candidate: modelCandidate.startsWith("typesafe") ? "jev_hybrid" : (modelCandidate === "local-laya" ? "laya_hybrid" : "gemini_all"),
-        model_name: modelCandidate,
-        typo_strategy: typoStrat,
-        gemini_api_key: geminiKey,
-        openrouter_api_key: openRouterKey
-      };
-
-      let resp;
-      try {
-        resp = await fetch(`${apiBase}/api/tafrigh/run`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        });
-      } catch (netErr) {
-        if (!apiBase) {
-          resp = await fetch("http://127.0.0.1:8000/api/tafrigh/run", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload)
-          });
-        } else {
-          throw netErr;
-        }
-      }
-
-      const data = await resp.json();
-      restoreButtons();
-
-      if (data.success) {
-        if (progressBar) progressBar.style.width = "100%";
-        setTimeout(() => {
-          if (progressWrap) progressWrap.classList.add("hidden");
-          if (typeof renderTafrighOutput === "function") {
-            renderTafrighOutput(data);
-          }
-          showToast("✅ اكتملت مرحلة التفريغ الذكي وهيكلة المتن والشرح بنجاح!");
-        }, 200);
-      } else {
-        if (progressWrap) progressWrap.classList.add("hidden");
-        if (errorWrap) {
-          errorWrap.classList.remove("hidden");
-          if (errorMessage) {
-            errorMessage.textContent = data.message || "حدث خطأ أثناء معالجة التفريغ في الخادم.";
-          }
-        }
-        showToast("❌ حدث خطأ أثناء تشغيل التفريغ الذكي");
-      }
+      const r = await fetch("/api/tafrigh/segment", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...src, seg_config: tafrighSegConfig() })
+      });
+      const d = await r.json();
+      if (!d.success) throw new Error(d.message || "segment failed");
+      const prevCount = tfg.preview ? tfg.preview.segments.length : 0;
+      tfg.preview = d;
+      const n = d.segments.length;
+      const toEl = tfgEl("inpTafrighTo"), fromEl = tfgEl("inpTafrighFrom");
+      if (toEl) { toEl.max = n; if (!prevCount || parseInt(toEl.value, 10) > n || parseInt(toEl.value, 10) === prevCount) toEl.value = n; }
+      if (fromEl) { fromEl.max = n; if (parseInt(fromEl.value, 10) > n) fromEl.value = 1; }
+      renderTafrighStats();
+      renderTafrighSegList();
     } catch (e) {
-      restoreButtons();
-      console.error("Tafrigh error:", e);
-      if (progressWrap) progressWrap.classList.add("hidden");
-      if (errorWrap) {
-        errorWrap.classList.remove("hidden");
-        if (errorMessage) {
-          errorMessage.textContent = `تعذر الاتصال بخادم التفريغ الذكي. يرجى التأكد من تشغيل خادم Wahy Backend على المنفذ 8000 (${e.message}).`;
-        }
-      }
-      showToast("❌ تعذر الاتصال بخادم التفريغ الذكي");
+      if (list) list.innerHTML = `<div class="p-4 text-center text-rose-300">تعذر تقطيع النص: ${escapeHtml(e.message)}</div>`;
     }
   }
 
-  // Tafrigh Run Buttons
-  document.getElementById("btnRunAiTafrigh")?.addEventListener("click", triggerRunAiTafrigh);
-  document.getElementById("btnRunTafrighFromEmpty")?.addEventListener("click", triggerRunAiTafrigh);
-  document.getElementById("btnRerunTafrigh")?.addEventListener("click", triggerRunAiTafrigh);
-  document.getElementById("btnTafrighRetry")?.addEventListener("click", triggerRunAiTafrigh);
+  function statCard(label, value, tone = "text-white") {
+    return `<div class="rounded-xl bg-slate-950/80 border border-slate-800 px-2 py-2">
+      <div class="text-[10px] text-slate-400">${label}</div><div class="font-mono font-bold text-sm ${tone}">${value}</div></div>`;
+  }
+
+  function renderTafrighStats() {
+    const box = tfgEl("tafrighSegStats"), sum = tfgEl("tafrighRangeSummary");
+    if (!box) return;
+    const st = tfg.preview?.stats;
+    if (!st) { box.innerHTML = ""; if (sum) sum.textContent = ""; return; }
+    const reasons = Object.entries(st.cut_reasons || {}).map(([k, v]) => `${CUT_AR[k] || k}: ${v}`).join(" • ");
+    box.innerHTML = [
+      statCard("عدد الجمل", st.sentences, "text-amber-300"),
+      statCard("جمل مقتبسات", st.quote_sentences ?? 0, "text-emerald-300"),
+      statCard("مجموع الكلمات", st.words_total),
+      statCard("أقصر جملة", `${st.min_words} كلمة`),
+      statCard("أطول جملة", `${st.max_words} كلمة`, st.over_cap ? "text-rose-300" : "text-white"),
+      statCard("المتوسط / الوسيط", `${st.avg_words} / ${st.median_words}`),
+      statCard("متوسط المدة", st.avg_duration_sec != null ? `${st.avg_duration_sec}ث` : "—")
+    ].join("") + `<div class="col-span-3 sm:col-span-6 text-[11px] text-slate-400 text-right">سبب نهاية الجمل: ${escapeHtml(reasons || "—")}${st.has_timestamps ? "" : " • (لا توجد توقيتات كلمات: التقطيع بالسكتات غير متاح)"}</div>`;
+    updateTafrighRangeSummary();
+  }
+
+  function updateTafrighRangeSummary() {
+    const sum = tfgEl("tafrighRangeSummary");
+    if (!sum || !tfg.preview) return;
+    const { from, to, count } = tafrighRange();
+    const model = tfgEl("selTafrighModel")?.value || "";
+    const perSentence = model.startsWith("typesafe") ? 3.5 : 2.5;   // measured: JEV ≈ 3.5 s / sentence
+    const words = tfg.preview.segments.slice(from - 1, to).reduce((a, s) => a + s.words, 0);
+    sum.textContent = `سيعمل النموذج على ${count} جملة (من ${from} إلى ${to}، ${words} كلمة) • الوقت التقريبي ≈ ${fmtSec(count * perSentence)}`;
+    const lbl = tfgEl("lblRunTafrigh");
+    if (lbl) lbl.textContent = `تشغيل التفريغ على ${count} جملة`;
+    tfgEl("tafrighSegList")?.querySelectorAll("[data-seg-idx]").forEach(row => {
+      const k = parseInt(row.getAttribute("data-seg-idx"), 10) + 1;
+      row.classList.toggle("opacity-40", k < from || k > to);
+    });
+  }
+
+  function renderTafrighSegList() {
+    const list = tfgEl("tafrighSegList");
+    if (!list || !tfg.preview) return;
+    const maxW = tafrighSegConfig().max_words;
+    list.innerHTML = tfg.preview.segments.map(sg => {
+      const t = sg.start_time != null ? formatSecondsToShortTime(sg.start_time) : "";
+      const long = maxW && sg.words > maxW;
+      return `<div class="flex items-start gap-2 px-3 py-1.5 hover:bg-slate-900/70" data-seg-idx="${sg.index}">
+        <span class="font-mono text-[10px] text-slate-500 w-8 shrink-0 pt-0.5">${sg.index + 1}</span>
+        ${sg.has_detection ? `<span class="shrink-0 px-1.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-500/30 text-[10px]">${(sg.quote_kinds || []).map(k => ({ quran: "آية", hadith: "حديث", adhkar: "ذكر" }[k] || k)).join(" + ") || "مقتبس"}</span>` : ""}
+        <span class="flex-1 leading-relaxed ${sg.has_detection ? "text-emerald-200" : "text-slate-200"}" data-no-i18n>${escapeHtml(sg.text)}</span>
+        <span class="shrink-0 text-[10px] font-mono ${long ? "text-rose-300" : "text-slate-500"}" title="عدد الكلمات">${sg.words}ك</span>
+        <span class="shrink-0 text-[10px] text-slate-500 w-14 text-left" title="سبب نهاية الجملة">${CUT_AR[sg.cut_reason] || ""}</span>
+        <span class="shrink-0 text-[10px] font-mono text-slate-600 w-16 text-left" dir="ltr">${t}</span>
+      </div>`;
+    }).join("");
+    updateTafrighRangeSummary();
+  }
+
+  function renderTafrighProgress(d) {
+    const info = d.details || {};
+    const pct = Math.round(d.percent ?? 0);
+    const bar = tfgEl("tafrighProgressBar");
+    if (bar) bar.style.width = `${Math.max(parseFloat(bar.style.width) || 0, pct)}%`;
+    const pctEl = tfgEl("tafrighProgressPct");
+    if (pctEl) pctEl.textContent = `${Math.max(parseInt(pctEl.textContent, 10) || 0, pct)}%`;
+    if (tfgEl("tafrighProgressTitle") && d.message) tfgEl("tafrighProgressTitle").textContent = d.message;
+    if (tfgEl("tafrighProgressSubtitle")) {
+      tfgEl("tafrighProgressSubtitle").textContent = info.paused ? "⏸️ متوقف مؤقتاً — اضغط «استئناف» للمتابعة" : "";
+    }
+    const det = tfgEl("tafrighProgressDetails");
+    if (det && info.total != null) {
+      det.innerHTML = [
+        statCard("الجمل", `${info.done} / ${info.total}`, "text-amber-300"),
+        statCard("الوقت المنقضي", fmtSec(info.elapsed_sec)),
+        statCard("المتبقي تقريباً", fmtSec(info.eta_sec)),
+        statCard("ثانية لكل جملة", info.sec_per_sentence ?? "—"),
+        statCard("طلبات النموذج", info.model_calls ?? 0),
+        statCard("التكلفة", `$${(info.cost_usd || 0).toFixed(5)}`),
+        statCard("أخطاء", info.errors ?? 0, info.errors ? "text-rose-300" : "text-white"),
+        statCard("تقسيم / تصحيح", `${info.splits ?? 0} / ${info.edits ?? 0}`)
+      ].join("");
+    }
+    const tags = tfgEl("tafrighProgressTags");
+    if (tags && info.tags) {
+      tags.innerHTML = Object.entries(info.tags).map(([k, v]) =>
+        `<span class="px-2 py-0.5 rounded-lg bg-slate-800 text-slate-200 ${k === info.last_tag ? "ring-1 ring-amber-400" : ""}">${TAG_AR[k] || k}: <b>${v}</b></span>`).join("");
+    }
+    if (info.current && tfgEl("tafrighProgressCurrent")) {
+      tfgEl("tafrighProgressCurrent").textContent = info.current.text || "—";
+      const purpose = { classify: "تصنيف", split: "تقسيم", correct: "تصحيح", classify_window: "تصنيف نافذة" }[info.current.purpose] || "";
+      if (tfgEl("tafrighProgressPurpose")) tfgEl("tafrighProgressPurpose").textContent = purpose ? `(${purpose})` : "";
+    }
+  }
+
+  async function tafrighControl(action) {
+    if (!tfg.jobId) return;
+    try {
+      await fetch("/api/tafrigh/control", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ job_id: tfg.jobId, action })
+      });
+    } catch (e) { showToast("تعذر الاتصال بالخادم"); }
+  }
+
+  let tafrighRunInFlight = false;
+
+  // A run ends either when /api/tafrigh/run answers or, for a cancel, right away (its late answer is ignored)
+  function endTafrighRun(jobId) {
+    if (tfg.jobId !== jobId) return;
+    clearInterval(tfg.poll);
+    tafrighRunInFlight = false;
+    tfg.jobId = null;
+    const btnTop = tfgEl("btnRunAiTafrigh");
+    if (btnTop) btnTop.disabled = false;
+  }
+
+  // Back to what was on screen before the run: the previous result, or the preview if there is none
+  function restoreTafrighBeforeRun() {
+    if (currentState.tafrigh && currentState.tafrigh.hasRun) tafrighShow("tafrighResultsView");
+    else openTafrighPrep();
+  }
+
+  async function triggerRunAiTafrigh() {
+    if (tafrighRunInFlight) {
+      showToast("⏳ التفريغ الذكي قيد التشغيل بالفعل، انتظر حتى ينتهي أو ألغِه.");
+      return;
+    }
+    if (!tfg.preview || !tfg.preview.segments.length) {
+      await refreshTafrighPreview();
+      if (!tfg.preview || !tfg.preview.segments.length) { showToast("⚠️ لا توجد جمل للتشغيل"); return; }
+    }
+    tafrighRunInFlight = true;
+    await runAiTafrighOnce();
+  }
+
+  async function runAiTafrighOnce() {
+    const { from, to, count } = tafrighRange();
+    const modelCandidate = tfgEl("selTafrighModel")?.value || "typesafe/jev-1.14";
+    const matnText = (tfgEl("inpTafrighMatn")?.value || "").trim();
+    const jobId = "tfg_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+    tfg.jobId = jobId;
+    tfg.paused = false;
+
+    tafrighShow("tafrighProgressWrap");
+    if (tfgEl("tafrighProgressBar")) tfgEl("tafrighProgressBar").style.width = "0%";
+    if (tfgEl("tafrighProgressPct")) tfgEl("tafrighProgressPct").textContent = "0%";
+    if (tfgEl("tafrighProgressTitle")) tfgEl("tafrighProgressTitle").textContent = `جاري التحضير لـ ${count} جملة...`;
+    ["tafrighProgressDetails", "tafrighProgressTags"].forEach(id => { if (tfgEl(id)) tfgEl(id).innerHTML = ""; });
+    if (tfgEl("tafrighProgressCurrent")) tfgEl("tafrighProgressCurrent").textContent = "—";
+    if (tfgEl("btnTafrighPause")) tfgEl("btnTafrighPause").textContent = "⏸️ إيقاف مؤقت";
+    ["btnTafrighStop", "btnTafrighCancel", "btnTafrighPause"].forEach(id => { if (tfgEl(id)) tfgEl(id).disabled = false; });
+    const btnTop = tfgEl("btnRunAiTafrigh");
+    if (btnTop) btnTop.disabled = true;
+
+    clearInterval(tfg.poll);
+    tfg.poll = setInterval(async () => {
+      try {
+        const r = await fetch(`/api/transcribe/progress/${jobId}`, { trapError: false });
+        const d = await r.json();
+        if (d.stage === "tafrigh") renderTafrighProgress(d);
+      } catch (e) { /* polling is best effort */ }
+    }, 600);
+
+    const payload = {
+      job_id: jobId,
+      ...tafrighSource(),
+      seg_config: tafrighSegConfig(),
+      quote_style: tafrighQuoteStyle(),
+      target_range: [from - 1, to],
+      matn_config: matnText ? { mode: "upload", raw_matn_text: matnText } : { mode: "no_matn" },
+      lecture_slug: (currentState.lectureTitle || "lecture").slice(0, 40),
+      processing_mode: tfgEl("selTafrighMode")?.value || "per_sentence",
+      model_candidate: modelCandidate.startsWith("typesafe") ? "jev_hybrid" : (modelCandidate === "local-laya" ? "laya_hybrid" : "gemini_all"),
+      model_name: modelCandidate,
+      typo_strategy: tfgEl("selTafrighTypoStrategy")?.value || "gated",
+      ...(() => {
+        const route = tfgEl("selTafrighGeminiRoute")?.value || "openrouter:google/gemini-3.1-flash-lite";
+        return route === "direct"
+          ? { gemini_route: "direct" }
+          : { gemini_route: "openrouter", openrouter_gemini_model: route.slice("openrouter:".length) };
+      })(),
+      gemini_api_key: currentState?.aiVerification?.geminiApiKey || localStorage.getItem("wahy_gemini_api_key") || "",
+      openrouter_api_key: currentState?.aiVerification?.openRouterApiKey || localStorage.getItem("wahy_openrouter_api_key") || ""
+    };
+
+    try {
+      const resp = await fetch("/api/tafrigh/run", {
+        method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload)
+      });
+      const data = await resp.json();
+      if (tfg.jobId !== jobId) return; // cancelled: the UI already went back
+      endTafrighRun(jobId);
+      if (data.discarded) {
+        restoreTafrighBeforeRun();
+        showToast(`⏹️ ${data.message || "تم إلغاء التفريغ دون تطبيق أي تغيير"}`);
+        return;
+      }
+      const warnBox = tfgEl("tafrighWarnings");
+      if (warnBox) {
+        const ws = Array.isArray(data.warnings) ? data.warnings : [];
+        warnBox.classList.toggle("hidden", !ws.length);
+        warnBox.innerHTML = ws.map(w => `<div>⚠️ ${escapeHtml(w)}</div>`).join("");
+      }
+      if (data.success) {
+        if (typeof renderTafrighOutput === "function") renderTafrighOutput(data);
+        tafrighShow("tafrighResultsView");
+        showToast(data.cancelled ? "⏹️ تم الإيقاف — عرض الجمل المكتملة" : "✅ اكتمل التفريغ الذكي");
+      } else {
+        tafrighShow("tafrighErrorWrap");
+        if (tfgEl("tafrighErrorMessage")) tfgEl("tafrighErrorMessage").textContent = data.message || "حدث خطأ أثناء معالجة التفريغ في الخادم.";
+        showToast("❌ تعذر إكمال التفريغ الذكي");
+      }
+    } catch (e) {
+      if (tfg.jobId !== jobId) return;
+      endTafrighRun(jobId);
+      console.error("Tafrigh error:", e);
+      tafrighShow("tafrighErrorWrap");
+      if (tfgEl("tafrighErrorMessage")) tfgEl("tafrighErrorMessage").textContent = `تعذر الاتصال بخادم التفريغ الذكي (${e.message}).`;
+    }
+  }
+
+  // Wiring: the toolbar button and "re-run" open the preview; only the preview's run button starts a run
+  tfgEl("btnRunAiTafrigh")?.addEventListener("click", openTafrighPrep);
+  tfgEl("btnRerunTafrigh")?.addEventListener("click", openTafrighPrep);
+  tfgEl("btnTafrighRetry")?.addEventListener("click", openTafrighPrep);
+  tfgEl("btnRunTafrighFromEmpty")?.addEventListener("click", triggerRunAiTafrigh);
+  tfgEl("btnOpenSaveTafrighRun")?.addEventListener("click", () => openSaveTafrighRunModal());
+  const routeSel = tfgEl("selTafrighGeminiRoute");
+  if (routeSel) {
+    try { const saved = localStorage.getItem("wahyTafrighGeminiRoute"); if (saved && [...routeSel.options].some(o => o.value === saved)) routeSel.value = saved; } catch (e) { /* storage blocked */ }
+    routeSel.addEventListener("change", () => { try { localStorage.setItem("wahyTafrighGeminiRoute", routeSel.value); } catch (e) { /* storage blocked */ } });
+  }
+  // Optional: re-detect quotes with the chosen engine before the Tafrigh (replaces manual quote edits; undoable)
+  tfgEl("btnTafrighRerunEngine")?.addEventListener("click", async () => {
+    if (!(currentState.words || []).length) { showToast("لا يوجد نص لإعادة فحصه بعد"); return; }
+    const choice = tfgEl("selTafrighEngine")?.value === "v4" ? "v4" : "v3";
+    if (!confirm(`إعادة اكتشاف المقتبسات بالمحرك ${choice}؟ ستُستبدل المقتبسات الحالية وتعديلاتك اليدوية عليها (يمكن التراجع).`)) return;
+    if (typeof pushUndoSnapshot === "function") pushUndoSnapshot(`إعادة تشغيل المحرك ${choice} قبل التفريغ`);
+    try { localStorage.setItem("wahyEngine", choice); } catch (e) { /* storage blocked */ }
+    ["selEngineVersion", "selEngineVersionQuick"].forEach(id => { const el = document.getElementById(id); if (el) el.value = choice; });
+    rebuildMatcher();
+    runDetectionAndBuildCaptions();
+    const isV4 = typeof WahyEngine !== "undefined" && activeMatcher instanceof WahyEngine;
+    showToast(choice === "v4" && !isV4 ? "⚠ تعذّر تشغيل v4، تم استخدام v3" : `🔄 تمت إعادة تشغيل المحرك (${isV4 ? "v4" : "v3"})`);
+    await refreshTafrighPreview();
+  });
+  tfgEl("btnTafrighPause")?.addEventListener("click", async () => {
+    tfg.paused = !tfg.paused;
+    await tafrighControl(tfg.paused ? "pause" : "resume");
+    tfgEl("btnTafrighPause").textContent = tfg.paused ? "▶️ استئناف" : "⏸️ إيقاف مؤقت";
+  });
+  // Stop: end now and show the sentences already done (the server answers without waiting for the in-flight request)
+  tfgEl("btnTafrighStop")?.addEventListener("click", async () => {
+    ["btnTafrighStop", "btnTafrighCancel", "btnTafrighPause"].forEach(id => { if (tfgEl(id)) tfgEl(id).disabled = true; });
+    if (tfgEl("tafrighProgressTitle")) tfgEl("tafrighProgressTitle").textContent = "جاري الإيقاف وتجهيز الجمل المكتملة...";
+    await tafrighControl("stop");
+  });
+  // Cancel: discard this run entirely and go back to what was shown before it
+  tfgEl("btnTafrighCancel")?.addEventListener("click", async () => {
+    if (!confirm("إلغاء التفريغ؟ لن يُطبَّق أي شيء من هذا التشغيل وستعود للنتيجة السابقة.")) return;
+    const jobId = tfg.jobId;
+    await tafrighControl("cancel");
+    endTafrighRun(jobId);
+    restoreTafrighBeforeRun();
+    showToast("✕ تم إلغاء التفريغ دون تطبيق أي تغيير");
+  });
+  ["inpSegPause", "inpSegMin", "inpSegMax", "chkSegPunct"].forEach(id => tfgEl(id)?.addEventListener("change", () => {
+    clearTimeout(tfg.previewTimer);
+    tfg.previewTimer = setTimeout(refreshTafrighPreview, 250);
+  }));
+  ["inpTafrighFrom", "inpTafrighTo", "selTafrighModel"].forEach(id => tfgEl(id)?.addEventListener("input", updateTafrighRangeSummary));
+  document.querySelectorAll("[data-tafrigh-range]").forEach(btn => btn.addEventListener("click", () => {
+    const n = tfg.preview ? tfg.preview.segments.length : 0;
+    const v = btn.getAttribute("data-tafrigh-range");
+    tfgEl("inpTafrighFrom").value = 1;
+    tfgEl("inpTafrighTo").value = v === "all" ? n : Math.min(n, parseInt(v, 10));
+    updateTafrighRangeSummary();
+  }));
+  document.querySelectorAll(".tafrigh-view-tab").forEach(b => b.addEventListener("click", () => setTafrighResultsView(b.getAttribute("data-tafrigh-view"))));
+  window.openTafrighPrep = openTafrighPrep;
 
   // Tab switching buttons
   document.getElementById("btnLectureTab_SYNC")?.addEventListener("click", () => {
@@ -786,6 +1178,8 @@ window.addEventListener("DOMContentLoaded", () => {
     if (typeof switchLectureStageTab === "function") {
       switchLectureStageTab("tafrigh");
     }
+    // no result yet (and nothing running): the preview is the default view
+    if (!(currentState.tafrigh && currentState.tafrigh.hasRun) && !tafrighRunInFlight) openTafrighPrep();
   });
 
   // Markdown copy button
@@ -984,6 +1378,29 @@ window.addEventListener("DOMContentLoaded", () => {
     });
   });
 
+  // Engine choice (settings dropdown + toolbar dropdown stay in sync) and one-click re-run on the current transcript
+  const engineSelects = ["selEngineVersion", "selEngineVersionQuick"].map(id => document.getElementById(id)).filter(Boolean);
+  let savedEngine = "v3";
+  try { savedEngine = localStorage.getItem("wahyEngine") === "v4" ? "v4" : "v3"; } catch (e) { /* storage blocked */ }
+  const applyEngine = (choice, rerun) => {
+    try { localStorage.setItem("wahyEngine", choice); } catch (e) { /* storage blocked */ }
+    engineSelects.forEach(el => { el.value = choice; });
+    rebuildMatcher();
+    if (rerun && currentState.rawTranscript) runDetectionAndBuildCaptions();
+    const isV4 = typeof WahyEngine !== "undefined" && activeMatcher instanceof WahyEngine;
+    showToast(choice === "v4" && !isV4 ? "⚠ تعذّر تشغيل v4، تم استخدام v3" : `✓ المحرك الحالي: ${isV4 ? "v4" : "v3"}`);
+  };
+  engineSelects.forEach(el => {
+    el.value = savedEngine;
+    el.addEventListener("change", () => applyEngine(el.value, true));
+  });
+  document.getElementById("btnRerunEngine")?.addEventListener("click", () => {
+    if (!currentState.rawTranscript) { showToast("لا يوجد نص لإعادة فحصه بعد"); return; }
+    rebuildMatcher();
+    runDetectionAndBuildCaptions();
+    showToast(`🔄 تمت إعادة تشغيل المحرك (${typeof WahyEngine !== "undefined" && activeMatcher instanceof WahyEngine ? "v4" : "v3"})`);
+  });
+
   document.getElementById("chkToggleAdhkarEngine")?.addEventListener("change", (e) => {
     currentState.adhkarEnabled = e.target.checked;
     rebuildMatcher();
@@ -1115,19 +1532,14 @@ window.addEventListener("DOMContentLoaded", () => {
     e.target.value = "";
   });
 
-  document.getElementById("btnSyncRemoteAdhkar")?.addEventListener("click", () => {
-    if (typeof WahyCorpusLoader?.syncRemoteAdhkarIntoDataset === "function") {
-      WahyCorpusLoader.syncRemoteAdhkarIntoDataset();
-    }
-  });
-
   document.getElementById("btnResetDefaultAdhkar")?.addEventListener("click", () => {
+    if (!confirm("استعادة الأذكار المدمجة فقط؟ ستُحذف الأذكار التي أضفتها بنفسك (يمكنك تصديرها أولاً).")) return;
     RAW_ADHKAR_DATA = BUILTIN_ADHKAR_DATA.map(x => ({ ...x }));
     persistUserDatasetsToStorage();
     rebuildMatcher();
     renderDatasetsSection();
     if (currentState.rawTranscript) runDetectionAndBuildCaptions();
-    showToast("↺ تمت استعادة الأذكار النبوية الافتراضية (42 ذكراً)");
+    showToast(`↺ تمت استعادة الأذكار المدمجة (${BUILTIN_ADHKAR_DATA.length} ذكراً) — حُذفت إضافاتك`);
   });
 
   // Table Row Actions in Dataset Browser
@@ -1287,15 +1699,7 @@ window.addEventListener("DOMContentLoaded", () => {
       selQuickProv.addEventListener("change", (e) => {
         currentState.aiVerification.activeProvider = e.target.value;
         saveAiConfigToStorage();
-      });
-    }
-
-    const selQuickScope = document.getElementById("selAiQuickScope");
-    if (selQuickScope) {
-      selQuickScope.value = currentState.aiVerification.targetScope || "HADITH_AND_CANDIDATES";
-      selQuickScope.addEventListener("change", (e) => {
-        currentState.aiVerification.targetScope = e.target.value;
-        saveAiConfigToStorage();
+        if (typeof updateAiLaunchButtonLabel === "function") updateAiLaunchButtonLabel();
       });
     }
 
@@ -1304,6 +1708,7 @@ window.addEventListener("DOMContentLoaded", () => {
     });
 
     const btnStart = document.getElementById("btnStartAiVerification");
+    const launchWrap = document.getElementById("wrapAiLaunchSplit") || btnStart;
     const btnStartFromLogs = document.getElementById("btnRunAiVerificationFromLogs");
     const btnPause = document.getElementById("btnPauseAiVerification");
     const btnCancel = document.getElementById("btnCancelAiVerification");
@@ -1312,13 +1717,18 @@ window.addEventListener("DOMContentLoaded", () => {
     const lblStatus = document.getElementById("aiVerificationStatusMsg");
     const lblPercent = document.getElementById("aiVerificationPercentLabel");
 
-    const triggerVerification = async () => {
+    let isAiVerificationRunning = false;
+    const triggerVerification = async (selectedIndices = null) => {
+      if (isAiVerificationRunning) {
+        showToast("⏳ يوجد تدقيق ذكي قيد التشغيل بالفعل.");
+        return;
+      }
       if (!currentState.detections.length) {
         showToast("⚠️ لا توجد مقتبسات لفحصها. يرجى تفريغ محاضرة أولاً.");
         return;
       }
 
-      if (btnStart) btnStart.classList.add("hidden");
+      if (launchWrap) launchWrap.classList.add("hidden");
       if (btnPause) {
         btnPause.classList.remove("hidden");
         btnPause.textContent = "⏸ إيقاف مؤقت";
@@ -1326,18 +1736,20 @@ window.addEventListener("DOMContentLoaded", () => {
       if (btnCancel) btnCancel.classList.remove("hidden");
       if (wrapProgress) wrapProgress.classList.remove("hidden");
 
+      isAiVerificationRunning = true;
       try {
         await WahyAiVerifier.runBatchAiVerification((p) => {
           const pct = p.total > 0 ? Math.round((p.processed / p.total) * 100) : 0;
           if (barProgress) barProgress.style.width = `${pct}%`;
           if (lblPercent) lblPercent.textContent = `${pct}% (${p.processed}/${p.total})`;
           if (lblStatus) lblStatus.textContent = p.message || "جاري الفحص...";
-        });
+        }, selectedIndices);
         showToast("✅ اكتمل الفحص والتدقيق الذكي للمقتبسات بنجاح!");
       } catch (err) {
         showToast(`⚠️ تنبيه التدقيق: ${err.message}`);
       } finally {
-        if (btnStart) btnStart.classList.remove("hidden");
+        isAiVerificationRunning = false;
+        if (launchWrap) launchWrap.classList.remove("hidden");
         if (btnPause) btnPause.classList.add("hidden");
         if (btnCancel) btnCancel.classList.add("hidden");
         setTimeout(() => {
@@ -1346,7 +1758,10 @@ window.addEventListener("DOMContentLoaded", () => {
       }
     };
 
-    btnStart?.addEventListener("click", triggerVerification);
+    window.triggerAiVerification = triggerVerification;
+    window.isAiVerificationRunning = () => isAiVerificationRunning;
+
+    btnStart?.addEventListener("click", () => triggerVerification());
     btnStartFromLogs?.addEventListener("click", () => {
       switchMainSection("display");
       triggerVerification();
@@ -1722,12 +2137,27 @@ window.addEventListener("DOMContentLoaded", () => {
     checkBackendHealthStatus();
     initAiVerificationEventListeners();
     await initDynamicCorpus(false);
+
+    // Resume the last working session (transcript, edits, media) instead of the demo lecture
+    try {
+      if (await restoreLatestLectureSession()) {
+        applyRestoredSessionToUi();
+        showToast(`↩️ تم استرجاع آخر جلسة: ${currentState.lectureTitle || "محاضرة"} (${currentState.words.length} كلمة)`);
+        renderSavedLecturesList();
+        return;
+      }
+    } catch (err) {
+      console.error("Session restore failed, starting from the demo lecture", err);
+    }
+    renderSavedLecturesList();
+
     const demoText = buildDynamicSampleLectureFromCorpus();
     const ta = document.getElementById("textareaFastPathInput");
     if (ta && !ta.value.trim()) {
       ta.value = demoText;
     }
     handleTextFastPathExecution(demoText, "محاضرة افتتاحية — استوديو الوحيين", false);
+    currentState.isDemoSession = true;      // the demo is never autosaved over a real session
     switchMainSection("display");
   })();
 
@@ -1793,36 +2223,29 @@ window.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // 4. Tafrigh Configuration Modal
-  const openTafrighModal = () => {
-    const m = document.getElementById("modalTafrighConfig");
-    if (m) {
-      m.classList.remove("hidden");
-      m.classList.add("flex");
-    } else {
-      triggerRunAiTafrigh();
+  document.getElementById("btnFetchGeminiModels")?.addEventListener("click", async () => {
+    const hint = document.getElementById("tafrighModelsHint");
+    const sel = document.getElementById("selTafrighModel");
+    const key = currentState?.aiVerification?.geminiApiKey || localStorage.getItem("wahy_gemini_api_key") || "";
+    if (hint) hint.textContent = "جاري الجلب...";
+    try {
+      const r = await fetch("/api/tafrigh/models", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ gemini_api_key: key }), trapError: false
+      });
+      const d = await r.json();
+      if (!d.success) { if (hint) hint.textContent = d.message || "تعذر جلب النماذج."; return; }
+      const keep = [...sel.options].filter(o => !o.value.startsWith("gemini") && o.value !== "auto");
+      const flash = d.models.filter(m => /flash/.test(m) && !/tts|image|live|audio/.test(m));
+      sel.innerHTML = `<option value="auto">Gemini — تلقائي (${escapeHtml(d.recommended || "")})</option>` +
+        flash.map(m => `<option value="${escapeHtml(m)}">${escapeHtml(m)}</option>`).join("");
+      keep.forEach(o => sel.appendChild(o));
+      if (hint) hint.textContent = `تم جلب ${flash.length} نموذج Flash متاح لمفتاحك.`;
+    } catch (e) {
+      if (hint) hint.textContent = "تعذر الاتصال بالخادم.";
     }
-  };
-
-  document.getElementById("btnRunAiTafrigh")?.addEventListener("click", (e) => {
-    e.stopImmediatePropagation();
-    openTafrighModal();
-  });
-  document.getElementById("btnRunTafrighFromEmpty")?.addEventListener("click", (e) => {
-    e.stopImmediatePropagation();
-    openTafrighModal();
   });
 
-  document.getElementById("btnCloseTafrighConfig")?.addEventListener("click", () => {
-    document.getElementById("modalTafrighConfig")?.classList.add("hidden");
-  });
-  document.getElementById("btnCancelTafrighConfig")?.addEventListener("click", () => {
-    document.getElementById("modalTafrighConfig")?.classList.add("hidden");
-  });
-  document.getElementById("btnConfirmLaunchTafrigh")?.addEventListener("click", () => {
-    document.getElementById("modalTafrighConfig")?.classList.add("hidden");
-    triggerRunAiTafrigh();
-  });
 
   // 5. Validate All Decisions Command
   document.getElementById("btnValidateAllAiDecisions")?.addEventListener("click", async () => {
@@ -1856,96 +2279,6 @@ window.addEventListener("DOMContentLoaded", () => {
     recalculateCaptionsFromCurrentFindings();
     if (typeof renderAllViews === "function") renderAllViews();
     showToast(`✅ تم اعتماد جميع نتائج الذكاء الاصطناعي (${count} مقتبس) وحفظها كبيانات تدريب ذهبية!`);
-  });
-
-  // 6. Pre-Flight Verification Estimator Modal
-  document.getElementById("btnOpenPreFlightVerificationModal")?.addEventListener("click", () => {
-    const modal = document.getElementById("modalPreFlightVerification");
-    const listEl = document.getElementById("preFlightCandidatesList");
-    if (!modal || !listEl) return;
-
-    const dets = currentState.detections || [];
-    if (!dets.length) {
-      showToast("⚠️ لا توجد اقتباسات مكتشفة بعد.");
-      return;
-    }
-
-    listEl.innerHTML = dets.map((d, i) => `
-      <label class="flex items-center justify-between p-2 rounded-xl bg-slate-950/80 border border-slate-800 hover:border-slate-700 cursor-pointer text-xs">
-        <div class="flex items-center gap-2 overflow-hidden">
-          <input type="checkbox" class="chkPreFlightQuote accent-emerald-500" data-quote-idx="${i}" checked />
-          <span class="font-bold text-slate-200 truncate">${escapeHtml(d.displayRef || d.reference || "مقتبس")}</span>
-          <span class="font-arabic-text text-slate-400 truncate max-w-xs">«${escapeHtml(d.matchedText || "")}»</span>
-        </div>
-        <span class="font-mono text-[10px] text-slate-500">${formatSecondsToShortTime(d.startTime)}</span>
-      </label>
-    `).join("");
-
-    const updateCalc = () => {
-      const checkedBoxes = listEl.querySelectorAll(".chkPreFlightQuote:checked");
-      const selIndices = Array.from(checkedBoxes).map(cb => parseInt(cb.getAttribute("data-quote-idx"), 10));
-      const est = (typeof WahyAiVerifier === "object" && typeof WahyAiVerifier.estimateBatchVerification === "function")
-        ? WahyAiVerifier.estimateBatchVerification(selIndices)
-        : { count: selIndices.length, approxTokens: selIndices.length * 380, estCost: 0, estSeconds: Math.ceil(selIndices.length / 12) * 60 };
-
-      document.getElementById("lblEstQuotesCount").textContent = est.count;
-      document.getElementById("lblEstTokensCount").textContent = `~${est.approxTokens}`;
-      document.getElementById("lblEstCostUsd").textContent = `$${est.estCost.toFixed(4)}`;
-      document.getElementById("lblEstDurationSec").textContent = `~${est.estSeconds} ثانية`;
-    };
-
-    listEl.querySelectorAll(".chkPreFlightQuote").forEach(cb => cb.addEventListener("change", updateCalc));
-    updateCalc();
-
-    document.getElementById("btnSelectAllCandidates")?.addEventListener("click", () => {
-      listEl.querySelectorAll(".chkPreFlightQuote").forEach(cb => cb.checked = true);
-      updateCalc();
-    });
-    document.getElementById("btnSelectOnlyQuran")?.addEventListener("click", () => {
-      dets.forEach((d, i) => {
-        const cb = listEl.querySelector(`.chkPreFlightQuote[data-quote-idx="${i}"]`);
-        if (cb) cb.checked = (d.sourceType === "QURAN" || d.type === "ayah");
-      });
-      updateCalc();
-    });
-    document.getElementById("btnSelectOnlyHadith")?.addEventListener("click", () => {
-      dets.forEach((d, i) => {
-        const cb = listEl.querySelector(`.chkPreFlightQuote[data-quote-idx="${i}"]`);
-        if (cb) cb.checked = (d.sourceType === "HADITH" || d.type === "hadith");
-      });
-      updateCalc();
-    });
-    document.getElementById("btnSelectLowConfidence")?.addEventListener("click", () => {
-      dets.forEach((d, i) => {
-        const cb = listEl.querySelector(`.chkPreFlightQuote[data-quote-idx="${i}"]`);
-        if (cb) cb.checked = ((d.totalScore || 0) < 15 || d.confidenceBand === "CANDIDATE");
-      });
-      updateCalc();
-    });
-
-    modal.classList.remove("hidden");
-    modal.classList.add("flex");
-  });
-
-  document.getElementById("btnClosePreFlightModal")?.addEventListener("click", () => {
-    document.getElementById("modalPreFlightVerification")?.classList.add("hidden");
-  });
-  document.getElementById("btnCancelPreFlight")?.addEventListener("click", () => {
-    document.getElementById("modalPreFlightVerification")?.classList.add("hidden");
-  });
-
-  document.getElementById("btnLaunchSelectedVerification")?.addEventListener("click", () => {
-    const listEl = document.getElementById("preFlightCandidatesList");
-    const checkedBoxes = listEl ? listEl.querySelectorAll(".chkPreFlightQuote:checked") : [];
-    const selIndices = Array.from(checkedBoxes).map(cb => parseInt(cb.getAttribute("data-quote-idx"), 10));
-    document.getElementById("modalPreFlightVerification")?.classList.add("hidden");
-    if (!selIndices.length) {
-      showToast("⚠️ لم يتم تحديد أي مقتبسات للفحص.");
-      return;
-    }
-    // Launch batch verification on selected quotes
-    const btnStart = document.getElementById("btnStartAiVerification");
-    if (btnStart) btnStart.click();
   });
 
   // 7. Training Data Hub Controls

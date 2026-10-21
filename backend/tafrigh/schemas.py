@@ -20,8 +20,10 @@ class GeminiSingleOutputSchema(BaseModel):
     hasTypo: bool = False
     needsSplitting: bool = False
     splitPoints: List[int] = Field(default_factory=list)
-    edits: List[TextEdit] = Field(default_factory=list)
+    # raw model edits; word-indexed {wordStart, wordEnd, original, replacement} — resolved by edit_resolver
+    edits: List[Any] = Field(default_factory=list)
     confidence: Optional[float] = None
+    trace: Dict[str, Any] = Field(default_factory=dict)   # provider-specific answers/confidences for the UI
 
 
 class GeminiWindowItemSchema(GeminiSingleOutputSchema):
@@ -60,6 +62,8 @@ class PipelineConfig(BaseModel):
     model_candidate: Literal["gemini_all", "jev_hybrid", "laya_hybrid"] = "gemini_all"
     jev_layout: Literal["independent_questions", "split_as_tag_option"] = "independent_questions"
     jev_execution_order: Literal["parallel", "sequential"] = "parallel"
-    typo_strategy: Literal["gated", "always_correct", "asr_confidence_gated"] = "gated"
-    use_detection_boundaries: bool = True
+    typo_strategy: Literal["gated", "always_correct", "asr_confidence_gated", "off"] = "gated"
+    # Tested on a real run: cutting at every Quran/hadith edge broke sentences mid-way ("قال الله تعالى والعصر | إن الإنسان…").
+    # Detections are still attached to segments as signals and still forbid punctuation cuts inside an ayah.
+    use_detection_boundaries: bool = False
     max_edit_change_ratio: float = 0.30

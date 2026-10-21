@@ -1,0 +1,31 @@
+{
+  "run_id": "run_55c477dcef99",
+  "lecture_slug": "سابقوا إلى مغفرة من ربكم | الشيخ سلطان ا",
+  "label": "default",
+  "total_requests": 16,
+  "total_input_tokens": 0,
+  "total_output_tokens": 0,
+  "total_cached_tokens": 0,
+  "total_cost_usd": 0.0,
+  "wall_clock_seconds": 2556.92,
+  "cost_per_100_sentences_usd": 0.0,
+  "time_per_100_sentences_sec": 23244.73,
+  "failure_rate": 0.0,
+  "retry_rate": 0.0,
+  "fallback_rate": 0.0,
+  "latency_by_purpose_ms": {
+    "classify": {
+      "p50": 0.62,
+      "p95": 5.05,
+      "max": 5.05
+    }
+  },
+  "structural_tag_distribution": {
+    "paragraph": 11
+  },
+  "review_flag_counts": {
+    "SPLIT_VALIDATION_FAILED": 22,
+    "EDIT_CAP_EXCEEDED": 1
+  },
+  "evaluation_metrics": null
+}
