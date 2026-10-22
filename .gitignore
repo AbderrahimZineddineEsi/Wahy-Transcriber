@@ -11,3 +11,8 @@ backend/models/
 # 90 MB corpus, fetched by run.sh from the Wahy-Finder repo
 data/corpus.json
 data/corpora/
+
+# Local outputs: browser-test screenshots, downloaded media, run reports
+.playwright-mcp/
+data/media_cache/
+/runs/
