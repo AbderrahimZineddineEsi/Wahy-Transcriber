@@ -65,10 +65,10 @@ function switchEditorDockTab(tabName) {
     if (panelFn) panelFn.classList.remove("hidden");
     if (panelInsp) panelInsp.classList.add("hidden");
     if (btnFn) {
-      btnFn.className = "flex-1 px-3 py-2 rounded-xl text-xs font-bold bg-emerald-600/25 text-emerald-300 border border-emerald-500/40 flex items-center justify-center gap-1.5 shadow-sm transition";
+      btnFn.className = "seg-btn is-active flex-1 justify-center";
     }
     if (btnInsp) {
-      btnInsp.className = "flex-1 px-3 py-2 rounded-xl text-xs font-semibold bg-slate-900 hover:bg-slate-800 text-slate-400 border border-slate-800 flex items-center justify-center gap-1.5 transition";
+      btnInsp.className = "seg-btn flex-1 justify-center";
     }
     updateFnStudioSuggestions();
     updateFnRangeVisualHighlight();
@@ -76,10 +76,10 @@ function switchEditorDockTab(tabName) {
     if (panelInsp) panelInsp.classList.remove("hidden");
     if (panelFn) panelFn.classList.add("hidden");
     if (btnInsp) {
-      btnInsp.className = "flex-1 px-3 py-2 rounded-xl text-xs font-bold bg-sky-600/25 text-sky-200 border border-sky-500/40 flex items-center justify-center gap-1.5 shadow-sm transition";
+      btnInsp.className = "seg-btn is-active flex-1 justify-center";
     }
     if (btnFn) {
-      btnFn.className = "flex-1 px-3 py-2 rounded-xl text-xs font-semibold bg-slate-900 hover:bg-slate-800 text-slate-400 border border-slate-800 flex items-center justify-center gap-1.5 transition";
+      btnFn.className = "seg-btn flex-1 justify-center";
     }
     renderFindingInspector();
     updateFnRangeVisualHighlight();
@@ -976,6 +976,150 @@ function deleteFinding(findingIdx) {
 }
 
 // -----------------------------------------------------------------------------
+// 3b. Merge Neighbouring Findings (one quote the engine split on an ASR typo or a commentary)
+// -----------------------------------------------------------------------------
+
+/**
+ * Merge state for the finding at `findingIdx`, per side: the neighbour (if within the gap limit), its index, the gap
+ * words, and the AI suggestion for that pair, read from either finding (this one's `next` is the neighbour's `previous`).
+ */
+function getFindingMergeOptions(findingIdx) {
+  const det = currentState.detections[findingIdx];
+  const empty = { previous: null, next: null };
+  if (!det || typeof WahyAiVerifier !== "object") return empty;
+  const { previous, next } = WahyAiVerifier.findNeighborFindings(det);
+  const words = currentState.words || [];
+
+  const side = (nb, dir) => {
+    if (!nb) return null;
+    const [a, b] = dir === "previous" ? [nb, det] : [det, nb];
+    const opposite = dir === "previous" ? "next" : "previous";
+    const own = det.aiVerification?.mergeSuggestion;
+    const theirs = nb.aiVerification?.mergeSuggestion;
+    let suggestion = null;
+    if (own && own[dir] && own[`${dir}Id`] === nb.id) suggestion = own;
+    else if (theirs && theirs[opposite] && theirs[`${opposite}Id`] === det.id) suggestion = theirs;
+    return {
+      det: nb,
+      idx: currentState.detections.indexOf(nb),
+      gapWords: Math.max(0, b.wordStartIdx - a.wordEndIdx - 1),
+      gapText: words.slice(a.wordEndIdx + 1, b.wordStartIdx).map(w => w.word).join(" "),
+      suggestion
+    };
+  };
+  return { previous: side(previous, "previous"), next: side(next, "next") };
+}
+
+/** How many reference words a span aligns to under `unitId` (used to pick the reference of a merged quote). */
+function scoreMergedSpanAgainstUnit(det, unitId, rawTokens) {
+  const probe = Object.assign({}, det, { unitId, qSegments: undefined, qFullSegments: undefined });
+  recomputeCanonicalForDetection(probe, rawTokens);
+  return (probe.qFullSegments || probe.qSegments || []).reduce((acc, [s, e]) => acc + Math.max(0, e - s), 0);
+}
+
+/**
+ * Merge the finding at `findingIdx` with its previous or next neighbour into one finding.
+ * `gapType` "PART_OF_QUOTE" absorbs the words between them (typo / garbled words of the quote) into one segment;
+ * "COMMENTARY" keeps them out as a commentary gap between two segments of the same finding.
+ * The merged finding keeps whichever reference covers more of the merged words; the other stays in its candidates.
+ */
+function mergeFindingWithNeighbor(findingIdx, direction, gapType = null) {
+  const opts = getFindingMergeOptions(findingIdx)[direction];
+  const det = currentState.detections[findingIdx];
+  if (!det || !opts) {
+    showToast("⚠️ لا يوجد مقتبس مجاور قريب للدمج في هذا الاتجاه.");
+    return;
+  }
+  const [first, second] = direction === "previous" ? [opts.det, det] : [det, opts.det];
+  const kind = gapType || opts.suggestion?.gapType || "PART_OF_QUOTE";
+
+  pushUndoSnapshot("دمج مقتبسين متجاورين");
+
+  const segsOf = d => (Array.isArray(d.segments) && d.segments.length ? d.segments : [[d.wordStartIdx, d.wordEndIdx + 1]]).map(s => s.slice());
+  const aSegs = segsOf(first);
+  const bSegs = segsOf(second);
+  let segments;
+  let gaps = [...(first.commentaryGaps || []), ...(second.commentaryGaps || [])];
+  if (kind === "COMMENTARY" && opts.gapWords > 0) {
+    segments = [...aSegs, ...bSegs];
+    gaps.push([first.wordEndIdx + 1, second.wordStartIdx]);
+  } else {
+    const joined = [aSegs[aSegs.length - 1][0], bSegs[0][1]];
+    segments = [...aSegs.slice(0, -1), joined, ...bSegs.slice(1)];
+  }
+
+  // keep the reference that best explains the merged span
+  const rawTokens = tokenizeText(currentState.rawTranscript);
+  const merged = Object.assign({}, first, { segments, commentaryGaps: gaps, wordStartIdx: first.wordStartIdx, wordEndIdx: second.wordEndIdx });
+  let keep = first;
+  let other = second;
+  const canAlign = rawTokens.length && merged.wordEndIdx < rawTokens.length && activeMatcher?.units;
+  if (first.unitId !== second.unitId && canAlign && activeMatcher.units.get(second.unitId)) {
+    const sFirst = activeMatcher.units.get(first.unitId) ? scoreMergedSpanAgainstUnit(merged, first.unitId, rawTokens) : -1;
+    const sSecond = scoreMergedSpanAgainstUnit(merged, second.unitId, rawTokens);
+    if (sSecond > sFirst) { keep = second; other = first; }
+  }
+
+  // candidates: the kept reference first, then everything the other finding knew about
+  const candidates = getFindingCandidates(keep).slice();
+  getFindingCandidates(other).forEach(c => {
+    if (!candidates.some(x => x.unitId === c.unitId)) candidates.push(c);
+  });
+
+  Object.assign(keep, {
+    segments,
+    commentaryGaps: gaps,
+    wordStartIdx: first.wordStartIdx,
+    wordEndIdx: second.wordEndIdx,
+    candidates,
+    totalScore: Math.max(first.totalScore || 0, second.totalScore || 0),
+    qFullSegments: undefined,
+    snappedToCanonical: false
+  });
+  if (canAlign) recomputeCanonicalForDetection(keep, rawTokens);
+
+  // the pair just merged is done; suggestions on the outer sides (first's previous, second's next) carry over
+  const outerPrev = first.aiVerification?.mergeSuggestion;
+  const outerNext = second.aiVerification?.mergeSuggestion;
+  const remaining = (outerPrev?.previous || outerNext?.next) ? {
+    previous: Boolean(outerPrev?.previous),
+    previousId: outerPrev?.previous ? outerPrev.previousId : null,
+    next: Boolean(outerNext?.next),
+    nextId: outerNext?.next ? outerNext.nextId : null,
+    confidence: (outerPrev?.previous ? outerPrev : outerNext).confidence,
+    gapType: (outerPrev?.previous ? outerPrev : outerNext).gapType
+  } : null;
+  if (keep.aiVerification || remaining) {
+    keep.aiVerification = keep.aiVerification || {};
+    keep.aiVerification.mergeSuggestion = remaining;
+    keep.aiVerification.boundaryStatus = "COMPLETE_SPAN";
+    keep.aiVerification.mergedFrom = [...(keep.aiVerification.mergedFrom || []), other.id];
+  }
+
+  const removeIdx = currentState.detections.indexOf(other);
+  currentState.detections.splice(removeIdx, 1);
+  currentState.selectedPredIndex = currentState.detections.indexOf(keep);
+
+  recalculateCaptionsFromCurrentFindings();
+  showToast(`🔗 تم دمج المقتبسين في مقتبس واحد [${keep.wordStartIdx + 1} → ${keep.wordEndIdx + 1}] — ${keep.displayRef || "مقتبس"}${kind === "COMMENTARY" && opts.gapWords > 0 ? " (التعليق بينهما محفوظ كفاصل)" : ""}`);
+}
+
+/** Drop the AI merge suggestion for this finding's `direction` pair (stored on either finding). */
+function dismissFindingMergeSuggestion(findingIdx, direction) {
+  const opts = getFindingMergeOptions(findingIdx)[direction];
+  const det = currentState.detections[findingIdx];
+  if (!det || !opts?.suggestion) return;
+  const opposite = direction === "previous" ? "next" : "previous";
+  [[det, direction], [opts.det, opposite]].forEach(([d, side]) => {
+    const sug = d.aiVerification?.mergeSuggestion;
+    if (!sug || !sug[side]) return;
+    const rest = Object.assign({}, sug, { [side]: false });
+    d.aiVerification.mergeSuggestion = (rest.previous || rest.next) ? rest : null;
+  });
+  if (typeof renderAllViews === "function") renderAllViews();
+}
+
+// -----------------------------------------------------------------------------
 // 4. Drag-Select Text Highlighting -> Floating Toolbar & Direct FN Studio Sync
 // -----------------------------------------------------------------------------
 
@@ -1739,6 +1883,9 @@ window.WahyEditor = {
   convertFindingToSavedDhikr,
   linkFindingToCorpusUnit,
   deleteFinding,
+  getFindingMergeOptions,
+  mergeFindingWithNeighbor,
+  dismissFindingMergeSuggestion,
   handleLectureSelectionChange,
   openCorpusSearchModalForSelection,
   renderCorpusModalSearchResults,

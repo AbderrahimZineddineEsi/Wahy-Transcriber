@@ -62,9 +62,9 @@ function switchEditorSubMode(subMode) {
     }
     if (btn) {
       if (m === target) {
-        btn.className = "px-3.5 py-1.5 rounded-xl text-xs font-bold bg-emerald-600 text-white shadow-sm border border-emerald-400/60 transition flex items-center gap-1.5";
+        btn.className = "seg-btn is-active";
       } else {
-        btn.className = "px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 transition flex items-center gap-1.5";
+        btn.className = "seg-btn";
       }
     }
   });
@@ -225,6 +225,14 @@ function buildLectureHtmlContent(isEditorMode = false) {
         }
       }
 
+      // AI merge suggestion badge (one quote the engine split in two)
+      const mergeOpts = typeof getFindingMergeOptions === "function" ? getFindingMergeOptions(dIdx) : {};
+      const mergePrev = Boolean(mergeOpts.previous?.suggestion);
+      const mergeNext = Boolean(mergeOpts.next?.suggestion);
+      const mergeBadgeHtml = (mergePrev || mergeNext)
+        ? `<span class="px-1.5 py-0.5 rounded bg-violet-500/25 text-violet-200 border border-violet-400/50 text-[10px] font-bold inline-flex items-center gap-1" title="اقتراح الذكاء الاصطناعي: هذا المقتبس جزء من نفس النص مع المقتبس المجاور — افتح المقتبس للدمج">🔗 ${mergePrev && mergeNext ? "دمج مع الطرفين" : (mergePrev ? "دمج مع السابق" : "دمج مع التالي")}</span>`
+        : "";
+
       // Which text a quote shows. Display: the reference text once snapped to it. Editor: the spoken words, unless
       // a toggle asks for the reference text («الرسم القياسي») or the whole source («المتن كاملاً»), or the user
       // applied reference words to this quote (shown, so the edit is visible where it was made).
@@ -282,6 +290,7 @@ function buildLectureHtmlContent(isEditorMode = false) {
               title="انقر لفحص وتعديل المقتبس [${escapeHtml(refText)}]">
           ${aiBadgeHtml}
           ${boundaryBadgeHtml}
+          ${mergeBadgeHtml}
           <span class="opacity-85 select-none">${escapeHtml(brackets.open)}</span>${innerWordsHtml}<span class="opacity-85 select-none">${escapeHtml(brackets.close)}</span>
           ${(refText && showBadge) ? `<span class="inline-flex items-center gap-1 px-2 py-0.5 mr-1 rounded-md text-[11px] font-sans font-bold border ${badgeColor}">📖 ${escapeHtml(refText)} <span class="font-mono text-[10px] opacity-75" dir="ltr">${timeTag}</span></span>` : ""}
         </span>
@@ -591,6 +600,44 @@ function renderFindingInspector() {
     : null;
   const unitWords = unit ? (unit.vocalizedWords || unit.fullText.split(/\s+/)) : (det.canonicalText || "").split(/\s+/);
 
+  // Merge with a neighbouring finding (AI-suggested pairs are highlighted, others offered manually)
+  const mergeOpts = typeof getFindingMergeOptions === "function" ? getFindingMergeOptions(idx) : { previous: null, next: null };
+  const mergeSideHtml = (dir) => {
+    const o = mergeOpts[dir];
+    if (!o) return "";
+    const label = dir === "previous" ? "السابق" : "التالي";
+    const sug = o.suggestion;
+    const gapInfo = o.gapWords
+      ? `فاصل ${o.gapWords} كلمة: «<span class="text-slate-300">${escapeHtml(o.gapText)}</span>»`
+      : "متلاصقان بلا فاصل";
+    const btn = (gapType, text, primary) => `
+      <button type="button" data-merge-dir="${dir}" data-merge-gap="${gapType}" class="flex-1 px-2 py-1.5 rounded-lg text-[11px] font-bold border transition ${primary
+        ? "bg-violet-600/30 hover:bg-violet-600/45 text-violet-100 border-violet-500/50"
+        : "bg-slate-900 hover:bg-slate-800 text-slate-300 border-slate-700"}">${text}</button>`;
+    const preferred = sug?.gapType || "PART_OF_QUOTE";
+    const buttons = o.gapWords
+      ? btn("PART_OF_QUOTE", "🔗 دمج وضمّ الفاصل (خطأ تفريغ)", preferred === "PART_OF_QUOTE") +
+        btn("COMMENTARY", "🔗 دمج والفاصل تعليق", preferred === "COMMENTARY")
+      : btn("PART_OF_QUOTE", "🔗 دمج", true);
+    return `
+      <div class="p-2.5 rounded-lg space-y-1.5 border ${sug ? "bg-violet-950/40 border-violet-500/40" : "bg-slate-900/60 border-slate-800"}">
+        <div class="flex items-center justify-between gap-2">
+          <span class="text-[11px] font-bold ${sug ? "text-violet-200" : "text-slate-300"}">${sug
+            ? `🤖 يقترح الذكاء الاصطناعي الدمج مع ${label} (${Math.round((sug.confidence || 0) * 100)}%)`
+            : `المقتبس ${label}`}</span>
+          ${sug ? `<button type="button" data-merge-dismiss="${dir}" class="text-[10px] text-slate-400 hover:text-slate-200 underline">تجاهل</button>` : ""}
+        </div>
+        <div class="text-[10px] text-slate-400 leading-relaxed">📖 ${escapeHtml(o.det.displayRef || o.det.reference || "مقتبس")} • ${gapInfo}</div>
+        <div class="flex gap-1.5">${buttons}</div>
+      </div>`;
+  };
+  const mergeBlockHtml = (mergeOpts.previous || mergeOpts.next) ? `
+      <div class="rounded-xl bg-slate-950/90 border ${(mergeOpts.previous?.suggestion || mergeOpts.next?.suggestion) ? "border-violet-500/40" : "border-slate-800"} p-3 space-y-2">
+        <div class="text-[11px] font-bold text-slate-300">🔗 دمج مع مقتبس مجاور <span class="font-normal text-slate-500">— حين قسّم المحرك نصاً واحداً بسبب خطأ تفريغ أو تعليق</span></div>
+        ${mergeSideHtml("previous")}
+        ${mergeSideHtml("next")}
+      </div>` : "";
+
   const activeUnitIndices = new Set();
   if (Array.isArray(det.qSegments)) {
     det.qSegments.forEach(([qStart, qEnd]) => {
@@ -775,6 +822,8 @@ function renderFindingInspector() {
         </div>
       </div>
 
+      ${mergeBlockHtml}
+
       <!-- AI Verification & Dual-State Training Telemetry Card -->
       <div class="rounded-xl bg-slate-950/90 border border-sky-500/30 p-3.5 space-y-3">
         <div class="flex flex-wrap items-center justify-between gap-2">
@@ -916,6 +965,14 @@ function renderFindingInspector() {
   panel.querySelector("#btnStartWordPlus")?.addEventListener("click", () => adjustFindingWordBoundary(idx, "start", 1));
   panel.querySelector("#btnEndWordMinus")?.addEventListener("click", () => adjustFindingWordBoundary(idx, "end", -1));
   panel.querySelector("#btnEndWordPlus")?.addEventListener("click", () => adjustFindingWordBoundary(idx, "end", 1));
+
+  // Merge with neighbour
+  panel.querySelectorAll("[data-merge-dir]").forEach(btn => {
+    btn.addEventListener("click", () => mergeFindingWithNeighbor(idx, btn.getAttribute("data-merge-dir"), btn.getAttribute("data-merge-gap")));
+  });
+  panel.querySelectorAll("[data-merge-dismiss]").forEach(btn => {
+    btn.addEventListener("click", () => dismissFindingMergeSuggestion(idx, btn.getAttribute("data-merge-dismiss")));
+  });
 
   // Word Chip Selection & Apply
   const chips = panel.querySelectorAll(".ref-word-chip");
@@ -1330,9 +1387,9 @@ function setWorkspaceLayoutMode(mode) {
     const btn = document.getElementById(`btnLayout_${m}`);
     if (!btn) return;
     if (m === mode) {
-      btn.className = "px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-600 text-white shadow-sm border border-emerald-400/50 transition";
+      btn.className = "seg-btn is-active";
     } else {
-      btn.className = "px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 transition";
+      btn.className = "seg-btn";
     }
   });
 }
@@ -2343,8 +2400,7 @@ function setTafrighResultsView(view) {
   document.getElementById("tafrighDetailsView")?.classList.toggle("hidden", view !== "details");
   document.querySelectorAll(".tafrigh-view-tab").forEach(b => {
     const on = b.getAttribute("data-tafrigh-view") === view;
-    b.className = "tafrigh-view-tab px-3 py-1.5 rounded-xl text-xs border " +
-      (on ? "font-bold bg-amber-600/25 text-amber-200 border-amber-500/50" : "font-semibold bg-slate-900 text-slate-300 border-slate-800");
+    b.className = "tafrigh-view-tab seg-btn" + (on ? " is-active" : "");
   });
 }
 

@@ -16,9 +16,9 @@ function switchInputSourceTab(tabName) {
     const panel = document.getElementById(`panelInput_${t}`);
     if (btn) {
       if (t === tabName) {
-        btn.className = "px-4 py-2.5 rounded-xl text-xs font-bold bg-emerald-600/25 text-emerald-300 border border-emerald-500/50 flex items-center gap-2 shadow-sm transition";
+        btn.className = "seg-btn is-active";
       } else {
-        btn.className = "px-4 py-2.5 rounded-xl text-xs font-semibold bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 flex items-center gap-2 transition";
+        btn.className = "seg-btn";
       }
     }
     if (panel) {
@@ -341,11 +341,11 @@ function applyThemeMode(theme) {
   if (theme === "light") {
     htmlEl.classList.remove("dark");
     htmlEl.classList.add("light");
-    if (lbl) lbl.textContent = "🌙";
+    if (lbl) lbl.textContent = "☾";
   } else {
     htmlEl.classList.remove("light");
     htmlEl.classList.add("dark");
-    if (lbl) lbl.textContent = "☀️";
+    if (lbl) lbl.textContent = "☀";
   }
   try {
     localStorage.setItem(LS_THEME_KEY, theme);
@@ -789,27 +789,111 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 
   // The Tafrigh input is the current session, not the original raw transcript: the text is rebuilt from the
-  // current words (manual text edits included) and every quote (engine-detected or added by hand) is placed by
-  // its word range, so the segmenter can make each ayah / hadith / dhikr its own sentence.
+  // current words (manual text edits included). How quotes are sent depends on «مصدر النص»:
+  //   raw_findings — every quote (engine-detected or added by hand) placed by its word range, so the segmenter
+  //                  makes each ayah / hadith / dhikr its own sentence (default)
+  //   corrected    — the same, but each quote's spoken words are replaced by its text from the source (as in Display)
+  //   raw          — the plain text, quotes not marked at all
+  function tafrighTextSourceMode() {
+    return tfgEl("selTafrighTextSource")?.value || "raw_findings";
+  }
+
+  function tafrighQuoteDets(words) {
+    let lastEnd = -1;
+    return (currentState.detections || [])
+      .filter(d => d.aiVerification?.verdict !== "FALSE")          // rejected by the AI verifier: not a quote
+      .filter(d => words[d.wordStartIdx] && words[d.wordEndIdx] && d.wordEndIdx >= d.wordStartIdx)
+      .slice()
+      .sort((a, b) => a.wordStartIdx - b.wordStartIdx)
+      .filter(d => {                                               // overlapping quotes: keep the first
+        if (d.wordStartIdx <= lastEnd) return false;
+        lastEnd = d.wordEndIdx;
+        return true;
+      });
+  }
+
+  function tafrighSpanMeta(d) {
+    return {
+      type: d.sourceType === "QURAN" ? "quran" : (d.sourceType === "HADITH" ? "hadith" : "adhkar"),
+      unit_id: d.unitId, ref: d.displayRef || d.reference || "", band: d.confidenceBand || "",
+      canonical: d.canonicalText || (Array.isArray(d.canonicalSegments) ? d.canonicalSegments.join(" ") : "")
+    };
+  }
+
+  /**
+   * Rebuild the text with every quote written from its source: each quote segment's spoken words are replaced by
+   * its reference words (commentary gaps between segments stay as spoken). The new words get times spread evenly
+   * over the spoken quote's time, so pause-based sentence cuts still work around it.
+   */
+  function tafrighCorrectedSource(words, dets) {
+    const out = [];       // { word, start, end }
+    const spans = [];
+    const pushWord = (word, start, end) => { if (word) out.push({ word, start, end }); };
+    let i = 0;
+    dets.forEach(d => {
+      for (; i < d.wordStartIdx; i++) pushWord(words[i].word, words[i].start, words[i].end);
+      const segs = (Array.isArray(d.segments) && d.segments.length ? d.segments : [[d.wordStartIdx, d.wordEndIdx + 1]])
+        .map(([a, b]) => [Math.max(d.wordStartIdx, a), Math.min(d.wordEndIdx + 1, b)])
+        .filter(([a, b]) => b > a);
+      const segTexts = Array.isArray(d.canonicalSegments) && d.canonicalSegments.length === segs.length
+        ? d.canonicalSegments
+        : null;
+      const parts = segTexts ? segs.map((sg, k) => [sg, segTexts[k]]) : [[[d.wordStartIdx, d.wordEndIdx + 1], d.canonicalText]];
+      let cur = d.wordStartIdx;
+      parts.forEach(([[a, b], canon]) => {
+        for (; cur < a; cur++) pushWord(words[cur].word, words[cur].start, words[cur].end);   // commentary gap
+        const spoken = words.slice(a, b);
+        const toks = String(canon || "").split(/\s+/).filter(Boolean);
+        const useToks = toks.length ? toks : spoken.map(w => w.word);
+        const t0 = Number(spoken[0].start), t1 = Number(spoken[spoken.length - 1].end);
+        const step = (t1 - t0) / useToks.length;
+        const first = out.length;
+        useToks.forEach((tk, k) => pushWord(tk, t0 + k * step, t0 + (k + 1) * step));
+        spans.push({ firstWord: first, lastWord: out.length - 1, meta: Object.assign(tafrighSpanMeta(d), { canonical: useToks.join(" ") }) });
+        cur = b;
+      });
+      for (; cur <= d.wordEndIdx; cur++) pushWord(words[cur].word, words[cur].start, words[cur].end);
+      i = d.wordEndIdx + 1;
+    });
+    for (; i < words.length; i++) pushWord(words[i].word, words[i].start, words[i].end);
+
+    let cursor = 0;
+    const asr = out.map(w => {
+      const o = { start: w.start, end: w.end, char_start: cursor, char_end: cursor + w.word.length };
+      cursor = o.char_end + 1;
+      return o;
+    });
+    return {
+      raw_text: out.map(w => w.word).join(" "),
+      asr_words: asr,
+      detection_spans: spans
+        .filter(sp => sp.lastWord >= sp.firstWord)
+        .map(sp => Object.assign({ start: asr[sp.firstWord].char_start, end: asr[sp.lastWord].char_end }, sp.meta)),
+      use_detection_boundaries: true,
+      text_source: "corrected"
+    };
+  }
+
   function tafrighSource() {
     if (typeof syncRawTextFromWords === "function") syncRawTextFromWords();
     const words = currentState.words || [];
     const text = currentState.rawTranscript || "";
-    const spans = (currentState.detections || [])
-      .filter(d => d.aiVerification?.verdict !== "FALSE")          // rejected by the AI verifier: not a quote
-      .filter(d => words[d.wordStartIdx] && words[d.wordEndIdx] && d.wordEndIdx >= d.wordStartIdx)
-      .map(d => ({
-        start: words[d.wordStartIdx].char_start, end: words[d.wordEndIdx].char_end,
-        type: d.sourceType === "QURAN" ? "quran" : (d.sourceType === "HADITH" ? "hadith" : "adhkar"),
-        unit_id: d.unitId, ref: d.displayRef || d.reference || "", band: d.confidenceBand || "",
-        canonical: d.canonicalText || (Array.isArray(d.canonicalSegments) ? d.canonicalSegments.join(" ") : "")
-      }))
+    const mode = tafrighTextSourceMode();
+    const asrWords = words.map(w => ({ start: w.start, end: w.end, char_start: w.char_start, char_end: w.char_end }));
+    if (mode === "raw") {
+      return { raw_text: text, asr_words: asrWords, detection_spans: [], use_detection_boundaries: false, text_source: mode };
+    }
+    const dets = tafrighQuoteDets(words);
+    if (mode === "corrected") return tafrighCorrectedSource(words, dets);
+    const spans = dets
+      .map(d => Object.assign({ start: words[d.wordStartIdx].char_start, end: words[d.wordEndIdx].char_end }, tafrighSpanMeta(d)))
       .filter(sp => sp.end > sp.start);
     return {
       raw_text: text,
-      asr_words: words.map(w => ({ start: w.start, end: w.end, char_start: w.char_start, char_end: w.char_end })),
+      asr_words: asrWords,
       detection_spans: spans,
-      use_detection_boundaries: true
+      use_detection_boundaries: true,
+      text_source: mode
     };
   }
 
@@ -818,7 +902,14 @@ window.addEventListener("DOMContentLoaded", () => {
     if (!el) return;
     const by = src.detection_spans.reduce((acc, sp) => { acc[sp.type] = (acc[sp.type] || 0) + 1; return acc; }, {});
     const engine = typeof WahyEngine !== "undefined" && activeMatcher instanceof WahyEngine ? "v4" : "v3";
-    el.textContent = `${(currentState.words || []).length} كلمة • ﴿ ${by.quran || 0} آية • « ${by.hadith || 0} حديث • 〖 ${by.adhkar || 0} ذكر — كل مقتبس جملة مستقلة • يشمل تعديلاتك اليدوية • المحرك: ${engine}`;
+    const modeNote = {
+      raw: "النص الخام كما هو، دون تمييز المقتبسات",
+      corrected: "كل مقتبس جملة مستقلة بنصه من المصدر",
+      raw_findings: "كل مقتبس جملة مستقلة بلفظ الشيخ"
+    }[src.text_source] || "";
+    el.textContent = src.text_source === "raw"
+      ? `${(currentState.words || []).length} كلمة — ${modeNote} • يشمل تعديلاتك اليدوية`
+      : `${(currentState.words || []).length} كلمة • ﴿ ${by.quran || 0} آية • « ${by.hadith || 0} حديث • 〖 ${by.adhkar || 0} ذكر — ${modeNote} • يشمل تعديلاتك اليدوية • المحرك: ${engine}`;
     const sel = tfgEl("selTafrighEngine");
     if (sel && document.activeElement !== sel) sel.value = engine;
   }
@@ -840,6 +931,143 @@ window.addEventListener("DOMContentLoaded", () => {
       max_words: parseInt(tfgEl("inpSegMax")?.value || "40", 10),
       use_punctuation: tfgEl("chkSegPunct")?.checked !== false
     };
+  }
+
+  // Provider & model. OpenRouter: one search over its whole catalog — a JEV model is classified through JEV's
+  // decisions API (split/typo fixes then go to the helper model), any other model does the whole job itself.
+  // Keys come from the AI verification settings.
+  const tfgProvider = () => tfgEl("selTafrighProvider")?.value || "openrouter";
+  const tfgModelId = (inputId) => {
+    const m = (tfgEl(inputId)?.value || "").trim();
+    return /^gemini-/i.test(m) ? `google/${m}` : m;
+  };
+  const tfgChatModel = () => tfgModelId("inpTafrighChatModel");
+  const tfgHelperModel = () => tfgModelId("inpTafrighHelperModel");
+  const tfgIsJev = (id) => /typesafe\/jev/.test(id);
+  // JEV / Laya only classify: the helper model handles splits and typo fixes
+  const tfgNeedsHelper = () => tfgProvider() === "laya" || (tfgProvider() === "openrouter" && tfgIsJev(tfgChatModel()));
+  const tfgHelperDirect = () => Boolean(tfgEl("chkTafrighHelperDirect")?.checked);
+
+  function tfgStore(key, value) {
+    try { localStorage.setItem(key, value); } catch (e) { /* storage blocked */ }
+  }
+  function tfgLoad(key) {
+    try { return localStorage.getItem(key); } catch (e) { return null; }
+  }
+
+  const tfgCatalog = () => currentState.aiVerification?.openRouterModelsCatalog || [];
+  const tfgPrice = (m) => `$${(parseFloat(m.pricing.prompt || 0) * 1e6).toFixed(3)} / $${(parseFloat(m.pricing.completion || 0) * 1e6).toFixed(3)}`;
+
+  function renderTafrighModelInfo(infoId, id) {
+    const info = tfgEl(infoId);
+    if (!info) return;
+    const meta = tfgCatalog().find(m => m.id === id);
+    info.innerHTML = meta
+      ? `${escapeHtml(meta.name)} • <span class="text-emerald-400 font-mono">${tfgPrice(meta)}</span> لكل مليون رمز • سياق ${Math.round((meta.context_length || 0) / 1000)}k${tfgIsJev(id) ? " • 🎯 يُصنَّف عبر JEV" : ""}`
+      : (tfgCatalog().length && id ? '<span class="text-rose-300">النموذج غير موجود في قائمة OpenRouter؛ اختره من نتائج البحث.</span>' : "");
+  }
+
+  /** Searchable dropdown over the whole OpenRouter catalog (id, name, price), filtered as you type. */
+  function attachTafrighModelSearch(inputId, listId, infoId, storeKey) {
+    const input = tfgEl(inputId), list = tfgEl(listId);
+    if (!input || !list) return;
+    const render = () => {
+      const q = input.value.toLowerCase().trim();
+      const words = q.split(/\s+/).filter(Boolean);
+      const hits = tfgCatalog().filter(m => {
+        const hay = `${m.id} ${m.name}`.toLowerCase();
+        return words.every(w => hay.includes(w) || (w === "free" && m.isFree));
+      });
+      if (!tfgCatalog().length) {
+        list.innerHTML = `<div class="p-3 text-slate-400 text-center">⏳ جاري تحميل قائمة نماذج OpenRouter...</div>`;
+      } else if (!hits.length) {
+        list.innerHTML = `<div class="p-3 text-slate-400 text-center">لا توجد نماذج مطابقة.</div>`;
+      } else {
+        list.innerHTML = hits.slice(0, 60).map(m => `
+          <div class="model-dropdown-item ${m.id === input.value.trim() ? "selected" : ""}" data-model-id="${escapeHtml(m.id)}">
+            <div class="flex items-center justify-between gap-2">
+              <span class="font-bold text-slate-200">${escapeHtml(m.name)}</span>
+              <span class="font-mono text-[10px] text-emerald-400" dir="ltr">${m.isFree ? "مجاني" : tfgPrice(m)}</span>
+            </div>
+            <div class="flex items-center justify-between text-[10px] text-slate-400 mt-0.5">
+              <span class="font-mono" dir="ltr">${escapeHtml(m.id)}</span>
+              <span>${Math.round((m.context_length || 0) / 1000)}k</span>
+            </div>
+          </div>`).join("") + (hits.length > 60 ? `<div class="p-2 text-center text-[10px] text-slate-500">+${hits.length - 60} — اكتب أكثر لتضييق البحث</div>` : "");
+        list.querySelectorAll("[data-model-id]").forEach(item => item.addEventListener("mousedown", (e) => {
+          e.preventDefault();   // keep focus handling simple: pick before the input's blur hides the list
+          input.value = item.getAttribute("data-model-id");
+          list.classList.add("hidden");
+          commit();
+        }));
+      }
+      list.classList.remove("hidden");
+    };
+    const commit = () => {
+      tfgStore(storeKey, tfgModelId(inputId));
+      renderTafrighModelInfo(infoId, tfgModelId(inputId));
+      syncTafrighProviderUI();
+    };
+    input.addEventListener("focus", async () => { render(); await loadTafrighCatalog(); render(); });
+    input.addEventListener("input", render);
+    input.addEventListener("change", commit);
+    input.addEventListener("blur", () => setTimeout(() => list.classList.add("hidden"), 120));
+  }
+
+  async function loadTafrighCatalog() {
+    if (typeof WahyAiVerifier !== "object") return;
+    await WahyAiVerifier.fetchOpenRouterModelsCatalog();
+    renderTafrighModelInfo("lblTafrighChatModelInfo", tfgChatModel());
+    renderTafrighModelInfo("lblTafrighHelperModelInfo", tfgHelperModel());
+  }
+
+  function syncTafrighProviderUI() {
+    const prov = tfgProvider();
+    tfgEl("wrapTafrighChatModel")?.classList.toggle("hidden", prov !== "openrouter");
+    tfgEl("wrapTafrighGeminiModel")?.classList.toggle("hidden", prov !== "gemini");
+    tfgEl("wrapTafrighHelperRoute")?.classList.toggle("hidden", !tfgNeedsHelper());
+    const helperInp = tfgEl("inpTafrighHelperModel");
+    if (helperInp) helperInp.disabled = tfgHelperDirect();
+    const modeSel = tfgEl("selTafrighMode");
+    const windowed = modeSel?.querySelector('option[value="windowed"]');
+    if (windowed) windowed.disabled = tfgNeedsHelper();   // windowed batches need a chat model (Gemini / OpenRouter non-JEV)
+    if (modeSel && windowed?.disabled && modeSel.value === "windowed") modeSel.value = "per_sentence";
+    if (prov === "openrouter" || tfgNeedsHelper()) loadTafrighCatalog();
+    updateTafrighRangeSummary();
+  }
+
+  /** The model part of the run request for the chosen provider. */
+  function tafrighModelPayload() {
+    const prov = tfgProvider();
+    const chatModel = tfgChatModel();
+    const helper = tfgHelperDirect()
+      ? { gemini_route: "direct" }
+      : { gemini_route: "openrouter", openrouter_gemini_model: tfgHelperModel() || "google/gemini-3.1-flash-lite" };
+    if (prov === "openrouter" && tfgIsJev(chatModel)) {
+      return { model_candidate: "jev_hybrid", model_name: chatModel, jev_model: chatModel, ...helper };
+    }
+    if (prov === "openrouter") return { model_candidate: "openrouter_chat", model_name: chatModel, openrouter_chat_model: chatModel };
+    if (prov === "laya") return { model_candidate: "laya_hybrid", model_name: "local-laya", ...helper };
+    return { model_candidate: "gemini_all", model_name: tfgEl("selTafrighModel")?.value || "auto", gemini_route: "direct" };
+  }
+
+  /** Why a run with the chosen provider cannot start (missing key / model), or "" when it can. */
+  function tafrighProviderProblem() {
+    const ai = currentState.aiVerification || {};
+    const prov = tfgProvider();
+    const orKey = (ai.openRouterApiKey || tfgLoad("wahy_openrouter_api_key") || "").trim();
+    const gemKey = (ai.geminiApiKey || tfgLoad("wahy_gemini_api_key") || "").trim();
+    const known = (id) => !tfgCatalog().length || tfgCatalog().some(m => m.id === id);
+    if ((prov === "openrouter" || (tfgNeedsHelper() && !tfgHelperDirect())) && !orKey) return "أدخل مفتاح OpenRouter API في إعدادات التدقيق الذكي أولاً.";
+    if ((prov === "gemini" || (tfgNeedsHelper() && tfgHelperDirect())) && !gemKey) return "أدخل مفتاح Google Gemini API في إعدادات التدقيق الذكي أولاً.";
+    if (prov === "openrouter") {
+      if (!tfgChatModel()) return "ابحث عن نموذج OpenRouter واختره أولاً.";
+      if (!tfgIsJev(tfgChatModel()) && !known(tfgChatModel())) return `النموذج «${tfgChatModel()}» غير موجود على OpenRouter — اختره من نتائج البحث.`;
+    }
+    if (tfgNeedsHelper() && !tfgHelperDirect() && tfgHelperModel() && !known(tfgHelperModel())) {
+      return `نموذج المساعدة «${tfgHelperModel()}» غير موجود على OpenRouter — اختره من نتائج البحث.`;
+    }
+    return "";
   }
 
   function tafrighRange() {
@@ -913,8 +1141,7 @@ window.addEventListener("DOMContentLoaded", () => {
     const sum = tfgEl("tafrighRangeSummary");
     if (!sum || !tfg.preview) return;
     const { from, to, count } = tafrighRange();
-    const model = tfgEl("selTafrighModel")?.value || "";
-    const perSentence = model.startsWith("typesafe") ? 3.5 : 2.5;   // measured: JEV ≈ 3.5 s / sentence
+    const perSentence = tfgNeedsHelper() && tfgProvider() === "openrouter" ? 3.5 : 2.5;   // measured: JEV ≈ 3.5 s / sentence
     const words = tfg.preview.segments.slice(from - 1, to).reduce((a, s) => a + s.words, 0);
     sum.textContent = `سيعمل النموذج على ${count} جملة (من ${from} إلى ${to}، ${words} كلمة) • الوقت التقريبي ≈ ${fmtSec(count * perSentence)}`;
     const lbl = tfgEl("lblRunTafrigh");
@@ -1013,6 +1240,9 @@ window.addEventListener("DOMContentLoaded", () => {
       showToast("⏳ التفريغ الذكي قيد التشغيل بالفعل، انتظر حتى ينتهي أو ألغِه.");
       return;
     }
+    if (tfgProvider() === "openrouter" || tfgNeedsHelper()) await loadTafrighCatalog();
+    const problem = tafrighProviderProblem();
+    if (problem) { showToast(`⚠️ ${problem}`); return; }
     if (!tfg.preview || !tfg.preview.segments.length) {
       await refreshTafrighPreview();
       if (!tfg.preview || !tfg.preview.segments.length) { showToast("⚠️ لا توجد جمل للتشغيل"); return; }
@@ -1023,7 +1253,6 @@ window.addEventListener("DOMContentLoaded", () => {
 
   async function runAiTafrighOnce() {
     const { from, to, count } = tafrighRange();
-    const modelCandidate = tfgEl("selTafrighModel")?.value || "typesafe/jev-1.14";
     const matnText = (tfgEl("inpTafrighMatn")?.value || "").trim();
     const jobId = "tfg_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
     tfg.jobId = jobId;
@@ -1058,15 +1287,8 @@ window.addEventListener("DOMContentLoaded", () => {
       matn_config: matnText ? { mode: "upload", raw_matn_text: matnText } : { mode: "no_matn" },
       lecture_slug: (currentState.lectureTitle || "lecture").slice(0, 40),
       processing_mode: tfgEl("selTafrighMode")?.value || "per_sentence",
-      model_candidate: modelCandidate.startsWith("typesafe") ? "jev_hybrid" : (modelCandidate === "local-laya" ? "laya_hybrid" : "gemini_all"),
-      model_name: modelCandidate,
+      ...tafrighModelPayload(),
       typo_strategy: tfgEl("selTafrighTypoStrategy")?.value || "gated",
-      ...(() => {
-        const route = tfgEl("selTafrighGeminiRoute")?.value || "openrouter:google/gemini-3.1-flash-lite";
-        return route === "direct"
-          ? { gemini_route: "direct" }
-          : { gemini_route: "openrouter", openrouter_gemini_model: route.slice("openrouter:".length) };
-      })(),
       gemini_api_key: currentState?.aiVerification?.geminiApiKey || localStorage.getItem("wahy_gemini_api_key") || "",
       openrouter_api_key: currentState?.aiVerification?.openRouterApiKey || localStorage.getItem("wahy_openrouter_api_key") || ""
     };
@@ -1113,11 +1335,40 @@ window.addEventListener("DOMContentLoaded", () => {
   tfgEl("btnTafrighRetry")?.addEventListener("click", openTafrighPrep);
   tfgEl("btnRunTafrighFromEmpty")?.addEventListener("click", triggerRunAiTafrigh);
   tfgEl("btnOpenSaveTafrighRun")?.addEventListener("click", () => openSaveTafrighRunModal());
-  const routeSel = tfgEl("selTafrighGeminiRoute");
-  if (routeSel) {
-    try { const saved = localStorage.getItem("wahyTafrighGeminiRoute"); if (saved && [...routeSel.options].some(o => o.value === saved)) routeSel.value = saved; } catch (e) { /* storage blocked */ }
-    routeSel.addEventListener("change", () => { try { localStorage.setItem("wahyTafrighGeminiRoute", routeSel.value); } catch (e) { /* storage blocked */ } });
+  // Provider, models and text source: restored from the last session, saved on change. Older sessions saved
+  // "jev" / "openrouter_chat" as separate providers and the helper as a fixed route: mapped onto the search fields.
+  const savedProv = tfgLoad("wahyTafrighProvider");
+  if (savedProv === "jev" || savedProv === "openrouter_chat") tfgStore("wahyTafrighProvider", "openrouter");
+  if (savedProv === "jev" && !tfgLoad("wahyTafrighChatModel")) tfgStore("wahyTafrighChatModel", tfgLoad("wahyTafrighJevModel") || "typesafe/jev-1.14");
+  const savedRoute = tfgLoad("wahyTafrighGeminiRoute") || "";
+  if (savedRoute === "direct") tfgStore("wahyTafrighHelperDirect", "1");
+  if (savedRoute.startsWith("openrouter:google/") && !tfgLoad("wahyTafrighHelperModel")) tfgStore("wahyTafrighHelperModel", savedRoute.slice("openrouter:".length));
+
+  [["selTafrighProvider", "wahyTafrighProvider"], ["selTafrighTextSource", "wahyTafrighTextSource"]].forEach(([id, key]) => {
+    const el = tfgEl(id);
+    if (!el) return;
+    const saved = tfgLoad(key);
+    if (saved && [...el.options].some(o => o.value === saved)) el.value = saved;
+    el.addEventListener("change", () => tfgStore(key, el.value));
+  });
+  if (tfgEl("inpTafrighChatModel")) {
+    tfgEl("inpTafrighChatModel").value = tfgLoad("wahyTafrighChatModel") || currentState.aiVerification?.openRouterSelectedModel || "typesafe/jev-1.14";
   }
+  if (tfgEl("inpTafrighHelperModel")) {
+    tfgEl("inpTafrighHelperModel").value = tfgLoad("wahyTafrighHelperModel") || "google/gemini-3.1-flash-lite";
+  }
+  if (tfgEl("chkTafrighHelperDirect")) {
+    tfgEl("chkTafrighHelperDirect").checked = tfgLoad("wahyTafrighHelperDirect") === "1";
+    tfgEl("chkTafrighHelperDirect").addEventListener("change", (e) => {
+      tfgStore("wahyTafrighHelperDirect", e.target.checked ? "1" : "0");
+      syncTafrighProviderUI();
+    });
+  }
+  attachTafrighModelSearch("inpTafrighChatModel", "tafrighChatModelList", "lblTafrighChatModelInfo", "wahyTafrighChatModel");
+  attachTafrighModelSearch("inpTafrighHelperModel", "tafrighHelperModelList", "lblTafrighHelperModelInfo", "wahyTafrighHelperModel");
+  tfgEl("selTafrighProvider")?.addEventListener("change", syncTafrighProviderUI);
+  tfgEl("selTafrighTextSource")?.addEventListener("change", refreshTafrighPreview);
+  syncTafrighProviderUI();
   // Optional: re-detect quotes with the chosen engine before the Tafrigh (replaces manual quote edits; undoable)
   tfgEl("btnTafrighRerunEngine")?.addEventListener("click", async () => {
     if (!(currentState.words || []).length) { showToast("لا يوجد نص لإعادة فحصه بعد"); return; }
@@ -1156,7 +1407,7 @@ window.addEventListener("DOMContentLoaded", () => {
     clearTimeout(tfg.previewTimer);
     tfg.previewTimer = setTimeout(refreshTafrighPreview, 250);
   }));
-  ["inpTafrighFrom", "inpTafrighTo", "selTafrighModel"].forEach(id => tfgEl(id)?.addEventListener("input", updateTafrighRangeSummary));
+  ["inpTafrighFrom", "inpTafrighTo"].forEach(id => tfgEl(id)?.addEventListener("input", updateTafrighRangeSummary));
   document.querySelectorAll("[data-tafrigh-range]").forEach(btn => btn.addEventListener("click", () => {
     const n = tfg.preview ? tfg.preview.segments.length : 0;
     const v = btn.getAttribute("data-tafrigh-range");
@@ -1738,13 +1989,17 @@ window.addEventListener("DOMContentLoaded", () => {
 
       isAiVerificationRunning = true;
       try {
-        await WahyAiVerifier.runBatchAiVerification((p) => {
+        const summary = await WahyAiVerifier.runBatchAiVerification((p) => {
           const pct = p.total > 0 ? Math.round((p.processed / p.total) * 100) : 0;
           if (barProgress) barProgress.style.width = `${pct}%`;
           if (lblPercent) lblPercent.textContent = `${pct}% (${p.processed}/${p.total})`;
           if (lblStatus) lblStatus.textContent = p.message || "جاري الفحص...";
         }, selectedIndices);
-        showToast("✅ اكتمل الفحص والتدقيق الذكي للمقتبسات بنجاح!");
+        if (summary && summary.failed) {
+          showToast(`⚠️ اكتمل التدقيق مع ${summary.failed} طلب فاشل من ${summary.total} — راجع السبب في فاحص المقتبس أو سجل الطلبات.`);
+        } else if (summary && !summary.cancelled) {
+          showToast("✅ اكتمل الفحص والتدقيق الذكي للمقتبسات بنجاح!");
+        }
       } catch (err) {
         showToast(`⚠️ تنبيه التدقيق: ${err.message}`);
       } finally {
@@ -1908,9 +2163,18 @@ window.addEventListener("DOMContentLoaded", () => {
       }
     }
 
-    btnOrJev?.addEventListener("click", () => setOpenRouterModeUI("jev"));
+    // Picking a mode in the studio card also makes it the provider the next run uses
+    function selectOpenRouterProvider(mode) {
+      setOpenRouterModeUI(mode);
+      currentState.aiVerification.activeProvider = mode === "chat" ? "openrouter_chat" : "openrouter_jev";
+      if (selQuickProv) selQuickProv.value = currentState.aiVerification.activeProvider;
+      saveAiConfigToStorage();
+      if (typeof updateAiLaunchButtonLabel === "function") updateAiLaunchButtonLabel();
+    }
+
+    btnOrJev?.addEventListener("click", () => selectOpenRouterProvider("jev"));
     btnOrChat?.addEventListener("click", () => {
-      setOpenRouterModeUI("chat");
+      selectOpenRouterProvider("chat");
       WahyAiVerifier.fetchOpenRouterModelsCatalog().then(renderOpenRouterDropdown);
     });
     setOpenRouterModeUI(currentState.aiVerification.openRouterMode || "jev");
@@ -2187,8 +2451,7 @@ window.addEventListener("DOMContentLoaded", () => {
     currentState.editorViewRasmQiyasi = !currentState.editorViewRasmQiyasi;
     const btn = document.getElementById("btnEditorToggleRasmQiyasi");
     if (btn) {
-      btn.classList.toggle("bg-emerald-600", currentState.editorViewRasmQiyasi);
-      btn.classList.toggle("text-white", currentState.editorViewRasmQiyasi);
+      btn.classList.toggle("is-on", currentState.editorViewRasmQiyasi);
     }
     if (typeof renderEditorLectureStage === "function") renderEditorLectureStage();
     showToast(currentState.editorViewRasmQiyasi ? "✨ تم تفعيل عرض الرسم القياسي في لوحة التحرير" : "تم إلغاء عرض الرسم القياسي في لوحة التحرير");
@@ -2198,8 +2461,7 @@ window.addEventListener("DOMContentLoaded", () => {
     currentState.editorViewFullCanonicalSpan = !currentState.editorViewFullCanonicalSpan;
     const btn = document.getElementById("btnEditorToggleFullMatn");
     if (btn) {
-      btn.classList.toggle("bg-emerald-600", currentState.editorViewFullCanonicalSpan);
-      btn.classList.toggle("text-white", currentState.editorViewFullCanonicalSpan);
+      btn.classList.toggle("is-on", currentState.editorViewFullCanonicalSpan);
     }
     if (typeof renderEditorLectureStage === "function") renderEditorLectureStage();
     showToast(currentState.editorViewFullCanonicalSpan ? "📜 تم تفعيل عرض المتن كاملاً في لوحة التحرير" : "تم التبديل لعرض المقطع المنطوق فقط");

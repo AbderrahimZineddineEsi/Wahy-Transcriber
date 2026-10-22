@@ -1,216 +1,866 @@
 /* =========================================================================
-   Wahy Studio (Wahy-Transcriber) — Public Edition Stylesheet
-   Clean, spacious typography, RTL layout, synchronized word progress,
-   FN Studio range highlighting, and Dark/Light themes.
+   Wahy Studio — stylesheet
+   Two themes: black (html.dark, default) and white (html.light).
+   The interface itself is greyscale; colour is reserved for what the
+   lecture quotes: Quran (emerald), hadith (amber), adhkar (violet).
+   Tailwind colour families are mapped onto the ramps below (see the
+   tailwind.config in index.html), so script-rendered markup follows too.
    ========================================================================= */
 
-:root {
-  --bg-app: #070b14;
-  --bg-surface: #0f172a;
-  --bg-elevated: #1e293b;
-  --border-subtle: rgba(51, 65, 85, 0.65);
+/* ---------- Ramps (space-separated RGB so Tailwind can apply opacity) ---- */
+:root,
+html.dark {
+  color-scheme: dark;
+  --white: 255 255 255;
+
+  --n-50: 250 250 250;  --n-100: 240 240 240; --n-200: 222 222 222; --n-300: 189 189 189;
+  --n-400: 150 150 150; --n-500: 115 115 115; --n-600: 82 82 82;    --n-700: 58 58 58;
+  --n-800: 36 36 36;    --n-900: 17 17 17;    --n-950: 0 0 0;
+
+  /* Lapis: the interface accent */
+  --a-50: 239 244 255;  --a-100: 219 229 254; --a-200: 191 208 252; --a-300: 147 176 248;
+  --a-400: 112 148 245; --a-500: 70 112 232;  --a-600: 50 88 208;   --a-700: 40 70 170;
+  --a-800: 34 57 138;   --a-900: 30 46 104;   --a-950: 18 27 62;
+
+  --q-50: 236 253 245;  --q-100: 209 250 229; --q-200: 167 243 208; --q-300: 110 231 183;
+  --q-400: 52 211 153;  --q-500: 16 185 129;  --q-600: 5 150 105;   --q-700: 4 120 87;
+  --q-800: 6 95 70;     --q-900: 6 78 59;     --q-950: 2 44 34;
+
+  --h-50: 255 251 235;  --h-100: 254 243 199; --h-200: 253 230 138; --h-300: 252 211 77;
+  --h-400: 251 191 36;  --h-500: 245 158 11;  --h-600: 217 119 6;   --h-700: 180 83 9;
+  --h-800: 146 64 14;   --h-900: 120 53 15;   --h-950: 69 26 3;
+
+  --d-50: 245 243 255;  --d-100: 237 233 254; --d-200: 221 214 254; --d-300: 196 181 253;
+  --d-400: 167 139 250; --d-500: 139 92 246;  --d-600: 124 58 237;  --d-700: 109 40 217;
+  --d-800: 91 33 182;   --d-900: 76 29 149;   --d-950: 46 16 101;
+
+  --r-50: 255 241 242;  --r-100: 255 228 230; --r-200: 254 205 211; --r-300: 253 164 175;
+  --r-400: 251 113 133; --r-500: 244 63 94;   --r-600: 225 29 72;   --r-700: 190 18 60;
+  --r-800: 159 18 57;   --r-900: 136 19 55;   --r-950: 76 5 25;
+
+  /* Roles */
+  --bg: rgb(var(--n-950));
+  --surface: rgb(var(--n-900));
+  --surface-2: rgb(24 24 24);
+  --line: rgb(var(--n-800));
+  --line-strong: rgb(var(--n-700));
+  --fg: rgb(var(--white));
+  --fg-2: rgb(var(--n-300));
+  --fg-3: rgb(var(--n-400));
+  --invert-bg: rgb(var(--white));
+  --invert-fg: rgb(var(--n-950));
+
+  --accent: rgb(var(--a-400));
+  --accent-fill: rgb(var(--a-500));
+  --accent-fill-hover: rgb(var(--a-400));
+  --accent-tint: rgb(var(--a-500) / 0.16);
+  --accent-line: rgb(var(--a-500) / 0.55);
+  --on-accent: #ffffff;
+  --gold: rgb(var(--h-400));
+
+  --quran: rgb(var(--q-300));
+  --quran-tint: rgb(var(--q-500) / 0.12);
+  --quran-line: rgb(var(--q-500) / 0.45);
+  --hadith: rgb(var(--h-300));
+  --hadith-tint: rgb(var(--h-500) / 0.12);
+  --hadith-line: rgb(var(--h-500) / 0.45);
+  --dhikr: rgb(var(--d-300));
+  --dhikr-tint: rgb(var(--d-500) / 0.14);
+  --dhikr-line: rgb(var(--d-500) / 0.5);
+  --danger: rgb(var(--r-400));
+  --danger-tint: rgb(var(--r-500) / 0.12);
+  --danger-line: rgb(var(--r-500) / 0.5);
+
+  --shadow-pop: 0 18px 40px -12px rgb(0 0 0 / 0.9), 0 0 0 1px rgb(var(--n-800));
+
+  --font-ui: "Readex Pro", system-ui, sans-serif;
+  --font-text: "Amiri", "Scheherazade New", "Traditional Arabic", serif;
+  --font-code: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+
+  /* Names kept for older component rules */
+  --bg-app: var(--bg);
+  --bg-surface: var(--surface);
+  --bg-surface-elevated: var(--surface-2);
+  --bg-surface-sunken: var(--bg);
+  --border-subtle: var(--line);
+  --border-medium: var(--line-strong);
+  --border-strong: var(--fg-3);
+  --text-primary: var(--fg);
+  --text-secondary: var(--fg-2);
+  --text-muted: var(--fg-3);
+  --text-inverse: var(--invert-fg);
+  --accent-ayah: var(--quran);
+  --accent-ayah-bg: var(--quran-tint);
+  --accent-ayah-border: var(--quran-line);
+  --accent-hadith: var(--hadith);
+  --accent-hadith-bg: var(--hadith-tint);
+  --accent-hadith-border: var(--hadith-line);
+  --accent-dhikr: var(--dhikr);
+  --accent-dhikr-bg: var(--dhikr-tint);
+  --accent-dhikr-border: var(--dhikr-line);
+  --accent-matn: var(--hadith);
+  --accent-matn-bg: var(--hadith-tint);
+  --accent-matn-border: var(--hadith-line);
+  --status-correct: rgb(var(--q-400));
+  --status-false: var(--danger);
+  --status-unsure: rgb(var(--h-400));
+  --status-unverified: var(--fg-3);
+  --font-arabic-text: var(--font-text);
+  --font-arabic-ui: var(--font-ui);
+  --font-mono-numbers: var(--font-ui);
 }
 
+/* White theme: every ramp mirrored (50 <-> 950), so "light text on dark" becomes "dark text on light". */
+html.light {
+  color-scheme: light;
+  --white: 0 0 0;
+
+  --n-50: 0 0 0;        --n-100: 23 23 23;    --n-200: 40 40 40;    --n-300: 64 64 64;
+  --n-400: 96 96 96;    --n-500: 125 125 125; --n-600: 170 170 170; --n-700: 212 212 212;
+  --n-800: 232 232 232; --n-900: 246 246 246; --n-950: 255 255 255;
+
+  --a-50: 18 27 62;     --a-100: 30 46 104;   --a-200: 34 57 138;   --a-300: 40 70 170;
+  --a-400: 50 88 208;   --a-500: 70 112 232;  --a-600: 112 148 245; --a-700: 147 176 248;
+  --a-800: 191 208 252; --a-900: 219 229 254; --a-950: 239 244 255;
+
+  --q-50: 2 44 34;      --q-100: 6 78 59;     --q-200: 6 95 70;     --q-300: 4 120 87;
+  --q-400: 5 150 105;   --q-500: 16 185 129;  --q-600: 52 211 153;  --q-700: 110 231 183;
+  --q-800: 167 243 208; --q-900: 209 250 229; --q-950: 236 253 245;
+
+  --h-50: 69 26 3;      --h-100: 120 53 15;   --h-200: 146 64 14;   --h-300: 180 83 9;
+  --h-400: 217 119 6;   --h-500: 245 158 11;  --h-600: 251 191 36;  --h-700: 252 211 77;
+  --h-800: 253 230 138; --h-900: 254 243 199; --h-950: 255 251 235;
+
+  --d-50: 46 16 101;    --d-100: 76 29 149;   --d-200: 91 33 182;   --d-300: 109 40 217;
+  --d-400: 124 58 237;  --d-500: 139 92 246;  --d-600: 167 139 250; --d-700: 196 181 253;
+  --d-800: 221 214 254; --d-900: 237 233 254; --d-950: 245 243 255;
+
+  --r-50: 76 5 25;      --r-100: 136 19 55;   --r-200: 159 18 57;   --r-300: 190 18 60;
+  --r-400: 225 29 72;   --r-500: 244 63 94;   --r-600: 251 113 133; --r-700: 253 164 175;
+  --r-800: 254 205 211; --r-900: 255 228 230; --r-950: 255 241 242;
+
+  --surface-2: rgb(240 240 240);
+  --accent-fill: rgb(50 88 208);
+  --accent-fill-hover: rgb(40 70 170);
+  --gold: rgb(180 120 20);
+  --quran: rgb(4 120 87);
+  --hadith: rgb(161 72 8);
+  --dhikr: rgb(109 40 217);
+  --danger: rgb(190 18 60);
+  --shadow-pop: 0 18px 40px -16px rgb(0 0 0 / 0.25), 0 0 0 1px rgb(var(--n-800));
+}
+
+/* ---------- Base ---------------------------------------------------------- */
 body {
-  font-family: 'IBM Plex Sans Arabic', 'Inter', sans-serif;
-  background-color: #070b14;
-  color: #f1f5f9;
+  font-family: var(--font-ui);
+  background-color: var(--bg);
+  color: var(--fg);
   overflow-x: hidden;
+  font-feature-settings: "tnum";
 }
 
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
+pre, code, kbd, samp {
+  font-family: var(--font-code);
 }
 
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
+::selection {
+  background: var(--accent-fill);
+  color: var(--on-accent);
+}
+
+input[type="range"],
+input[type="checkbox"] {
+  accent-color: var(--accent-fill);
+}
+
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+* {
+  scrollbar-color: rgb(var(--n-700)) transparent;
+  scrollbar-width: thin;
+}
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgb(var(--n-700)); border-radius: 9999px; }
+::-webkit-scrollbar-thumb:hover { background: rgb(var(--n-600)); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* The lecture is set as a page of text: a Naskh face, a generous measure. */
 .font-quran-text {
-  font-family: 'Amiri', serif;
+  font-family: var(--font-text);
   line-height: 2.15;
-  font-size: 1.22rem;
+  font-size: 1.25rem;
 }
 
 .lecture-pane {
-  line-height: 2.15;
-  font-size: 1.08rem;
+  font-family: var(--font-text);
+  line-height: 2.25;
+  font-size: 1.28rem;
 }
 
-/* Custom Sleek Scrollbars */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+/* Inline quote boxes are unbreakable, so justified lines open wide gaps; set the text ragged instead. */
+.lecture-pane .text-justify {
+  text-align: start;
 }
 
-::-webkit-scrollbar-track {
-  background: transparent;
+/* ---------- Header and navigation ---------------------------------------- */
+.app-header {
+  background: var(--bg);
+  border-bottom: 1px solid var(--line);
 }
 
-::-webkit-scrollbar-thumb {
-  background: #334155;
-  border-radius: 9999px;
+.brand-mark {
+  font-family: var(--font-text);
+  font-size: 1.6rem;
+  line-height: 1;
+  color: var(--gold);
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: #475569;
+.brand-name {
+  font-family: var(--font-text);
+  font-weight: 700;
+  font-size: 1.35rem;
+  line-height: 1;
+  color: var(--fg);
 }
 
-/* Main Navigation Pills in Compact Navbar */
+/* Section tabs: plain text, the current one carries a rule underneath. */
 .main-nav-pill {
   position: relative;
-  border-radius: 0.75rem;
-  transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 1px solid transparent;
   white-space: nowrap;
+  border-radius: 0;
+  padding: 0 0.15rem;
+  height: 3.5rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.82rem;
+  transition: color 0.15s ease;
 }
 
 .main-nav-pill.nav-active {
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.22), rgba(13, 148, 136, 0.18));
-  color: #34d399;
-  border-color: rgba(16, 185, 129, 0.45);
-  font-weight: 700;
-  box-shadow: 0 2px 10px -2px rgba(16, 185, 129, 0.2);
+  color: var(--fg);
+  font-weight: 600;
+  box-shadow: inset 0 -2px 0 var(--accent);
 }
 
 .main-nav-pill.nav-inactive {
-  background-color: transparent;
-  color: #94a3b8;
-  font-weight: 500;
+  color: var(--fg-3);
+  font-weight: 400;
 }
 
 .main-nav-pill.nav-inactive:hover {
-  background-color: rgba(30, 41, 59, 0.65);
-  color: #f1f5f9;
+  color: var(--fg);
 }
 
-/* Citation Badges & Spans in Lecture View */
-.citation-ayah {
-  background-color: rgba(16, 185, 129, 0.15);
-  border: 1px solid rgba(16, 185, 129, 0.4);
-  color: #6ee7b7;
-  font-family: 'Amiri', serif;
-  font-size: 1.2rem;
-  padding: 0.12rem 0.5rem;
-  border-radius: 0.5rem;
+.nav-count {
+  font-size: 0.68rem;
+  color: var(--fg-3);
+  font-weight: 400;
+}
+
+.main-nav-pill.nav-active .nav-count {
+  color: var(--accent);
+}
+
+/* ---------- Buttons, segmented controls, menus -------------------------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  height: 2rem;
+  padding: 0 0.8rem;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  white-space: nowrap;
+  color: var(--fg);
+  background: transparent;
+  border: 1px solid var(--line-strong);
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
   cursor: pointer;
-  transition: all 0.15s ease;
 }
 
-.citation-ayah:hover {
-  background-color: rgba(16, 185, 129, 0.25);
-  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.55);
+.btn:hover {
+  background: var(--surface-2);
+  border-color: var(--fg-3);
+}
+
+.btn-primary {
+  background: var(--accent-fill);
+  color: var(--on-accent);
+  border-color: var(--accent-fill);
+  font-weight: 600;
+}
+
+.btn-primary:hover {
+  background: var(--accent-fill-hover);
+  border-color: var(--accent-fill-hover);
+}
+
+.btn-quiet {
+  border-color: transparent;
+  color: var(--fg-2);
+}
+
+.btn-quiet:hover {
+  color: var(--fg);
+  background: var(--surface-2);
+  border-color: transparent;
+}
+
+.btn-danger {
+  color: var(--danger);
+  border-color: var(--danger-line);
+}
+
+.btn-danger:hover {
+  background: var(--danger-tint);
+  border-color: var(--danger);
+}
+
+.btn-icon {
+  width: 2rem;
+  padding: 0;
+}
+
+.btn-lg {
+  height: 2.6rem;
+  padding: 0 1.3rem;
+  font-size: 0.86rem;
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.btn-count {
+  font-size: 0.7rem;
+  padding: 0 0.35rem;
+  border-radius: 4px;
+  background: rgb(255 255 255 / 0.2);
+}
+
+/* A row of mutually exclusive choices. */
+.seg {
+  display: inline-flex;
+  padding: 2px;
+  gap: 2px;
+  border-radius: 9px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
+
+.seg-btn {
+  height: 1.75rem;
+  padding: 0 0.7rem;
+  border-radius: 7px;
+  font-size: 0.76rem;
+  color: var(--fg-3);
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+/* Equal-width tabs (flex-1) may wrap their label instead of pushing past the screen edge. */
+.seg-btn.flex-1 {
+  min-width: 0;
+  white-space: normal;
+  height: auto;
+  min-height: 1.75rem;
+  padding-block: 0.3rem;
+  text-align: center;
+}
+
+.seg-btn:hover {
+  color: var(--fg);
+}
+
+.seg-btn.is-active {
+  background: var(--accent-tint);
+  color: var(--accent);
+  font-weight: 600;
+  box-shadow: 0 0 0 1px var(--accent-line);
+}
+
+/* Disclosure menus built on <details>; js/ui-menus.js closes them on outside click / Escape. */
+.menu {
+  position: relative;
+}
+
+.menu > summary {
+  list-style: none;
+}
+
+.menu > summary::-webkit-details-marker {
+  display: none;
+}
+
+.menu[open] > summary {
+  background: var(--accent-tint);
+  border-color: var(--accent-line);
+  color: var(--accent);
+}
+
+.menu-panel {
+  position: absolute;
+  z-index: 45;
+  top: calc(100% + 6px);
+  inset-inline-end: 0;
+  min-width: 300px;
+  max-width: min(92vw, 400px);
+  padding: 6px;
+  border-radius: 10px;
+  background: var(--bg);
+  box-shadow: var(--shadow-pop);
+  animation: menu-in 0.12s ease-out;
+}
+
+.menu:not([open]) > .menu-panel {
+  display: none;
+}
+
+/* On phones an open menu spans the screen width (16px gutters) right under its button. */
+@media (max-width: 640px) {
+  .menu-panel {
+    position: fixed;
+    top: auto;
+    left: 16px;
+    right: 16px;
+    min-width: 0;
+    max-width: none;
+    margin-top: 6px;
+  }
+}
+
+.menu-panel.menu-start {
+  inset-inline-end: auto;
+  inset-inline-start: 0;
+}
+
+@keyframes menu-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: none; }
+}
+
+.menu-label {
+  display: block;
+  padding: 0.55rem 0.6rem 0.25rem;
+  font-size: 0.7rem;
+  color: var(--fg-3);
+}
+
+.menu-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  color: var(--fg);
+  text-align: start;
+  cursor: pointer;
+}
+
+.menu-item:hover {
+  background: var(--surface-2);
+}
+
+.menu-item small {
+  display: block;
+  font-size: 0.7rem;
+  color: var(--fg-3);
+}
+
+/* On/off commands show their state as a box at the end of the row. */
+.menu-check::after {
+  content: "";
+  margin-inline-start: auto;
+  width: 0.95rem;
+  height: 0.95rem;
+  flex-shrink: 0;
+  border-radius: 4px;
+  border: 1.5px solid var(--line-strong);
+}
+
+.menu-check.is-on::after,
+.menu-check.btn-playback-sync-active::after {
+  background: var(--accent-fill);
+  border-color: var(--accent-fill);
+  box-shadow: inset 0 0 0 2px var(--bg);
+}
+
+.menu .btn-playback-sync-active,
+.menu .btn-playback-sync-inactive {
+  background: transparent !important;
+  color: var(--fg) !important;
+  border-color: transparent !important;
+}
+
+.menu .btn-playback-sync-active:hover,
+.menu .btn-playback-sync-inactive:hover {
+  background: var(--surface-2) !important;
+}
+
+.menu-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.4rem 0.6rem;
+  font-size: 0.8rem;
+  color: var(--fg-2);
+}
+
+.menu-row > span {
+  white-space: nowrap;
+}
+
+.menu-row select {
+  min-width: 9rem;
+}
+
+.menu-sep {
+  height: 1px;
+  margin: 6px 4px;
+  background: var(--line);
+}
+
+/* Form controls inherit the theme without per-element classes. */
+.field {
+  height: 2rem;
+  padding: 0 0.6rem;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  color: var(--fg);
+  background: var(--bg);
+  border: 1px solid var(--line-strong);
+}
+
+.field {
+  max-width: 100%;
+}
+
+.field:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+/* Solid colour fills on buttons (many rendered by scripts) read as the one primary style:
+   the lapis accent. Other hues stay for quotes and verdicts; rose fills keep meaning danger. */
+button[class~="bg-emerald-500"],
+button[class~="bg-emerald-600"],
+button[class~="bg-emerald-700"],
+button[class~="bg-violet-500"],
+button[class~="bg-violet-600"],
+button[class~="bg-violet-700"],
+button[class~="bg-indigo-500"],
+button[class~="bg-indigo-600"],
+button[class~="bg-indigo-700"],
+button[class~="bg-sky-500"],
+button[class~="bg-sky-600"],
+button[class~="bg-sky-700"],
+button[class~="bg-teal-500"],
+button[class~="bg-teal-600"],
+button[class~="bg-teal-700"],
+button[class~="bg-purple-500"],
+button[class~="bg-purple-600"],
+button[class~="bg-purple-700"],
+button[class~="bg-amber-500"],
+button[class~="bg-amber-600"],
+button[class~="bg-amber-700"],
+button[class~="bg-cyan-500"],
+button[class~="bg-cyan-600"],
+button[class~="bg-cyan-700"],
+button[class~="bg-blue-500"],
+button[class~="bg-blue-600"],
+button[class~="bg-blue-700"],
+button[class~="bg-orange-500"],
+button[class~="bg-orange-600"],
+button[class~="bg-orange-700"],
+button[class*="bg-gradient-to-"],
+label[class~="bg-emerald-500"],
+label[class~="bg-emerald-600"],
+label[class~="bg-emerald-700"],
+label[class~="bg-violet-500"],
+label[class~="bg-violet-600"],
+label[class~="bg-violet-700"],
+label[class~="bg-indigo-500"],
+label[class~="bg-indigo-600"],
+label[class~="bg-indigo-700"],
+label[class~="bg-sky-500"],
+label[class~="bg-sky-600"],
+label[class~="bg-sky-700"],
+label[class~="bg-teal-500"],
+label[class~="bg-teal-600"],
+label[class~="bg-teal-700"],
+label[class~="bg-purple-500"],
+label[class~="bg-purple-600"],
+label[class~="bg-purple-700"],
+label[class~="bg-amber-500"],
+label[class~="bg-amber-600"],
+label[class~="bg-amber-700"],
+label[class~="bg-cyan-500"],
+label[class~="bg-cyan-600"],
+label[class~="bg-cyan-700"],
+label[class~="bg-blue-500"],
+label[class~="bg-blue-600"],
+label[class~="bg-blue-700"],
+label[class~="bg-orange-500"],
+label[class~="bg-orange-600"],
+label[class~="bg-orange-700"],
+label[class*="bg-gradient-to-"] {
+  background: var(--accent-fill) !important;
+  color: var(--on-accent) !important;
+  border-color: var(--accent-fill) !important;
+}
+
+button[class~="bg-emerald-500"]:hover,
+button[class~="bg-emerald-600"]:hover,
+button[class~="bg-emerald-700"]:hover,
+button[class~="bg-violet-500"]:hover,
+button[class~="bg-violet-600"]:hover,
+button[class~="bg-violet-700"]:hover,
+button[class~="bg-indigo-500"]:hover,
+button[class~="bg-indigo-600"]:hover,
+button[class~="bg-indigo-700"]:hover,
+button[class~="bg-sky-500"]:hover,
+button[class~="bg-sky-600"]:hover,
+button[class~="bg-sky-700"]:hover,
+button[class~="bg-teal-500"]:hover,
+button[class~="bg-teal-600"]:hover,
+button[class~="bg-teal-700"]:hover,
+button[class~="bg-purple-500"]:hover,
+button[class~="bg-purple-600"]:hover,
+button[class~="bg-purple-700"]:hover,
+button[class~="bg-amber-500"]:hover,
+button[class~="bg-amber-600"]:hover,
+button[class~="bg-amber-700"]:hover,
+button[class~="bg-cyan-500"]:hover,
+button[class~="bg-cyan-600"]:hover,
+button[class~="bg-cyan-700"]:hover,
+button[class~="bg-blue-500"]:hover,
+button[class~="bg-blue-600"]:hover,
+button[class~="bg-blue-700"]:hover,
+button[class~="bg-orange-500"]:hover,
+button[class~="bg-orange-600"]:hover,
+button[class~="bg-orange-700"]:hover,
+button[class*="bg-gradient-to-"]:hover,
+label[class~="bg-emerald-500"]:hover,
+label[class~="bg-emerald-600"]:hover,
+label[class~="bg-emerald-700"]:hover,
+label[class~="bg-violet-500"]:hover,
+label[class~="bg-violet-600"]:hover,
+label[class~="bg-violet-700"]:hover,
+label[class~="bg-indigo-500"]:hover,
+label[class~="bg-indigo-600"]:hover,
+label[class~="bg-indigo-700"]:hover,
+label[class~="bg-sky-500"]:hover,
+label[class~="bg-sky-600"]:hover,
+label[class~="bg-sky-700"]:hover,
+label[class~="bg-teal-500"]:hover,
+label[class~="bg-teal-600"]:hover,
+label[class~="bg-teal-700"]:hover,
+label[class~="bg-purple-500"]:hover,
+label[class~="bg-purple-600"]:hover,
+label[class~="bg-purple-700"]:hover,
+label[class~="bg-amber-500"]:hover,
+label[class~="bg-amber-600"]:hover,
+label[class~="bg-amber-700"]:hover,
+label[class~="bg-cyan-500"]:hover,
+label[class~="bg-cyan-600"]:hover,
+label[class~="bg-cyan-700"]:hover,
+label[class~="bg-blue-500"]:hover,
+label[class~="bg-blue-600"]:hover,
+label[class~="bg-blue-700"]:hover,
+label[class~="bg-orange-500"]:hover,
+label[class~="bg-orange-600"]:hover,
+label[class~="bg-orange-700"]:hover,
+label[class*="bg-gradient-to-"]:hover {
+  background: var(--accent-fill-hover) !important;
+  border-color: var(--accent-fill-hover) !important;
+}
+
+/* ---------- Page structure ----------------------------------------------- */
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+.panel-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.doc-title {
+  font-family: var(--font-text);
+  font-weight: 700;
+  font-size: 1.55rem;
+  line-height: 1.3;
+  color: var(--fg);
+}
+
+/* The lecture's quote counts, marked with the brackets they appear in. */
+.tally {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.25rem;
+  font-size: 0.8rem;
+  color: var(--fg-3);
+  white-space: nowrap;
+}
+
+.tally strong {
+  font-weight: 600;
+  color: var(--fg);
+}
+
+.tally-mark {
+  font-family: var(--font-text);
+  font-size: 1rem;
+}
+
+.tally-ayah .tally-mark, .tally-ayah strong { color: var(--quran); }
+.tally-hadith .tally-mark, .tally-hadith strong { color: var(--hadith); }
+.tally-dhikr .tally-mark, .tally-dhikr strong { color: var(--dhikr); }
+
+.metric-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 1.1rem;
+  font-size: 0.74rem;
+  color: var(--fg-3);
+}
+
+.metric-line strong {
+  color: var(--fg);
+  font-weight: 500;
+}
+
+/* ---------- Citations in the lecture -------------------------------------- */
+.citation-ayah,
+.citation-hadith,
+.citation-dhikr {
+  padding: 0.1rem 0.45rem;
+  border-radius: 6px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.citation-ayah {
+  background-color: var(--quran-tint);
+  border-color: var(--quran-line);
+  color: var(--quran);
+  font-family: var(--font-text);
+  font-size: 1.32rem;
 }
 
 .citation-hadith {
-  background-color: rgba(245, 158, 11, 0.15);
-  border: 1px solid rgba(245, 158, 11, 0.4);
-  color: #fcd34d;
-  padding: 0.12rem 0.5rem;
-  border-radius: 0.5rem;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.citation-hadith:hover {
-  background-color: rgba(245, 158, 11, 0.25);
-  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.55);
+  background-color: var(--hadith-tint);
+  border-color: var(--hadith-line);
+  color: var(--hadith);
 }
 
 .citation-dhikr {
-  background-color: rgba(139, 92, 246, 0.16);
-  border: 1px solid rgba(139, 92, 246, 0.45);
-  color: #c4b5fd;
-  padding: 0.12rem 0.5rem;
-  border-radius: 0.5rem;
-  cursor: pointer;
-  transition: all 0.15s ease;
+  background-color: var(--dhikr-tint);
+  border-color: var(--dhikr-line);
+  color: var(--dhikr);
 }
 
-.citation-dhikr:hover {
-  background-color: rgba(139, 92, 246, 0.28);
-  box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.55);
-}
+.citation-ayah:hover { box-shadow: 0 0 0 2px var(--quran-line); }
+.citation-hadith:hover { box-shadow: 0 0 0 2px var(--hadith-line); }
+.citation-dhikr:hover { box-shadow: 0 0 0 2px var(--dhikr-line); }
 
 .citation-selected-ring {
-  box-shadow: 0 0 0 2.5px #38bdf8 !important;
+  box-shadow: 0 0 0 2px var(--accent) !important;
 }
 
-/* Word Tokens & Real-time Word Progress Indicator */
+/* ---------- Word tokens and the playhead ---------------------------------- */
 .lecture-word-token {
   cursor: pointer;
-  border-radius: 0.3rem;
-  padding: 0.05rem 0.16rem;
-  transition: background-color 0.12s ease, color 0.12s ease, box-shadow 0.12s ease;
+  border-radius: 4px;
+  padding: 0.02rem 0.14rem;
+  transition: background-color 0.12s ease, color 0.12s ease;
   display: inline-block;
 }
 
 .lecture-word-token:hover {
-  background-color: rgba(56, 189, 248, 0.16);
+  background-color: rgb(var(--n-500) / 0.2);
 }
 
+/* The spoken word is lit in the accent: the one strong mark on the page. */
 .lecture-word-active {
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.55), rgba(56, 189, 248, 0.5)) !important;
-  color: #ffffff !important;
-  box-shadow: 0 0 0 2px #34d399, 0 3px 12px rgba(16, 185, 129, 0.4);
-  font-weight: 700;
-  border-radius: 0.375rem;
-  padding: 0.05rem 0.28rem;
-  transform: translateY(-1px);
+  background: var(--accent-fill) !important;
+  color: var(--on-accent) !important;
+  border-radius: 4px;
+  padding: 0.02rem 0.24rem;
 }
 
 .lecture-word-passed {
-  color: #cbd5e1;
+  color: var(--fg-2);
 }
 
-/* =========================================================================
-   FN Studio Interactive Word Range Selection & Highlighting (from Wahy-Finder)
-   ========================================================================= */
+/* ---------- FN Studio word-range selection -------------------------------- */
 .raw-tok-item {
-  transition: all 0.12s ease;
+  transition: background-color 0.12s ease, color 0.12s ease;
 }
 
 .editor-word-selectable:hover {
-  background-color: rgba(16, 185, 129, 0.22);
-  color: #a7f3d0;
+  background-color: rgb(var(--n-500) / 0.22);
+  color: var(--fg);
 }
 
-.fn-tok-start {
-  background-color: #10b981 !important;
-  color: #022c22 !important;
+.fn-tok-start,
+.fn-tok-end {
+  background-color: var(--accent-fill) !important;
+  color: var(--on-accent) !important;
   font-weight: 700 !important;
-  border-radius: 0.375rem;
+  border-radius: 5px;
   padding: 0.06rem 0.38rem !important;
-  box-shadow: 0 0 0 2px #34d399, 0 4px 12px rgba(16, 185, 129, 0.4);
 }
 
 .fn-tok-in-range {
-  background-color: rgba(16, 185, 129, 0.28) !important;
-  color: #a7f3d0 !important;
-  border-bottom: 2px solid #10b981 !important;
+  background-color: rgb(var(--n-500) / 0.28) !important;
+  color: var(--fg) !important;
+  border-bottom: 2px solid var(--accent) !important;
   font-weight: 600;
-  border-radius: 0.25rem;
+  border-radius: 3px;
   padding: 0.04rem 0.22rem !important;
 }
 
-.fn-tok-end {
-  background-color: #059669 !important;
-  color: #ffffff !important;
-  font-weight: 700 !important;
-  border-radius: 0.375rem;
-  padding: 0.06rem 0.38rem !important;
-  box-shadow: 0 0 0 2px #6ee7b7, 0 4px 12px rgba(5, 150, 105, 0.45);
-}
-
 .fn-tok-hover-preview {
-  background-color: rgba(56, 189, 248, 0.26) !important;
-  color: #e0f2fe !important;
-  border-bottom: 2px dashed #38bdf8 !important;
-  border-radius: 0.25rem;
+  background-color: rgb(var(--n-500) / 0.2) !important;
+  color: var(--fg) !important;
+  border-bottom: 2px dashed var(--fg-3) !important;
+  border-radius: 3px;
 }
 
-/* Inline Word Quick Edit */
 .inline-edit-wrap {
   display: inline-flex;
   vertical-align: middle;
@@ -221,13 +871,17 @@ body {
   font-family: inherit;
 }
 
-/* Video Player & Custom Styled Caption Overlay */
+/* ---------- Player and caption overlay ------------------------------------ */
 .video-stage-container {
   position: relative;
-  background: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
-  border-radius: 1rem;
+  background: #000;
+  border-radius: 10px;
   overflow: hidden;
-  border: 1px solid rgba(51, 65, 85, 0.75);
+  border: 1px solid var(--line);
+}
+
+html.light .video-stage-container {
+  background: rgb(var(--n-900));
 }
 
 .video-caption-overlay {
@@ -244,334 +898,176 @@ body {
   text-align: center;
 }
 
+/* Captions sit on video, so they keep a dark plate in both themes. */
 .overlay-caption-box {
   max-width: 94%;
   padding: 0.55rem 1.15rem;
-  border-radius: 0.85rem;
-  backdrop-filter: blur(10px);
-  background: rgba(2, 6, 23, 0.86);
-  border: 1px solid rgba(148, 163, 184, 0.3);
-  color: #f8fafc;
-  font-size: 1.08rem;
+  border-radius: 8px;
+  background: rgb(0 0 0 / 0.82);
+  border: 1px solid rgb(255 255 255 / 0.14);
+  color: #fafafa;
+  font-family: var(--font-text);
+  font-size: 1.2rem;
   line-height: 1.85;
-  box-shadow: 0 12px 28px -5px rgba(0, 0, 0, 0.75);
-  transition: all 0.15s ease;
+  transition: opacity 0.15s ease;
 }
 
 .overlay-caption-box.overlay-ayah {
-  background: rgba(6, 78, 59, 0.9);
-  border-color: rgba(16, 185, 129, 0.65);
-  color: #ecfdf5;
-  font-family: 'Amiri', serif;
-  font-size: 1.25rem;
+  border-color: rgb(16 185 129 / 0.7);
+  color: #a7f3d0;
+  font-size: 1.32rem;
 }
 
 .overlay-caption-box.overlay-hadith {
-  background: rgba(120, 53, 15, 0.9);
-  border-color: rgba(245, 158, 11, 0.65);
-  color: #fffbeb;
+  border-color: rgb(245 158 11 / 0.7);
+  color: #fde68a;
 }
 
 .overlay-caption-box.overlay-dhikr {
-  background: rgba(49, 46, 129, 0.9);
-  border-color: rgba(139, 92, 246, 0.65);
-  color: #eef2ff;
+  border-color: rgb(139 92 246 / 0.75);
+  color: #ddd6fe;
 }
 
-/* Interactive Caption Timeline Cards */
+/* Once a caption is on screen the "how to start" hint behind it gives way. */
+.video-stage-container:has(.overlay-caption-box:not(.opacity-0)) #videoPlaceholderBanner {
+  visibility: hidden;
+}
+
 .caption-row-card {
-  transition: border-color 0.15s ease, background-color 0.15s ease, transform 0.1s ease;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
 }
 
 .caption-row-active {
-  border-color: #38bdf8 !important;
-  background-color: rgba(14, 116, 144, 0.18) !important;
-  box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.5);
+  border-color: var(--accent) !important;
+  background-color: var(--accent-tint) !important;
 }
 
-/* Light Mode Theme Overrides */
-html.light body {
-  background-color: #f8fafc !important;
-  color: #0f172a !important;
-}
-
-html.light header {
-  background-color: rgba(255, 255, 255, 0.95) !important;
-  border-color: #e2e8f0 !important;
-}
-
-html.light .main-nav-pill.nav-active {
-  background: #ecfdf5 !important;
-  color: #047857 !important;
-  border-color: #6ee7b7 !important;
-}
-
-html.light .main-nav-pill.nav-inactive {
-  color: #475569 !important;
-}
-
-html.light .main-nav-pill.nav-inactive:hover {
-  background-color: #f1f5f9 !important;
-  color: #0f172a !important;
-}
-
-html.light .bg-slate-950,
-html.light .bg-slate-950\/95,
-html.light .bg-slate-950\/90,
-html.light .bg-slate-950\/80,
-html.light .bg-slate-950\/60,
-html.light .bg-slate-950\/50,
-html.light .bg-slate-950\/40 {
-  background-color: #f1f5f9 !important;
-  color: #0f172a !important;
-}
-
-html.light .bg-slate-900,
-html.light .bg-slate-900\/95,
-html.light .bg-slate-900\/90,
-html.light .bg-slate-900\/80 {
-  background-color: #ffffff !important;
-  color: #0f172a !important;
-}
-
-html.light .bg-slate-800,
-html.light .bg-slate-800\/90,
-html.light .bg-slate-800\/80 {
-  background-color: #f1f5f9 !important;
-  color: #1e293b !important;
-}
-
-html.light .border-slate-800,
-html.light .border-slate-800\/80,
-html.light .border-slate-700 {
-  border-color: #e2e8f0 !important;
-}
-
-html.light .text-white,
-html.light .text-slate-100,
-html.light .text-slate-200 {
-  color: #0f172a !important;
-}
-
-html.light .text-slate-300 {
-  color: #334155 !important;
-}
-
-html.light .text-slate-400,
-html.light .text-slate-500 {
-  color: #64748b !important;
-}
-
-html.light .citation-ayah {
-  background-color: #ecfdf5 !important;
-  border-color: #10b981 !important;
-  color: #065f46 !important;
-}
-
-html.light .citation-hadith {
-  background-color: #fffbeb !important;
-  border-color: #f59e0b !important;
-  color: #92400e !important;
-}
-
-html.light .citation-dhikr {
-  background-color: #f5f3ff !important;
-  border-color: #8b5cf6 !important;
-  color: #4c1d95 !important;
-}
-
-html.light .fn-tok-in-range {
-  background-color: #d1fae5 !important;
-  color: #065f46 !important;
-}
-
-html.light select,
-html.light input[type="text"],
-html.light input[type="url"],
-html.light input[type="search"],
-html.light input[type="number"],
-html.light input[type="password"],
-html.light textarea {
-  background-color: #ffffff !important;
-  color: #0f172a !important;
-  border-color: #cbd5e1 !important;
-}
-
-@media print {
-  header,
-  #section_input,
-  #section_editor,
-  #section_datasets,
-  #displayVideoColumn,
-  #floatingSelectionToolbar,
-  .no-print {
-    display: none !important;
-  }
-  body {
-    background: #ffffff !important;
-    color: #0f172a !important;
-  }
-  #formattedLectureStage {
-    border: none !important;
-    box-shadow: none !important;
-    background: #ffffff !important;
-    color: #0f172a !important;
-    max-height: none !important;
-    overflow: visible !important;
-  }
-}
-
-/* =========================================================================
-   AI Verification Layer & Telemetry Studio Styles (v2.2)
-   ========================================================================= */
-
+/* ---------- AI verdict badges and filters --------------------------------- */
 .ai-badge {
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
+  font-family: var(--font-ui);
   font-size: 0.65rem;
-  font-weight: 700;
+  font-weight: 600;
   padding: 0.1rem 0.4rem;
   border-radius: 9999px;
   vertical-align: middle;
   line-height: 1.2;
   margin-right: 0.35rem;
+  border: 1px solid transparent;
 }
 
 .ai-badge-correct {
-  background-color: rgba(16, 185, 129, 0.22);
-  color: #34d399;
-  border: 1px solid rgba(16, 185, 129, 0.5);
+  background-color: rgb(var(--q-500) / 0.16);
+  color: rgb(var(--q-400));
+  border-color: rgb(var(--q-500) / 0.45);
 }
 
 .ai-badge-not-sure {
-  background-color: rgba(245, 158, 11, 0.22);
-  color: #fbbf24;
-  border: 1px solid rgba(245, 158, 11, 0.5);
+  background-color: rgb(var(--h-500) / 0.16);
+  color: rgb(var(--h-400));
+  border-color: rgb(var(--h-500) / 0.45);
 }
 
 .ai-badge-false {
-  background-color: rgba(239, 68, 68, 0.22);
-  color: #f87171;
-  border: 1px solid rgba(239, 68, 68, 0.5);
+  background-color: var(--danger-tint);
+  color: var(--danger);
+  border-color: var(--danger-line);
   text-decoration: line-through;
 }
 
 .ai-badge-pending {
-  background-color: rgba(56, 189, 248, 0.22);
-  color: #38bdf8;
-  border: 1px solid rgba(56, 189, 248, 0.5);
+  background-color: rgb(var(--n-500) / 0.18);
+  color: var(--fg-2);
+  border-color: var(--line-strong);
   animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-/* False Positive Citation when showFalse is enabled */
 .citation-hadith.ai-marked-false,
 .citation-ayah.ai-marked-false,
 .citation-dhikr.ai-marked-false {
-  border: 1px dashed rgba(239, 68, 68, 0.65) !important;
-  background-color: rgba(239, 68, 68, 0.12) !important;
-  color: #fca5a5 !important;
+  border: 1px dashed var(--danger-line) !important;
+  background-color: var(--danger-tint) !important;
+  color: var(--danger) !important;
   opacity: 0.85;
 }
 
-/* Multi-Toggle Pill Group for AI Verdict Filter */
+/* Verdict filters: a checkbox list inside the filter menu. */
 .ai-filter-pill {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: 0.35rem;
-  padding: 0.3rem 0.65rem;
-  border-radius: 0.75rem;
-  font-size: 0.75rem;
-  font-weight: 600;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.45rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
   cursor: pointer;
-  transition: all 0.18s ease;
   user-select: none;
-  border: 1px solid transparent;
+  color: var(--fg-3);
 }
 
-.ai-filter-pill-correct {
-  background-color: rgba(16, 185, 129, 0.12);
-  color: #6ee7b7;
-  border-color: rgba(16, 185, 129, 0.3);
-}
-.ai-filter-pill-correct.active {
-  background-color: rgba(16, 185, 129, 0.3);
-  color: #34d399;
-  border-color: rgba(16, 185, 129, 0.7);
-  box-shadow: 0 0 10px -2px rgba(16, 185, 129, 0.3);
+.ai-filter-pill:hover {
+  background: var(--surface-2);
 }
 
-.ai-filter-pill-notsure {
-  background-color: rgba(245, 158, 11, 0.12);
-  color: #fcd34d;
-  border-color: rgba(245, 158, 11, 0.3);
-}
-.ai-filter-pill-notsure.active {
-  background-color: rgba(245, 158, 11, 0.3);
-  color: #fbbf24;
-  border-color: rgba(245, 158, 11, 0.7);
-  box-shadow: 0 0 10px -2px rgba(245, 158, 11, 0.3);
+.ai-filter-pill::before {
+  content: "";
+  width: 0.95rem;
+  height: 0.95rem;
+  flex-shrink: 0;
+  border-radius: 4px;
+  border: 1.5px solid var(--line-strong);
 }
 
-.ai-filter-pill-false {
-  background-color: rgba(239, 68, 68, 0.1);
-  color: #fca5a5;
-  border-color: rgba(239, 68, 68, 0.3);
-}
-.ai-filter-pill-false.active {
-  background-color: rgba(239, 68, 68, 0.3);
-  color: #f87171;
-  border-color: rgba(239, 68, 68, 0.7);
-  box-shadow: 0 0 10px -2px rgba(239, 68, 68, 0.3);
+.ai-filter-pill.active {
+  color: var(--fg);
 }
 
-.ai-filter-pill-unverified {
-  background-color: rgba(148, 163, 184, 0.1);
-  color: #cbd5e1;
-  border-color: rgba(148, 163, 184, 0.3);
-}
-.ai-filter-pill-unverified.active {
-  background-color: rgba(148, 163, 184, 0.25);
-  color: #f8fafc;
-  border-color: rgba(148, 163, 184, 0.6);
+.ai-filter-pill.active::before {
+  border-color: var(--fg);
+  background: var(--fg);
+  box-shadow: inset 0 0 0 2px var(--bg);
 }
 
-/* Telemetry KPI Strip */
+.ai-filter-pill-unverified.active::before { background-color: var(--accent-fill); border-color: var(--accent-fill); }
+.ai-filter-pill-correct.active::before { background-color: rgb(var(--q-500)); border-color: rgb(var(--q-500)); }
+.ai-filter-pill-notsure.active::before { background-color: rgb(var(--h-500)); border-color: rgb(var(--h-500)); }
+.ai-filter-pill-false.active::before { background-color: rgb(var(--r-500)); border-color: rgb(var(--r-500)); }
+
 .ai-metric-card {
-  background-color: rgba(15, 23, 42, 0.85);
-  border: 1px solid rgba(51, 65, 85, 0.8);
-  border-radius: 0.85rem;
-  padding: 0.65rem 0.85rem;
+  background-color: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0.6rem 0.8rem;
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
-  transition: border-color 0.15s ease;
+  gap: 0.2rem;
 }
 
-.ai-metric-card:hover {
-  border-color: rgba(56, 189, 248, 0.5);
+.ai-metric-card strong {
+  color: var(--fg) !important;
+  font-weight: 500;
 }
 
-/* OpenRouter Live Model Combobox Dropdown */
+/* OpenRouter live model combobox */
 .model-dropdown-list {
   max-height: 280px;
   overflow-y: auto;
-  border-radius: 0.85rem;
-  background-color: #0b1120;
-  border: 1px solid #1e293b;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+  border-radius: 10px;
+  background-color: var(--bg);
+  box-shadow: var(--shadow-pop);
 }
 
 .model-dropdown-item {
   padding: 0.55rem 0.75rem;
   cursor: pointer;
-  border-bottom: 1px solid rgba(30, 41, 59, 0.6);
-  transition: background-color 0.12s ease;
+  border-bottom: 1px solid var(--line);
 }
 
 .model-dropdown-item:hover,
 .model-dropdown-item.selected {
-  background-color: rgba(30, 41, 59, 0.9);
+  background-color: var(--surface-2);
 }
 
 .model-dropdown-item:last-child {
@@ -579,30 +1075,25 @@ html.light textarea {
 }
 
 .btn-filter-clipped-active {
-  background-color: rgba(249, 115, 22, 0.35) !important;
-  border-color: rgba(249, 115, 22, 0.9) !important;
-  color: #ffedd5 !important;
-  box-shadow: 0 0 12px -2px rgba(249, 115, 22, 0.4);
+  background-color: var(--accent-tint) !important;
+  border-color: var(--accent-line) !important;
+  color: var(--accent) !important;
+  font-weight: 600;
 }
 
-/* =========================================================================
-   AI Tafrigh Phase Stylesheet Extensions
-   ========================================================================= */
-
+/* ---------- AI Tafrigh output -------------------------------------------- */
 .tafrigh-matn-block {
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(217, 119, 6, 0.08));
-  border-right: 4px solid #f59e0b;
-  border-radius: 0.5rem;
-  padding: 0.75rem 1rem;
+  border-inline-start: 3px solid var(--hadith-line);
+  padding: 0.5rem 1rem;
   margin: 1rem 0;
-  font-family: 'Amiri', serif;
-  font-size: 1.25rem;
+  font-family: var(--font-text);
+  font-size: 1.3rem;
   line-height: 2.2;
-  color: #fef3c7;
+  color: var(--fg);
 }
 
 .tafrigh-matn-block .tafrigh-label {
-  color: #fbbf24;
+  color: var(--hadith);
   font-weight: 700;
   margin-left: 0.5rem;
 }
@@ -613,23 +1104,23 @@ html.light textarea {
 }
 
 .tafrigh-sharh-block .tafrigh-label {
-  color: #38bdf8;
+  color: var(--fg);
   font-weight: 700;
   font-size: 1.15rem;
-  border-bottom: 2px solid rgba(56, 189, 248, 0.3);
-  padding-bottom: 0.2rem;
+  border-bottom: 1px solid var(--line-strong);
+  padding-bottom: 0.15rem;
   display: inline-block;
 }
 
 .tafrigh-heading {
-  color: #38bdf8;
+  color: var(--fg);
   font-weight: 700;
   margin: 1.5rem 0 0.75rem 0;
 }
 
 .tafrigh-list-intro {
   font-weight: 600;
-  color: #e2e8f0;
+  color: var(--fg);
   margin-top: 1rem;
   margin-bottom: 0.25rem;
 }
@@ -637,7 +1128,7 @@ html.light textarea {
 .tafrigh-list-item {
   margin: 0.35rem 1.5rem;
   list-style-type: disc;
-  color: #cbd5e1;
+  color: var(--fg-2);
 }
 
 .tafrigh-continuation {
@@ -645,24 +1136,24 @@ html.light textarea {
 }
 
 .tafrigh-comment {
-  background-color: rgba(100, 116, 139, 0.12);
-  border: 1px dashed rgba(148, 163, 184, 0.4);
-  border-radius: 0.5rem;
+  border: 1px dashed var(--line-strong);
+  border-radius: 6px;
   padding: 0.5rem 0.75rem;
   margin: 0.75rem 0;
   font-size: 0.95rem;
-  color: #94a3b8;
+  color: var(--fg-3);
   font-style: italic;
 }
 
 .tafrigh-comment-badge {
   display: inline-block;
-  background-color: rgba(148, 163, 184, 0.25);
-  color: #e2e8f0;
-  font-size: 0.8rem;
-  font-weight: 600;
+  background-color: var(--surface-2);
+  color: var(--fg-2);
+  font-family: var(--font-ui);
+  font-size: 0.75rem;
+  font-weight: 500;
   padding: 0.1rem 0.4rem;
-  border-radius: 0.25rem;
+  border-radius: 4px;
   margin-left: 0.35rem;
   font-style: normal;
 }
@@ -670,195 +1161,120 @@ html.light textarea {
 .tafrigh-diff-popover {
   position: absolute;
   z-index: 50;
-  background-color: #0f172a;
-  border: 1px solid #334155;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
-  border-radius: 0.5rem;
+  background-color: var(--bg);
+  box-shadow: var(--shadow-pop);
+  border-radius: 8px;
   padding: 0.75rem;
   width: 280px;
 }
 
+/* Lecture tabs (synced text / structured transcript) */
 .tafrigh-tab-btn {
-  padding: 0.35rem 0.85rem;
-  border-radius: 0.65rem;
-  font-size: 0.75rem;
-  font-weight: 700;
-  transition: all 0.15s ease;
+  height: 1.75rem;
+  padding: 0 0.75rem;
+  border-radius: 7px;
+  font-size: 0.78rem;
   cursor: pointer;
-  border: 1px solid transparent;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: color 0.15s ease, background-color 0.15s ease;
 }
+
 .tafrigh-tab-btn.active {
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.25), rgba(217, 119, 6, 0.2));
-  color: #fbbf24;
-  border-color: rgba(245, 158, 11, 0.6);
-  box-shadow: 0 2px 8px -2px rgba(245, 158, 11, 0.3);
+  background: var(--accent-tint);
+  color: var(--accent);
+  font-weight: 600;
+  box-shadow: 0 0 0 1px var(--accent-line);
 }
+
 .tafrigh-tab-btn.inactive {
-  background-color: rgba(15, 23, 42, 0.6);
-  color: #94a3b8;
-  border-color: rgba(51, 65, 85, 0.5);
+  color: var(--fg-3);
 }
+
 .tafrigh-tab-btn.inactive:hover {
-  background-color: rgba(30, 41, 59, 0.8);
-  color: #f1f5f9;
+  color: var(--fg);
 }
 
 .tafrigh-toc-bar {
   display: flex;
   flex-wrap: wrap;
   gap: 0.35rem;
-  padding: 0.5rem 0.75rem;
-  background-color: rgba(15, 23, 42, 0.85);
-  border: 1px solid rgba(51, 65, 85, 0.6);
-  border-radius: 0.75rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--line);
   margin-bottom: 0.75rem;
 }
+
 .tafrigh-toc-pill {
-  padding: 0.2rem 0.6rem;
-  border-radius: 0.5rem;
+  padding: 0.15rem 0.55rem;
+  border-radius: 6px;
+  font-family: var(--font-ui);
   font-size: 0.72rem;
-  font-weight: 600;
-  background-color: rgba(56, 189, 248, 0.12);
-  color: #7dd3fc;
-  border: 1px solid rgba(56, 189, 248, 0.3);
+  color: var(--fg-2);
+  border: 1px solid var(--line-strong);
   text-decoration: none;
-  transition: all 0.12s ease;
 }
+
 .tafrigh-toc-pill:hover {
-  background-color: rgba(56, 189, 248, 0.25);
-  color: #e0f2fe;
+  color: var(--fg);
+  border-color: var(--fg-3);
 }
 
-
-
-
-/* =========================================================================
-   Wahy Studio v2.3 — Enhanced Scholarly Theme Tokens & Components
-   ========================================================================= */
-
-:root {
-  --bg-app: #f8fafc;
-  --bg-surface: #ffffff;
-  --bg-surface-elevated: #f1f5f9;
-  --bg-surface-sunken: #e2e8f0;
-  
-  --border-subtle: #e2e8f0;
-  --border-medium: #cbd5e1;
-  --border-strong: #94a3b8;
-  
-  --text-primary: #0f172a;
-  --text-secondary: #475569;
-  --text-muted: #64748b;
-  --text-inverse: #f8fafc;
-  
-  --accent-ayah: #059669;
-  --accent-ayah-bg: #ecfdf5;
-  --accent-ayah-border: #a7f3d0;
-  
-  --accent-hadith: #d97706;
-  --accent-hadith-bg: #fffbeb;
-  --accent-hadith-border: #fde68a;
-  
-  --accent-dhikr: #7c3aed;
-  --accent-dhikr-bg: #f5f3ff;
-  --accent-dhikr-border: #ddd6fe;
-
-  --accent-matn: #0284c7;
-  --accent-matn-bg: #f0f9ff;
-  --accent-matn-border: #bae6fd;
-
-  --status-correct: #10b981;
-  --status-false: #ef4444;
-  --status-unsure: #f59e0b;
-  --status-unverified: #6b7280;
-
-  --font-arabic-text: 'Amiri', 'Scheherazade New', 'Traditional Arabic', serif;
-  --font-arabic-ui: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  --font-mono-numbers: 'SFMono-Regular', Menlo, Monaco, Consolas, monospace;
+.tafrigh-view-tab {
+  height: 1.9rem;
 }
 
-html.dark, :root[data-theme="dark"] {
-  --bg-app: #090d16;
-  --bg-surface: #0f172a;
-  --bg-surface-elevated: #1e293b;
-  --bg-surface-sunken: #020617;
-  
-  --border-subtle: rgba(255, 255, 255, 0.08);
-  --border-medium: rgba(255, 255, 255, 0.16);
-  --border-strong: rgba(255, 255, 255, 0.28);
-  
-  --text-primary: #f8fafc;
-  --text-secondary: #cbd5e1;
-  --text-muted: #64748b;
-  --text-inverse: #0f172a;
-  
-  --accent-ayah: #10b981;
-  --accent-ayah-bg: rgba(16, 185, 129, 0.12);
-  --accent-ayah-border: rgba(16, 185, 129, 0.35);
-  
-  --accent-hadith: #f59e0b;
-  --accent-hadith-bg: rgba(245, 158, 11, 0.12);
-  --accent-hadith-border: rgba(245, 158, 11, 0.35);
-  
-  --accent-dhikr: #8b5cf6;
-  --accent-dhikr-bg: rgba(139, 92, 246, 0.12);
-  --accent-dhikr-border: rgba(139, 92, 246, 0.35);
-
-  --accent-matn: #38bdf8;
-  --accent-matn-bg: rgba(56, 189, 248, 0.12);
-  --accent-matn-border: rgba(56, 189, 248, 0.35);
-
-  --status-correct: #10b981;
-  --status-false: #f43f5e;
-  --status-unsure: #fbbf24;
-  --status-unverified: #94a3b8;
-}
-
-/* Reference Word Chips (Matching image_096977.png specification) */
+/* Reference word chips */
 .ref-word-chip {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   padding: 0.25rem 0.6rem;
   margin: 0.18rem;
-  border-radius: 0.5rem;
-  font-family: var(--font-arabic-text);
-  font-size: 1.05rem;
+  border-radius: 6px;
+  font-family: var(--font-text);
+  font-size: 1.1rem;
   line-height: 1.6;
   cursor: pointer;
   user-select: none;
-  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: background-color 0.12s ease, border-color 0.12s ease;
   border: 1.5px solid transparent;
 }
 
 .ref-word-chip.matched {
-  background-color: rgba(16, 185, 129, 0.2);
-  color: #34d399;
-  border-color: rgba(16, 185, 129, 0.65);
+  background-color: var(--quran-tint);
+  color: var(--quran);
+  border-color: var(--quran-line);
   font-weight: bold;
-  box-shadow: 0 1px 4px rgba(16, 185, 129, 0.2);
 }
 
 .ref-word-chip.unmatched {
-  background-color: rgba(30, 41, 59, 0.7);
-  color: #94a3b8;
-  border-color: rgba(51, 65, 85, 0.5);
+  background-color: var(--surface-2);
+  color: var(--fg-3);
+  border-color: var(--line);
 }
 
 .ref-word-chip.unmatched:hover {
-  background-color: rgba(51, 65, 85, 0.8);
-  color: #f1f5f9;
-  border-color: rgba(148, 163, 184, 0.6);
+  color: var(--fg);
+  border-color: var(--fg-3);
 }
 
 .ref-word-chip.selected {
-  background-color: rgba(14, 165, 233, 0.25);
-  color: #38bdf8;
-  border-color: rgba(56, 189, 248, 0.8);
-  box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.3);
+  background-color: var(--accent-fill);
+  color: var(--on-accent);
+  border-color: var(--accent-fill);
 }
 
-/* Verification State Borders & Badges */
+.ref-word-chip.outside-matn {
+  opacity: 0.55;
+  font-style: italic;
+  border-style: dashed;
+}
+
+.ref-word-chip.outside-matn.matched {
+  opacity: 0.9;
+}
+
 .quote-verified-solid {
   border-style: solid !important;
   border-width: 1.5px !important;
@@ -874,76 +1290,54 @@ html.dark, :root[data-theme="dark"] {
   opacity: 1;
 }
 
-/* Active Video Sync Mode Indicator */
 .btn-playback-sync-active {
-  background-color: rgba(16, 185, 129, 0.2) !important;
-  color: #34d399 !important;
-  border-color: rgba(16, 185, 129, 0.5) !important;
+  background-color: var(--accent-fill) !important;
+  color: var(--on-accent) !important;
+  border-color: var(--accent-fill) !important;
 }
 
 .btn-playback-sync-inactive {
-  background-color: rgba(30, 41, 59, 0.6) !important;
-  color: #94a3b8 !important;
-  border-color: rgba(51, 65, 85, 0.4) !important;
+  background-color: transparent !important;
+  color: var(--fg-3) !important;
+  border-color: var(--line-strong) !important;
 }
 
-/* Training Data Hub Table & Cards */
+/* Training data hub */
 .training-metric-card {
-  background: linear-gradient(145deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.6));
-  border: 1px solid rgba(51, 65, 85, 0.5);
-  border-radius: 1rem;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 10px;
   padding: 1rem;
-  transition: all 0.2s ease;
-}
-
-html.light .training-metric-card {
-  background: #ffffff !important;
-  border: 1px solid #e2e8f0 !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .training-metric-card:hover {
-  border-color: rgba(56, 189, 248, 0.5);
-  transform: translateY(-1px);
+  border-color: var(--line-strong);
 }
 
-/* AI Diagnostics Card */
 .ai-diagnostic-box {
-  background: linear-gradient(135deg, rgba(88, 28, 135, 0.15), rgba(15, 23, 42, 0.9));
-  border: 1px solid rgba(168, 85, 247, 0.35);
-  border-radius: 0.875rem;
+  background: var(--dhikr-tint);
+  border: 1px solid var(--dhikr-line);
+  border-radius: 10px;
   padding: 1rem;
 }
 
-html.light .ai-diagnostic-box {
-  background: #fdf4ff !important;
-  border-color: #d8b4fe !important;
-  color: #581c87 !important;
-}
-
-/* Tafrigh preview / stage scroll areas: dark scrollbars instead of the browser's white default */
-#tafrighStage, #tafrighSegList {
-  scrollbar-color: #334155 transparent;
-  scrollbar-width: thin;
-}
-
 /* Tafrigh output: quotations from their source, readable paragraphs */
+.tafrigh-rendered-content {
+  font-family: var(--font-text);
+  font-size: 1.22rem;
+  color: var(--fg);
+}
+
 .tafrigh-rendered-content .tafrigh-paragraph { margin: 0 0 0.9rem; line-height: 2.1; }
 .tafrigh-quote { font-weight: 600; }
-.tafrigh-quote-quran { color: #6ee7b7; font-family: "Amiri Quran", "Amiri", "Scheherazade New", serif; }
-.tafrigh-quote-hadith { color: #fcd34d; }
-.tafrigh-quote-adhkar { color: #c4b5fd; }
-.tafrigh-ref { font-size: 0.75em; color: #94a3b8; white-space: nowrap; }
-html.light .tafrigh-quote-quran { color: #047857; }
-html.light .tafrigh-quote-hadith { color: #b45309; }
-html.light .tafrigh-quote-adhkar { color: #6d28d9; }
+.tafrigh-quote-quran { color: var(--quran); font-family: "Amiri Quran", "Amiri", "Scheherazade New", serif; }
+.tafrigh-quote-hadith { color: var(--hadith); }
+.tafrigh-quote-adhkar { color: var(--dhikr); }
+.tafrigh-ref { font-family: var(--font-ui); font-size: 0.68em; color: var(--fg-3); white-space: nowrap; }
 
-
-/* ==========================================================================
-   Left-to-right interface languages (js/i18n.js sets <html dir="ltr">).
-   Lecture and corpus text stays Arabic, so it keeps right-to-left flow;
-   form fields follow their own content.
-   ========================================================================== */
+/* ---------- Left-to-right interface languages ----------------------------
+   js/i18n.js sets <html dir="ltr">. Lecture and corpus text stays Arabic,
+   so it keeps right-to-left flow; form fields follow their own content. */
 html[dir="ltr"] .lecture-pane,
 html[dir="ltr"] .font-arabic-text,
 html[dir="ltr"] .font-quran-text,
@@ -970,8 +1364,8 @@ html[dir="ltr"] #editorPane_fn_studio > * {
   direction: ltr;
 }
 
-/* The Tafrigh panel is mostly UI (labels, buttons, review controls): follow the interface direction,
-   while the Arabic sentences inside it (marked data-no-i18n) take their direction from their own text. */
+/* The Tafrigh panel is mostly UI: follow the interface direction, while the
+   Arabic sentences inside it (marked data-no-i18n) take their own direction. */
 html[dir="ltr"] #tafrighStage.lecture-pane {
   direction: ltr;
 }
@@ -984,38 +1378,43 @@ html[dir="ltr"] [data-no-i18n] {
   text-align: start;
 }
 
-/* ==========================================================================
-   Tafrigh inline review: every sentence of the formatted output is clickable;
-   sentences waiting for review are highlighted, reviewed ones get a quiet mark.
-   ========================================================================== */
+/* The Tafrigh stage holds UI, not lecture text: keep it in the interface face. */
+#tafrighStage.lecture-pane {
+  font-family: var(--font-ui);
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+/* ---------- Tafrigh inline review ----------------------------------------
+   Every sentence of the formatted output is clickable; sentences waiting for
+   review are highlighted, reviewed ones get a quiet mark. */
 #tafrighRenderedContent .tfg-seg {
   cursor: pointer;
-  border-radius: 6px;
+  border-radius: 4px;
   transition: background-color 0.15s ease;
 }
 #tafrighRenderedContent .tfg-seg:hover {
-  background-color: rgba(148, 163, 184, 0.10);
+  background-color: rgb(var(--n-500) / 0.12);
 }
 #tafrighRenderedContent .tfg-needs-review {
-  background-color: rgba(245, 158, 11, 0.12);
-  box-shadow: inset 0 -2px 0 rgba(245, 158, 11, 0.65);
+  background-color: var(--hadith-tint);
+  box-shadow: inset 0 -2px 0 var(--hadith-line);
 }
 #tafrighRenderedContent .tfg-reviewed {
-  box-shadow: inset 0 -2px 0 rgba(16, 185, 129, 0.45);
+  box-shadow: inset 0 -2px 0 rgb(var(--q-500) / 0.45);
 }
 #tafrighRenderedContent .tfg-active {
-  outline: 2px solid rgba(251, 191, 36, 0.85);
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 #tafrighRenderedContent .tfg-review-card {
   display: block;
   margin: 6px 0 10px;
   padding: 10px 12px;
-  border-radius: 12px;
-  background: rgba(2, 6, 23, 0.92);
-  border: 1px solid rgba(245, 158, 11, 0.45);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
-  font-family: inherit;
+  border-radius: 10px;
+  background: var(--bg);
+  box-shadow: var(--shadow-pop);
+  font-family: var(--font-ui);
   font-size: 12px;
   line-height: 1.6;
   cursor: default;
@@ -1027,35 +1426,46 @@ html[dir="ltr"] #tafrighRenderedContent .tfg-review-card {
   direction: ltr;
   text-align: left;
 }
-html:not(.dark) #tafrighRenderedContent .tfg-review-card {
-  background: #ffffff;
-}
 
-/* Split visibility in the Tafrigh output */
 #tafrighRenderedContent .tfg-split-piece {
-  text-decoration: underline dotted rgba(167, 139, 250, 0.85);
+  text-decoration: underline dotted var(--dhikr);
   text-underline-offset: 6px;
 }
 #tafrighRenderedContent .tfg-split-cut::before {
   content: "✂";
-  color: #a78bfa;
+  color: var(--dhikr);
   font-size: 0.8em;
   margin-inline: 0.25em;
 }
 #tafrighRenderedContent .tfg-split-skipped::after {
   content: "✂?";
-  color: #a78bfa;
+  color: var(--dhikr);
   font-size: 0.7em;
   margin-inline-start: 0.3em;
   vertical-align: super;
 }
 
-/* Inspector: hadith words outside the matn (chain of narration / takhrij) — shown, dimmed, still selectable */
-.ref-word-chip.outside-matn {
-  opacity: 0.55;
-  font-style: italic;
-  border-style: dashed;
-}
-.ref-word-chip.outside-matn.matched {
-  opacity: 0.9;
+/* ---------- Print ----------------------------------------------------------- */
+@media print {
+  header,
+  #section_input,
+  #section_editor,
+  #section_datasets,
+  #displayVideoColumn,
+  #floatingSelectionToolbar,
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+  #formattedLectureStage {
+    border: none !important;
+    box-shadow: none !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
 }

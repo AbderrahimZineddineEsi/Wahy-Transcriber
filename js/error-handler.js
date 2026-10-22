@@ -186,7 +186,7 @@ ${errObj.traceback || "No traceback available"}
               "Content-Type": "application/json"
             },
             body: JSON.stringify({
-              model: "google/gemini-2.0-flash-001",
+              model: "google/gemini-3.1-flash-lite",
               messages: [{ role: "user", content: promptText }]
             })
           });
@@ -389,7 +389,8 @@ ${errObj.traceback || "No traceback available"}
   if (originalFetch) {
     window.fetch = async function interceptedFetch(input, init = {}) {
       const urlStr = typeof input === "string" ? input : (input?.url || "");
-      const isBackendApi = urlStr.includes("/api/");
+      // Only our own backend counts: third-party APIs (openrouter.ai/api/..., etc.) report errors to their caller.
+      const isBackendApi = urlStr.includes("/api/") && (urlStr.startsWith("/") || urlStr.startsWith(window.location.origin));
       const shouldTrap = init.trapError === true || (isBackendApi && init.trapError !== false);
 
       logAction("FETCH_REQUEST", `${init.method || "GET"} ${urlStr.slice(0, 100)}`);
@@ -400,6 +401,9 @@ ${errObj.traceback || "No traceback available"}
           try {
             const cloned = response.clone();
             errPayload = await cloned.json();
+            if (!errPayload?.message && errPayload?.error) {
+              errPayload.message = typeof errPayload.error === "string" ? errPayload.error : errPayload.error.message;
+            }
           } catch (_) {
             try {
               const text = await response.clone().text();

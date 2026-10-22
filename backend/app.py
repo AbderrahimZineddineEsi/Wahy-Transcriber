@@ -622,6 +622,15 @@ def api_tafrigh_run(body: Dict[str, Any]) -> JSONResponse:
         "gemini": "gemini_all",
     }
     model_candidate = _MODEL_CANDIDATE_ALIASES.get(model_candidate, model_candidate)
+    # "openrouter_chat": any OpenRouter chat model does the whole job, through the same adapter as Gemini mode
+    chat_model = (body.get("openrouter_chat_model") or "").strip()
+    if model_candidate == "openrouter_chat":
+        if not (body.get("openrouter_api_key") or os.getenv("JEV_API_KEY", "")):
+            return JSONResponse({"success": False, "message": "أدخل مفتاح OpenRouter API في إعدادات التدقيق الذكي لاستخدام نماذج OpenRouter Chat."})
+        if not chat_model:
+            return JSONResponse({"success": False, "message": "اختر نموذج OpenRouter Chat أولاً (مثل google/gemini-2.5-flash)."})
+        model_candidate = "gemini_all"
+        body = {**body, "gemini_route": "openrouter", "openrouter_gemini_model": chat_model}
     jev_layout = body.get("jev_layout", "independent_questions")
     typo_strategy = body.get("typo_strategy", "gated")
     lecture_slug = body.get("lecture_slug", "lecture")
@@ -689,7 +698,7 @@ def api_tafrigh_run(body: Dict[str, Any]) -> JSONResponse:
             jev_layout=jev_layout,
             execution_order=body.get("jev_execution_order", "parallel"),
         )
-        jev_model = model_name if "jev" in str(model_name) else "typesafe/jev-1.14"
+        jev_model = body.get("jev_model") or (model_name if "jev" in str(model_name) else "typesafe/jev-1.14")
         custom_adapters["jev"] = JEVAdapter(api_key=openrouter_key, config=jev_cfg, model=jev_model)
 
     logger = RunLogger(lecture_slug=lecture_slug, label=label)

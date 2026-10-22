@@ -46,6 +46,17 @@ NON-NEGOTIABLE GUARDRAILS:
 GEMINI_BASE_URL = "https://generativelanguage.googleapis.com/v1beta"
 OPENROUTER_CHAT_URL = "https://openrouter.ai/api/v1/chat/completions"
 DEFAULT_OPENROUTER_GEMINI_MODEL = "google/gemini-3.1-flash-lite"
+# Without max_tokens OpenRouter reserves the model's whole output limit up front (64k for Claude Sonnet ≈ $1) and
+# answers 402 on a small balance. A window of 20 decisions with edits fits well inside this; a reply cut short
+# (thinking models) is retried once with OPENROUTER_MAX_TOKENS_RETRY.
+OPENROUTER_MAX_TOKENS = 4096
+OPENROUTER_MAX_TOKENS_RETRY = 12000
+
+
+def normalize_openrouter_model(model: Optional[str]) -> str:
+    """OpenRouter IDs are "provider/model"; a bare Gemini name (as used by Google's direct API) 404s there."""
+    m = (model or "").strip() or DEFAULT_OPENROUTER_GEMINI_MODEL
+    return f"google/{m}" if m.lower().startswith("gemini-") else m
 # Preference order when no model is chosen (or the chosen one does not exist for this key): first hit wins.
 PREFERRED_MODEL_HINTS = ["flash-lite-latest", "3.1-flash-lite", "2.5-flash-lite", "flash-lite", "flash-latest", "flash"]
 
@@ -144,7 +155,7 @@ class GeminiAdapter(BaseAdapter):
         # When set, every call goes through OpenRouter's chat API instead of Google's (free-tier) endpoint:
         # no free-plan rate limits / 429 back-off, billed on the OpenRouter account that JEV already uses.
         self.openrouter_api_key = (openrouter_api_key or "").strip()
-        self.openrouter_model = (openrouter_model or DEFAULT_OPENROUTER_GEMINI_MODEL).strip()
+        self.openrouter_model = normalize_openrouter_model(openrouter_model)
         self.total_cost_usd = 0.0
         self.model_name = model_name
         self.typo_strategy = typo_strategy
@@ -219,6 +230,7 @@ class GeminiAdapter(BaseAdapter):
         body = {
             "model": self.openrouter_model,
             "temperature": 0.1,
+            "max_tokens": OPENROUTER_MAX_TOKENS,
             "response_format": {"type": "json_object"},
             "messages": [
                 {"role": "system", "content": STATIC_SYSTEM_PREFIX},
@@ -238,15 +250,25 @@ class GeminiAdapter(BaseAdapter):
                     resp = client.post(OPENROUTER_CHAT_URL, json=body, headers=headers)
                 if resp.status_code in (429, 500, 502, 503, 504):
                     raise GeminiAPIError(f"OpenRouter HTTP {resp.status_code}: {resp.text[:200]}", resp.status_code, True)
+                if (resp.status_code in (400, 404) and "response_format" in body
+                        and re.search(r"response_format|json|parameter", resp.text, re.I)):
+                    body.pop("response_format")   # a model without JSON mode: ask again without it (the prompt still asks for JSON)
+                    raise GeminiAPIError(f"OpenRouter HTTP {resp.status_code}: JSON mode unsupported, retrying without it", resp.status_code, True)
                 if resp.status_code != 200:
                     raise GeminiAPIError(f"OpenRouter HTTP {resp.status_code} ({self.openrouter_model}): {resp.text[:300]}", resp.status_code)
                 data = resp.json()
-                raw_text = ((data.get("choices") or [{}])[0].get("message") or {}).get("content") or ""
-                if not raw_text.strip():
-                    raise GeminiAPIError("رد فارغ من النموذج عبر OpenRouter", None, True)
+                if data.get("error"):
+                    raise GeminiAPIError(f"OpenRouter provider error ({self.openrouter_model}): {str(data['error'])[:300]}", None, True)
+                choice = (data.get("choices") or [{}])[0]
+                raw_text = (choice.get("message") or {}).get("content") or ""
+                cut_short = choice.get("finish_reason") == "length"
                 try:
+                    if not raw_text.strip():
+                        raise ValueError(f"رد فارغ من النموذج عبر OpenRouter (finish_reason={choice.get('finish_reason')})")
                     parsed = parse_model_json(raw_text)
                 except ValueError as exc:
+                    if cut_short and body["max_tokens"] < OPENROUTER_MAX_TOKENS_RETRY:
+                        body["max_tokens"] = OPENROUTER_MAX_TOKENS_RETRY
                     raise GeminiAPIError(str(exc), None, True) from exc
                 usage = data.get("usage") or {}
                 self.request_count += 1
@@ -366,7 +388,8 @@ class GeminiAdapter(BaseAdapter):
         items: List[GeminiWindowItemSchema] = []
         for d in decisions_raw:
             item = GeminiWindowItemSchema.model_validate(d)
-            item.trace = {"provider": "gemini", "model": self.model_name, "raw": d}
+            item.trace = ({"provider": "openrouter", "model": self.openrouter_model, "raw": d} if self.openrouter_api_key
+                          else {"provider": "gemini", "model": self.model_name, "raw": d})
             items.append(item)
 
         return items

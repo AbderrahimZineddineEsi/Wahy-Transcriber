@@ -811,6 +811,7 @@ function renderAiOptsPreview() {
       ${pv.systemPrompt ? `<div><div class="text-[10px] uppercase text-slate-500 font-bold">System</div><div class="whitespace-pre-wrap">${escapeHtml(pv.systemPrompt)}</div></div>` : ""}
       <div><div class="text-[10px] uppercase text-slate-500 font-bold">Verdict question</div><div class="whitespace-pre-wrap">${highlightAdded(v.instructions)}</div><ul class="list-disc pl-4 mt-1 space-y-0.5">${crit(v.criteria)}</ul></div>
       <div><div class="text-[10px] uppercase text-slate-500 font-bold">Boundary question</div><div class="whitespace-pre-wrap">${escapeHtml(b.instructions)}</div></div>
+      ${pv.questions.merge_suggestion ? `<div><div class="text-[10px] uppercase text-slate-500 font-bold">Merge question (neighbouring findings)</div><div class="whitespace-pre-wrap">${escapeHtml(pv.questions.merge_suggestion.instructions)}</div><ul class="list-disc pl-4 mt-1 space-y-0.5">${crit(pv.questions.merge_suggestion.criteria)}</ul></div>` : ""}
       <div class="text-[10px] text-slate-500">+ بيانات المقتبس (السياق، النص المرجعي، درجة المحرك...) — اعرض JSON لرؤيتها كاملة.</div>
     </div>`;
 }

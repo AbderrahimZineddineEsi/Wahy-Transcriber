@@ -145,7 +145,108 @@
       }
     };
 
-    return { state: canonicalState, questions: canonicalQuestions };
+    return { state: canonicalState, questions: canonicalQuestions, merge: buildMergeContext(det, words) };
+  }
+
+  // ---------------------------------------------------------------------------
+  // 1a. Merge Context (one quotation the engine split into neighbouring findings)
+  // Sent only to prompt-capable providers and only when a neighbour is close,
+  // so the canonical envelope (and Laya's fixed questions) stay untouched.
+  // ---------------------------------------------------------------------------
+
+  const MERGE_MAX_GAP_WORDS = 12;
+
+  function clipWords(text, n) {
+    const w = String(text || "").split(/\s+/).filter(Boolean);
+    return w.length > n ? w.slice(0, n).join(" ") + " …" : w.join(" ");
+  }
+
+  /** The findings right before and after `det` in transcript order, if no more than `maxGap` words away. */
+  function findNeighborFindings(det, detections = currentState.detections || [], maxGap = MERGE_MAX_GAP_WORDS) {
+    const sorted = detections
+      .filter(d => typeof d.wordStartIdx === "number" && typeof d.wordEndIdx === "number")
+      .slice()
+      .sort((a, b) => a.wordStartIdx - b.wordStartIdx);
+    const pos = sorted.indexOf(det);
+    if (pos < 0) return { previous: null, next: null };
+    const previous = sorted[pos - 1] || null;
+    const next = sorted[pos + 1] || null;
+    const gapTo = (a, b) => Math.max(0, b.wordStartIdx - a.wordEndIdx - 1);
+    return {
+      previous: previous && gapTo(previous, det) <= maxGap ? previous : null,
+      next: next && gapTo(det, next) <= maxGap ? next : null
+    };
+  }
+
+  function describeNeighbor(det, nb, direction, words) {
+    const gapStart = direction === "previous" ? nb.wordEndIdx + 1 : det.wordEndIdx + 1;
+    const gapEnd = direction === "previous" ? det.wordStartIdx : nb.wordStartIdx;
+    const span = (words || []).slice(nb.wordStartIdx, nb.wordEndIdx + 1).map(w => w.word).join(" ") || nb.matchedText || "";
+    return {
+      source_type: nb.sourceType || "HADITH",
+      candidate_reference: nb.displayRef || nb.reference || "",
+      same_reference_as_current: Boolean(det.unitId && nb.unitId === det.unitId),
+      gap_word_count: Math.max(0, gapEnd - gapStart),
+      gap_transcript_text: (words || []).slice(gapStart, Math.max(gapStart, gapEnd)).map(w => w.word).join(" "),
+      neighbor_span_in_lecture: clipWords(span, 30),
+      neighbor_canonical_corpus_text: clipWords(nb.canonicalText || "", 40)
+    };
+  }
+
+  function buildMergeContext(det, words) {
+    const { previous, next } = findNeighborFindings(det);
+    if (!previous && !next) return null;
+
+    const criteria = {
+      NO_MERGE: "This finding is a separate quotation (or the neighbour is a different text, or the gap is unrelated speech)."
+    };
+    if (previous) criteria.MERGE_WITH_PREVIOUS = "This finding and the `previous` neighbour are parts of the same quotation.";
+    if (next) criteria.MERGE_WITH_NEXT = "This finding and the `next` neighbour are parts of the same quotation.";
+    if (previous && next) criteria.MERGE_BOTH = "The `previous` neighbour, this finding and the `next` neighbour are all parts of the same quotation.";
+
+    return {
+      neighborIds: { previous: previous ? previous.id : null, next: next ? next.id : null },
+      neighbors: {
+        previous: previous ? describeNeighbor(det, previous, "previous", words) : null,
+        next: next ? describeNeighbor(det, next, "next", words) : null
+      },
+      questions: {
+        merge_suggestion: {
+          type: "choice",
+          instructions:
+            "`neighbor_findings` lists the engine findings immediately before (`previous`) and/or after (`next`) this one, with the transcript words between them (`gap_transcript_text`). " +
+            "The engine often splits ONE quotation into separate findings when an ASR typo, a garbled or missing word, or a short repetition breaks the match; a neighbour may even be linked to a different reference. " +
+            "Decide, independently of `verdict`, whether this finding and a neighbour are consecutive parts of the same quoted text (compare the spans and the corpus texts) and should be one finding. " +
+            "Do not merge two different texts quoted one after the other.",
+          criteria
+        },
+        merge_gap_type: {
+          type: "choice",
+          instructions: "Only meaningful when you suggest a merge: what are the words in `gap_transcript_text` between the parts?",
+          criteria: {
+            PART_OF_QUOTE: "The gap is empty, or it is mis-transcribed / garbled / repeated words of the quoted text itself.",
+            COMMENTARY: "The gap is the speaker's own interjection or explanation between two parts of the same quotation."
+          }
+        }
+      }
+    };
+  }
+
+  /** Reads a provider's merge answer into { previous, next, confidence, gapType }, or null for no merge. */
+  function normalizeMergeSuggestion(choice, confidence, gapType, merge) {
+    if (!merge || !choice) return null;
+    const c = String(choice).toUpperCase();
+    const previous = Boolean(merge.neighborIds.previous) && (c === "MERGE_WITH_PREVIOUS" || c === "MERGE_BOTH");
+    const next = Boolean(merge.neighborIds.next) && (c === "MERGE_WITH_NEXT" || c === "MERGE_BOTH");
+    if (!previous && !next) return null;
+    return {
+      previous,
+      next,
+      previousId: merge.neighborIds.previous,
+      nextId: merge.neighborIds.next,
+      confidence: typeof confidence === "number" ? confidence : 0.75,
+      gapType: String(gapType || "").toUpperCase() === "COMMENTARY" ? "COMMENTARY" : "PART_OF_QUOTE"
+    };
   }
 
   // ---------------------------------------------------------------------------
@@ -165,7 +266,8 @@
   };
 
   const CHAT_OUTPUT_CONTRACT =
-    "Return ONLY a valid JSON object with keys: {\"verdict\": \"CORRECT\" | \"FALSE\" | \"NOT_SURE\", \"confidence\": 0.0-1.0, \"probabilities\": {\"CORRECT\": p1, \"FALSE\": p2, \"NOT_SURE\": p3}, \"boundary_status\": \"COMPLETE_SPAN\" | \"MISSING_START\" | \"MISSING_END\" | \"MISSING_BOTH\", \"boundary_confidence\": 0.0-1.0, \"reason\": \"concise explanation\"}.";
+    "Return ONLY a valid JSON object with keys: {\"verdict\": \"CORRECT\" | \"FALSE\" | \"NOT_SURE\", \"confidence\": 0.0-1.0, \"probabilities\": {\"CORRECT\": p1, \"FALSE\": p2, \"NOT_SURE\": p3}, \"boundary_status\": \"COMPLETE_SPAN\" | \"MISSING_START\" | \"MISSING_END\" | \"MISSING_BOTH\", \"boundary_confidence\": 0.0-1.0, \"reason\": \"concise explanation\"}. " +
+    "If `questions` contains `merge_suggestion`, also include \"merge_suggestion\" (one of its criteria keys), \"merge_confidence\": 0.0-1.0 and \"merge_gap_type\": \"PART_OF_QUOTE\" | \"COMMENTARY\".";
 
   const PROMPT_PRESETS = {
     balanced: {
@@ -226,12 +328,17 @@
       label: "عند الشك: «غير متأكد»",
       hint: "يفضل النموذج «غير متأكد» بدل التخمين، فتراجعه أنت يدوياً.",
       text: "If the evidence is genuinely mixed, answer NOT_SURE rather than guessing."
+    },
+    suggestMerges: {
+      label: "اقتراح دمج المقتبسات المجزأة",
+      hint: "يرسل المقتبس المجاور (حتى 12 كلمة) ليقترح النموذج دمج حديث قسّمه المحرك بسبب خطأ تفريغ أو تعليق.",
+      text: ""   // adds the merge_suggestion question instead of prompt text
     }
   };
 
   const DEFAULT_PROMPT_CONFIG = {
     preset: "balanced",
-    rules: { ignoreAsrErrors: true, citationCues: true, narratorNames: false, explainingRepeat: false, preferNotSure: false },
+    rules: { ignoreAsrErrors: true, citationCues: true, narratorNames: false, explainingRepeat: false, preferNotSure: false, suggestMerges: true },
     reasonLang: "ar",          // "ar" | "en"
     reasonDetail: "brief",     // "brief" | "detailed"
     extraInstructions: "",
@@ -260,7 +367,7 @@
     const guidance = [];
     if (preset.verdictAddendum) guidance.push(preset.verdictAddendum);
     Object.keys(PROMPT_RULES).forEach(k => {
-      if (cfg.rules[k]) guidance.push(PROMPT_RULES[k].text);
+      if (cfg.rules[k] && PROMPT_RULES[k].text) guidance.push(PROMPT_RULES[k].text);
     });
     const extra = (cfg.extraInstructions || "").trim();
     if (extra) guidance.push(extra);
@@ -273,6 +380,19 @@
       q.boundary_status.instructions += "\n\n" + preset.boundaryAddendum;
     }
     return q;
+  }
+
+  /** The state + questions actually sent: the canonical envelope plus the merge question when it applies. */
+  function composeRequestEnvelope(item, provider) {
+    const questions = composeQuestions(item.envelope.questions, provider);
+    const merge = item.envelope.merge;
+    if (!merge || !providerSupportsPrompt(provider) || !getPromptConfig().rules.suggestMerges) {
+      return { state: item.envelope.state, questions };
+    }
+    return {
+      state: Object.assign({}, item.envelope.state, { neighbor_findings: merge.neighbors }),
+      questions: Object.assign({}, questions, merge.questions)
+    };
   }
 
   function composeSystemPrompt(provider) {
@@ -353,17 +473,14 @@
   // ---------------------------------------------------------------------------
 
   function buildGeminiRequestBody(batchItems) {
-    const batchInput = batchItems.map(item => ({
-      finding_id: findingIdOf(item),
-      state: item.envelope.state,
-      questions: composeQuestions(item.envelope.questions, "gemini")
-    }));
+    const batchInput = batchItems.map(item => Object.assign({ finding_id: findingIdOf(item) }, composeRequestEnvelope(item, "gemini")));
     const systemPrompt = composeSystemPrompt("gemini");
 
     const userPrompt =
       "Given the following candidate citations extracted by the transcription engine, " +
       "evaluate each item against the instructions and criteria in `questions`. " +
-      "Return ONLY a JSON array of evaluations corresponding to the input items.\n\n" +
+      "Return ONLY a JSON array of evaluations corresponding to the input items. " +
+      "Answer `merge_suggestion` / `merge_gap_type` only for items whose `questions` contain them (otherwise use NO_MERGE).\n\n" +
       JSON.stringify(batchInput, null, 2);
 
     const requestBody = {
@@ -401,6 +518,12 @@
                 enum: ["COMPLETE_SPAN", "MISSING_START", "MISSING_END", "MISSING_BOTH"]
               },
               boundary_confidence: { type: "NUMBER" },
+              merge_suggestion: {
+                type: "STRING",
+                enum: ["NO_MERGE", "MERGE_WITH_PREVIOUS", "MERGE_WITH_NEXT", "MERGE_BOTH"]
+              },
+              merge_confidence: { type: "NUMBER" },
+              merge_gap_type: { type: "STRING", enum: ["PART_OF_QUOTE", "COMMENTARY"] },
               reason: { type: "STRING" }
             },
             required: ["finding_id", "verdict", "confidence", "probabilities", "boundary_status", "reason"]
@@ -520,11 +643,10 @@
   // ---------------------------------------------------------------------------
 
   function buildJevPayload(item) {
-    return {
-      model: (currentState.aiVerification.openRouterJevModel || "typesafe/jev-1.14").trim(),
-      state: item.envelope.state,
-      questions: composeQuestions(item.envelope.questions, "openrouter_jev")
-    };
+    return Object.assign(
+      { model: (currentState.aiVerification.openRouterJevModel || "typesafe/jev-1.14").trim() },
+      composeRequestEnvelope(item, "openrouter_jev")
+    );
   }
 
   async function callOpenRouterJev(item) {
@@ -608,6 +730,9 @@
         boundary_status: finalBStatus,
         boundary_confidence: bConf,
         boundary_probabilities: bProbs,
+        merge_suggestion: data?.answers?.merge_suggestion?.choice,
+        merge_confidence: data?.answers?.merge_suggestion?.confidence,
+        merge_gap_type: data?.answers?.merge_gap_type?.choice,
         reason: "قرار System-1 من نموذج JEV المصاغ بالاحتمالات المعايرة."
       }],
       latencyMs: elapsedMs,
@@ -655,6 +780,7 @@
           completion: m.pricing?.completion || "0"
         },
         description: m.description || "",
+        supportedParameters: Array.isArray(m.supported_parameters) ? m.supported_parameters : null,
         isFree: parseFloat(m.pricing?.prompt || "0") === 0 || m.id.endsWith(":free"),
         isJev: m.id.includes("jev") || m.id.includes("decider") || m.id.includes("liquid/d1"),
         isGemini: m.id.includes("gemini"),
@@ -672,11 +798,98 @@
     }
   }
 
-  function buildOpenRouterChatPayload(item, modelId) {
-    return {
+  const OPENROUTER_CHAT_URL = "https://openrouter.ai/api/v1/chat/completions";
+
+  /** OpenRouter IDs are "provider/model"; a bare Gemini name (as used by Google's direct API) 404s. */
+  function normalizeOpenRouterModelId(id) {
+    const m = String(id || "").trim() || "deepseek/deepseek-chat";
+    return /^gemini-/i.test(m) ? `google/${m}` : m;
+  }
+
+  /** false only when the catalog says the model has no JSON mode; unknown (no catalog yet) → true. */
+  function modelSupportsJsonMode(modelId) {
+    const meta = (currentState.aiVerification.openRouterModelsCatalog || []).find(m => m.id === modelId);
+    if (!meta || !Array.isArray(meta.supportedParameters)) return true;
+    return meta.supportedParameters.includes("response_format") || meta.supportedParameters.includes("structured_outputs");
+  }
+
+  /**
+   * Fails fast, before any finding is sent, when the chosen model is not on OpenRouter
+   * (otherwise every finding of the batch gets the same 404).
+   */
+  async function assertOpenRouterChatModelExists() {
+    const modelId = normalizeOpenRouterModelId(currentState.aiVerification.openRouterSelectedModel);
+    if (/typesafe\/jev/.test(modelId)) return;
+    const catalog = await fetchOpenRouterModelsCatalog();
+    if (!catalog.length || catalog.some(m => m.id === modelId)) return;   // catalog unreachable: let the request decide
+    const key = modelId.split("/").pop().split(":")[0].toLowerCase();
+    const close = catalog.filter(m => m.id.toLowerCase().includes(key)).slice(0, 4).map(m => m.id);
+    throw new Error(`النموذج «${modelId}» غير موجود على OpenRouter.` +
+      (close.length ? ` هل تقصد: ${close.join("، ")}؟` : " اختر نموذجاً من قائمة البحث في إعدادات OpenRouter."));
+  }
+
+  /** An error whose cause is the same for every finding (bad key, unknown model, no credits): the batch stops. */
+  function fatalError(message) {
+    const err = new Error(message);
+    err.fatal = true;
+    return err;
+  }
+
+  function describeOpenRouterError(status, bodyText, modelId) {
+    let msg = bodyText || "";
+    try { msg = JSON.parse(bodyText)?.error?.message || msg; } catch (_) {}
+    msg = String(msg).slice(0, 300);
+    const lower = msg.toLowerCase();
+    if (status === 401) return fatalError(`مفتاح OpenRouter غير صالح أو منتهي (401): ${msg}`);
+    if (status === 402) return fatalError(`رصيد OpenRouter أو حد المفتاح غير كافٍ لهذا النموذج (402) — اشحن الرصيد، أو ارفع حد المفتاح من إعدادات OpenRouter، أو اختر نموذجاً أرخص: ${msg}`);
+    if (status === 403) return fatalError(`رفض OpenRouter الطلب (403) — قد يكون النموذج محظوراً على حسابك أو المحتوى مرفوضاً: ${msg}`);
+    if (status === 404) {
+      if (lower.includes("data policy") || lower.includes("privacy") || lower.includes("guardrail")) {
+        return fatalError(`لا يوجد مزوّد متاح للنموذج «${modelId}» بإعدادات الخصوصية في حسابك — فعّل المزوّدين من openrouter.ai/settings/privacy (404): ${msg}`);
+      }
+      return fatalError(`النموذج «${modelId}» غير متاح على OpenRouter (404): ${msg}`);
+    }
+    return new Error(`خطأ OpenRouter (${status}) — ${modelId}: ${msg}`);
+  }
+
+  /** The JSON object in a model reply: plain, inside ```json fences, or surrounded by prose. */
+  function parseModelJson(text) {
+    const t = String(text || "").trim();
+    const attempts = [t];
+    const fenced = t.match(/```(?:json)?\s*([\s\S]*?)```/i);
+    if (fenced) attempts.push(fenced[1]);
+    const a = t.indexOf("{");
+    const b = t.lastIndexOf("}");
+    if (a >= 0 && b > a) attempts.push(t.slice(a, b + 1));
+    for (const candidate of attempts) {
+      try {
+        const v = JSON.parse(candidate);
+        if (v && typeof v === "object") return Array.isArray(v) ? v[0] : v;
+      } catch (_) {}
+    }
+    return null;
+  }
+
+  const VERDICT_ALIASES = { TRUE: "CORRECT", YES: "CORRECT", QUOTE: "CORRECT", NO: "FALSE", INCORRECT: "FALSE", UNSURE: "NOT_SURE", UNCERTAIN: "NOT_SURE", "NOT SURE": "NOT_SURE" };
+
+  function normalizeVerdict(v) {
+    const u = String(v || "").trim().toUpperCase();
+    if (u === "CORRECT" || u === "FALSE" || u === "NOT_SURE") return u;
+    return VERDICT_ALIASES[u] || "NOT_SURE";
+  }
+
+  // The reply is one small JSON object (~150-400 tokens). Without max_tokens OpenRouter reserves the model's whole
+  // output limit up front (64k for Claude Sonnet ≈ $1) and refuses the request with 402 on a small balance.
+  // The headroom covers models that think before answering; an answer cut short is retried once with more.
+  const CHAT_MAX_TOKENS = 1500;
+  const CHAT_MAX_TOKENS_RETRY = 4000;
+  const CHAT_EXPECTED_OUTPUT_TOKENS = 300;
+
+  function buildOpenRouterChatPayload(item, modelId, jsonMode = modelSupportsJsonMode(modelId), maxTokens = CHAT_MAX_TOKENS) {
+    const payload = {
       model: modelId,
       temperature: getPromptTemperature(),
-      response_format: { type: "json_object" },
+      max_tokens: maxTokens,
       messages: [
         {
           role: "system",
@@ -684,30 +897,27 @@
         },
         {
           role: "user",
-          content: JSON.stringify({
-            state: item.envelope.state,
-            questions: composeQuestions(item.envelope.questions, "openrouter_chat")
-          })
+          content: JSON.stringify(composeRequestEnvelope(item, "openrouter_chat"))
         }
       ]
     };
+    if (jsonMode) payload.response_format = { type: "json_object" };
+    return payload;
   }
 
   async function callOpenRouterChat(item) {
     const apiKey = (currentState.aiVerification.openRouterApiKey || "").trim();
     if (!apiKey) {
-      throw new Error("يرجى إدخال مفتاح OpenRouter API Key.");
+      throw fatalError("يرجى إدخال مفتاح OpenRouter API Key.");
     }
 
-    const modelId = (currentState.aiVerification.openRouterSelectedModel || "deepseek/deepseek-chat").trim();
+    const modelId = normalizeOpenRouterModelId(currentState.aiVerification.openRouterSelectedModel);
 
     // Auto-route JEV models to Decisions API if user selected a JEV model in chat search
     if (modelId.includes("typesafe/jev") || modelId.includes("~typesafe/jev")) {
       currentState.aiVerification.openRouterJevModel = modelId;
       return callOpenRouterJev(item);
     }
-
-    const payload = buildOpenRouterChatPayload(item, modelId);
 
     const headers = {
       "Authorization": `Bearer ${apiKey}`,
@@ -716,30 +926,73 @@
       "X-Title": "Wahy Transcriber Universal LLM Verifier"
     };
 
-    await waitIfPaused();
-    const t0 = performance.now();
-    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-      method: "POST",
-      headers: headers,
-      body: JSON.stringify(payload)
-    });
+    let jsonMode = modelSupportsJsonMode(modelId);
+    let maxTokens = CHAT_MAX_TOKENS;
+    let payload = buildOpenRouterChatPayload(item, modelId, jsonMode, maxTokens);
+    const retryDelays = [3000, 8000, 20000];
+    let attempt = 0;
+    let response;
+    let elapsedMs = 0;
 
-    const elapsedMs = Math.round(performance.now() - t0);
-    if (!response.ok) {
+    while (true) {
+      if (isVerificationCancelled) throw new Error("VERIFICATION_CANCELLED");
+      await waitIfPaused();
+      const t0 = performance.now();
+      try {
+        response = await fetch(OPENROUTER_CHAT_URL, { method: "POST", headers, body: JSON.stringify(payload) });
+      } catch (networkErr) {
+        if (attempt < retryDelays.length) {
+          await new Promise(r => setTimeout(r, retryDelays[attempt++]));
+          continue;
+        }
+        throw new Error(`تعذر الاتصال بـ OpenRouter: ${networkErr.message}`);
+      }
+      elapsedMs = Math.round(performance.now() - t0);
+      if (response.ok) break;
+
       const errText = await response.text();
-      throw new Error(`خطأ OpenRouter (${response.status}): ${errText.slice(0, 300)}`);
+      // A model without JSON mode can be refused for `response_format`: retry once without it
+      if (jsonMode && (response.status === 400 || response.status === 404) && /response_format|json|parameter/i.test(errText)) {
+        jsonMode = false;
+        payload = buildOpenRouterChatPayload(item, modelId, false, maxTokens);
+        continue;
+      }
+      if ((response.status === 429 || response.status >= 500) && attempt < retryDelays.length) {
+        await new Promise(r => setTimeout(r, retryDelays[attempt++]));
+        continue;
+      }
+      throw describeOpenRouterError(response.status, errText, modelId);
     }
 
-    const data = await response.json();
-    const rawContent = data?.choices?.[0]?.message?.content || "{}";
-    let parsed = {};
-    try {
-      parsed = JSON.parse(rawContent);
-    } catch (_) {
-      parsed = { verdict: "NOT_SURE", confidence: 0.5, reason: rawContent.slice(0, 100) };
+    let data = await response.json();
+    // OpenRouter can answer 200 with an error object (provider failure mid-stream)
+    if (data?.error) {
+      throw new Error(`خطأ من مزوّد النموذج عبر OpenRouter: ${String(data.error.message || JSON.stringify(data.error)).slice(0, 300)}`);
+    }
+    let rawContent = data?.choices?.[0]?.message?.content || "";
+    let parsed = parseModelJson(rawContent);
+
+    // Cut off by max_tokens (usually a model that spent them thinking): one retry with more room
+    if (!parsed && data?.choices?.[0]?.finish_reason === "length" && maxTokens < CHAT_MAX_TOKENS_RETRY) {
+      maxTokens = CHAT_MAX_TOKENS_RETRY;
+      payload = buildOpenRouterChatPayload(item, modelId, jsonMode, maxTokens);
+      await waitIfPaused();
+      const t0 = performance.now();
+      const retryResp = await fetch(OPENROUTER_CHAT_URL, { method: "POST", headers, body: JSON.stringify(payload) });
+      elapsedMs += Math.round(performance.now() - t0);
+      if (!retryResp.ok) throw describeOpenRouterError(retryResp.status, await retryResp.text(), modelId);
+      data = await retryResp.json();
+      rawContent = data?.choices?.[0]?.message?.content || "";
+      parsed = parseModelJson(rawContent);
+    }
+    if (!parsed) {
+      const finish = data?.choices?.[0]?.finish_reason;
+      throw new Error(rawContent.trim()
+        ? `لم يُرجع النموذج JSON صالحاً: ${rawContent.slice(0, 160)}`
+        : `رد فارغ من النموذج «${modelId}»${finish ? ` (finish_reason: ${finish})` : ""} — جرّب نموذجاً آخر.`);
     }
 
-    const verdict = (parsed.verdict || "NOT_SURE").toUpperCase();
+    const verdict = normalizeVerdict(parsed.verdict);
     const conf = typeof parsed.confidence === "number" ? parsed.confidence : 0.80;
     const probs = parsed.probabilities || {
       CORRECT: verdict === "CORRECT" ? conf : (1 - conf) / 2,
@@ -747,7 +1000,7 @@
       NOT_SURE: verdict === "NOT_SURE" ? conf : (1 - conf) / 2
     };
 
-    const rawBStatus = parsed.boundary_status || "COMPLETE_SPAN";
+    const rawBStatus = String(parsed.boundary_status || "COMPLETE_SPAN").toUpperCase();
     const bConf = typeof parsed.boundary_confidence === "number" ? parsed.boundary_confidence : 0.85;
     const finalBStatus = normalizeBoundaryVerdict(verdict, rawBStatus, item.envelope.state);
 
@@ -774,10 +1027,13 @@
         probabilities: probs,
         boundary_status: finalBStatus,
         boundary_confidence: bConf,
+        merge_suggestion: parsed.merge_suggestion,
+        merge_confidence: parsed.merge_confidence,
+        merge_gap_type: parsed.merge_gap_type,
         reason: parsed.reason || "تدقيق بواسطة نموذج OpenRouter."
       }],
       latencyMs: elapsedMs,
-      model: modelId,
+      model: data.model || modelId,
       provider: "openrouter_chat",
       inputTokens: inTokens,
       outputTokens: outTokens,
@@ -1009,9 +1265,15 @@
       return;
     }
 
-    // Mark as PENDING
+    if (provider === "openrouter_chat") {
+      await assertOpenRouterChatModelExists();
+    }
+
+    // Mark as PENDING (the prior status comes back if the run stops before reaching a finding)
+    const priorStatus = new Map();
     targetDetections.forEach(det => {
       det.aiVerification = det.aiVerification || {};
+      priorStatus.set(det, det.aiVerification.status);
       det.aiVerification.status = "PENDING";
     });
     if (typeof window.renderAllViews === "function") window.renderAllViews();
@@ -1023,6 +1285,8 @@
     }));
 
     let processedCount = 0;
+    let failedCount = 0;
+    let fatalErr = null;
     const totalCount = preparedItems.length;
 
     try {
@@ -1068,6 +1332,7 @@
         } catch (apiErr) {
           chunkStatus = "ERROR";
           chunkErrorMsg = apiErr.message;
+          if (apiErr.fatal) fatalErr = apiErr;
           console.error("AI Verification Request Error:", apiErr);
         }
 
@@ -1104,6 +1369,9 @@
                 boundaryProbabilities: bProbs,
                 unmatchedPrefixPreview: item.envelope.state.unmatched_corpus_prefix_words || "",
                 unmatchedSuffixPreview: item.envelope.state.unmatched_corpus_suffix_words || "",
+                mergeSuggestion: getPromptConfig().rules.suggestMerges && providerSupportsPrompt(providerResult.provider)
+                  ? normalizeMergeSuggestion(evalResult.merge_suggestion, evalResult.merge_confidence, evalResult.merge_gap_type, item.envelope.merge)
+                  : null,
                 reason: evalResult.reason || "",
                 modelUsed: providerResult.model,
                 provider: providerResult.provider,
@@ -1179,7 +1447,9 @@
         }
 
         processedCount += currentChunk.length;
+        if (chunkStatus !== "SUCCESS") failedCount += currentChunk.length;
         updateAiVerificationMetrics();
+        if (fatalErr) break;
         if (typeof window.renderAllViews === "function") window.renderAllViews();
         if (typeof window.renderAiRequestLogsTable === "function") window.renderAiRequestLogsTable();
       }
@@ -1188,11 +1458,19 @@
         onProgress({
           processed: processedCount,
           total: totalCount,
-          status: isVerificationCancelled ? "cancelled" : "done",
-          message: isVerificationCancelled ? "تم إيقاف التدقيق." : `اكتمل التدقيق الذكي لـ ${processedCount} مقتبس بنجاح!`
+          status: fatalErr ? "error" : (isVerificationCancelled ? "cancelled" : "done"),
+          message: fatalErr
+            ? `⛔ توقف التدقيق: ${fatalErr.message}`
+            : (isVerificationCancelled ? "تم إيقاف التدقيق." : `اكتمل التدقيق الذكي لـ ${processedCount - failedCount} من ${totalCount} مقتبس${failedCount ? ` (فشل ${failedCount})` : ""}.`)
         });
       }
+      if (fatalErr) throw fatalErr;
+      return { processed: processedCount, failed: failedCount, total: totalCount, cancelled: isVerificationCancelled };
     } finally {
+      // findings never sent (stopped, cancelled) get their previous status back instead of hanging on PENDING
+      targetDetections.forEach(det => {
+        if (det.aiVerification?.status === "PENDING") det.aiVerification.status = priorStatus.get(det);
+      });
       // Rebuild smart captions with respect to visibility filter
       if (typeof recalculateCaptionsFromCurrentFindings === "function") {
         recalculateCaptionsFromCurrentFindings();
@@ -1431,7 +1709,7 @@
       model = payload.model;
       endpoint = "openrouter.ai/api/alpha/decisions";
     } else if (prov === "openrouter_chat") {
-      model = currentState.aiVerification.openRouterSelectedModel || "deepseek/deepseek-chat";
+      model = normalizeOpenRouterModelId(currentState.aiVerification.openRouterSelectedModel);
       payload = buildOpenRouterChatPayload(item, model);
       endpoint = "openrouter.ai/api/v1/chat/completions";
     } else {
@@ -1445,7 +1723,7 @@
       model,
       endpoint,
       payload,
-      questions: composeQuestions(item.envelope.questions, prov),
+      questions: composeRequestEnvelope(item, prov).questions,
       systemPrompt: (prov === "gemini" || prov === "openrouter_chat") ? composeSystemPrompt(prov) : "",
       approxTokens: Math.round(json.length / 3.2)
     };
@@ -1459,7 +1737,11 @@
     const approxTokens = count * (sample ? sample.approxTokens : 380);
     let estCost = 0.0;
     if (provider === "openrouter_chat") {
-      estCost = (approxTokens / 1000000) * 0.14;
+      const modelId = normalizeOpenRouterModelId(currentState.aiVerification.openRouterSelectedModel);
+      const meta = (currentState.aiVerification.openRouterModelsCatalog || []).find(m => m.id === modelId);
+      const priceIn = meta ? parseFloat(meta.pricing.prompt || 0) : 0.14 / 1000000;
+      const priceOut = meta ? parseFloat(meta.pricing.completion || 0) : 0.28 / 1000000;
+      estCost = approxTokens * priceIn + count * CHAT_EXPECTED_OUTPUT_TOKENS * priceOut;
     } else if (provider === "openrouter_jev") {
       estCost = (approxTokens / 1000000) * 0.042;
     }
@@ -1479,6 +1761,8 @@
     PROMPT_PRESETS,
     PROMPT_RULES,
     buildCanonicalDecisionEnvelope,
+    findNeighborFindings,
+    MERGE_MAX_GAP_WORDS,
     callGeminiApi,
     callOpenRouterJev,
     callOpenRouterChat,

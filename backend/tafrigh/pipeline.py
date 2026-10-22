@@ -189,7 +189,7 @@ class TafrighPipeline:
                 "latency_ms": round((time.perf_counter() - t0) * 1000, 2), "error": str(exc), "http_status": exc.status,
             })
             self._stats["errors"] = self._stats.get("errors", 0) + 1
-            if exc.status in (400, 401, 403, 404):
+            if exc.status in (400, 401, 402, 403, 404):
                 raise TafrighModelError(f"رفض مزود النموذج الطلب (HTTP {exc.status}): {exc}") from exc
             self._fail_streak += 1
         except Exception as exc:  # parse / validation failures from the adapter

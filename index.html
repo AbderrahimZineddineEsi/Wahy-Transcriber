@@ -9,117 +9,117 @@
   <script src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Readex+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['"IBM Plex Sans Arabic"', 'Inter', 'sans-serif'],
-            quran: ['Amiri', 'serif'],
-            mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace']
+    // Every Tailwind colour family resolves to a CSS variable (css/styles.css), so the markup the
+    // scripts render re-themes with the page. The chrome is greyscale; hue is kept for meaning only:
+    // emerald = Quran, amber = hadith, violet = adhkar, rose = danger; lapis (sky/blue/cyan/indigo) marks
+    // what the user can act on.
+    (function () {
+      const STEPS = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950];
+      const ramp = (name) => Object.fromEntries(STEPS.map(s => [s, `rgb(var(--${name}-${s}) / <alpha-value>)`]));
+      const n = ramp("n"), a = ramp("a"), q = ramp("q"), h = ramp("h"), d = ramp("d"), r = ramp("r");
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              white: 'rgb(var(--white) / <alpha-value>)',
+              slate: n, gray: n, zinc: n, neutral: n, stone: n,
+              sky: a, blue: a, cyan: a, indigo: a, fuchsia: n, lime: n,
+              emerald: q, green: q, teal: q,
+              amber: h, yellow: h, orange: h,
+              violet: d, purple: d,
+              rose: r, red: r, pink: r
+            },
+            fontFamily: {
+              sans: ['"Readex Pro"', 'system-ui', 'sans-serif'],
+              quran: ['Amiri', 'serif'],
+              mono: ['"Readex Pro"', 'system-ui', 'sans-serif']
+            },
+            borderRadius: { lg: '6px', xl: '8px', '2xl': '10px', '3xl': '12px' },
+            boxShadow: {
+              sm: 'none', md: 'var(--shadow-pop)', lg: 'var(--shadow-pop)',
+              xl: 'none', '2xl': 'none'
+            }
           }
         }
-      }
-    };
+      };
+    })();
   </script>
-  <link rel="stylesheet" href="css/styles.css?v=1792528429" />
+  <link rel="stylesheet" href="css/styles.css?v=1792632000" />
   <!-- Interface language layer: loaded in <head> (not deferred) so the page direction is set before first paint -->
-  <script src="js/i18n-en.js?v=1792529851"></script>
-  <script src="js/i18n.js?v=1792529851"></script>
+  <script src="js/i18n-en.js?v=1792632000"></script>
+  <script src="js/i18n.js?v=1792632000"></script>
 </head>
 
-<body class="min-h-screen flex flex-col bg-slate-950 text-slate-100 antialiased selection:bg-emerald-500/30 selection:text-emerald-200">
+<body class="min-h-screen flex flex-col bg-slate-950 text-slate-100 antialiased">
 
   <!-- ===================================================================== -->
-  <!-- COMPACT, UNCLUTTERED PUBLIC NAVBAR (56px)                             -->
+  <!-- HEADER: brand, the six workspaces, global actions                     -->
   <!-- ===================================================================== -->
-  <header class="border-b border-slate-800/80 bg-slate-900/90 backdrop-blur-md sticky top-0 z-40">
-    <div class="max-w-[1640px] mx-auto px-3 sm:px-5 h-14 flex items-center justify-between gap-2">
+  <header class="app-header sticky top-0 z-40">
+    <div class="max-w-[1640px] mx-auto px-4 sm:px-6 h-14 flex items-center gap-4 lg:gap-8">
 
-      <!-- Brand & Subtle Status -->
       <div class="flex items-center gap-2.5 shrink-0">
-        <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center shadow-md shadow-emerald-950/60 font-bold text-white text-sm">
-          ﴿﴾
-        </div>
-        <div class="flex items-center gap-2">
-          <h1 class="text-sm sm:text-base font-bold text-white tracking-tight">واحي ستوديو</h1>
-          <span class="hidden xl:inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-slate-950 border border-slate-800 text-[11px] text-slate-400">
-            <span id="backendStatusDot" class="w-2 h-2 rounded-full bg-emerald-400"></span>
-            <span id="backendStatusBadge">جاهز</span>
-          </span>
-        </div>
+        <span class="brand-mark" aria-hidden="true">﴿﴾</span>
+        <h1 class="brand-name hidden sm:block">واحي ستوديو</h1>
+        <span class="hidden xl:inline-flex items-center gap-1.5 text-[11px] text-slate-400 ms-2" title="حالة الخادم المحلي">
+          <span id="backendStatusDot" class="w-2 h-2 rounded-full bg-emerald-400"></span>
+          <span id="backendStatusBadge">جاهز</span>
+        </span>
       </div>
 
-      <!-- Center: 4 Clean Primary Workspace Sections -->
-      <nav class="flex items-center gap-1 bg-slate-950/90 p-1 rounded-2xl border border-slate-800/90 overflow-x-auto no-scrollbar">
-        <button type="button" id="navBtn_input" class="main-nav-pill nav-inactive px-3 sm:px-4 py-1.5 text-xs flex items-center gap-1.5">
-          <span>📥</span>
-          <span>الإدخال والتفريغ</span>
+      <nav class="flex items-center gap-4 lg:gap-6 overflow-x-auto no-scrollbar min-w-0 flex-1" aria-label="مساحات العمل">
+        <button type="button" id="navBtn_input" class="main-nav-pill nav-inactive" title="إدخال المحاضرة: نص، رابط يوتيوب، أو ملف صوتي/مرئي">
+          <span>الإدخال</span>
         </button>
-
-        <button type="button" id="navBtn_display" class="main-nav-pill nav-active px-3 sm:px-4 py-1.5 text-xs flex items-center gap-1.5">
-          <span>🎬</span>
-          <span>العرض والمتابعة</span>
+        <button type="button" id="navBtn_display" class="main-nav-pill nav-active" title="قراءة المحاضرة مع المشغل والكابشن المتزامن">
+          <span>العرض</span>
         </button>
-
-        <button type="button" id="navBtn_editor" class="main-nav-pill nav-inactive px-3 sm:px-4 py-1.5 text-xs flex items-center gap-1.5" title="محرر المقتبسات واستوديو التصحيح">
-          <span>✍️</span>
-          <span>التحرير وتوثيق المقتبسات</span>
-          <span id="navBadgeFindingsCount" class="px-1.5 py-0.2 rounded-full bg-emerald-500/20 text-emerald-300 font-mono text-[10px]">0</span>
+        <button type="button" id="navBtn_editor" class="main-nav-pill nav-inactive" title="محرر المقتبسات واستوديو التصحيح">
+          <span>التحرير</span>
+          <span id="navBadgeFindingsCount" class="nav-count">0</span>
         </button>
-
-        <button type="button" id="navBtn_datasets" class="main-nav-pill nav-inactive px-3 sm:px-4 py-1.5 text-xs flex items-center gap-1.5">
-          <span>📿</span>
+        <button type="button" id="navBtn_datasets" class="main-nav-pill nav-inactive" title="قواعد الآيات والأحاديث والأذكار">
           <span>القواعد والأذكار</span>
-          <span id="navBadgeAdhkarCount" class="px-1.5 py-0.2 rounded-full bg-violet-500/20 text-violet-300 font-mono text-[10px]">42</span>
+          <span id="navBadgeAdhkarCount" class="nav-count">42</span>
         </button>
-
-        <button type="button" id="navBtn_ai_logs" class="main-nav-pill nav-inactive px-3 sm:px-4 py-1.5 text-xs flex items-center gap-1.5" title="تدقيق المقتبسات بالذكاء الاصطناعي وسجل الطلبات ونموذج Laya">
-          <span>🤖</span>
-          <span>الذكاء الاصطناعي والسجل</span>
-          <span id="navBadgeAiVerifiedCount" class="px-1.5 py-0.2 rounded-full bg-sky-500/20 text-sky-300 font-mono text-[10px]">0</span>
+        <button type="button" id="navBtn_ai_logs" class="main-nav-pill nav-inactive" title="تدقيق المقتبسات بالذكاء الاصطناعي وسجل الطلبات ونموذج Laya">
+          <span>الذكاء الاصطناعي</span>
+          <span id="navBadgeAiVerifiedCount" class="nav-count">0</span>
         </button>
-
-        <button type="button" id="navBtn_training_data" class="main-nav-pill nav-inactive px-3 sm:px-4 py-1.5 text-xs flex items-center gap-1.5" title="بنك بيانات التدريب للنماذج وهندسة التصحيح">
-          <span>📊</span>
-          <span>بيانات التدريب (Data Hub)</span>
-          <span id="badgeTrainingRecordCount" class="px-1.5 py-0.2 rounded-full bg-emerald-500/20 text-emerald-300 font-mono text-[10px]">0</span>
+        <button type="button" id="navBtn_training_data" class="main-nav-pill nav-inactive" title="بنك بيانات التدريب للنماذج وهندسة التصحيح">
+          <span>بيانات التدريب</span>
+          <span id="badgeTrainingRecordCount" class="nav-count">0</span>
         </button>
       </nav>
 
-      <!-- Left: Compact Utility Actions (Undo, Export Menu, Theme, Settings Menu) -->
       <div class="flex items-center gap-1.5 shrink-0">
-        <button type="button" id="btnUndoAction" class="hidden px-2.5 py-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 text-xs font-bold transition" title="التراجع عن آخر تعديل">
-          ↩️ <span class="hidden sm:inline">تراجع</span>
+        <button type="button" id="btnUndoAction" class="hidden btn btn-quiet" title="التراجع عن آخر تعديل">
+          <span aria-hidden="true">↶</span><span class="hidden sm:inline">تراجع</span>
         </button>
-
-        <button type="button" id="btnOpenExportModal" class="px-3 py-1.5 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 text-xs font-bold flex items-center gap-1.5 transition" title="تصدير المحاضرة وملفات الترجمة وتنسيق الأقواس">
-          <span>📤</span>
-          <span class="hidden sm:inline">تصدير وتنسيق</span>
+        <button type="button" id="btnOpenExportModal" class="btn btn-primary" title="تصدير المحاضرة وملفات الترجمة وتنسيق الأقواس">
+          <span>تصدير</span>
         </button>
-
-        <button type="button" id="btnToggleTheme" class="w-8 h-8 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-200 border border-slate-700/80 text-xs flex items-center justify-center transition" title="تبديل الوضع الليلي / النهاري">
-          <span id="lblThemeToggle">☀️</span>
+        <button type="button" id="btnToggleTheme" class="btn btn-quiet btn-icon" title="تبديل الوضع الليلي / النهاري" aria-label="تبديل الوضع الليلي / النهاري">
+          <span id="lblThemeToggle">☀</span>
         </button>
-
-        <button type="button" id="btnOpenSettingsModal" class="px-2.5 py-1.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-200 border border-slate-700/80 text-xs font-semibold flex items-center gap-1 transition" title="الإعدادات المتقدمة وحساسية المحرك ومصادر البيانات">
-          <span>⚙️</span>
-          <span class="hidden md:inline">الإعدادات</span>
+        <button type="button" id="btnOpenSettingsModal" class="btn btn-quiet btn-icon" title="الإعدادات المتقدمة وحساسية المحرك ومصادر البيانات" aria-label="الإعدادات">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
         </button>
       </div>
     </div>
 
-    <!-- Auto-Hiding Slim Corpus Loading Bar (Hidden once loaded) -->
-    <div id="corpusDownloadProgressWrap" class="hidden bg-slate-950/95 border-t border-slate-800/80 px-4 py-1.5">
+    <!-- Corpus loading strip (hidden once loaded) -->
+    <div id="corpusDownloadProgressWrap" class="hidden border-t border-slate-800 px-4 py-1.5">
       <div class="max-w-[1640px] mx-auto flex items-center justify-between gap-3 text-[11px]">
-        <span id="corpusDownloadStatusLabel" class="text-emerald-300 font-medium truncate">جاري تهيئة القواعد...</span>
+        <span id="corpusDownloadStatusLabel" class="text-slate-300 truncate">جاري تهيئة القواعد...</span>
         <div class="flex items-center gap-2 w-48 shrink-0">
-          <div class="flex-1 h-1.5 rounded-full bg-slate-800 overflow-hidden">
-            <div id="corpusDownloadProgressBar" class="h-full bg-gradient-to-l from-emerald-500 to-sky-400 transition-all duration-300" style="width: 0%"></div>
+          <div class="flex-1 h-1 rounded-full bg-slate-800 overflow-hidden">
+            <div id="corpusDownloadProgressBar" class="h-full bg-sky-500 transition-all duration-300" style="width: 0%"></div>
           </div>
-          <span id="corpusDownloadPercentLabel" class="font-mono font-bold text-sky-400" dir="ltr">0%</span>
+          <span id="corpusDownloadPercentLabel" class="text-slate-300" dir="ltr">0%</span>
         </div>
       </div>
     </div>
@@ -128,74 +128,70 @@
   <!-- ===================================================================== -->
   <!-- MAIN WORKSPACE CONTAINER                                              -->
   <!-- ===================================================================== -->
-  <main class="flex-1 max-w-[1640px] w-full mx-auto px-3 sm:px-5 py-4">
+  <main class="flex-1 max-w-[1640px] w-full mx-auto px-4 sm:px-6 py-5">
+
 
     <!-- =================================================================== -->
     <!-- SECTION 1: INPUT & TRANSCRIPTION STUDIO (#section_input)            -->
     <!-- =================================================================== -->
-    <section id="section_input" class="hidden max-w-4xl mx-auto space-y-5 py-2">
-      <div class="rounded-3xl bg-slate-900/95 border border-slate-800/90 p-5 sm:p-7 shadow-2xl space-y-6">
+    <section id="section_input" class="hidden max-w-3xl mx-auto py-4 space-y-10">
 
-        <!-- Section Header -->
-        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-4">
-          <div>
-            <h2 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
-              <span>📥 استوديو الإدخال والتفريغ الصوتي الذكي</span>
-            </h2>
-            <p class="text-xs text-slate-400 mt-0.5">اختر مصدر المحاضرة (نص جاهز، رابط يوتيوب، أو ملف صوتي/مرئي) ليقوم المحرك باكتشاف الآيات والأحاديث والأذكار وبناء الكابشن المتزامن.</p>
+      <div class="space-y-6">
+        <div class="flex flex-wrap items-end justify-between gap-3">
+          <div class="space-y-1">
+            <h2 class="doc-title">محاضرة جديدة</h2>
+            <p class="text-sm text-slate-400 max-w-xl">اختر مصدر المحاضرة (نص جاهز، رابط يوتيوب، أو ملف صوتي/مرئي) ليقوم المحرك باكتشاف الآيات والأحاديث والأذكار وبناء الكابشن المتزامن.</p>
           </div>
-          <button type="button" id="btnLoadDynamicDemoLecture" class="px-3.5 py-2 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/35 text-indigo-300 border border-indigo-500/40 text-xs font-bold transition flex items-center gap-1.5">
-            <span>✨ تجربة محاضرة نموذجية</span>
+          <button type="button" id="btnLoadDynamicDemoLecture" class="btn btn-quiet">
+            <span>تجربة محاضرة نموذجية</span>
           </button>
         </div>
 
-        <!-- Lecture Title Input -->
-        <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
-          <label for="inpLectureTitle" class="sm:col-span-3 text-xs font-bold text-slate-300">عنوان المحاضرة أو الدرس:</label>
+        <div class="space-y-1.5">
+          <label for="inpLectureTitle" class="block text-xs text-slate-400">عنوان المحاضرة أو الدرس</label>
           <input type="text" id="inpLectureTitle" value="محاضرة علمية — استوديو الوحيين"
             placeholder="أدخل عنوان المحاضرة..."
-            class="sm:col-span-9 rounded-xl bg-slate-950 border border-slate-800 focus:border-emerald-500 focus:outline-none px-3.5 py-2 text-xs sm:text-sm text-slate-100" />
+            class="w-full bg-transparent border-0 border-b border-slate-700 focus:border-white focus:outline-none px-0 py-2 text-lg text-slate-100 font-quran" />
         </div>
 
-        <!-- Input Source Tabs -->
-        <div class="flex flex-wrap items-center gap-2">
-          <button type="button" id="btnInputTab_text" class="px-4 py-2.5 rounded-xl text-xs font-bold bg-emerald-600/25 text-emerald-300 border border-emerald-500/50 flex items-center gap-2 shadow-sm transition">
-            <span>📝 نص مباشر أو ملف ترجمة (.txt / .srt / .vtt)</span>
+        <!-- Source -->
+        <div class="seg" role="tablist" aria-label="مصدر المحاضرة">
+          <button type="button" id="btnInputTab_text" class="seg-btn is-active">
+            <span>نص أو ملف ترجمة</span>
           </button>
-          <button type="button" id="btnInputTab_youtube" class="px-4 py-2.5 rounded-xl text-xs font-semibold bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 flex items-center gap-2 transition">
-            <span>▶️ رابط يوتيوب (YouTube)</span>
+          <button type="button" id="btnInputTab_youtube" class="seg-btn">
+            <span>رابط يوتيوب</span>
           </button>
-          <button type="button" id="btnInputTab_media" class="px-4 py-2.5 rounded-xl text-xs font-semibold bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 flex items-center gap-2 transition">
-            <span>🎬 ملف فيديو أو صوت (.mp4 / .mp3 / .wav)</span>
+          <button type="button" id="btnInputTab_media" class="seg-btn">
+            <span>ملف فيديو أو صوت</span>
           </button>
         </div>
 
-        <!-- Tab 1: Text / Subtitle Fast-Path -->
+        <!-- Text / subtitles -->
         <div id="panelInput_text" class="space-y-3">
-          <textarea id="textareaFastPathInput" rows="7"
-            class="w-full rounded-2xl bg-slate-950 border border-slate-800 focus:border-emerald-500 focus:outline-none p-4 text-sm text-slate-100 leading-relaxed"
+          <textarea id="textareaFastPathInput" rows="9"
+            class="w-full rounded-2xl bg-slate-900 border border-slate-800 focus:border-slate-500 focus:outline-none p-4 text-slate-100 font-quran text-lg leading-loose"
             placeholder="الصق نص المحاضرة هنا أو محتوى ملف الترجمة (.SRT / .VTT)..."></textarea>
 
-          <div class="flex flex-wrap items-center justify-between gap-3 pt-1">
-            <label class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 text-xs font-bold cursor-pointer transition flex items-center gap-1.5">
-              <span>📂 استيراد ملف نصي أو ترجمة (.txt / .srt / .vtt)</span>
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <label class="btn btn-quiet">
+              <span>استيراد ملف .txt / .srt / .vtt</span>
               <input type="file" id="inpTextFileUpload" accept=".txt,.srt,.vtt" class="hidden" />
             </label>
-
-            <button type="button" id="btnRunTextFastPath" class="px-6 py-2.5 rounded-xl bg-gradient-to-l from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs sm:text-sm font-bold shadow-lg shadow-emerald-950/60 transition flex items-center gap-2">
-              <span>⚡ تحليل النص والانتقال لشاشة العرض</span>
+            <button type="button" id="btnRunTextFastPath" class="btn btn-primary btn-lg">
+              <span>تحليل النص</span>
             </button>
           </div>
         </div>
 
-        <!-- Tab 2: YouTube URL Input -->
+        <!-- YouTube -->
         <div id="panelInput_youtube" class="hidden space-y-3">
-          <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+          <div class="flex flex-col sm:flex-row items-stretch gap-2">
             <input type="url" id="inpYoutubeUrl" dir="ltr"
               placeholder="https://www.youtube.com/watch?v=..."
-              class="flex-1 rounded-xl bg-slate-950 border border-slate-800 focus:border-emerald-500 px-4 py-3 text-sm font-mono text-slate-100" />
-            <button type="button" id="btnTranscribeYoutube" class="px-6 py-3 rounded-xl bg-gradient-to-l from-rose-600 to-amber-600 hover:from-rose-500 hover:to-amber-500 text-white text-xs sm:text-sm font-bold shadow-lg transition shrink-0">
-              ▶️ جلب وتفريغ المحاضرة
+              class="flex-1 rounded-xl bg-slate-900 border border-slate-800 focus:border-slate-500 focus:outline-none px-4 py-2.5 text-sm text-slate-100" />
+            <button type="button" id="btnTranscribeYoutube" class="btn btn-primary btn-lg shrink-0">
+              جلب وتفريغ المحاضرة
             </button>
           </div>
           <p class="text-xs text-slate-400">
@@ -203,46 +199,51 @@
           </p>
         </div>
 
-        <!-- Tab 3: Video / Audio File Upload -->
-        <div id="panelInput_media" class="hidden space-y-4">
-          <div class="flex flex-wrap items-center justify-between gap-3 p-5 rounded-2xl bg-slate-950 border border-dashed border-slate-700">
+        <!-- Media file -->
+        <div id="panelInput_media" class="hidden">
+          <div class="flex flex-wrap items-center justify-between gap-3 p-5 rounded-2xl border border-dashed border-slate-700">
             <input type="file" id="inpMediaFileUpload" accept=".mp4,.mkv,.webm,.mp3,.wav,.m4a"
-              class="text-xs text-slate-300 file:ml-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-emerald-600/25 file:text-emerald-300 hover:file:bg-emerald-600/40" />
-            <button type="button" id="btnTranscribeMediaFile" class="px-6 py-2.5 rounded-xl bg-gradient-to-l from-emerald-600 to-sky-600 hover:from-emerald-500 hover:to-sky-500 text-white text-xs sm:text-sm font-bold shadow-lg transition">
-              🎙️ رفع وتفريغ الملف
+              class="text-xs text-slate-300 file:ml-3 file:py-1.5 file:px-3 file:rounded-lg file:border file:border-slate-700 file:bg-transparent file:text-xs file:text-slate-100 hover:file:bg-slate-800" />
+            <button type="button" id="btnTranscribeMediaFile" class="btn btn-primary btn-lg">
+              رفع وتفريغ الملف
             </button>
           </div>
         </div>
 
-        <!-- Audio Transcription Engine Configuration (Compact Bar) -->
-        <div class="rounded-2xl bg-slate-950/70 border border-slate-800/80 p-3.5 flex flex-wrap items-center justify-between gap-3 text-xs">
-          <div class="flex flex-wrap items-center gap-2">
-            <label for="selTranscriptionModel" class="font-bold text-slate-400">محرك التفريغ الصوتي:</label>
-            <select id="selTranscriptionModel" class="rounded-xl bg-slate-900 border border-slate-700 text-xs font-bold text-amber-300 px-3 py-1.5 focus:border-emerald-500 focus:outline-none" dir="ltr">
-              <option value="groq-whisper-large-v3-turbo">Groq Cloud (whisper-large-v3-turbo — سحابي سريع)</option>
-              <option value="local-turbo-int8">Local GPU — Whisper Turbo (int8 ~2.2GB VRAM)</option>
-              <option value="local-small-int8">Local GPU — Whisper Small (int8 ~800MB VRAM)</option>
-            </select>
-          </div>
-
-          <div class="flex flex-wrap items-center gap-2">
-            <input type="password" id="inpGroqApiKey" placeholder="مفتاح Groq API (gsk_...)" dir="ltr"
-              class="w-48 rounded-xl bg-slate-900 border border-slate-800 focus:border-sky-500 px-3 py-1.5 text-xs font-mono text-slate-200" />
-            <label class="inline-flex items-center gap-1.5 text-xs text-slate-300 cursor-pointer select-none bg-slate-900 px-3 py-1.5 rounded-xl border border-slate-800">
-              <input type="checkbox" id="chkAutoFallback" checked class="rounded text-emerald-500 focus:ring-0" />
+        <!-- Speech-to-text engine: only relevant to YouTube and media, kept folded -->
+        <details class="group rounded-xl border border-slate-800 text-xs">
+          <summary class="cursor-pointer select-none px-4 py-3 flex items-center justify-between gap-3 text-slate-300">
+            <span>محرك التفريغ الصوتي</span>
+            <span class="text-slate-500 group-open:rotate-180 transition-transform" aria-hidden="true">⌄</span>
+          </summary>
+          <div class="px-4 pb-4 pt-1 grid gap-3 sm:grid-cols-2">
+            <label class="space-y-1.5">
+              <span class="block text-slate-400">النموذج</span>
+              <select id="selTranscriptionModel" class="field w-full" dir="ltr">
+                <option value="groq-whisper-large-v3-turbo">Groq Cloud (whisper-large-v3-turbo — سحابي سريع)</option>
+                <option value="local-turbo-int8">Local GPU — Whisper Turbo (int8 ~2.2GB VRAM)</option>
+                <option value="local-small-int8">Local GPU — Whisper Small (int8 ~800MB VRAM)</option>
+              </select>
+            </label>
+            <label class="space-y-1.5">
+              <span class="block text-slate-400">مفتاح Groq API</span>
+              <input type="password" id="inpGroqApiKey" placeholder="مفتاح Groq API (gsk_...)" dir="ltr" class="field w-full" />
+            </label>
+            <label class="sm:col-span-2 inline-flex items-center gap-2 text-slate-300 cursor-pointer select-none">
+              <input type="checkbox" id="chkAutoFallback" checked class="accent-sky-500" />
               <span>التحول التلقائي للمعالج المحلي عند الحاجة</span>
             </label>
           </div>
-        </div>
+        </details>
 
-        <!-- Transcription Progress -->
-        <div id="transcriptionStatusBanner" class="hidden rounded-2xl bg-sky-950/60 border border-sky-500/40 px-4 py-3 space-y-2 text-xs text-sky-200">
+        <!-- Transcription progress -->
+        <div id="transcriptionStatusBanner" class="hidden rounded-xl border border-slate-700 px-4 py-3 space-y-2 text-xs text-slate-200">
           <div class="flex items-center justify-between gap-3">
             <span id="transcriptionStatusText">جاري معالجة الوسائط وتفريغ الكلمات...</span>
-            <span id="transcriptionPercent" class="font-mono font-bold text-sky-300" dir="ltr">0%</span>
+            <span id="transcriptionPercent" class="text-slate-100" dir="ltr">0%</span>
           </div>
-          <div class="h-2.5 rounded-full bg-slate-900 overflow-hidden border border-sky-900/60">
-            <div id="transcriptionProgressBar" class="h-full rounded-full bg-gradient-to-l from-sky-400 to-emerald-400 transition-all duration-300" style="width:0%"></div>
+          <div class="h-1 rounded-full bg-slate-800 overflow-hidden">
+            <div id="transcriptionProgressBar" class="h-full rounded-full bg-sky-500 transition-all duration-300" style="width:0%"></div>
           </div>
           <div id="transcriptionStages" class="flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-slate-400">
             <span data-stage="download">⬇️ التحميل</span>
@@ -251,14 +252,13 @@
             <span data-stage="engine">🔎 محرك الكشف</span>
           </div>
         </div>
-
       </div>
 
       <!-- Saved lectures (autosaved) -->
-      <div class="rounded-3xl bg-slate-900/95 border border-slate-800/90 p-5 sm:p-6 shadow-2xl space-y-3">
-        <div class="flex flex-wrap items-center justify-between gap-2">
-          <h3 class="text-sm sm:text-base font-bold text-white">🗂️ المحاضرات المحفوظة <span class="text-[11px] font-normal text-slate-400">(تُحفظ تلقائياً)</span></h3>
-          <button type="button" id="btnClearAllLectures" class="px-3 py-1.5 rounded-xl bg-rose-600/15 hover:bg-rose-600/30 text-rose-300 border border-rose-500/40 text-[11px] font-bold transition">🗑️ حذف الكل</button>
+      <div class="space-y-3">
+        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-2">
+          <h3 class="text-sm font-semibold text-white">المحاضرات المحفوظة <span class="text-[11px] font-normal text-slate-400">(تُحفظ تلقائياً)</span></h3>
+          <button type="button" id="btnClearAllLectures" class="btn btn-quiet text-rose-400">حذف الكل</button>
         </div>
         <div id="savedLecturesList" class="space-y-2"></div>
       </div>
@@ -270,259 +270,216 @@
     <!-- =================================================================== -->
     <section id="section_display" class="space-y-4">
 
-      <!-- Clean Top Summary & View Controls Ribbon -->
-      <div class="rounded-2xl bg-slate-900/90 border border-slate-800/90 px-4 py-2.5 flex flex-wrap items-center justify-between gap-3">
-        <!-- Lecture Title & KPI Pills -->
-        <div class="flex flex-wrap items-center gap-3 text-xs">
-          <span id="displayLectureTitleLabel" class="font-bold text-white text-sm ml-1">محاضرة علمية</span>
-          <span class="px-2.5 py-1 rounded-lg bg-slate-950 border border-slate-800 text-slate-300">
-            الكلمات: <strong id="kpiTotalWords" class="font-mono text-white">0</strong>
-          </span>
-          <span class="px-2.5 py-1 rounded-lg bg-emerald-950/40 border border-emerald-500/30 text-emerald-300">
-            ﴿ الآيات: <strong id="kpiAyatCount" class="font-mono">0</strong> ﴾
-          </span>
-          <span class="px-2.5 py-1 rounded-lg bg-amber-950/40 border border-amber-500/30 text-amber-300">
-            « الأحاديث: <strong id="kpiHadithCount" class="font-mono">0</strong> »
-          </span>
-          <span class="px-2.5 py-1 rounded-lg bg-violet-950/40 border border-violet-500/30 text-violet-300">
-            〖 الأذكار: <strong id="kpiDhikrCount" class="font-mono">0</strong> 〗
-          </span>
-          <span class="hidden sm:inline-flex px-2.5 py-1 rounded-lg bg-slate-950 border border-slate-800 text-slate-400">
-            الكابشن: <strong id="kpiCaptionsCount" class="font-mono text-sky-400">0</strong>
-          </span>
+      <!-- Lecture heading: title, what was found, view and actions -->
+      <div class="flex flex-wrap items-end justify-between gap-x-8 gap-y-3">
+        <div class="min-w-0 space-y-1.5">
+          <h2 id="displayLectureTitleLabel" class="doc-title truncate">محاضرة علمية</h2>
+          <div class="flex flex-wrap items-center gap-x-5 gap-y-1">
+            <span class="tally">الكلمات <strong id="kpiTotalWords">0</strong></span>
+            <span class="tally tally-ayah" title="الآيات"><span class="tally-mark">﴿</span>الآيات <strong id="kpiAyatCount">0</strong><span class="tally-mark">﴾</span></span>
+            <span class="tally tally-hadith" title="الأحاديث"><span class="tally-mark">«</span>الأحاديث <strong id="kpiHadithCount">0</strong><span class="tally-mark">»</span></span>
+            <span class="tally tally-dhikr" title="الأذكار"><span class="tally-mark">〖</span>الأذكار <strong id="kpiDhikrCount">0</strong><span class="tally-mark">〗</span></span>
+            <span class="tally hidden sm:inline-flex">الكابشن <strong id="kpiCaptionsCount">0</strong></span>
+          </div>
         </div>
 
-        <!-- Layout & Quick Actions -->
-        <div class="flex flex-wrap items-center gap-1.5">
-          <select id="selEngineVersionQuick" class="px-2 py-1.5 rounded-xl text-xs font-bold bg-slate-900 text-emerald-300 border border-slate-700" title="محرك الكشف">
-            <option value="v3">v3</option>
-            <option value="v4">v4</option>
-          </select>
-          <select id="selHadithCorpusQuick" class="px-2 py-1.5 rounded-xl text-xs font-bold bg-slate-900 text-amber-300 border border-slate-700" title="قاعدة الأحاديث التي يبحث فيها المحرك (تُجهَّز القواعد الجديدة من الإعدادات)">
-            <option value="wahy_default">📚 واحي</option>
-            <option value="open_hadith_data">📚 Open Hadith Data</option>
-          </select>
-          <button type="button" id="btnRerunEngine" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-sky-600/20 hover:bg-sky-600/35 text-sky-300 border border-sky-500/40 transition" title="إعادة تشغيل محرك الكشف على النص الحالي دون إعادة إدخال الرابط">
-            🔄 إعادة تشغيل المحرك
-          </button>
-          <button type="button" id="btnRunAiTafrigh" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-600/20 hover:bg-amber-600/35 text-amber-300 border border-amber-500/40 transition" title="تشغيل مرحلة التفريغ الذكي وتقسيم المتن والشرح والهيكلة">
-            📑 التفريغ الذكي (AI Tafrigh)
-          </button>
-          <button type="button" id="btnSnapAllToCanonical" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-950/70 hover:bg-emerald-900/80 text-emerald-300 border border-emerald-500/40 transition">
-            ✨ توحيد بالرسم القياسي
-          </button>
-          <button type="button" id="btnToggleDisplayFormattingPanel" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition flex items-center gap-1" title="خيارات تخصيص الأقواس وأرقام الآيات والمصادر والألوان">
-            🎨 خيارات التنسيق والعرض
+        <div class="flex flex-wrap items-center gap-2">
+          <div class="seg" role="group" aria-label="طريقة العرض">
+            <button type="button" id="btnLayout_SPLIT" class="seg-btn is-active">المحاضرة + الفيديو</button>
+            <button type="button" id="btnLayout_LECTURE_ONLY" class="seg-btn">المحاضرة فقط</button>
+            <button type="button" id="btnLayout_CAPTIONS_ONLY" class="seg-btn">الفيديو فقط</button>
+          </div>
+
+          <button type="button" id="btnRunAiTafrigh" class="btn" title="تشغيل مرحلة التفريغ الذكي وتقسيم المتن والشرح والهيكلة">
+            التفريغ الذكي
           </button>
 
-          <button type="button" id="btnQuickGoToEditor" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-sky-600/20 hover:bg-sky-600/35 text-sky-300 border border-sky-500/40 transition" title="الانتقال إلى استوديو التحرير وإضافة المقتبسات المفقودة (FN Studio)">
-            ✍️ تحرير / إضافة مفقود (FN)
-          </button>
-          <div class="h-4 w-px bg-slate-800 mx-0.5 hidden sm:block"></div>
-          <button type="button" id="btnLayout_SPLIT" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-600 text-white shadow-sm border border-emerald-400/50 transition">
-            ◫ المحاضرة + الفيديو
-          </button>
-          <button type="button" id="btnLayout_LECTURE_ONLY" class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 transition">
-            📖 المحاضرة فقط
-          </button>
-          <button type="button" id="btnLayout_CAPTIONS_ONLY" class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 transition">
-            🎬 الفيديو فقط
-          </button>
+          <details class="menu">
+            <summary class="btn" title="محرك الكشف والتنسيق والتحرير">خيارات <span aria-hidden="true">⌄</span></summary>
+            <div class="menu-panel">
+              <span class="menu-label">محرك الكشف</span>
+              <label class="menu-row">
+                <span>إصدار المحرك</span>
+                <select id="selEngineVersionQuick" class="field" title="محرك الكشف">
+                  <option value="v3">v3</option>
+                  <option value="v4">v4</option>
+                </select>
+              </label>
+              <label class="menu-row">
+                <span>قاعدة الأحاديث</span>
+                <select id="selHadithCorpusQuick" class="field" title="قاعدة الأحاديث التي يبحث فيها المحرك (تُجهَّز القواعد الجديدة من الإعدادات)">
+                  <option value="wahy_default">📚 واحي</option>
+                  <option value="open_hadith_data">📚 Open Hadith Data</option>
+                </select>
+              </label>
+              <button type="button" id="btnRerunEngine" class="menu-item" title="إعادة تشغيل محرك الكشف على النص الحالي دون إدخال الرابط مجدداً">
+                <span>إعادة تشغيل المحرك<small>على النص الحالي، دون إعادة الإدخال</small></span>
+              </button>
+              <div class="menu-sep"></div>
+              <span class="menu-label">النص</span>
+              <button type="button" id="btnSnapAllToCanonical" class="menu-item">
+                <span>توحيد بالرسم القياسي<small>استبدال كل المقتبسات بنصها من المصدر</small></span>
+              </button>
+              <button type="button" id="btnToggleDisplayFormattingPanel" class="menu-item" title="خيارات تخصيص الأقواس وأرقام الآيات والمصادر والألوان">
+                <span>خيارات التنسيق والعرض<small>الأقواس، أرقام الآيات، المصادر</small></span>
+              </button>
+              <button type="button" id="btnQuickGoToEditor" class="menu-item" title="الانتقال إلى استوديو التحرير وإضافة المقتبسات المفقودة (FN Studio)">
+                <span>تحرير / إضافة مقتبس مفقود<small>يفتح استوديو التحرير</small></span>
+              </button>
+            </div>
+          </details>
         </div>
       </div>
 
-      <!-- AI Verification Quick Bar & Real-time Metrics Ribbon -->
-      <div id="aiVerificationQuickBar" class="rounded-2xl bg-slate-900/90 border border-slate-800/90 p-3.5 space-y-3">
+      <!-- AI verification of quotes -->
+      <div id="aiVerificationQuickBar" class="panel px-4 py-3 space-y-2.5">
         <div class="flex flex-wrap items-center justify-between gap-3">
-          <div class="flex flex-wrap items-center gap-2 text-xs">
-            <span class="font-bold text-sky-300 flex items-center gap-1.5">
-              <span>🤖</span>
-              <span>التدقيق الذكي للمقتبسات:</span>
-            </span>
-
-            <select id="selAiQuickProvider" class="rounded-xl bg-slate-950 border border-slate-800 text-xs text-sky-200 px-3 py-1.5 font-semibold focus:outline-none focus:border-sky-500">
+          <div class="flex flex-wrap items-center gap-2 text-xs w-full sm:w-auto min-w-0">
+            <span class="text-slate-300 font-medium">التدقيق الذكي للمقتبسات</span>
+            <select id="selAiQuickProvider" class="field w-full sm:w-auto min-w-0" aria-label="مزوّد التدقيق">
               <option value="gemini">✨ Google Gemini (3.5 Flash-Lite)</option>
               <option value="openrouter_jev">🎯 OpenRouter — JEV Mode (Decisions API)</option>
               <option value="openrouter_chat">💬 OpenRouter — Chat LLMs (DeepSeek / Qwen / etc.)</option>
               <option value="local_laya">🖥️ Laya-Multilingual (GTX 1050 3GB VRAM)</option>
             </select>
-
           </div>
 
-          <div class="flex items-center gap-2 mr-auto flex-wrap">
-            <button type="button" id="btnValidateAllAiDecisions" class="px-3 py-1.5 rounded-xl bg-emerald-600/25 hover:bg-emerald-600/40 text-emerald-300 border border-emerald-500/50 font-bold text-xs transition flex items-center gap-1" title="اعتماد جميع أحكام الذكاء الاصطناعي دفعة واحدة">
-              <span>✓</span>
-              <span>اعتماد الكل (Validate All)</span>
+          <div class="flex items-center gap-1.5 flex-wrap">
+            <button type="button" id="btnGoToAiLogsTab" class="btn btn-quiet" title="فتح استوديو النماذج وسجل الطلبات">السجل</button>
+            <button type="button" id="btnValidateAllAiDecisions" class="btn" title="اعتماد جميع أحكام الذكاء الاصطناعي دفعة واحدة">
+              <span>اعتماد الكل</span>
             </button>
-            <!-- Split launch button: launches with the current target set; ⚙️ opens selection / model / prompt options -->
-            <div id="wrapAiLaunchSplit" class="flex items-stretch rounded-xl shadow-md overflow-hidden">
-              <button type="button" id="btnStartAiVerification" class="px-4 py-1.5 bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 text-white font-bold text-xs transition flex items-center gap-1.5" title="بدء التدقيق على المقتبسات المحددة في الخيارات">
-                <span>🤖</span>
-                <span>بدء التدقيق الذكي</span>
-                <span id="lblAiLaunchTargetCount" class="px-1.5 py-0.5 rounded-md bg-white/15 font-mono text-[10px]">0</span>
+            <button type="button" id="btnPauseAiVerification" class="hidden btn">⏸ إيقاف مؤقت</button>
+            <button type="button" id="btnCancelAiVerification" class="hidden btn btn-danger">✕ إلغاء</button>
+            <!-- Split launch: start with the current selection; the second half opens selection / model / prompt -->
+            <div id="wrapAiLaunchSplit" class="flex items-stretch">
+              <button type="button" id="btnStartAiVerification" class="btn btn-primary rounded-e-none" title="بدء التدقيق على المقتبسات المحددة في الخيارات">
+                <span>بدء التدقيق</span>
+                <span id="lblAiLaunchTargetCount" class="btn-count">0</span>
               </button>
-              <button type="button" id="btnOpenAiRequestOptions" class="px-2.5 bg-indigo-700 hover:bg-indigo-600 text-white text-sm border-r border-white/20 transition" title="خيارات الطلب: تحديد المقتبسات، النموذج، والموجّه">
-                ⚙️
+              <button type="button" id="btnOpenAiRequestOptions" class="btn btn-primary btn-icon rounded-s-none border-s border-s-slate-500" title="خيارات الطلب: تحديد المقتبسات، النموذج، والموجّه" aria-label="خيارات الطلب">
+                <span aria-hidden="true">⌄</span>
               </button>
             </div>
-            <button type="button" id="btnPauseAiVerification" class="hidden px-3 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-xs font-bold transition">
-              ⏸ إيقاف مؤقت
-            </button>
-            <button type="button" id="btnCancelAiVerification" class="hidden px-3 py-1.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 text-xs font-bold transition">
-              ✕ إلغاء
-            </button>
-            <button type="button" id="btnGoToAiLogsTab" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-xs font-semibold transition" title="فتح استوديو النماذج وسجل الطلبات">
-              📊 السجل والتفاصيل
-            </button>
           </div>
         </div>
 
-        <!-- Live Progress & Status Bar (Hidden when idle) -->
-        <div id="aiVerificationProgressWrap" class="hidden rounded-xl bg-slate-950 border border-sky-500/30 p-2.5 space-y-1.5">
+        <div id="aiVerificationProgressWrap" class="hidden space-y-1.5">
           <div class="flex items-center justify-between text-xs">
-            <span id="aiVerificationStatusMsg" class="text-sky-300 font-semibold animate-pulse">جاري فحص المقتبسات...</span>
-            <span id="aiVerificationPercentLabel" class="font-mono text-sky-400 font-bold">0%</span>
+            <span id="aiVerificationStatusMsg" class="text-slate-200">جاري فحص المقتبسات...</span>
+            <span id="aiVerificationPercentLabel" class="text-slate-200">0%</span>
           </div>
-          <div class="h-1.5 rounded-full bg-slate-800 overflow-hidden">
-            <div id="aiVerificationProgressBar" class="h-full bg-gradient-to-l from-sky-400 via-indigo-400 to-emerald-400 transition-all duration-200" style="width: 0%"></div>
+          <div class="h-1 rounded-full bg-slate-800 overflow-hidden">
+            <div id="aiVerificationProgressBar" class="h-full bg-sky-500 transition-all duration-200" style="width: 0%"></div>
           </div>
         </div>
 
-        <!-- 8-Card Telemetry & Performance Strip (#aiMetricsSummaryGrid) -->
-        <div id="aiMetricsSummaryGrid" class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2 text-xs pt-1">
-          <div class="ai-metric-card">
-            <span class="text-[10px] text-slate-400">زمن المحرك</span>
-            <strong id="aiMetricEngineTime" class="text-emerald-400 font-mono text-xs">0 ms</strong>
-          </div>
-          <div class="ai-metric-card">
-            <span class="text-[10px] text-slate-400">إجمالي الطلبات</span>
-            <strong id="aiMetricTotalReq" class="text-sky-400 font-mono text-xs">0 طلب</strong>
-          </div>
-          <div class="ai-metric-card">
-            <span class="text-[10px] text-slate-400">الزمن الكلي</span>
-            <strong id="aiMetricFullTime" class="text-indigo-300 font-mono text-xs">0 s</strong>
-          </div>
-          <div class="ai-metric-card">
-            <span class="text-[10px] text-slate-400">متوسط زمن الطلب</span>
-            <strong id="aiMetricAvgTime" class="text-cyan-300 font-mono text-xs">0 ms</strong>
-          </div>
-          <div class="ai-metric-card">
-            <span class="text-[10px] text-slate-400">إجمالي السياق</span>
-            <strong id="aiMetricTotalTokens" class="text-amber-300 font-mono text-xs">0 توكن</strong>
-          </div>
-          <div class="ai-metric-card">
-            <span class="text-[10px] text-slate-400">متوسط السياق</span>
-            <strong id="aiMetricAvgContext" class="text-teal-300 font-mono text-xs">0 توكن/طلب</strong>
-          </div>
-          <div class="ai-metric-card">
-            <span class="text-[10px] text-slate-400">نتائج التصنيف</span>
-            <strong id="aiMetricVerdicts" class="text-slate-200 font-mono text-[11px] truncate">0✓ | 0✕ | 0؟</strong>
-          </div>
-          <div class="ai-metric-card">
-            <span class="text-[10px] text-slate-400">التكلفة التقديرية</span>
-            <strong id="aiMetricCost" class="text-emerald-400 font-mono text-xs">$0.00</strong>
-          </div>
+        <!-- Run telemetry, one line -->
+        <div id="aiMetricsSummaryGrid" class="metric-line">
+          <span>النتائج <strong id="aiMetricVerdicts">0✓ | 0✕ | 0؟</strong></span>
+          <span>الطلبات <strong id="aiMetricTotalReq">0 طلب</strong></span>
+          <span>التكلفة <strong id="aiMetricCost">$0.00</strong></span>
+          <span>الزمن الكلي <strong id="aiMetricFullTime">0 s</strong></span>
+          <span>متوسط الطلب <strong id="aiMetricAvgTime">0 ms</strong></span>
+          <span>السياق <strong id="aiMetricTotalTokens">0 توكن</strong></span>
+          <span>متوسط السياق <strong id="aiMetricAvgContext">0 توكن/طلب</strong></span>
+          <span>زمن المحرك <strong id="aiMetricEngineTime">0 ms</strong></span>
         </div>
       </div>
 
-      <!-- Dual Display Grid: Lecture Next to Video Player -->
+      <!-- Lecture next to the player -->
       <div id="dualWorkspaceGrid" class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
 
-        <!-- RIGHT COLUMN: Formatted Lecture View with Word Progress Indicator -->
+        <!-- Lecture column -->
         <div id="rightLectureColumn" class="lg:col-span-7 flex flex-col gap-4">
-          <div class="rounded-2xl bg-slate-900/95 border border-slate-800/90 shadow-xl overflow-hidden flex flex-col">
+          <div class="panel overflow-hidden flex flex-col">
 
-            <!-- Lecture Stage Tabs: Sync Word Stage vs. Structured Tafrigh Stage -->
-            <div class="bg-slate-950/90 border-b border-slate-800/80 px-4 py-2 flex flex-wrap items-center justify-between gap-2">
-              <div class="flex items-center gap-1.5" role="tablist">
+            <!-- Synced text / structured transcript -->
+            <div class="panel-head">
+              <div class="seg" role="tablist">
                 <button type="button" id="btnLectureTab_SYNC" class="tafrigh-tab-btn active" role="tab" aria-selected="true">
-                  <span>📖 النص المتزامن والكابشن</span>
+                  <span>النص المتزامن</span>
                 </button>
-                <button type="button" id="btnLectureTab_TAFRIGH" class="tafrigh-tab-btn inactive flex items-center gap-1.5" role="tab" aria-selected="false">
-                  <span>📑 التفريغ المهيكل (المتن والشرح)</span>
-                  <span id="badgeTafrighStatus" class="hidden px-1.5 py-0.5 rounded-full text-[10px] bg-amber-500/20 text-amber-300 font-bold">جاهز</span>
+                <button type="button" id="btnLectureTab_TAFRIGH" class="tafrigh-tab-btn inactive" role="tab" aria-selected="false">
+                  <span>التفريغ المهيكل</span>
+                  <span id="badgeTafrighStatus" class="hidden text-[10px] text-amber-400">جاهز</span>
                 </button>
               </div>
-              <div id="tafrighQuickActions" class="hidden flex items-center gap-1.5">
-                <button type="button" id="btnCopyTafrighMarkdown" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 text-[11px] font-bold transition flex items-center gap-1" title="نسخ التفريغ المهيكل بصيغة Markdown">
-                  <span>📋 نسخ Markdown</span>
+              <div id="tafrighQuickActions" class="hidden flex items-center gap-1">
+                <button type="button" id="btnCopyTafrighMarkdown" class="btn btn-quiet" title="نسخ التفريغ المهيكل بصيغة Markdown">
+                  <span>نسخ Markdown</span>
                 </button>
-                <button type="button" id="btnExportTafrighHtml" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-slate-700 text-[11px] font-bold transition flex items-center gap-1" title="تنزيل صفحة التفريغ بصيغة HTML منسقة">
-                  <span>📥 تصدير HTML</span>
+                <button type="button" id="btnExportTafrighHtml" class="btn btn-quiet" title="تنزيل صفحة التفريغ بصيغة HTML منسقة">
+                  <span>تصدير HTML</span>
                 </button>
-                <button type="button" id="btnRerunTafrigh" class="px-2.5 py-1 rounded-lg bg-amber-600/20 hover:bg-amber-600/35 text-amber-300 border border-amber-500/40 text-[11px] font-bold transition flex items-center gap-1" title="إعادة تشغيل التفريغ المهيكل">
-                  <span>🔄 إعادة المعالجة</span>
+                <button type="button" id="btnRerunTafrigh" class="btn" title="إعادة تشغيل التفريغ المهيكل">
+                  <span>إعادة المعالجة</span>
                 </button>
               </div>
             </div>
 
-            <!-- Lecture Toolbar + Real-time Word Progress Bar -->
-            <div id="lectureSyncToolbar" class="bg-slate-900 border-b border-slate-800 px-4 py-3 space-y-2.5">
-              <div class="flex flex-wrap items-center justify-between gap-2">
-                <div class="flex items-center gap-2">
-                  <h2 class="text-sm font-bold text-white">📖 نص المحاضرة المتزامن</h2>
-                  <span class="text-[11px] text-slate-400 hidden sm:inline">• انقر على أي كلمة للانتقال لتوقيتها أو ظلّل نصاً لإضافته في FN Studio</span>
-                </div>
+            <!-- Find, filter, follow -->
+            <div id="lectureSyncToolbar" class="border-b border-slate-800">
+              <div class="px-4 py-2 flex flex-wrap items-center gap-2">
+                <input type="search" id="inpLectureSearch" placeholder="بحث في المحاضرة..."
+                  class="field flex-1 min-w-[10rem] max-w-xs" />
 
-                <div class="flex flex-wrap items-center gap-2">
-                  <label class="inline-flex items-center gap-1.5 text-[11px] text-slate-300 cursor-pointer select-none bg-slate-950 px-2.5 py-1 rounded-lg border border-slate-800" title="التمرير التلقائي السلس مع الكلمة المنطوقة أثناء تشغيل الفيديو">
-                    <input type="checkbox" id="chkAutoFollowWord" checked class="rounded text-emerald-500 focus:ring-0" />
-                    <span>تتبع الكلمة تلقائياً</span>
-                  </label>
-
-                  <!-- AI Verdict Multi-Toggle Filter Group (User requirement: freely toggle showing correct, not sure, false, unverified) -->
-                  <div id="aiVerdictFilterGroup" class="flex flex-wrap items-center gap-1 p-1 rounded-xl bg-slate-950 border border-slate-800 text-xs">
-                    <label class="ai-filter-pill ai-filter-pill-correct active" title="إظهار المقتبسات المقبولة / الصحيحة">
-                      <input type="checkbox" id="chkFilterShowCorrect" checked class="hidden" />
-                      <span>✓ مقبول 🟢</span>
-                    </label>
-
-                    <label class="ai-filter-pill ai-filter-pill-notsure active" title="إظهار المقتبسات غير المؤكدة أو التقريبية">
-                      <input type="checkbox" id="chkFilterShowNotSure" checked class="hidden" />
-                      <span>؟ غير متأكد 🟡</span>
-                    </label>
-
-                    <label class="ai-filter-pill ai-filter-pill-false" title="إظهار المقتبسات المستبعدة (كلام عادي أو تشابه لفظي خاطئ)">
-                      <input type="checkbox" id="chkFilterShowFalse" class="hidden" />
-                      <span>✕ خاطئ 🔴</span>
-                    </label>
-
-                    <label class="ai-filter-pill ai-filter-pill-unverified active" title="إظهار المقتبسات التي لم تفحص بعد">
-                      <input type="checkbox" id="chkFilterShowUnverified" checked class="hidden" />
-                      <span>⏳ غير مفحوص ⚪</span>
-                    </label>
-
-                    <button type="button" id="btnFilterOnlyClipped" class="px-2 py-0.5 rounded-lg border border-orange-500/40 bg-orange-950/30 hover:bg-orange-950/60 text-orange-300 font-bold text-[11px] transition" title="تصفية المقتبسات التي تم قص أطرافها من البداية أو النهاية">
-                      <span>✂️ ناقص الحدود</span> <span id="lblFilterClippedCount" class="font-mono text-[10px]">(0)</span>
-                    </button>
-
-                    <div class="h-3.5 w-px bg-slate-800 mx-0.5 hidden xl:block"></div>
-                    <div class="flex items-center gap-1 text-[10px]">
-                      <button type="button" id="btnFilterPreset_ALL" class="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300">الكل</button>
-                      <button type="button" id="btnFilterPreset_CORRECT_ONLY" class="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-emerald-300">الصحيح</button>
-                      <button type="button" id="btnFilterPreset_FALSE_ONLY" class="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-rose-300">الخاطئ</button>
+                <details class="menu">
+                  <summary class="btn" title="تصفية المقتبسات حسب حكم التدقيق والنوع">تصفية <span aria-hidden="true">⌄</span></summary>
+                  <div class="menu-panel">
+                    <span class="menu-label">حكم التدقيق</span>
+                    <div id="aiVerdictFilterGroup">
+                      <label class="ai-filter-pill ai-filter-pill-correct active" title="إظهار المقتبسات المقبولة / الصحيحة">
+                        <input type="checkbox" id="chkFilterShowCorrect" checked class="hidden" />
+                        <span>مقبول</span>
+                      </label>
+                      <label class="ai-filter-pill ai-filter-pill-notsure active" title="إظهار المقتبسات غير المؤكدة أو التقريبية">
+                        <input type="checkbox" id="chkFilterShowNotSure" checked class="hidden" />
+                        <span>غير متأكد</span>
+                      </label>
+                      <label class="ai-filter-pill ai-filter-pill-false" title="إظهار المقتبسات المستبعدة (كلام عادي أو تشابه لفظي خاطئ)">
+                        <input type="checkbox" id="chkFilterShowFalse" class="hidden" />
+                        <span>خاطئ</span>
+                      </label>
+                      <label class="ai-filter-pill ai-filter-pill-unverified active" title="إظهار المقتبسات التي لم تفحص بعد">
+                        <input type="checkbox" id="chkFilterShowUnverified" checked class="hidden" />
+                        <span>غير مفحوص</span>
+                      </label>
+                      <div class="flex items-center gap-1 px-1.5 pt-1.5">
+                        <button type="button" id="btnFilterPreset_ALL" class="btn btn-quiet h-7 px-2 text-[11px]">الكل</button>
+                        <button type="button" id="btnFilterPreset_CORRECT_ONLY" class="btn btn-quiet h-7 px-2 text-[11px]">الصحيح فقط</button>
+                        <button type="button" id="btnFilterPreset_FALSE_ONLY" class="btn btn-quiet h-7 px-2 text-[11px]">الخاطئ فقط</button>
+                      </div>
                     </div>
+                    <div class="menu-sep"></div>
+                    <button type="button" id="btnFilterOnlyClipped" class="menu-item" title="تصفية المقتبسات التي تم قص أطرافها من البداية أو النهاية">
+                      <span>ناقص الحدود فقط</span> <span id="lblFilterClippedCount" class="text-slate-400 text-[11px]">(0)</span>
+                    </button>
+                    <div class="menu-sep"></div>
+                    <label class="menu-row">
+                      <span>النوع</span>
+                      <select id="selLectureCategoryFilter" class="field">
+                        <option value="ALL">الكل</option>
+                        <option value="ayah">﴿ الآيات فقط ﴾</option>
+                        <option value="hadith">« الأحاديث فقط »</option>
+                        <option value="dhikr">〖 الأذكار فقط 〗</option>
+                      </select>
+                    </label>
                   </div>
+                </details>
 
-                  <select id="selLectureCategoryFilter" class="rounded-lg bg-slate-950 border border-slate-800 text-xs text-slate-200 px-2.5 py-1">
-                    <option value="ALL">الكل</option>
-                    <option value="ayah">﴿ الآيات فقط ﴾</option>
-                    <option value="hadith">« الأحاديث فقط »</option>
-                    <option value="dhikr">〖 الأذكار فقط 〗</option>
-                  </select>
-
-                  <input type="search" id="inpLectureSearch" placeholder="🔍 بحث في المحاضرة..."
-                    class="w-32 sm:w-40 rounded-lg bg-slate-950 border border-slate-800 px-2.5 py-1 text-xs text-slate-200 focus:border-emerald-500 focus:outline-none" />
-                </div>
+                <label class="inline-flex items-center gap-1.5 text-xs text-slate-300 cursor-pointer select-none ms-auto" title="التمرير التلقائي السلس مع الكلمة المنطوقة أثناء تشغيل الفيديو">
+                  <input type="checkbox" id="chkAutoFollowWord" checked class="accent-sky-500" />
+                  <span>تتبع الكلمة تلقائياً</span>
+                </label>
               </div>
 
-              <!-- Word Progress Indicator Bar -->
-              <div class="flex items-center gap-3 text-[11px]">
-                <span class="text-slate-400 shrink-0">مؤشر تقدم القراءة:</span>
-                <div class="flex-1 h-1.5 rounded-full bg-slate-950 border border-slate-800/80 overflow-hidden">
-                  <div id="lectureWordProgressBar" class="h-full bg-gradient-to-l from-emerald-500 via-teal-400 to-sky-400 transition-all duration-150" style="width: 0%"></div>
+              <!-- Reading progress -->
+              <div class="flex items-center gap-3 px-4 pb-2 text-[11px]">
+                <div class="flex-1 h-px bg-slate-800 overflow-hidden" title="مؤشر تقدم القراءة">
+                  <div id="lectureWordProgressBar" class="h-full bg-sky-500 transition-all duration-150" style="width: 0%"></div>
                 </div>
-                <span id="lectureWordProgressLabel" class="font-mono text-emerald-300 font-semibold shrink-0" dir="ltr">0 / 0</span>
+                <span id="lectureWordProgressLabel" class="text-slate-400 shrink-0" dir="ltr">0 / 0</span>
               </div>
             </div>
 
@@ -540,21 +497,32 @@
 
                 <!-- Options -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
-                  <div>
-                    <label class="block font-bold text-slate-300 mb-1">النموذج</label>
-                    <select id="selTafrighModel" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-2.5 py-1.5 font-bold text-slate-100">
-                      <option value="typesafe/jev-1.14">OpenRouter JEV 1.14</option>
-                      <option value="auto">Gemini — تلقائي (أفضل Flash-Lite متاح)</option>
-                      <option value="local-laya">Local Laya Engine</option>
+                  <div class="space-y-1.5">
+                    <label for="selTafrighProvider" class="block font-bold text-slate-300 mb-1">المزوّد والنموذج</label>
+                    <select id="selTafrighProvider" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-2.5 py-1.5 font-bold text-slate-100">
+                      <option value="openrouter">🌐 OpenRouter — أي نموذج (JEV، Gemini، Claude، DeepSeek...)</option>
+                      <option value="gemini">✨ Google Gemini (مباشرة بمفتاح Gemini)</option>
+                      <option value="laya">🖥️ Local Laya</option>
                     </select>
-                    <button type="button" id="btnFetchGeminiModels" class="mt-1 text-[11px] text-amber-300 hover:text-amber-200 underline">🔄 جلب نماذج Gemini المتاحة لمفتاحي</button>
-                    <div id="tafrighModelsHint" class="text-[10px] text-slate-500"></div>
+                    <div id="wrapTafrighChatModel" class="relative space-y-1">
+                      <input type="search" id="inpTafrighChatModel" autocomplete="off" placeholder="🔍 ابحث في كل نماذج OpenRouter (jev, gemini, claude, free...)" dir="ltr"
+                        class="w-full bg-slate-950 border border-indigo-500/50 rounded-xl px-2.5 py-1 text-slate-100 font-mono text-[11px] focus:outline-none" />
+                      <div id="tafrighChatModelList" class="hidden absolute top-full left-0 right-0 z-30 model-dropdown-list mt-1 text-xs"></div>
+                      <div id="lblTafrighChatModelInfo" class="text-[10px] text-slate-500"></div>
+                    </div>
+                    <div id="wrapTafrighGeminiModel" class="hidden">
+                      <select id="selTafrighModel" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-2.5 py-1 font-bold text-slate-100 text-[11px]">
+                        <option value="auto">Gemini — تلقائي (أفضل Flash-Lite متاح)</option>
+                      </select>
+                      <button type="button" id="btnFetchGeminiModels" class="mt-1 text-[11px] text-amber-300 hover:text-amber-200 underline">🔄 جلب نماذج Gemini المتاحة لمفتاحي</button>
+                      <div id="tafrighModelsHint" class="text-[10px] text-slate-500"></div>
+                    </div>
                   </div>
                   <div>
                     <label class="block font-bold text-slate-300 mb-1">نمط المعالجة</label>
                     <select id="selTafrighMode" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-2.5 py-1.5 font-bold text-slate-100">
                       <option value="per_sentence">جملة بجملة (Per-Sentence)</option>
-                      <option value="windowed">نافذة سياقية (Windowed — Gemini فقط)</option>
+                      <option value="windowed">نافذة سياقية (Windowed — Gemini / Chat فقط)</option>
                     </select>
                   </div>
                   <div>
@@ -583,8 +551,15 @@
 
                 <!-- Source: the current session (engine detections + manual edits), optionally re-detected first -->
                 <div class="rounded-xl border border-emerald-500/30 bg-emerald-950/20 px-3 py-2.5 text-xs flex flex-wrap items-center justify-between gap-2">
-                  <div class="space-y-0.5">
-                    <div class="font-bold text-emerald-200">📥 مصدر النص: الجلسة الحالية</div>
+                  <div class="space-y-1">
+                    <div class="flex flex-wrap items-center gap-2">
+                      <span class="font-bold text-emerald-200">📥 مصدر النص: الجلسة الحالية</span>
+                      <select id="selTafrighTextSource" class="px-2 py-1 rounded-lg bg-slate-950 border border-slate-700 text-emerald-200 font-semibold" title="ما يُرسل إلى النموذج">
+                        <option value="raw_findings">النص + المقتبسات كجمل مستقلة (الافتراضي)</option>
+                        <option value="corrected">النص مع تصحيح المقتبسات من مصادرها (كما في العرض)</option>
+                        <option value="raw">النص الخام فقط (بدون مقتبسات)</option>
+                      </select>
+                    </div>
                     <div id="lblTafrighSourceInfo" class="text-[11px] text-slate-400"></div>
                   </div>
                   <div class="flex items-center gap-1.5">
@@ -596,16 +571,19 @@
                   </div>
                 </div>
 
-                <!-- Where Gemini calls go (split points + typo fixes in JEV/Laya mode, everything in Gemini mode) -->
-                <div class="rounded-xl border border-slate-800 bg-slate-950/60 px-3 py-2.5 text-xs flex flex-wrap items-center gap-2">
-                  <label for="selTafrighGeminiRoute" class="font-bold text-slate-300">طلبات Gemini (التقسيم والتصحيح):</label>
-                  <select id="selTafrighGeminiRoute" class="px-2 py-1 rounded-lg bg-slate-950 border border-slate-700 text-slate-100 font-semibold">
-                    <option value="openrouter:google/gemini-3.1-flash-lite">عبر OpenRouter — gemini-3.1-flash-lite (موصى به)</option>
-                    <option value="openrouter:google/gemini-2.5-flash-lite">عبر OpenRouter — gemini-2.5-flash-lite (الأرخص)</option>
-                    <option value="openrouter:google/gemini-3.5-flash-lite">عبر OpenRouter — gemini-3.5-flash-lite (الأحدث)</option>
-                    <option value="direct">مباشرة عبر Google بمفتاح Gemini (الخطة المجانية بطيئة)</option>
-                  </select>
-                  <span class="text-[10px] text-slate-500">في وضع JEV يُستدعى Gemini فقط حين يرى JEV أن الجملة تحتاج تقسيماً أو فيها خطأ تفريغ.</span>
+                <!-- JEV / Laya only classify: split points and typo fixes go to this helper model -->
+                <div id="wrapTafrighHelperRoute" class="rounded-xl border border-slate-800 bg-slate-950/60 px-3 py-2.5 text-xs space-y-1.5">
+                  <div class="flex flex-wrap items-center gap-2">
+                    <label for="inpTafrighHelperModel" class="font-bold text-slate-300">نموذج المساعدة (التقسيم والتصحيح):</label>
+                    <div class="relative flex-1 min-w-[220px]">
+                      <input type="search" id="inpTafrighHelperModel" autocomplete="off" placeholder="🔍 ابحث في كل نماذج OpenRouter" dir="ltr"
+                        class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2 py-1 text-slate-100 font-mono text-[11px] focus:outline-none" />
+                      <div id="tafrighHelperModelList" class="hidden absolute top-full left-0 right-0 z-30 model-dropdown-list mt-1 text-xs"></div>
+                    </div>
+                    <label class="flex items-center gap-1 text-slate-400"><input type="checkbox" id="chkTafrighHelperDirect" class="accent-amber-500" /> مباشرة عبر Google بمفتاح Gemini</label>
+                  </div>
+                  <div id="lblTafrighHelperModelInfo" class="text-[10px] text-slate-500"></div>
+                  <div class="text-[10px] text-slate-500">حين يكون المصنّف JEV أو Laya يُستدعى هذا النموذج فقط إذا رأى المصنّف أن الجملة تحتاج تقسيماً أو فيها خطأ تفريغ.</div>
                 </div>
 
                 <!-- Segmentation + matn -->
@@ -632,7 +610,7 @@
                 <div id="tafrighSegList" class="max-h-[340px] overflow-y-auto rounded-xl border border-slate-800 divide-y divide-slate-800/70 text-xs"></div>
 
                 <div class="flex justify-end">
-                  <button type="button" id="btnRunTafrighFromEmpty" class="px-5 py-2.5 rounded-xl text-xs font-bold bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-slate-950 shadow-lg shadow-amber-600/25 transition flex items-center gap-2">
+                  <button type="button" id="btnRunTafrighFromEmpty" class="btn btn-primary btn-lg">
                     <span>🚀</span><span id="lblRunTafrigh">تشغيل التفريغ على الجمل المحددة</span>
                   </button>
                 </div>
@@ -692,8 +670,8 @@
                 <!-- Run summary + view tabs -->
                 <div id="tafrighRunSummary" class="flex flex-wrap gap-1.5 text-[11px]"></div>
                 <div class="flex flex-wrap items-center gap-2 border-b border-slate-800 pb-2">
-                  <button type="button" data-tafrigh-view="text" class="tafrigh-view-tab px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-600/25 text-amber-200 border border-amber-500/50">📄 النص المنسق</button>
-                  <button type="button" data-tafrigh-view="details" class="tafrigh-view-tab px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-900 text-slate-300 border border-slate-800" title="مراجعة وسم كل جملة وتعديله">🔍 تفاصيل القرارات وتعديل الوسوم</button>
+                  <button type="button" data-tafrigh-view="text" class="tafrigh-view-tab seg-btn is-active">📄 النص المنسق</button>
+                  <button type="button" data-tafrigh-view="details" class="tafrigh-view-tab seg-btn" title="مراجعة وسم كل جملة وتعديله">🔍 تفاصيل القرارات وتعديل الوسوم</button>
                   <button type="button" id="btnOpenSaveTafrighRun" class="mr-auto px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-600/20 hover:bg-emerald-600/35 text-emerald-300 border border-emerald-500/40 flex items-center gap-1.5" title="حفظ جمل مختارة من هذا التشغيل كبيانات لتدريب Laya">
                     <span>💾</span><span>حفظ التشغيل</span><span id="lblTafrighSavedBadge" class="hidden px-1.5 py-0.5 rounded-md bg-emerald-500/20 font-mono text-[10px]"></span>
                   </button>
@@ -709,56 +687,50 @@
           </div>
         </div>
 
-        <!-- LEFT COLUMN: Sticky Video/Audio Player + Live Styled Caption Overlay -->
+        <!-- Player column: sticky video / audio with the caption overlay -->
         <div id="displayVideoColumn" class="lg:col-span-5 flex flex-col gap-4 lg:sticky lg:top-16">
-          <div class="rounded-2xl bg-slate-900/95 border border-slate-800/90 shadow-xl overflow-hidden p-4 space-y-3.5">
-            <div class="flex items-center justify-between gap-2">
-              <h2 class="text-sm font-bold text-white flex items-center gap-1.5">
-                <span>🎬 المشغل المتزامن وشاشة الكابشن</span>
-              </h2>
-              <label class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 text-[11px] font-bold cursor-pointer transition">
-                📹 ربط فيديو/صوت محلي
+          <div class="panel overflow-hidden">
+            <div class="panel-head">
+              <h2 class="text-sm font-medium text-white">المشغل والكابشن</h2>
+              <label class="btn btn-quiet cursor-pointer">
+                ربط فيديو/صوت محلي
                 <input type="file" id="inpLocalPreviewMediaFile" accept="video/*,audio/*" class="hidden" />
               </label>
             </div>
 
-            <!-- Video Stage with Custom Styled Caption Overlay -->
-            <div class="video-stage-container min-h-[260px] flex flex-col items-center justify-center">
-              <video id="wahyVideoPlayer" controls class="hidden w-full max-h-[340px] bg-black"></video>
+            <div class="p-3 space-y-3">
+              <div class="video-stage-container min-h-[260px] flex flex-col items-center justify-center">
+                <video id="wahyVideoPlayer" controls class="hidden w-full max-h-[340px] bg-black"></video>
 
-              <!-- Interactive Stage Banner when playing in Text/Simulated Timer mode -->
-              <div id="videoPlaceholderBanner" class="p-6 text-center space-y-2.5">
-                <div class="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xl font-bold">
-                  ﴿﴾
+                <div id="videoPlaceholderBanner" class="p-6 text-center space-y-2">
+                  <div class="brand-mark text-white/40 text-3xl" aria-hidden="true">﴿﴾</div>
+                  <div class="text-xs font-medium text-slate-200">المعاينة الحية للكابشن المتزامن</div>
+                  <p class="text-[11px] text-slate-400 max-w-sm mx-auto leading-relaxed">
+                    اضغط تشغيل بالأسفل أو انقر على أي كلمة في المحاضرة لمشاهدة تزامن الكلمات وظهور الآيات والأحاديث والأذكار كاملة دون انقسام.
+                  </p>
                 </div>
-                <div class="text-xs font-bold text-slate-200">المعاينة الحية للكابشن الملون المتزامن</div>
-                <p class="text-[11px] text-slate-400 max-w-sm mx-auto leading-relaxed">
-                  اضغط تشغيل بالأسفل أو انقر على أي كلمة في المحاضرة لمشاهدة تزامن الكلمات وظهور الآيات والأحاديث والأذكار كاملة دون انقسام.
-                </p>
+
+                <div id="videoCaptionOverlay" class="video-caption-overlay">
+                  <div id="videoCaptionOverlayBox" class="overlay-caption-box opacity-0"></div>
+                </div>
               </div>
 
-              <!-- Custom Styled Caption Overlay rendered over the bottom of the player -->
-              <div id="videoCaptionOverlay" class="video-caption-overlay">
-                <div id="videoCaptionOverlayBox" class="overlay-caption-box opacity-0"></div>
+              <!-- Transport -->
+              <div class="flex flex-wrap items-center gap-2" dir="ltr">
+                <button type="button" id="btnTogglePlayPause" class="btn btn-primary shrink-0" dir="rtl">
+                  <span id="btnSimulatedPlayLabel">▶ تشغيل المتابعة</span>
+                </button>
+                <button type="button" id="btnPlayerBack5s" class="btn btn-quiet px-2" title="رجوع 5 ثوانٍ">-5s</button>
+                <input type="range" id="playerTimelineSlider" min="0" max="100" step="0.1" value="0"
+                  class="flex-1 min-w-[6rem] cursor-pointer" />
+                <button type="button" id="btnPlayerForward5s" class="btn btn-quiet px-2" title="تقديم 5 ثوانٍ">+5s</button>
+                <span id="playerCurrentTimeLabel" class="text-xs text-slate-300 shrink-0">00:00.00 / 00:00.00</span>
               </div>
-            </div>
 
-            <!-- Synchronized Playhead Transport Bar -->
-            <div class="rounded-xl bg-slate-950 border border-slate-800 px-3 py-2.5 flex flex-wrap items-center gap-2.5" dir="ltr">
-              <button type="button" id="btnTogglePlayPause" class="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition shrink-0" dir="rtl">
-                <span id="btnSimulatedPlayLabel">▶ تشغيل المتابعة</span>
-              </button>
-              <button type="button" id="btnPlayerBack5s" class="px-2 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 font-mono text-[11px]" title="رجوع 5 ثوانٍ">-5s</button>
-              <input type="range" id="playerTimelineSlider" min="0" max="100" step="0.1" value="0"
-                class="flex-1 accent-emerald-500 cursor-pointer" />
-              <button type="button" id="btnPlayerForward5s" class="px-2 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 font-mono text-[11px]" title="تقديم 5 ثوانٍ">+5s</button>
-              <span id="playerCurrentTimeLabel" class="font-mono text-xs text-sky-300 shrink-0">00:00.00 / 00:00.00</span>
-            </div>
-
-            <!-- Compact Status Bar -->
-            <div class="rounded-xl bg-slate-950/60 border border-slate-800/80 px-3.5 py-2 flex items-center justify-between gap-2 text-[11px] text-slate-400">
-              <span class="text-slate-400">المزامنة اللحظية والتحكم الصوتي جاهز.</span>
-              <button type="button" id="btnQuickGoToInput" class="text-emerald-400 hover:underline font-semibold shrink-0">تغيير المدخلات ←</button>
+              <div class="flex items-center justify-between gap-2 text-[11px] text-slate-400 pt-1">
+                <span>المزامنة اللحظية والتحكم الصوتي جاهز.</span>
+                <button type="button" id="btnQuickGoToInput" class="text-slate-200 hover:underline shrink-0">تغيير المدخلات</button>
+              </div>
             </div>
           </div>
         </div>
@@ -772,45 +744,48 @@
     <!-- =================================================================== -->
     <section id="section_editor" class="hidden space-y-4">
 
-      <!-- Smart Editor Top Bar: Sub-Mode Tabs + Sticky Non-Intrusive Mini Audio Bar -->
-      <div class="rounded-2xl bg-slate-900/95 border border-slate-800 px-4 py-3 flex flex-wrap items-center justify-between gap-3">
-        <!-- 3 Editor Sub-Modes -->
-        <div class="flex flex-wrap items-center gap-2">
-          <button type="button" id="btnEditorSubMode_fn_studio" class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-emerald-600 text-white shadow-sm border border-emerald-400/60 transition flex items-center gap-1.5">
-            <span>➕ تحديد المقتبسات و FN Studio</span>
+      <!-- Editor bar: what to edit, how the text is shown, a small player -->
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div class="seg" role="tablist" aria-label="وضع التحرير">
+          <button type="button" id="btnEditorSubMode_fn_studio" class="seg-btn is-active">
+            <span>المقتبسات و FN Studio</span>
           </button>
-          <button type="button" id="btnEditorSubMode_text_edit" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 transition flex items-center gap-1.5">
-            <span>📝 تحرير النص الكامل</span>
+          <button type="button" id="btnEditorSubMode_text_edit" class="seg-btn">
+            <span>النص الكامل</span>
           </button>
-          <button type="button" id="btnEditorSubMode_captions_edit" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 transition flex items-center gap-1.5">
-            <span>⏱️ محرر مقاطع الكابشن والتوقيت</span>
+          <button type="button" id="btnEditorSubMode_captions_edit" class="seg-btn">
+            <span>الكابشن والتوقيت</span>
           </button>
         </div>
 
-        <!-- Playback Sync & View Toggles + Mini Audio Control Bar -->
         <div class="flex flex-wrap items-center gap-2">
-          <button type="button" id="btnToggleEditorSyncPlayback" class="px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 border border-emerald-500/40 bg-emerald-950/40 text-emerald-300" title="عند التفعيل: النقر على أي كلمة يقفز بالفيديو لتوقيتها، ويستأنف التشغيل إذا كان الفيديو يعمل">
-            <span id="editorSyncIcon">🔗</span>
-            <span id="editorSyncLabel">مزامنة الفيديو مع المؤشر: مفعّلة</span>
-          </button>
-          <button type="button" id="btnEditorToggleRasmQiyasi" class="px-2.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-700 transition flex items-center gap-1" title="معاينة المقتبسات بالرسم القياسي / العثماني">
-            <span>✨</span>
-            <span id="lblEditorRasmQiyasi">الرسم القياسي</span>
-          </button>
-          <button type="button" id="btnEditorToggleFullMatn" class="px-2.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-700 transition flex items-center gap-1" title="عرض المتن كاملاً من المصدر بدل المقطع المنطوق فقط">
-            <span>📜</span>
-            <span id="lblEditorFullMatn">المتن كاملاً</span>
-          </button>
-          <div class="flex items-center gap-1.5 bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1 text-xs" dir="ltr">
-            <button type="button" id="btnEditorMiniPlayPause" class="px-2.5 py-0.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[11px]" dir="rtl">
+          <div class="flex items-center gap-1 text-xs" dir="ltr">
+            <button type="button" id="btnEditorMiniPlayPause" class="btn btn-primary" dir="rtl">
               <span id="btnEditorMiniPlayLabel">▶ استماع</span>
             </button>
-            <button type="button" id="btnEditorMiniBack2s" class="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 font-mono text-[11px]">-2s</button>
-            <button type="button" id="btnEditorMiniForward2s" class="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 font-mono text-[11px]">+2s</button>
-            <span id="editorMiniTimeLabel" class="font-mono text-[11px] text-sky-300 px-1">00:00.00 / 00:00.00</span>
+            <button type="button" id="btnEditorMiniBack2s" class="btn btn-quiet px-2">-2s</button>
+            <button type="button" id="btnEditorMiniForward2s" class="btn btn-quiet px-2">+2s</button>
+            <span id="editorMiniTimeLabel" class="text-[11px] text-slate-300 px-1">00:00.00 / 00:00.00</span>
           </div>
-          <button type="button" id="btnQuickGoToDisplayFromEditor" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold transition">
-            🎬 العودة لشاشة العرض
+
+          <details class="menu">
+            <summary class="btn" title="طريقة عرض النص أثناء التحرير">عرض <span aria-hidden="true">⌄</span></summary>
+            <div class="menu-panel">
+              <button type="button" id="btnToggleEditorSyncPlayback" class="menu-item menu-check btn-playback-sync-active" data-keep-open title="عند التفعيل: النقر على أي كلمة يقفز بالفيديو لتوقيتها، ويستأنف التشغيل إذا كان الفيديو يعمل">
+                <span id="editorSyncIcon" class="hidden">🔗</span>
+                <span id="editorSyncLabel">مزامنة الفيديو مع المؤشر: مفعّلة</span>
+              </button>
+              <button type="button" id="btnEditorToggleRasmQiyasi" class="menu-item menu-check" data-keep-open title="معاينة المقتبسات بالرسم القياسي / العثماني">
+                <span id="lblEditorRasmQiyasi">الرسم القياسي</span>
+              </button>
+              <button type="button" id="btnEditorToggleFullMatn" class="menu-item menu-check" data-keep-open title="عرض المتن كاملاً من المصدر بدل المقطع المنطوق فقط">
+                <span id="lblEditorFullMatn">المتن كاملاً</span>
+              </button>
+            </div>
+          </details>
+
+          <button type="button" id="btnQuickGoToDisplayFromEditor" class="btn btn-quiet">
+            العودة لشاشة العرض
           </button>
         </div>
       </div>
@@ -843,11 +818,11 @@
         <div class="lg:col-span-5 flex flex-col gap-3 lg:sticky lg:top-16">
 
           <!-- Dock Switcher: FN Studio vs Finding Inspector -->
-          <div class="rounded-2xl bg-slate-950/90 border border-slate-800 p-1.5 flex items-center gap-1.5">
-            <button type="button" id="btnDockTabFnStudio" class="flex-1 px-3 py-2 rounded-xl text-xs font-bold bg-emerald-600/25 text-emerald-300 border border-emerald-500/40 flex items-center justify-center gap-1.5 shadow-sm transition">
+          <div class="seg w-full">
+            <button type="button" id="btnDockTabFnStudio" class="seg-btn is-active flex-1 justify-center">
               <span>➕ إضافة مفقود (FN Studio)</span>
             </button>
-            <button type="button" id="btnDockTabInspector" class="flex-1 px-3 py-2 rounded-xl text-xs font-semibold bg-slate-900 hover:bg-slate-800 text-slate-400 border border-slate-800 flex items-center justify-center gap-1.5 transition">
+            <button type="button" id="btnDockTabInspector" class="seg-btn flex-1 justify-center">
               <span>🔍 فحص وتعديل المقتبس المحدد</span>
             </button>
           </div>
@@ -2062,18 +2037,19 @@
   <!-- ===================================================================== -->
   <!-- APPLICATION SCRIPTS (Strict Execution Order: Error Trap First!)       -->
   <!-- ===================================================================== -->
-  <script defer src="js/error-handler.js?v=1792529851"></script>
-  <script defer src="js/state.js?v=1792529851"></script>
-  <script defer src="js/corpus-loader.js?v=1792529851"></script>
-  <script defer src="js/hadith-corpus.js?v=1792529851"></script>
-  <script defer src="js/engine.js?v=1792529851"></script>
-  <script defer src="js/engine_v4.js?v=1792529851"></script>
-  <script defer src="js/caption-builder.js?v=1792529851"></script>
-  <script defer src="js/ai-verifier.js?v=1792529851"></script>
-  <script defer src="js/editor.js?v=1792529851"></script>
-  <script defer src="js/render.js?v=1792529851"></script>
-  <script defer src="js/ai-request-options.js?v=1792529851"></script>
-  <script defer src="js/events.js?v=1792529851"></script>
+  <script defer src="js/error-handler.js?v=1792632000"></script>
+  <script defer src="js/state.js?v=1792632000"></script>
+  <script defer src="js/corpus-loader.js?v=1792632000"></script>
+  <script defer src="js/hadith-corpus.js?v=1792632000"></script>
+  <script defer src="js/engine.js?v=1792632000"></script>
+  <script defer src="js/engine_v4.js?v=1792632000"></script>
+  <script defer src="js/caption-builder.js?v=1792632000"></script>
+  <script defer src="js/ai-verifier.js?v=1792632000"></script>
+  <script defer src="js/editor.js?v=1792632000"></script>
+  <script defer src="js/render.js?v=1792632000"></script>
+  <script defer src="js/ai-request-options.js?v=1792632000"></script>
+  <script defer src="js/events.js?v=1792632000"></script>
+  <script defer src="js/ui-menus.js?v=1792632000"></script>
 
   <!-- Diagnostic Error Fallback Elements -->
   <div class="hidden" style="display:none">
