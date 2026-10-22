@@ -5,8 +5,8 @@
 // =============================================================================
 
 window.WAHY_I18N_EN = {
-  "واحي ستوديو (Wahy Studio) — التفريغ الذكي للمحاضرات واكتشاف الآيات والأحاديث والأذكار": "Wahy Studio — Smart Lecture Transcription & Detection of Verses, Hadith and Adhkar",
-  "واحي ستوديو": "Wahy Studio",
+  "مكتشف الوحيين (Wahy Studio) — التفريغ الذكي للمحاضرات واكتشاف الآيات والأحاديث والأذكار": "Wahy Studio — Smart Lecture Transcription & Detection of Verses, Hadith and Adhkar",
+  "مكتشف الوحيين": "Wahy Studio",
   "جاهز": "Ready",
   "الإدخال والتفريغ": "Input & Transcription",
   "العرض والمتابعة": "Display & Follow-along",
