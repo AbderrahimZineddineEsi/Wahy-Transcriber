@@ -1,0 +1,22 @@
+{
+  "run_id": "run_6a070c14b78f",
+  "processing_mode": "per_sentence",
+  "window_size": 20,
+  "model_candidate": "jev_hybrid",
+  "jev_layout": "independent_questions",
+  "jev_execution_order": "parallel",
+  "typo_strategy": "gated",
+  "use_detection_boundaries": true,
+  "num_segments": 24,
+  "target_range": [
+    0,
+    23
+  ],
+  "cancelled": false,
+  "adapter_mode": "live",
+  "model_name": "auto",
+  "gemini_route": "openrouter:google/gemini-3.5-flash-lite",
+  "wall_clock_seconds": 38.83,
+  "run_dir": "runs/20261021_183223_١٩ شرح حديث احفظ الله يحفظك عبد السلام ا_default",
+  "completed_at": "2026-10-21T18:33:01.879670+00:00"
+}

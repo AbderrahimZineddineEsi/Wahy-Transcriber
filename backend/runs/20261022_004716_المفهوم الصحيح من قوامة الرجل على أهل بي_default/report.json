@@ -1,0 +1,29 @@
+{
+  "run_id": "run_d37a929ec292",
+  "lecture_slug": "المفهوم الصحيح من قوامة الرجل على أهل بي",
+  "label": "default",
+  "total_requests": 8,
+  "total_input_tokens": 0,
+  "total_output_tokens": 0,
+  "total_cached_tokens": 0,
+  "total_cost_usd": 0.002971,
+  "wall_clock_seconds": 26.01,
+  "cost_per_100_sentences_usd": 0.0371,
+  "time_per_100_sentences_sec": 325.12,
+  "failure_rate": 0.0,
+  "retry_rate": 0.0,
+  "fallback_rate": 0.0,
+  "latency_by_purpose_ms": {
+    "classify": {
+      "p50": 3159.01,
+      "p95": 4679.24,
+      "max": 4679.24
+    }
+  },
+  "structural_tag_distribution": {
+    "paragraph": 4,
+    "continuation": 4
+  },
+  "review_flag_counts": {},
+  "evaluation_metrics": null
+}

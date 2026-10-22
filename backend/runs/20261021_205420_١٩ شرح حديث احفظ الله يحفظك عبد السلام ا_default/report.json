@@ -1,0 +1,31 @@
+{
+  "run_id": "run_78160f2fcb05",
+  "lecture_slug": "١٩ شرح حديث احفظ الله يحفظك عبد السلام ا",
+  "label": "default",
+  "total_requests": 26,
+  "total_input_tokens": 0,
+  "total_output_tokens": 0,
+  "total_cached_tokens": 0,
+  "total_cost_usd": 0.012603,
+  "wall_clock_seconds": 168.75,
+  "cost_per_100_sentences_usd": 0.0485,
+  "time_per_100_sentences_sec": 649.04,
+  "failure_rate": 0.0,
+  "retry_rate": 0.0,
+  "fallback_rate": 0.0,
+  "latency_by_purpose_ms": {
+    "classify": {
+      "p50": 4695.49,
+      "p95": 16280.48,
+      "max": 33431.79
+    }
+  },
+  "structural_tag_distribution": {
+    "paragraph": 14,
+    "continuation": 12
+  },
+  "review_flag_counts": {
+    "EDIT_REJECTED": 1
+  },
+  "evaluation_metrics": null
+}
