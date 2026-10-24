@@ -16,3 +16,7 @@ data/corpora/
 .playwright-mcp/
 data/media_cache/
 /runs/
+
+# secrets and generated datasets
+.env
+data/laya_datagen/

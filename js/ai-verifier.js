@@ -1047,12 +1047,21 @@
   // 6. Provider 4: Local Laya Engine (GTX 1050 3GB VRAM)
   // ---------------------------------------------------------------------------
 
+  // Laya is trained without the engine's own score/band (they differ per engine and would become a shortcut);
+  // keep this list in sync with ENGINE_STATE_KEYS in backend/laya_datagen/export.py
+  const LAYA_HIDDEN_STATE_KEYS = ["engine_score", "engine_confidence_band"];
+  function layaState(state) {
+    const s = Object.assign({}, state);
+    LAYA_HIDDEN_STATE_KEYS.forEach(k => delete s[k]);
+    return s;
+  }
+
   function buildLayaPayload(items) {
     if (items.length === 1) {
-      return { state: items[0].envelope.state, questions: items[0].envelope.questions, max_len: 1024 };
+      return { state: layaState(items[0].envelope.state), questions: items[0].envelope.questions, max_len: 1024 };
     }
     return {
-      items: items.map(it => ({ finding_id: findingIdOf(it), state: it.envelope.state, questions: it.envelope.questions })),
+      items: items.map(it => ({ finding_id: findingIdOf(it), state: layaState(it.envelope.state), questions: it.envelope.questions })),
       max_len: 1024
     };
   }
