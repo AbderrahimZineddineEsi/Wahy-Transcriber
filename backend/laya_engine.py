@@ -1,7 +1,8 @@
 """
 Local Laya Engine Integration for Wahy-Transcriber
 Optimized for NVIDIA GTX 1050 (3GB VRAM) and CPU fallback.
-Checkpoint: convaiinnovations/laya-multilingual (mmBERT-base backbone, 322M params)
+Checkpoint: ZenoAbderrahim/laya-wahy-soft_asis (convaiinnovations/laya-multilingual, mmBERT-base, fine-tuned on Wahy's
+laya_v1 data; private Hub repo, needs `hf auth login`). The base checkpoint stays selectable in the AI studio.
 """
 
 import os
@@ -18,7 +19,7 @@ except ImportError:
     torch = None
 
 class LocalLayaVerifier:
-    DEFAULT_CHECKPOINT = "convaiinnovations/laya-multilingual"
+    DEFAULT_CHECKPOINT = "ZenoAbderrahim/laya-wahy-soft_asis"
 
     def __init__(self):
         self.agent = None
@@ -63,6 +64,17 @@ class LocalLayaVerifier:
                 "error": str(e)
             }
 
+    @staticmethod
+    def cuda_supported() -> bool:
+        """True when the installed torch has kernels for GPU 0 (CUDA can be 'available' on a GPU the build dropped)."""
+        if torch is None or not torch.cuda.is_available():
+            return False
+        major, minor = torch.cuda.get_device_capability(0)
+        arches = torch.cuda.get_arch_list()
+        # sm_XY kernels run on the same major with minor >= Y; a compute_XY (PTX) entry also covers newer GPUs
+        return any(a.startswith("sm_") and int(a[3:-1]) == major and int(a[-1]) <= minor or
+                   a.startswith("compute_") and (int(a[8:-1]), int(a[-1])) <= (major, minor) for a in arches)
+
     def load_model(
         self,
         checkpoint_id_or_path: Optional[str] = None,
@@ -85,7 +97,9 @@ class LocalLayaVerifier:
 
         vram = self.get_vram_status()
         use_cuda = False
-        if preferred_device == "cuda" and vram["cuda_available"]:
+        if not self.cuda_supported():
+            pass  # e.g. GTX 1050 (sm_61) with a torch build from sm_75 up: loading works, every forward pass fails
+        elif preferred_device == "cuda" and vram["cuda_available"]:
             use_cuda = True
         elif preferred_device == "auto" and vram["cuda_available"] and vram["free_mb"] >= 850:
             use_cuda = True
@@ -94,10 +108,11 @@ class LocalLayaVerifier:
         target_device = "cuda" if use_cuda else "cpu"
         try:
             self.agent = laya.load(target_ckpt, device=target_device)
-            # Configure max_len=1024 for Arabic context + 256 head budget if cfg is present
+            # A fine-tuned checkpoint keeps the budgets it was trained with (laya_v1: 1024, laya_v2: 2048); the base
+            # checkpoint gets at least 1024 for Arabic context + 256 for the questions
             if hasattr(self.agent, "cfg") and isinstance(self.agent.cfg, dict):
-                self.agent.cfg["max_len"] = 1024
-                self.agent.cfg["head_max_len"] = 256
+                self.agent.cfg["max_len"] = max(1024, int(self.agent.cfg.get("max_len") or 0))
+                self.agent.cfg["head_max_len"] = max(256, int(self.agent.cfg.get("head_max_len") or 0))
             self.device = target_device
             self.loaded_checkpoint = target_ckpt
         except RuntimeError as e:
@@ -124,12 +139,25 @@ class LocalLayaVerifier:
                 if torch is not None and torch.cuda.is_available(): torch.cuda.empty_cache()
         return self.get_status()
 
+    def envelope_info(self) -> Optional[Dict[str, Any]]:
+        """What the loaded checkpoint was trained to read (its rl_agent_config.json): `version` 2 = js/ai-verifier.js
+        buildLayaV2Requests with `options` ({passages, neighbours}); 1 = the canonical v1 envelope (laya_v1, base)."""
+        if self.agent is None:
+            return None
+        cfg = getattr(self.agent, "cfg", None) or {}
+        return {"version": int(cfg.get("wahy_envelope", 1)), "options": cfg.get("wahy_envelope_options") or {},
+                # run 4: the questions it was trained on (None = all of its envelope's); e.g. ["verdict"] for a
+                # verdict-only model, whose boundary the app then takes from the word-overlap rule
+                "questions": cfg.get("wahy_questions"),
+                "max_len": cfg.get("max_len"), "head_max_len": cfg.get("head_max_len")}
+
     def get_status(self) -> Dict[str, Any]:
         vram = self.get_vram_status()
         return {
             "loaded": self.agent is not None,
             "checkpoint": self.loaded_checkpoint or self.DEFAULT_CHECKPOINT,
             "device": self.device,
+            "envelope": self.envelope_info(),
             "vram": vram,
         }
 
@@ -137,13 +165,13 @@ class LocalLayaVerifier:
         self,
         state: dict,
         questions: dict,
-        max_len: int = 1024
+        max_len: Optional[int] = None
     ) -> Dict[str, Any]:
         if self.agent is None:
             self.load_model(self.DEFAULT_CHECKPOINT, preferred_device="auto")
         
         t0 = time.perf_counter()
-        result = self.agent.predict(state, questions, max_len=max_len)
+        result = self.agent.predict(state, questions, max_len=max_len or self.agent.cfg.get("max_len", 1024))
         elapsed_ms = round((time.perf_counter() - t0) * 1000, 2)
         
         raw_answers = result.get("answers", {}) if isinstance(result, dict) else getattr(result, "answers", {})

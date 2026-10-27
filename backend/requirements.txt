@@ -11,6 +11,8 @@ groq>=0.11.0
 yt-dlp>=2024.10.7
 faster-whisper>=1.0.3
 ctranslate2>=4.4.0
+# GTX 1050 is sm_61: the default PyPI torch (cu13x) has no kernels for it. Install the cu126 build:
+#   pip install torch --index-url https://download.pytorch.org/whl/cu126
 torch>=2.2.0
 laya>=0.1.0
 transformers>=4.46.0

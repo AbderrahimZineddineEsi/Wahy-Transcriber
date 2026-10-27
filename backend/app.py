@@ -416,7 +416,7 @@ async def api_laya_load(request: Request) -> Dict[str, Any]:
         body = await request.json()
     except Exception:
         pass
-    checkpoint = body.get("checkpoint") or "convaiinnovations/laya-multilingual"
+    checkpoint = body.get("checkpoint") or laya_verifier.DEFAULT_CHECKPOINT
     preferred_device = body.get("device") or "auto"
     return laya_verifier.load_model(
         checkpoint_id_or_path=checkpoint,
@@ -438,11 +438,12 @@ async def api_laya_predict(request: Request) -> Dict[str, Any]:
     """
     Run local Laya-Multilingual inference.
     Supports either:
-    1. Single envelope: { "state": {...}, "questions": {...}, "max_len": 1024 }
+    1. Single envelope: { "state": {...}, "questions": {...} }
     2. Batched findings: { "items": [ { "finding_id": "...", "state": {...}, "questions": {...} } ] }
+    `max_len` is optional: by default the checkpoint's own (1024 for laya_v1 models, 2048 for laya_v2).
     """
     body = await request.json()
-    max_len = int(body.get("max_len") or 1024)
+    max_len = int(body["max_len"]) if body.get("max_len") else None
 
     # Batch support
     if "items" in body and isinstance(body["items"], list):

@@ -99,7 +99,7 @@ Configure these on the **الذكاء الاصطناعي** (AI & Logs) tab:
 | **Google Gemini** (`gemini-3.5-flash-lite` and others) | Cheap batched verification | Has a free-tier pacer (12–15 RPM), `Retry-After` backoff, and 5–10 quotes per request |
 | **OpenRouter · JEV Decisions** (`typesafe/jev-1.14`) | Calibrated `CORRECT / FALSE / NOT_SURE` probabilities | Uses `/api/alpha/decisions`, about $0.042 per 1M tokens |
 | **OpenRouter · Chat LLMs** | Any of 500+ models (DeepSeek, Qwen, Claude, `:free`…) | Shows live prices and has model search |
-| **Laya (local)** | Offline verification | `convaiinnovations/laya-multilingual`, about 750 MB VRAM in FP16 and about 30 ms per decision. It unloads Whisper to free memory and falls back to CPU when VRAM is low |
+| **Laya (local)** | Offline verification | Default: `ZenoAbderrahim/laya-wahy-soft_asis` (laya-multilingual fine-tuned on Wahy data, private), about 1.5 GB VRAM and under 1 s per decision on a GTX 1050. It unloads Whisper to free memory and falls back to CPU when VRAM is low. The checkpoint's config says which input it was trained on: run-3 models (envelope v2) get consecutive verses as one passage, the nearest findings, and a yes/no "start / end cut off" boundary — see [docs/laya-finetune/envelope-v2.md](docs/laya-finetune/envelope-v2.md) |
 
 Before a verification run starts, the app shows how many quotes it will check, the estimated tokens, cost and time, and lets you untick quotes. Use the verdict filter (✓ accepted · ? unsure · ✕ ordinary speech · ⏳ unverified) to choose what appears in the transcript and captions. Quotes marked as ordinary speech are hidden, but their words are kept as normal text.
 
@@ -118,7 +118,13 @@ transcript ─► segment ─► units of work ─► model adapter (Gemini | JE
 
 ## Fine-tuning Laya
 
-Your corrections and the models' verdicts are saved together, so negative examples (normal speech the model mistook for a quote) are kept for training. Export them from the **بيانات التدريب** (Training Data) tab, then run:
+The Wahy models are trained on Kaggle (2× T4) from labelled lecture findings: how the data is made, every run step by step,
+and how to read the results are in [docs/laya-finetune/](docs/laya-finetune/) (start with
+[kaggle-guide.md](docs/laya-finetune/kaggle-guide.md)); the notebooks are indexed in [notebooks/README.md](notebooks/README.md).
+The data code is `backend/laya_datagen/` (`laya_v2.py` builds the current dataset, `kaggle/` holds the training and
+evaluation scripts).
+
+The older in-app route still works: your corrections and the models' verdicts are saved together, so negative examples (normal speech the model mistook for a quote) are kept for training. Export them from the **بيانات التدريب** (Training Data) tab, then run:
 
 ```bash
 # Train only the decision head on a GTX 1050 (< 1.3 GB VRAM)
@@ -135,7 +141,7 @@ Wahy-Transcriber/
 ├── index.html               # Single-page app: Input, Display, Editor, Corpora, AI, Training tabs
 ├── css/styles.css           # Light/dark themes, Amiri + Readex Pro typography
 ├── js/
-│   ├── engine.js / engine_v4.js   # Quote detection and matching
+│   ├── engine.js / engine_v4.js / engine_v5.js   # Quote detection and matching (v5 = default)
 │   ├── corpus-loader.js           # Loads the Quran, hadith and adhkar corpora
 │   ├── ai-verifier.js             # Gemini, OpenRouter, Laya clients and Laya converter
 │   ├── caption-builder.js         # Atomic SRT/VTT/ASS captions
@@ -151,9 +157,11 @@ Wahy-Transcriber/
 │   ├── laya_engine.py       # Local Laya inference that respects VRAM limits
 │   ├── laya_converter.py    # Audit logs to Laya JSONL
 │   ├── finetune_laya.py     # Head-only and full fine-tuning
+│   ├── laya_datagen/        # Laya training data: lectures, labels, datasets, Kaggle train/eval scripts
 │   ├── tafrigh/             # AI Tafrigh pipeline (adapters, validators, aligner, exporters)
 │   └── tests/               # pytest suite
-├── docs/screenshots/        # README images
+├── notebooks/               # data/ (build + label), kaggle/ (fine-tuning runs), results/ (read a run)
+├── docs/                    # laya-finetune/ (current guides), reports/, plans/, screenshots/
 ├── run.sh / run.bat         # One-command launchers
 └── pytest.ini
 ```

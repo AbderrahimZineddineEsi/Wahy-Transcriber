@@ -250,6 +250,281 @@
   }
 
   // ---------------------------------------------------------------------------
+  // 1a'. Laya envelope v2 (docs/laya-finetune/envelope-v2.md)
+  // Checkpoints trained on laya_v2 carry `wahy_envelope: 2` (+ the options they were trained with) in their
+  // config. The training data is built by THIS code (backend/laya_datagen/js/harness.js -> buildLayaV2Requests),
+  // so the app and the training rows cannot drift apart. Changes vs v1:
+  //   * consecutive verses found back to back are sent as one passage (`passages` option);
+  //   * the engine's nearest other findings are listed, without any verdict (`neighbours` option);
+  //   * lecture fields come before the corpus text (a long hadith used to push the span out of max_len);
+  //   * `current_ayah_text` (a copy of canonical_corpus_text) is gone;
+  //   * the boundary is two yes/no questions (start cut off? end cut off?) with the word-overlap evidence in the state.
+  // ---------------------------------------------------------------------------
+
+  const LAYA_ENVELOPE_V2 = 2;
+  const LAYA_V2 = {
+    contextWords: 25,
+    passageMaxGapWords: 2,       // consecutive verses at most this many words apart are one passage
+    passageMaxVerses: 6,         // a longer run is cut into equal passages of at most this size (splitRun)
+    neighbourMaxGapWords: 40,    // farther findings are not listed
+    neighbourSpanWords: 20,
+    neighbourGapWords: 30,
+    edgeWords: 2                 // corpus words next to the span checked for the boundary evidence (eval_laya.rule_boundary's k)
+  };
+
+  /** {s, a} for a Quran finding ("2:255"-style unitId), else null. */
+  function quranPos(det) {
+    if (!det || !(det.sourceType === "QURAN" || det.type === "ayah")) return null;
+    const parts = String(det.unitId || "").split(":");
+    const s = parseInt(parts[parts.length - 2], 10), a = parseInt(parts[parts.length - 1], 10);
+    return s > 0 && a > 0 ? { s, a } : null;
+  }
+
+  /** A run of n verses -> ceil(n / passageMaxVerses) passages of near-equal size, larger first (7 -> 4 + 3, 13 -> 5 + 4 + 4):
+   *  a fixed-size cut would leave the last verse alone (6 + 1), the very case passages are meant to fix. */
+  function splitRun(run) {
+    const k = Math.ceil(run.length / LAYA_V2.passageMaxVerses);
+    const out = [];
+    let start = 0;
+    for (let i = 0; i < k; i++) {
+      const size = Math.floor(run.length / k) + (i < run.length % k ? 1 : 0);
+      out.push(run.slice(start, start + size));
+      start += size;
+    }
+    return out;
+  }
+
+  /** Detections in transcript order, cut into passages: runs of consecutive verses of one surah found back to back. */
+  function groupLayaPassages(detections, usePassages = true) {
+    const sorted = (detections || [])
+      .filter(d => typeof d.wordStartIdx === "number" && typeof d.wordEndIdx === "number")
+      .slice()
+      .sort((a, b) => a.wordStartIdx - b.wordStartIdx || a.wordEndIdx - b.wordEndIdx);
+    const runs = [];
+    let cur = [];
+    for (const d of sorted) {
+      const prev = cur[cur.length - 1];
+      const p = quranPos(prev), q = quranPos(d);
+      const gap = prev ? d.wordStartIdx - prev.wordEndIdx - 1 : null;
+      if (usePassages && p && q && p.s === q.s && q.a === p.a + 1 && gap >= -1 && gap <= LAYA_V2.passageMaxGapWords) {
+        cur.push(d);
+      } else {
+        if (cur.length) runs.push(cur);
+        cur = [d];
+      }
+    }
+    if (cur.length) runs.push(cur);
+    return runs.flatMap(splitRun);
+  }
+
+  // Arabic word normalisation of eval_laya._norm_words: no diacritics / tatweel, alef forms -> ا, ة -> ه, ى -> ي, letters only
+  function normArabicWords(text) {
+    return String(text || "").split(/\s+/).map(w => w
+      .replace(/[ً-ْٰـ]/g, "")
+      .replace(/[إأآٱ]/g, "ا").replace(/ة/g, "ه").replace(/ى/g, "ي")
+      .replace(/[^ء-ي]/g, "")).filter(Boolean);
+  }
+
+  function levenshtein(a, b) {
+    let prev = Array.from({ length: b.length + 1 }, (_, j) => j);
+    for (let i = 1; i <= a.length; i++) {
+      const cur = [i];
+      for (let j = 1; j <= b.length; j++) {
+        cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+      }
+      prev = cur;
+    }
+    return prev[b.length];
+  }
+
+  // same word allowing ASR spelling errors (words of 3+ letters, >= 75 % alike)
+  function similarArabicWord(a, b) {
+    if (a === b) return true;
+    if (a.length <= 2 || b.length <= 2) return false;
+    return 1 - levenshtein(a, b) / Math.max(a.length, b.length) >= 0.75;
+  }
+
+  /** "n of k": how many of the k corpus words next to the span the speaker said right there (null: nothing to check). */
+  function edgeWordsHeard(corpusWords, transcriptWords, side) {
+    const k = LAYA_V2.edgeWords;
+    const c = normArabicWords(corpusWords), t = normArabicWords(transcriptWords);
+    const corpusEdge = side === "start" ? c.slice(-k) : c.slice(0, k);
+    const window = side === "start" ? t.slice(-(k + 2)) : t.slice(0, k + 2);
+    if (!corpusEdge.length) return null;
+    const heard = corpusEdge.filter(w => window.some(x => similarArabicWord(w, x))).length;
+    return `${heard} of ${corpusEdge.length}`;
+  }
+
+  /** The no-model boundary (eval_laya.rule_boundary): a side is cut off when any of its corpus edge words was heard
+   *  right there. Used for checkpoints not trained on the boundary. {start, end} as 0 / 1. */
+  function boundaryByRule(state) {
+    const heard = (corpus, transcript, side) => {
+      const ev = edgeWordsHeard(corpus, transcript, side);
+      return ev && parseInt(ev, 10) > 0 ? 1 : 0;
+    };
+    return {
+      start: heard(state.unmatched_corpus_prefix_words, state.immediate_transcript_before, "start"),
+      end: heard(state.unmatched_corpus_suffix_words, state.immediate_transcript_after, "end")
+    };
+  }
+
+  function passageReference(group) {
+    const first = group[0], last = group[group.length - 1];
+    const ref = first.displayRef || first.reference || "";
+    const lp = quranPos(last);
+    return group.length > 1 && lp ? ref.replace(/(\d+)\s*$/, `$1-${lp.a}`) : ref;
+  }
+
+  function wordsText(words, from, to) {
+    return (words || []).slice(Math.max(0, from), Math.max(0, to)).map(w => w.word).join(" ");
+  }
+
+  function describeLayaNeighbour(group, nb, direction, words) {
+    const first = group[0], last = group[group.length - 1];
+    const nFirst = nb[0], nLast = nb[nb.length - 1];
+    const gapStart = direction === "previous" ? nLast.wordEndIdx + 1 : last.wordEndIdx + 1;
+    const gapEnd = direction === "previous" ? first.wordStartIdx : nFirst.wordStartIdx;
+    const me = quranPos(direction === "previous" ? first : last);
+    const other = quranPos(direction === "previous" ? nLast : nFirst);
+    const sameSurah = Boolean(me && other && me.s === other.s);
+    return {
+      candidate_reference: passageReference(nb),
+      source_type: nFirst.sourceType || "HADITH",
+      same_reference: nb.some(d => d.unitId && group.some(g => g.unitId === d.unitId)),
+      same_surah: sameSurah,
+      ayah_distance: sameSurah ? (direction === "previous" ? me.a - other.a : other.a - me.a) : null,
+      gap_word_count: Math.max(0, gapEnd - gapStart),
+      gap_transcript_text: clipWords(wordsText(words, gapStart, gapEnd), LAYA_V2.neighbourGapWords),
+      neighbor_span_in_lecture: clipWords(wordsText(words, nFirst.wordStartIdx, nLast.wordEndIdx + 1), LAYA_V2.neighbourSpanWords)
+    };
+  }
+
+  const LAYA_V2_QUESTIONS = {
+    verdict: {
+      type: "choice",
+      instructions:
+        "In this Arabic Islamic lecture transcript, determine whether `matched_span_in_lecture` (surrounded by `context_before` and `context_after`) is an actual quotation/citation of `canonical_corpus_text` (`source_type`), or if it is merely ordinary speaker prose/explanation that happens to share words with the corpus text. " +
+        "When `verses_in_passage` is present, the span is that many consecutive verses the engine found back to back: judge them together. " +
+        "When `neighbor_findings` is present, it lists the engine's nearest other findings before and after this one (unverified: they can be false too), with the words between them.",
+      criteria: {
+        CORRECT:
+          "The speaker is genuinely quoting, reciting, or invoking this Quranic Ayah, Prophetic Hadith, or Dhikr (verbatim or as a direct religious citation in context).",
+        FALSE:
+          "False positive: the words are ordinary conversational speech, fiqh explanation, or narrator/person names that coincidentally overlap with corpus vocabulary without quoting the text.",
+        NOT_SURE:
+          "Ambiguous or partial paraphrase/meaning-only allusion where it is borderline whether the speaker intended a direct quotation."
+      }
+    },
+    start_missing: {
+      type: "noul",
+      instructions:
+        "Was the START of this quote cut off from the detected span? `unmatched_corpus_prefix_words` are the words of the corpus text just before the part that was matched; `immediate_transcript_before` is what the speaker said just before the span; `prefix_words_heard` counts how many of the last corpus words before the span appear there (allowing ASR spelling errors). " +
+        "Answer true only if the speaker actually said words of the quote right before `matched_span_in_lecture`.",
+      criteria: {
+        false: "The span starts where the speaker started quoting: no words of the quote are missing at the start.",
+        true: "Words of `unmatched_corpus_prefix_words` were said right before the span and are missing from its start."
+      }
+    },
+    end_missing: {
+      type: "noul",
+      instructions:
+        "Was the END of this quote cut off from the detected span? `unmatched_corpus_suffix_words` are the words of the corpus text just after the part that was matched; `immediate_transcript_after` is what the speaker said just after the span; `suffix_words_heard` counts how many of the first corpus words after the span appear there (allowing ASR spelling errors). " +
+        "Answer true only if the speaker actually said words of the quote right after `matched_span_in_lecture`.",
+      criteria: {
+        false: "The span ends where the speaker stopped quoting: no words of the quote are missing at the end.",
+        true: "Words of `unmatched_corpus_suffix_words` were said right after the span and are missing from its end."
+      }
+    }
+  };
+
+  /**
+   * The v2 state for one group (a single finding, or a passage of consecutive verses).
+   * `neighbours` = null (option off) or {previous, next} groups (each may be null).
+   */
+  function buildLayaEnvelopeV2(group, words, neighbours = null) {
+    group = Array.isArray(group) ? group : [group];
+    const first = group[0], last = group[group.length - 1];
+    const W = LAYA_V2.contextWords;
+    const sFirst = buildCanonicalDecisionEnvelope(first, words, W).state;
+    const sLast = group.length > 1 ? buildCanonicalDecisionEnvelope(last, words, W).state : sFirst;
+    const sIdx = Math.max(0, first.wordStartIdx);
+    const eIdx = Math.max(sIdx, Math.min((words || []).length - 1, last.wordEndIdx));
+    const span = words && words.length ? wordsText(words, sIdx, eIdx + 1) : sFirst.matched_span_in_lecture;
+
+    const state = {
+      source_type: sFirst.source_type,
+      candidate_reference: passageReference(group),
+      has_citation_cue: group.some(d => Boolean(d.hasCitationCue)),
+      context_before: sFirst.context_before,
+      matched_span_in_lecture: span,
+      context_after: sLast.context_after,
+      immediate_transcript_before: sFirst.immediate_transcript_before,
+      unmatched_corpus_prefix_words: sFirst.unmatched_corpus_prefix_words,
+      prefix_words_heard: edgeWordsHeard(sFirst.unmatched_corpus_prefix_words, sFirst.immediate_transcript_before, "start"),
+      immediate_transcript_after: sLast.immediate_transcript_after,
+      unmatched_corpus_suffix_words: sLast.unmatched_corpus_suffix_words,
+      suffix_words_heard: edgeWordsHeard(sLast.unmatched_corpus_suffix_words, sLast.immediate_transcript_after, "end")
+    };
+    if (group.length > 1) state.verses_in_passage = group.length;
+    if (neighbours) {
+      state.neighbor_findings = {
+        previous: neighbours.previous ? describeLayaNeighbour(group, neighbours.previous, "previous", words) : null,
+        next: neighbours.next ? describeLayaNeighbour(group, neighbours.next, "next", words) : null
+      };
+    }
+    state.canonical_corpus_text = group.length > 1
+      ? group.map(d => d.canonicalText || "").join(" ")
+      : sFirst.canonical_corpus_text;
+    const qFirst = sFirst.quran_neighboring_context, qLast = sLast.quran_neighboring_context;
+    if (qFirst) {
+      state.quran_neighboring_context = {
+        surah: qFirst.surah,
+        ayah: group.length > 1 && qLast ? `${qFirst.ayah}-${qLast.ayah}` : qFirst.ayah,
+        previous_ayah_text: qFirst.previous_ayah_text,
+        next_ayah_text: (qLast || qFirst).next_ayah_text
+      };
+    }
+    return { state, questions: JSON.parse(JSON.stringify(LAYA_V2_QUESTIONS)) };
+  }
+
+  /**
+   * Laya v2 requests for a lecture: [{members, state, questions}], one per group that holds a target.
+   * `detections` = every finding of the engine run (neighbours and passages are found among all of them);
+   * `targets` = the findings to verify (default: all); options = {passages, neighbours} as the checkpoint was trained.
+   */
+  function buildLayaV2Requests(detections, words, options = {}, targets = null) {
+    const groups = groupLayaPassages(detections, options.passages !== false);
+    const want = targets ? new Set(targets) : null;
+    const out = [];
+    groups.forEach((g, i) => {
+      if (want && !g.some(d => want.has(d))) return;
+      let nb = null;
+      if (options.neighbours) {
+        const prev = groups[i - 1], next = groups[i + 1];
+        const gapPrev = prev ? g[0].wordStartIdx - prev[prev.length - 1].wordEndIdx - 1 : Infinity;
+        const gapNext = next ? next[0].wordStartIdx - g[g.length - 1].wordEndIdx - 1 : Infinity;
+        nb = {
+          previous: gapPrev <= LAYA_V2.neighbourMaxGapWords ? prev : null,
+          next: gapNext <= LAYA_V2.neighbourMaxGapWords ? next : null
+        };
+      }
+      out.push(Object.assign({ members: g }, buildLayaEnvelopeV2(g, words, nb)));
+    });
+    return out;
+  }
+
+  /** P(start cut off) / P(end cut off) -> the 4 v1 boundary classes (treated as independent). */
+  function boundaryFromYesNo(pStart, pEnd) {
+    const s = Math.min(1, Math.max(0, pStart || 0)), e = Math.min(1, Math.max(0, pEnd || 0));
+    return {
+      COMPLETE_SPAN: (1 - s) * (1 - e),
+      MISSING_START: s * (1 - e),
+      MISSING_END: (1 - s) * e,
+      MISSING_BOTH: s * e
+    };
+  }
+
+  // ---------------------------------------------------------------------------
   // 1b. User Prompt Configuration (presets, rules, extra instructions)
   // Applied on top of the canonical envelope at request time only; the
   // canonical envelope stays untouched so Laya training records stay stable.
@@ -1056,14 +1331,44 @@
     return s;
   }
 
+  // max_len is left to the backend: the checkpoint's own (laya_v1 models 1024, laya_v2 2048)
   function buildLayaPayload(items) {
     if (items.length === 1) {
-      return { state: layaState(items[0].envelope.state), questions: items[0].envelope.questions, max_len: 1024 };
+      return { state: layaState(items[0].envelope.state), questions: items[0].envelope.questions };
     }
     return {
-      items: items.map(it => ({ finding_id: findingIdOf(it), state: layaState(it.envelope.state), questions: it.envelope.questions })),
-      max_len: 1024
+      items: items.map(it => ({ finding_id: findingIdOf(it), state: layaState(it.envelope.state), questions: it.envelope.questions }))
     };
+  }
+
+  /**
+   * What the Laya checkpoint reads: {version, options} from its config (backend /api/laya/status|load -> envelope).
+   * Loads the selected checkpoint first when none is loaded. version 2 = buildLayaV2Requests, 1 = the canonical envelope.
+   */
+  async function ensureLayaEnvelope() {
+    const ai = currentState.aiVerification;
+    let status = null;
+    try {
+      const r = await fetch("/api/laya/status");
+      if (r.ok) status = await r.json();
+    } catch (_) { /* the load below reports the error */ }
+    if (!status || !status.loaded) {
+      const r = await fetch("/api/laya/load", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ checkpoint: ai.layaCheckpoint, device: ai.layaDevice || "auto" })
+      });
+      if (!r.ok) throw new Error(`تعذر تحميل نموذج Laya (HTTP ${r.status}): ${(await r.text()).slice(0, 300)}`);
+      status = await r.json();
+    }
+    ai.layaEnvelope = status.envelope || { version: 1, options: {} };
+    return ai.layaEnvelope;
+  }
+
+  /** The v2 answers of one response: verdict as before + P(start cut off), P(end cut off). */
+  function readLayaV2Answers(answers) {
+    const yes = q => (typeof answers?.[q]?.noul === "number" ? answers[q].noul : null);
+    return { startMissing: yes("start_missing"), endMissing: yes("end_missing") };
   }
 
   async function callLocalLaya(items) {
@@ -1113,6 +1418,7 @@
         boundary_status: finalBStatus,
         boundary_confidence: bConf,
         boundary_probabilities: bProbs,
+        ...readLayaV2Answers(data.answers),
         reason: `استدلال محلي فائق السرعة عبر Laya-Multilingual (${data.device || "GPU"}).`
       });
     } else {
@@ -1141,12 +1447,13 @@
           boundary_status: finalBStatus,
           boundary_confidence: bConf,
           boundary_probabilities: bProbs,
+          ...readLayaV2Answers(itemRes.answers),
           reason: `استدلال محلي فائق السرعة عبر Laya-Multilingual (${itemRes.device || "GPU"}).`
         });
       }
     }
 
-    const approxInTokens = items.reduce((acc, it) => acc + (it.envelope.state.canonical_corpus_text.length / 3), 0);
+    const approxInTokens = items.reduce((acc, it) => acc + (String(it.envelope.state.canonical_corpus_text || "").length / 3), 0);
 
     return {
       results: results,
@@ -1287,16 +1594,45 @@
     });
     if (typeof window.renderAllViews === "function") window.renderAllViews();
 
-    const preparedItems = targetDetections.map((det, idx) => ({
-      det: det,
-      index: idx,
-      envelope: buildCanonicalDecisionEnvelope(det, currentState.words, contextWindow)
-    }));
+    // A laya_v2 checkpoint reads passages / neighbours built among ALL findings of the run; one request per group
+    // that holds a target, its answer applied to the targets in it (item.targets).
+    let layaEnvelope = null;
+    if (provider === "local_laya") {
+      try {
+        layaEnvelope = await ensureLayaEnvelope();
+      } catch (e) {
+        targetDetections.forEach(det => { det.aiVerification.status = priorStatus.get(det); });
+        throw e;
+      }
+    }
+    const useLayaV2 = Boolean(layaEnvelope && layaEnvelope.version === LAYA_ENVELOPE_V2);
+    // a checkpoint trained on some questions only (run 4, e.g. verdict-only) is asked only those; a boundary it was
+    // not trained on comes from the word-overlap rule (boundaryByRule)
+    const trainedQ = layaEnvelope && Array.isArray(layaEnvelope.questions) ? new Set(layaEnvelope.questions) : null;
+    const onlyTrained = qs => (trainedQ ? Object.fromEntries(Object.entries(qs).filter(([q]) => trainedQ.has(q))) : qs);
+    const targetSet = new Set(targetDetections);
+    const preparedItems = useLayaV2
+      ? buildLayaV2Requests(currentState.detections, currentState.words, layaEnvelope.options || {}, targetDetections)
+        .map((r, idx) => ({
+          det: r.members[0],
+          index: idx,
+          v2: true,
+          members: r.members,
+          targets: r.members.filter(d => targetSet.has(d)),
+          envelope: { state: r.state, questions: onlyTrained(r.questions) }
+        }))
+      : targetDetections.map((det, idx) => {
+        const env = buildCanonicalDecisionEnvelope(det, currentState.words, contextWindow);
+        if (provider === "local_laya") env.questions = onlyTrained(env.questions);
+        return { det: det, index: idx, envelope: env };
+      });
+    const itemTargets = item => item.targets || [item.det];
+    const countFindings = items => items.reduce((n, it) => n + itemTargets(it).length, 0);
 
     let processedCount = 0;
     let failedCount = 0;
     let fatalErr = null;
-    const totalCount = preparedItems.length;
+    const totalCount = countFindings(preparedItems);
 
     try {
       for (let i = 0; i < preparedItems.length; i += batchSize) {
@@ -1309,7 +1645,7 @@
             processed: processedCount,
             total: totalCount,
             status: "running",
-            message: `جاري تدقيق المقتبسات (${processedCount + 1} إلى ${Math.min(totalCount, processedCount + currentChunk.length)} من ${totalCount})...`
+            message: `جاري تدقيق المقتبسات (${processedCount + 1} إلى ${Math.min(totalCount, processedCount + countFindings(currentChunk))} من ${totalCount})...`
           });
         }
 
@@ -1350,25 +1686,45 @@
         const reqId = `req_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
 
         if (chunkStatus === "SUCCESS" && providerResult) {
+          const chunkFindings = countFindings(currentChunk);
           currentChunk.forEach(item => {
             const findingId = item.det.id || item.det._uniqueKey || `f_${item.index}`;
             const evalResult = (providerResult.results || []).find(r => r.finding_id === findingId) || providerResult.results?.[0];
 
-            if (evalResult) {
+            itemTargets(item).forEach(det => {
+              if (!evalResult) {
+                det.aiVerification = { status: "ERROR", verdict: null, reason: "لم ترجع استجابة صالحة لهذا المقتبس." };
+                return;
+              }
               const verdictChoice = (evalResult.verdict || "NOT_SURE").toUpperCase();
               const conf = typeof evalResult.confidence === "number" ? evalResult.confidence : 0.85;
+              const st = item.envelope.state;
 
-              const rawB = evalResult.boundary_status || "COMPLETE_SPAN";
-              const bStatus = normalizeBoundaryVerdict(verdictChoice, rawB, item.envelope.state);
-              const bConf = typeof evalResult.boundary_confidence === "number" ? evalResult.boundary_confidence : 1.0;
-              const bProbs = evalResult.boundary_probabilities || {
+              // v2: P(start cut off) belongs to the passage's first verse, P(end cut off) to its last
+              let bProbs, rawB, startP = null, endP = null;
+              const isFirst = !item.v2 || det === item.members[0];
+              const isLast = !item.v2 || det === item.members[item.members.length - 1];
+              const q = item.envelope.questions;
+              const byRule = provider === "local_laya" && !(q.start_missing || q.end_missing || q.boundary_status);
+              const rule = byRule ? boundaryByRule(st) : null;
+              if (item.v2 || byRule) {
+                startP = isFirst ? (rule ? rule.start : (evalResult.startMissing ?? 0)) : 0;
+                endP = isLast ? (rule ? rule.end : (evalResult.endMissing ?? 0)) : 0;
+                bProbs = boundaryFromYesNo(startP, endP);
+                rawB = Object.keys(bProbs).reduce((a, b) => (bProbs[b] > bProbs[a] ? b : a), "COMPLETE_SPAN");
+              } else {
+                rawB = evalResult.boundary_status || "COMPLETE_SPAN";
+              }
+              const bStatus = normalizeBoundaryVerdict(verdictChoice, rawB, st);
+              const bConf = (item.v2 || byRule) ? bProbs[rawB] : (typeof evalResult.boundary_confidence === "number" ? evalResult.boundary_confidence : 1.0);
+              bProbs = bProbs || evalResult.boundary_probabilities || {
                 COMPLETE_SPAN: bStatus === "COMPLETE_SPAN" ? bConf : (1 - bConf) / 3,
                 MISSING_START: bStatus === "MISSING_START" ? bConf : (1 - bConf) / 3,
                 MISSING_END: bStatus === "MISSING_END" ? bConf : (1 - bConf) / 3,
                 MISSING_BOTH: bStatus === "MISSING_BOTH" ? bConf : (1 - bConf) / 3
               };
 
-              item.det.aiVerification = {
+              det.aiVerification = {
                 status: "VERIFIED",
                 verdict: verdictChoice,
                 confidence: conf,
@@ -1376,8 +1732,15 @@
                 boundaryStatus: bStatus,
                 boundaryConfidence: bConf,
                 boundaryProbabilities: bProbs,
-                unmatchedPrefixPreview: item.envelope.state.unmatched_corpus_prefix_words || "",
-                unmatchedSuffixPreview: item.envelope.state.unmatched_corpus_suffix_words || "",
+                boundaryStartMissingP: startP,     // v2 / rule: the raw yes/no answers (for auto-heal)
+                boundarySource: byRule ? "rule" : "model",
+                boundaryEndMissingP: endP,
+                layaEnvelope: item.v2 ? LAYA_ENVELOPE_V2 : undefined,
+                passage: item.v2 && item.members.length > 1
+                  ? { reference: passageReference(item.members), verses: item.members.length, position: isFirst ? "first" : isLast ? "last" : "inner" }
+                  : null,
+                unmatchedPrefixPreview: isFirst ? (st.unmatched_corpus_prefix_words || "") : "",
+                unmatchedSuffixPreview: isLast ? (st.unmatched_corpus_suffix_words || "") : "",
                 mergeSuggestion: getPromptConfig().rules.suggestMerges && providerSupportsPrompt(providerResult.provider)
                   ? normalizeMergeSuggestion(evalResult.merge_suggestion, evalResult.merge_confidence, evalResult.merge_gap_type, item.envelope.merge)
                   : null,
@@ -1386,21 +1749,20 @@
                 provider: providerResult.provider,
                 requestId: reqId,
                 latencyMs: providerResult.latencyMs,
-                inputTokens: Math.round(providerResult.inputTokens / currentChunk.length),
-                outputTokens: Math.round(providerResult.outputTokens / currentChunk.length),
-                costUsd: providerResult.costUsd / currentChunk.length,
+                inputTokens: Math.round(providerResult.inputTokens / chunkFindings),
+                outputTokens: Math.round(providerResult.outputTokens / chunkFindings),
+                costUsd: providerResult.costUsd / chunkFindings,
                 humanOverride: false,
                 verifiedAt: new Date().toISOString()
               };
 
-              // Persist into IndexedDB training dataset
-              const layaRec = convertRecordToLayaTrainingEnvelope(item.det, item.envelope, timestampNow);
+              // Persist into IndexedDB training dataset (always the canonical v1 envelope of the finding itself)
+              const env = item.v2 ? buildCanonicalDecisionEnvelope(det, currentState.words, contextWindow) : item.envelope;
+              const layaRec = convertRecordToLayaTrainingEnvelope(det, env, timestampNow);
               if (typeof saveVerificationRecordToDB === "function") {
                 saveVerificationRecordToDB(layaRec).catch(() => {});
               }
-            } else {
-              item.det.aiVerification = { status: "ERROR", verdict: null, reason: "لم ترجع استجابة صالحة لهذا المقتبس." };
-            }
+            });
           });
 
           // Log request telemetry
@@ -1415,9 +1777,9 @@
             timestamp: new Date().toLocaleTimeString((typeof WahyI18n === "object" ? WahyI18n.dateLocale() : "ar-u-nu-latn")),
             model: providerResult.model,
             provider: providerResult.provider,
-            findingsCount: currentChunk.length,
-            findingsSummary: currentChunk.map(c => c.det.displayRef || c.det.canonicalText || c.det.matchedText).join(" | "),
-            verdicts: currentChunk.map(c => c.det.aiVerification?.verdict || "UNKNOWN"),
+            findingsCount: chunkFindings,
+            findingsSummary: currentChunk.map(c => (c.v2 ? passageReference(c.members) : "") || c.det.displayRef || c.det.canonicalText || c.det.matchedText).join(" | "),
+            verdicts: currentChunk.flatMap(c => itemTargets(c).map(d => d.aiVerification?.verdict || "UNKNOWN")),
             latencyMs: providerResult.latencyMs,
             inputTokens: providerResult.inputTokens,
             outputTokens: providerResult.outputTokens,
@@ -1430,11 +1792,13 @@
         } else {
           // Chunk error handling
           currentChunk.forEach(item => {
-            item.det.aiVerification = {
-              status: "ERROR",
-              verdict: null,
-              reason: chunkErrorMsg
-            };
+            itemTargets(item).forEach(det => {
+              det.aiVerification = {
+                status: "ERROR",
+                verdict: null,
+                reason: chunkErrorMsg
+              };
+            });
           });
 
           currentState.aiVerification.requestLogs.unshift({
@@ -1455,8 +1819,8 @@
           });
         }
 
-        processedCount += currentChunk.length;
-        if (chunkStatus !== "SUCCESS") failedCount += currentChunk.length;
+        processedCount += countFindings(currentChunk);
+        if (chunkStatus !== "SUCCESS") failedCount += countFindings(currentChunk);
         updateAiVerificationMetrics();
         if (fatalErr) break;
         if (typeof window.renderAllViews === "function") window.renderAllViews();
@@ -1723,7 +2087,13 @@
       endpoint = "openrouter.ai/api/v1/chat/completions";
     } else {
       model = currentState.aiVerification.layaCheckpoint || "laya-multilingual";
-      payload = buildLayaPayload([item]);
+      const env = currentState.aiVerification.layaEnvelope;
+      if (env && env.version === LAYA_ENVELOPE_V2) {
+        const r = buildLayaV2Requests(currentState.detections, currentState.words, env.options || {}, [det])[0];
+        payload = { state: r.state, questions: r.questions };
+      } else {
+        payload = buildLayaPayload([item]);
+      }
       endpoint = "/api/laya/predict";
     }
     const json = JSON.stringify(payload);
@@ -1732,7 +2102,7 @@
       model,
       endpoint,
       payload,
-      questions: composeRequestEnvelope(item, prov).questions,
+      questions: payload && payload.questions && prov === "local_laya" ? payload.questions : composeRequestEnvelope(item, prov).questions,
       systemPrompt: (prov === "gemini" || prov === "openrouter_chat") ? composeSystemPrompt(prov) : "",
       approxTokens: Math.round(json.length / 3.2)
     };
@@ -1770,6 +2140,13 @@
     PROMPT_PRESETS,
     PROMPT_RULES,
     buildCanonicalDecisionEnvelope,
+    LAYA_ENVELOPE_V2,
+    LAYA_V2,
+    groupLayaPassages,
+    buildLayaEnvelopeV2,
+    buildLayaV2Requests,
+    boundaryFromYesNo,
+    boundaryByRule,
     findNeighborFindings,
     MERGE_MAX_GAP_WORDS,
     callGeminiApi,

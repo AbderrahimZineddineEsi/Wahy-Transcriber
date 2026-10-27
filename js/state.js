@@ -205,7 +205,7 @@ let currentState = {
     openRouterSearchQuery: "",
 
     // Provider 4: Local Laya
-    layaCheckpoint: "convaiinnovations/laya-multilingual",
+    layaCheckpoint: "ZenoAbderrahim/laya-wahy-soft_asis",
     layaDevice: "auto",                   // "auto" | "cuda" | "cpu"
     layaCustomCheckpointPath: "",
     layaBackendReady: false,
@@ -702,10 +702,20 @@ function rebuildMatcher() {
   const activeAdhkar = currentState.adhkarEnabled !== false ? RAW_ADHKAR_DATA : [];
   const activeOutside = currentState.outsideCorpusEnabled !== false ? RAW_OUTSIDE_HADITH_DATA : [];
 
-  // Engine v4 is opt-in: localStorage.wahyEngine = "v4" (or "v3" to switch back). Falls back to v3 if v4 fails to build.
-  let engineChoice = "v3";
-  try { engineChoice = localStorage.getItem("wahyEngine") || "v3"; } catch (e) { /* storage blocked */ }
+  // Engine v5 is the default; localStorage.wahyEngine = "v3" | "v4" | "v5" | "v5:loose" picks another one ("v5:loose" =
+  // v5 with its loose profile, many more borderline findings for Laya to filter). Falls back to v3 if the chosen engine
+  // fails to build.
+  let engineChoice = "v5";
+  try { engineChoice = localStorage.getItem("wahyEngine") || "v5"; } catch (e) { /* storage blocked */ }
   activeMatcher = null;
+  if ((engineChoice === "v5" || engineChoice === "v5:loose") && typeof WahyEngineV5 !== "undefined") {
+    try {
+      const v5Params = Object.assign({}, params, { v5Profile: engineChoice === "v5:loose" ? "loose" : "normal" });
+      activeMatcher = new WahyEngineV5(RAW_QURAN_DATA, RAW_HADITH_DATA, v5Params, activeAdhkar, activeOutside);
+    } catch (e) {
+      console.error("WahyEngineV5 failed to initialise, falling back to v3", e);
+    }
+  }
   if (engineChoice === "v4" && typeof WahyEngine !== "undefined") {
     try {
       activeMatcher = new WahyEngine(RAW_QURAN_DATA, RAW_HADITH_DATA, params, activeAdhkar, activeOutside);
@@ -731,6 +741,15 @@ function rebuildMatcher() {
   if (navAdhkarBadge) {
     navAdhkarBadge.textContent = String(RAW_ADHKAR_DATA.length);
   }
+}
+
+/* Name of the engine that is actually running ("v3" | "v4" | "v5" | "v5:loose"): rebuildMatcher() falls back to v3 when
+   the chosen engine fails to build, so this can differ from localStorage.wahyEngine. */
+const ENGINE_CHOICES = ["v3", "v4", "v5", "v5:loose"];
+function activeEngineName() {
+  if (typeof WahyEngineV5 !== "undefined" && activeMatcher instanceof WahyEngineV5) return activeMatcher.P.profile === "loose" ? "v5:loose" : "v5";
+  if (typeof WahyEngine !== "undefined" && activeMatcher instanceof WahyEngine) return "v4";
+  return "v3";
 }
 
 function syncRawTextFromWords() {

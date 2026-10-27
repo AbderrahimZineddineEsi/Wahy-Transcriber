@@ -47,10 +47,10 @@
       };
     })();
   </script>
-  <link rel="stylesheet" href="css/styles.css?v=1792632000" />
+  <link rel="stylesheet" href="css/styles.css?v=1792920000" />
   <!-- Interface language layer: loaded in <head> (not deferred) so the page direction is set before first paint -->
-  <script src="js/i18n-en.js?v=1792632000"></script>
-  <script src="js/i18n.js?v=1792632000"></script>
+  <script src="js/i18n-en.js?v=1792920000"></script>
+  <script src="js/i18n.js?v=1792920000"></script>
 </head>
 
 <body class="min-h-screen flex flex-col bg-slate-950 text-slate-100 antialiased">
@@ -301,8 +301,10 @@
               <label class="menu-row">
                 <span>إصدار المحرك</span>
                 <select id="selEngineVersionQuick" class="field" title="محرك الكشف">
-                  <option value="v3">v3</option>
+                  <option value="v5">v5</option>
+                  <option value="v5:loose">v5:loose</option>
                   <option value="v4">v4</option>
+                  <option value="v3">v3</option>
                 </select>
               </label>
               <label class="menu-row">
@@ -564,8 +566,10 @@
                   </div>
                   <div class="flex items-center gap-1.5">
                     <select id="selTafrighEngine" class="px-2 py-1 rounded-lg bg-slate-950 border border-slate-700 text-emerald-300 font-bold" title="محرك الكشف">
-                      <option value="v3">v3</option>
+                      <option value="v5">v5</option>
+                      <option value="v5:loose">v5:loose</option>
                       <option value="v4">v4</option>
+                      <option value="v3">v3</option>
                     </select>
                     <button type="button" id="btnTafrighRerunEngine" class="px-2.5 py-1 rounded-lg bg-sky-600/20 hover:bg-sky-600/35 text-sky-300 border border-sky-500/40 font-bold" title="إعادة اكتشاف الآيات والأحاديث بالمحرك المختار قبل التفريغ (تُستبدل تعديلات المقتبسات اليدوية، ويمكن التراجع)">🔄 إعادة تشغيل المحرك أولاً</button>
                   </div>
@@ -1310,14 +1314,15 @@
               </div>
               <div class="flex items-center justify-between text-[11px]">
                 <span class="text-slate-400">النموذج المعتمد:</span>
-                <span class="font-mono text-sky-300">laya-multilingual (FP16)</span>
+                <span id="lblLayaCheckpointName" class="font-mono text-sky-300">laya-wahy-soft_asis</span>
               </div>
             </div>
 
             <div class="space-y-1.5 text-xs">
               <label class="text-slate-300 font-medium">مسار أو معرّف النموذج:</label>
               <select id="selLayaCheckpointOption" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-1.5 text-slate-200 text-xs focus:outline-none">
-                <option value="convaiinnovations/laya-multilingual">convaiinnovations/laya-multilingual (الافتراضي للعربية)</option>
+                <option value="ZenoAbderrahim/laya-wahy-soft_asis">ZenoAbderrahim/laya-wahy-soft_asis (المدرّب على وحي، الافتراضي)</option>
+                <option value="convaiinnovations/laya-multilingual">convaiinnovations/laya-multilingual (الأصلي قبل التدريب)</option>
                 <option value="custom">مسار مجلد تدريب محلي (models/laya-wahy-finetuned)...</option>
               </select>
               <input type="text" id="inpLayaCustomPath" placeholder="models/laya-wahy-finetuned"
@@ -1791,8 +1796,10 @@
             <div>
               <label class="block text-[11px] text-slate-400 mb-1">محرك الكشف</label>
               <select id="selEngineVersion" class="w-full rounded-lg bg-slate-900 border border-slate-700 px-2.5 py-1.5 text-xs text-emerald-300">
-                <option value="v3">المحرك v3 (الحالي)</option>
-                <option value="v4">المحرك v4 (تجريبي)</option>
+                <option value="v5">المحرك v5 (الافتراضي)</option>
+                <option value="v5:loose">المحرك v5:loose (مرن، نتائج أكثر لتصفيتها بـ Laya)</option>
+                <option value="v4">المحرك v4</option>
+                <option value="v3">المحرك v3 (القديم)</option>
               </select>
             </div>
             <div>
@@ -2037,19 +2044,20 @@
   <!-- ===================================================================== -->
   <!-- APPLICATION SCRIPTS (Strict Execution Order: Error Trap First!)       -->
   <!-- ===================================================================== -->
-  <script defer src="js/error-handler.js?v=1792632000"></script>
-  <script defer src="js/state.js?v=1792632000"></script>
-  <script defer src="js/corpus-loader.js?v=1792632000"></script>
-  <script defer src="js/hadith-corpus.js?v=1792632000"></script>
-  <script defer src="js/engine.js?v=1792632000"></script>
-  <script defer src="js/engine_v4.js?v=1792632000"></script>
-  <script defer src="js/caption-builder.js?v=1792632000"></script>
-  <script defer src="js/ai-verifier.js?v=1792632000"></script>
-  <script defer src="js/editor.js?v=1792632000"></script>
-  <script defer src="js/render.js?v=1792632000"></script>
-  <script defer src="js/ai-request-options.js?v=1792632000"></script>
-  <script defer src="js/events.js?v=1792632000"></script>
-  <script defer src="js/ui-menus.js?v=1792632000"></script>
+  <script defer src="js/error-handler.js?v=1792920000"></script>
+  <script defer src="js/state.js?v=1792920000"></script>
+  <script defer src="js/corpus-loader.js?v=1792920000"></script>
+  <script defer src="js/hadith-corpus.js?v=1792920000"></script>
+  <script defer src="js/engine.js?v=1792920000"></script>
+  <script defer src="js/engine_v4.js?v=1792920000"></script>
+  <script defer src="js/engine_v5.js?v=1792920000"></script>
+  <script defer src="js/caption-builder.js?v=1792920000"></script>
+  <script defer src="js/ai-verifier.js?v=1792920000"></script>
+  <script defer src="js/editor.js?v=1792920000"></script>
+  <script defer src="js/render.js?v=1792920000"></script>
+  <script defer src="js/ai-request-options.js?v=1792920000"></script>
+  <script defer src="js/events.js?v=1792920000"></script>
+  <script defer src="js/ui-menus.js?v=1792920000"></script>
 
   <!-- Diagnostic Error Fallback Elements -->
   <div class="hidden" style="display:none">

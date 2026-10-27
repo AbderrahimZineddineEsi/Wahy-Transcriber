@@ -880,7 +880,7 @@ function renderFindingInspector() {
         <div class="flex items-center justify-between gap-2 pt-1">
           <button type="button" id="btnInspectorDeepLinkAiLogs" class="w-full px-3 py-1.5 rounded-xl bg-sky-950/40 border border-sky-500/40 text-sky-300 hover:bg-sky-900/60 text-xs font-semibold flex items-center justify-center gap-1.5 transition">
             <span>📊</span>
-            <span>عرض تفاصيل الطلب وسجل الاستجابة الكامل في استوديو AI</span>
+            <span>عرض تفاصيل الطلب والاستجابة (مدخلات ومخرجات Laya)</span>
           </button>
         </div>
 
@@ -1009,7 +1009,9 @@ function renderFindingInspector() {
 
   // Deep Link to AI Logs Tab
   panel.querySelector("#btnInspectorDeepLinkAiLogs")?.addEventListener("click", () => {
-    switchMainSection("ai_logs");
+    // open this finding's request popup directly; the logs tab is only the fallback (logs are not kept across reloads)
+    const log = (currentState.aiVerification.requestLogs || []).find(l => l.id === det.aiVerification?.requestId);
+    if (!openAiPayloadModal(log)) switchMainSection("ai_logs");
   });
 
   // Human Override Buttons
@@ -1866,6 +1868,13 @@ async function checkAndUpdateLayaBackendStatus() {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     currentState.aiVerification.layaBackendReady = true;
+    // the loaded checkpoint, or the one /api/laya/predict will auto-load (the backend default)
+    currentState.aiVerification.layaCheckpoint = data.checkpoint;
+    // what the loaded checkpoint reads (null until loaded): laya_v2 models get passages / yes-no boundary requests
+    currentState.aiVerification.layaEnvelope = data.envelope || null;
+    const ckptLabel = document.getElementById("lblLayaCheckpointName");
+    const env = data.envelope;
+    if (ckptLabel) ckptLabel.textContent = String(data.checkpoint || "").split("/").pop() + (env && env.version >= 2 ? ` · v${env.version}` : "");
 
     if (statusBadge) {
       if (data.loaded) {
@@ -1975,31 +1984,28 @@ function renderAiRequestLogsTable() {
 
   // Bind inspector payload buttons
   tbody.querySelectorAll(".btn-inspect-payload").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const logIdx = parseInt(btn.getAttribute("data-log-idx"), 10);
-      const logItem = logs[logIdx];
-      if (!logItem) return;
-
-      const modal = document.getElementById("aiPayloadModal");
-      const summaryEl = document.getElementById("aiPayloadSummaryText");
-      const reqPre = document.getElementById("preAiPayloadRequest");
-      const respPre = document.getElementById("preAiPayloadResponse");
-
-      if (summaryEl) {
-        summaryEl.textContent = `${logItem.model} • ${logItem.provider} • زمن: ${logItem.latencyMs || 0}ms • تكلفة: $${Number(logItem.costUsd || 0).toFixed(6)}`;
-      }
-      if (reqPre) {
-        reqPre.textContent = JSON.stringify(logItem.requestPayload || {}, null, 2);
-      }
-      if (respPre) {
-        respPre.textContent = JSON.stringify(logItem.rawResponse || {}, null, 2);
-      }
-      if (modal) {
-        modal.classList.remove("hidden");
-        modal.classList.add("flex");
-      }
-    });
+    btn.addEventListener("click", () => openAiPayloadModal(logs[parseInt(btn.getAttribute("data-log-idx"), 10)]));
   });
+}
+
+/* The request / raw-response popup (#aiPayloadModal) for one entry of currentState.aiVerification.requestLogs. */
+function openAiPayloadModal(logItem) {
+  if (!logItem) return false;
+  const modal = document.getElementById("aiPayloadModal");
+  const summaryEl = document.getElementById("aiPayloadSummaryText");
+  const reqPre = document.getElementById("preAiPayloadRequest");
+  const respPre = document.getElementById("preAiPayloadResponse");
+
+  if (summaryEl) {
+    summaryEl.textContent = `${logItem.model} • ${logItem.provider} • زمن: ${logItem.latencyMs || 0}ms • تكلفة: $${Number(logItem.costUsd || 0).toFixed(6)}`;
+  }
+  if (reqPre) reqPre.textContent = JSON.stringify(logItem.requestPayload || {}, null, 2);
+  if (respPre) respPre.textContent = JSON.stringify(logItem.rawResponse || {}, null, 2);
+  if (modal) {
+    modal.classList.remove("hidden");
+    modal.classList.add("flex");
+  }
+  return true;
 }
 
 function renderAiLogsSection() {

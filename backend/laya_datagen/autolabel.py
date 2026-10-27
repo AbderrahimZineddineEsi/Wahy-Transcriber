@@ -53,11 +53,12 @@ def _prompt(batch: List[Dict[str, Any]], bundles: Dict[str, Dict[str, Any]]) -> 
             "for CORRECT / IN_HADITH (otherwise NONE), and a short `reason` in English.")
 
 
-def label_batch(batch: List[Dict[str, Any]], bundles: Dict[str, Dict[str, Any]]) -> Dict[str, Any]:
+def label_batch(batch: List[Dict[str, Any]], bundles: Dict[str, Dict[str, Any]], model: str = MODEL,
+                effort: str = EFFORT) -> Dict[str, Any]:
     RUN_DIR.mkdir(exist_ok=True)
     t0 = time.time()
     try:
-        p = subprocess.run(["claude", "-p", "--model", MODEL, "--effort", EFFORT, "--output-format", "json",
+        p = subprocess.run(["claude", "-p", "--model", model, "--effort", effort, "--output-format", "json",
                             "--no-session-persistence", "--tools", "", "--json-schema", json.dumps(SCHEMA)],
                            input=_prompt(batch, bundles), capture_output=True, text=True, cwd=RUN_DIR, timeout=900)
     except subprocess.TimeoutExpired:
@@ -81,10 +82,13 @@ def label_batch(batch: List[Dict[str, Any]], bundles: Dict[str, Dict[str, Any]])
 
 
 # ---------------------------------------------------------------------------------------------- the run
-def run(pool_: List[Dict[str, Any]], bundles: Dict[str, Dict[str, Any]], n: int, allow_calls: bool) -> None:
-    """Label the next `n` unlabelled findings of the pool, BATCH per call."""
+def run(pool_: List[Dict[str, Any]], bundles: Dict[str, Dict[str, Any]], n: int, allow_calls: bool,
+        store: str = STORE, model: str = MODEL, effort: str = EFFORT) -> None:
+    """Label the next `n` unlabelled findings of the pool, BATCH per call. `store` = the labels file
+    (labels/<store>.json): another one keeps e.g. an engine evaluation apart from the Laya training labels.
+    `model` / `effort` = what `claude -p` runs (saved with every answer)."""
     from . import cards
-    ans = cards.store(STORE)
+    ans = cards.store(store)
     todo = [r for r in pool_ if finding_key(r) not in ans][:n]
     if not todo:
         print("nothing to label: every finding of the pool has an answer")
@@ -97,17 +101,18 @@ def run(pool_: List[Dict[str, Any]], bundles: Dict[str, Dict[str, Any]], n: int,
     for s in range(0, len(todo), BATCH):
         batch = todo[s:s + BATCH]
         try:
-            res = label_batch(batch, bundles)
+            res = label_batch(batch, bundles, model, effort)
         except Stop as e:
             print(f"⏸ stopped after {done} cards: {e}\n   re-run this cell later to continue")
             break
         now = time.time()
         for k, a in res["answers"].items():
-            ans[k] = {"answer": a, "t": now, "model": f"{MODEL}/{EFFORT}"}
-        cards.save_store(STORE)
+            ans[k] = {"answer": a, "t": now, "model": f"{model}/{effort}"}
+        cards.save_store(store)
         with open(log, "a", encoding="utf-8") as f:
             f.write(json.dumps({"t": now, "cards": len(batch), "answered": len(res["answers"]), "seconds": res["seconds"],
-                                "cost_usd": res["cost_usd"], "tokens": res["tokens"], "model": f"{MODEL}/{EFFORT}"}) + "\n")
+                                "cost_usd": res["cost_usd"], "tokens": res["tokens"], "model": f"{model}/{effort}",
+                                "store": store}) + "\n")
         done += len(res["answers"])
         print(f"batch {s // BATCH + 1}/{-(-len(todo) // BATCH)} · {len(res['answers'])}/{len(batch)} answered · "
               f"{res['seconds']:.0f} s · {res['tokens']['output_tokens']:,} tokens out · ≈${res['cost_usd']:.3f}", flush=True)

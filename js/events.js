@@ -901,7 +901,7 @@ window.addEventListener("DOMContentLoaded", () => {
     const el = tfgEl("lblTafrighSourceInfo");
     if (!el) return;
     const by = src.detection_spans.reduce((acc, sp) => { acc[sp.type] = (acc[sp.type] || 0) + 1; return acc; }, {});
-    const engine = typeof WahyEngine !== "undefined" && activeMatcher instanceof WahyEngine ? "v4" : "v3";
+    const engine = activeEngineName();
     const modeNote = {
       raw: "النص الخام كما هو، دون تمييز المقتبسات",
       corrected: "كل مقتبس جملة مستقلة بنصه من المصدر",
@@ -1372,15 +1372,15 @@ window.addEventListener("DOMContentLoaded", () => {
   // Optional: re-detect quotes with the chosen engine before the Tafrigh (replaces manual quote edits; undoable)
   tfgEl("btnTafrighRerunEngine")?.addEventListener("click", async () => {
     if (!(currentState.words || []).length) { showToast("لا يوجد نص لإعادة فحصه بعد"); return; }
-    const choice = tfgEl("selTafrighEngine")?.value === "v4" ? "v4" : "v3";
+    const choice = ENGINE_CHOICES.includes(tfgEl("selTafrighEngine")?.value) ? tfgEl("selTafrighEngine").value : "v5";
     if (!confirm(`إعادة اكتشاف المقتبسات بالمحرك ${choice}؟ ستُستبدل المقتبسات الحالية وتعديلاتك اليدوية عليها (يمكن التراجع).`)) return;
     if (typeof pushUndoSnapshot === "function") pushUndoSnapshot(`إعادة تشغيل المحرك ${choice} قبل التفريغ`);
     try { localStorage.setItem("wahyEngine", choice); } catch (e) { /* storage blocked */ }
     ["selEngineVersion", "selEngineVersionQuick"].forEach(id => { const el = document.getElementById(id); if (el) el.value = choice; });
     rebuildMatcher();
     runDetectionAndBuildCaptions();
-    const isV4 = typeof WahyEngine !== "undefined" && activeMatcher instanceof WahyEngine;
-    showToast(choice === "v4" && !isV4 ? "⚠ تعذّر تشغيل v4، تم استخدام v3" : `🔄 تمت إعادة تشغيل المحرك (${isV4 ? "v4" : "v3"})`);
+    const running = activeEngineName();
+    showToast(running !== choice ? `⚠ تعذّر تشغيل ${choice}، تم استخدام ${running}` : `🔄 تمت إعادة تشغيل المحرك (${running})`);
     await refreshTafrighPreview();
   });
   tfgEl("btnTafrighPause")?.addEventListener("click", async () => {
@@ -1629,27 +1629,28 @@ window.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Engine choice (settings dropdown + toolbar dropdown stay in sync) and one-click re-run on the current transcript
+  // Engine choice (settings dropdown + toolbar dropdown stay in sync). Switching does not touch the current findings:
+  // the new engine applies to the next detection, or now via the re-run button.
   const engineSelects = ["selEngineVersion", "selEngineVersionQuick"].map(id => document.getElementById(id)).filter(Boolean);
-  let savedEngine = "v3";
-  try { savedEngine = localStorage.getItem("wahyEngine") === "v4" ? "v4" : "v3"; } catch (e) { /* storage blocked */ }
-  const applyEngine = (choice, rerun) => {
+  let savedEngine = "v5";
+  try { const s = localStorage.getItem("wahyEngine"); savedEngine = ENGINE_CHOICES.includes(s) ? s : "v5"; } catch (e) { /* storage blocked */ }
+  const applyEngine = (choice) => {
     try { localStorage.setItem("wahyEngine", choice); } catch (e) { /* storage blocked */ }
     engineSelects.forEach(el => { el.value = choice; });
     rebuildMatcher();
-    if (rerun && currentState.rawTranscript) runDetectionAndBuildCaptions();
-    const isV4 = typeof WahyEngine !== "undefined" && activeMatcher instanceof WahyEngine;
-    showToast(choice === "v4" && !isV4 ? "⚠ تعذّر تشغيل v4، تم استخدام v3" : `✓ المحرك الحالي: ${isV4 ? "v4" : "v3"}`);
+    const running = activeEngineName();
+    const hint = currentState.rawTranscript ? " — اضغط «إعادة تشغيل المحرك» لتطبيقه على النص الحالي" : "";
+    showToast(running !== choice ? `⚠ تعذّر تشغيل ${choice}، تم استخدام ${running}` : `✓ المحرك الحالي: ${running}${hint}`);
   };
   engineSelects.forEach(el => {
     el.value = savedEngine;
-    el.addEventListener("change", () => applyEngine(el.value, true));
+    el.addEventListener("change", () => applyEngine(el.value));
   });
   document.getElementById("btnRerunEngine")?.addEventListener("click", () => {
     if (!currentState.rawTranscript) { showToast("لا يوجد نص لإعادة فحصه بعد"); return; }
     rebuildMatcher();
     runDetectionAndBuildCaptions();
-    showToast(`🔄 تمت إعادة تشغيل المحرك (${typeof WahyEngine !== "undefined" && activeMatcher instanceof WahyEngine ? "v4" : "v3"})`);
+    showToast(`🔄 تمت إعادة تشغيل المحرك (${activeEngineName()})`);
   });
 
   document.getElementById("chkToggleAdhkarEngine")?.addEventListener("change", (e) => {
@@ -2288,7 +2289,7 @@ window.addEventListener("DOMContentLoaded", () => {
     document.getElementById("btnLoadLayaEngine")?.addEventListener("click", async () => {
       const isCustom = document.getElementById("selLayaCheckpointOption")?.value === "custom";
       const customPath = document.getElementById("inpLayaCustomPath")?.value?.trim() || "";
-      const ckpt = isCustom && customPath ? customPath : "convaiinnovations/laya-multilingual";
+      const ckpt = isCustom ? customPath : document.getElementById("selLayaCheckpointOption")?.value;
       const dev = document.getElementById("selLayaDeviceChoice")?.value || "auto";
 
       showToast("⏳ جاري تحميل نموذج Laya-Multilingual (3GB Safe)...");
