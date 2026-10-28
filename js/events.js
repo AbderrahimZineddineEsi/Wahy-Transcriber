@@ -323,6 +323,31 @@ async function checkBackendHealthStatus() {
     if (dot) {
       dot.className = "w-2 h-2 rounded-full bg-emerald-400";
     }
+
+    try {
+      const cfgResp = await fetch("/api/env-config", { trapError: false });
+      if (cfgResp.ok) {
+        const envCfg = await cfgResp.json();
+        const keyInp = document.getElementById("inpGroqApiKey");
+        if (keyInp && !keyInp.value && envCfg.groq_api_key) {
+          keyInp.value = envCfg.groq_api_key;
+          currentState.groqApiKey = envCfg.groq_api_key;
+        }
+        if (envCfg.gemini_api_key && !currentState.aiVerification.geminiApiKey) {
+          currentState.aiVerification.geminiApiKey = envCfg.gemini_api_key;
+        }
+        if (envCfg.openrouter_api_key && !currentState.aiVerification.openRouterApiKey) {
+          currentState.aiVerification.openRouterApiKey = envCfg.openrouter_api_key;
+        }
+        if (envCfg.is_colab) {
+          const modSel = document.getElementById("selTranscriptionModel");
+          if (modSel && (!localStorage.getItem(LS_MODEL_KEY) || localStorage.getItem(LS_MODEL_KEY) === "groq-whisper-large-v3-turbo")) {
+            modSel.value = "specialized-whisper-large-v3-ar";
+            currentState.selectedModel = "specialized-whisper-large-v3-ar";
+          }
+        }
+      }
+    } catch (_) {}
   } catch (_) {
     const badge = document.getElementById("backendStatusBadge");
     const dot = document.getElementById("backendStatusDot");

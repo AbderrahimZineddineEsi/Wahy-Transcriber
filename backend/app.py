@@ -50,6 +50,8 @@ from transcriber import (
     get_vram_allocated_mb,
     transcribe_with_groq_chunks,
     transcribe_with_local_faster_whisper,
+    transcribe_with_specialized_whisper,
+    unload_specialized_whisper,
 )
 from progress import clear_control, get_control, get_progress, set_control, set_progress
 from corpus_sources import SOURCES as HADITH_SOURCES, CorpusSourceManager
@@ -186,6 +188,7 @@ async def api_health() -> Dict[str, Any]:
     except Exception:
         pass
 
+    is_colab = bool(os.environ.get("COLAB_GPU") or os.environ.get("COLAB_RELEASE_TAG") or "COLAB_JUPYTER_IP" in os.environ)
     return {
         "status": "ok",
         "version": "2.0.0",
@@ -194,6 +197,19 @@ async def api_health() -> Dict[str, Any]:
         "gpu_device": device_name,
         "vram_allocated_mb": get_vram_allocated_mb(),
         "groq_env_key_configured": bool(os.environ.get("GROQ_API_KEY")),
+        "specialized_whisper_supported": True,
+        "is_colab": is_colab,
+    }
+
+
+@app.get("/api/env-config")
+async def api_env_config() -> Dict[str, Any]:
+    """Expose environment configuration (e.g. from Colab secrets or environment variables)."""
+    return {
+        "groq_api_key": os.environ.get("GROQ_API_KEY", ""),
+        "gemini_api_key": os.environ.get("GEMINI_API_KEY", ""),
+        "openrouter_api_key": os.environ.get("OPENROUTER_API_KEY", ""),
+        "is_colab": bool(os.environ.get("COLAB_GPU") or os.environ.get("COLAB_RELEASE_TAG") or "COLAB_JUPYTER_IP" in os.environ),
     }
 
 
@@ -296,6 +312,32 @@ def api_transcribe(
                 actual_model_used = "local:faster-whisper-small-int8"
             except Exception:
                 raise groq_exc
+
+    elif model_selected == "specialized-whisper-large-v3-ar":
+        try:
+            device = "cuda:0" if torch is not None and torch.cuda.is_available() else "cpu"
+            raw_words = transcribe_with_specialized_whisper(
+                wav_path=wav_path, device=device, on_segment=on_segment
+            )
+            actual_model_used = "local:Abu-Dju/whisper-large-v3-ar"
+        except Exception as spec_exc:
+            if not auto_fallback:
+                raise
+            # Fallback to Groq if key exists, else small
+            if os.environ.get("GROQ_API_KEY") or groq_api_key:
+                chunks = slice_audio_for_groq(mp3_path, duration_sec=duration_sec)
+                raw_words = transcribe_with_groq_chunks(
+                    chunks=chunks,
+                    api_key=groq_api_key or "",
+                    model_name="whisper-large-v3-turbo",
+                    on_chunk_done=on_chunk_done,
+                )
+                actual_model_used = "groq:whisper-large-v3-turbo (Fallback)"
+            else:
+                raw_words = transcribe_with_local_faster_whisper(
+                    wav_path=wav_path, model_size="small", on_segment=on_segment
+                )
+                actual_model_used = "local:faster-whisper-small-int8 (Fallback)"
 
     elif model_selected == "local-turbo-int8":
         try:

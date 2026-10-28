@@ -315,3 +315,137 @@ def transcribe_with_local_faster_whisper(
         if model is not None:
             del model
         cleanup_cuda_vram()
+
+
+_SPECIALIZED_WHISPER_PIPE = None
+
+
+def get_specialized_whisper_pipeline(device: Optional[str] = None):
+    """
+    Load or retrieve cached pipeline for specialized Arabic Quran/Hadith Whisper model:
+    `Abu-Dju/whisper-large-v3-ar` (~2B params, BF16/FP16).
+    Ideal for Google Colab T4 (15GB VRAM) or cloud GPUs with >=6GB VRAM.
+    """
+    global _SPECIALIZED_WHISPER_PIPE
+    if _SPECIALIZED_WHISPER_PIPE is not None:
+        return _SPECIALIZED_WHISPER_PIPE
+
+    if torch is None:
+        raise LocalWhisperError("مكتبة PyTorch غير متوفرة لتشغيل نموذج Whisper المخصص.")
+
+    try:
+        from transformers import AutoModelForSpeechSeq2Seq, AutoProcessor, pipeline  # type: ignore
+    except ImportError:
+        raise LocalWhisperError("مكتبة transformers غير مثبتة. يرجى تشغيل: pip install transformers accelerate")
+
+    dev = device
+    if not dev:
+        dev = "cuda:0" if torch.cuda.is_available() else "cpu"
+
+    dtype = torch.float16 if ("cuda" in dev and torch.cuda.is_available()) else torch.float32
+    model_id = "Abu-Dju/whisper-large-v3-ar"
+
+    try:
+        model = AutoModelForSpeechSeq2Seq.from_pretrained(
+            model_id,
+            torch_dtype=dtype,
+            low_cpu_mem_usage=True,
+            use_safetensors=True,
+        )
+        if "cuda" in dev and torch.cuda.is_available():
+            model.to(dev)
+
+        processor = AutoProcessor.from_pretrained(model_id)
+
+        pipe = pipeline(
+            "automatic-speech-recognition",
+            model=model,
+            tokenizer=processor.tokenizer,
+            feature_extractor=processor.feature_extractor,
+            torch_dtype=dtype,
+            device=dev if torch.cuda.is_available() else "cpu",
+            return_timestamps="word",
+            chunk_length_s=30,
+        )
+        _SPECIALIZED_WHISPER_PIPE = pipe
+        return _SPECIALIZED_WHISPER_PIPE
+    except Exception as exc:
+        err_msg = str(exc).lower()
+        if "out of memory" in err_msg or "cuda" in err_msg:
+            raise CUDAOutOfMemoryError(
+                f"نفدت ذاكرة البطاقة الرسومية (CUDA OOM) أثناء تحميل نموذج Whisper المخصص ({model_id}). "
+                f"هذا النموذج يحتاج ~4GB VRAM ويناسب بيئة Colab T4. التفاصيل: {exc}"
+            ) from exc
+        raise LocalWhisperError(f"تعذر تحميل نموذج Whisper المخصص ({model_id}): {exc}") from exc
+
+
+def unload_specialized_whisper() -> None:
+    """Explicitly unload specialized Whisper from GPU VRAM and run garbage collection."""
+    global _SPECIALIZED_WHISPER_PIPE
+    if _SPECIALIZED_WHISPER_PIPE is not None:
+        del _SPECIALIZED_WHISPER_PIPE
+        _SPECIALIZED_WHISPER_PIPE = None
+    cleanup_cuda_vram()
+
+
+def transcribe_with_specialized_whisper(
+    wav_path: Path,
+    device: Optional[str] = None,
+    on_segment=None,
+) -> List[Dict[str, Any]]:
+    """
+    Transcribe audio with `Abu-Dju/whisper-large-v3-ar` producing word-level timestamps.
+    Automatically handles 30s chunking and stitching.
+    """
+    pipe = get_specialized_whisper_pipeline(device=device)
+
+    try:
+        generate_kwargs = {
+            "language": "arabic",
+            "task": "transcribe",
+        }
+        outputs = pipe(
+            str(wav_path),
+            generate_kwargs=generate_kwargs,
+            return_timestamps="word",
+        )
+
+        extracted_words: List[Dict[str, Any]] = []
+        chunks = outputs.get("chunks", []) if isinstance(outputs, dict) else []
+
+        for c in chunks:
+            w_text = str(c.get("text", "")).strip()
+            if not w_text:
+                continue
+            ts = c.get("timestamp") or (0.0, 0.0)
+            s_start = float(ts[0] if ts[0] is not None else 0.0)
+            s_end = float(ts[1] if ts[1] is not None else s_start + 0.2)
+            if on_segment:
+                on_segment(s_end)
+            extracted_words.append(
+                {
+                    "word": w_text,
+                    "start": round(s_start, 3),
+                    "end": round(max(s_end, s_start + 0.05), 3),
+                }
+            )
+
+        if not extracted_words and isinstance(outputs, dict) and outputs.get("text"):
+            words = str(outputs["text"]).strip().split()
+            for idx, w in enumerate(words):
+                extracted_words.append(
+                    {
+                        "word": w,
+                        "start": round(idx * 0.3, 3),
+                        "end": round((idx + 1) * 0.3, 3),
+                    }
+                )
+
+        return extracted_words
+    except Exception as exc:
+        err_msg = str(exc).lower()
+        if "out of memory" in err_msg or "cuda" in err_msg:
+            raise CUDAOutOfMemoryError(
+                f"نفدت ذاكرة البطاقة الرسومية (CUDA OOM) أثناء تفريغ الصوت بنموذج Whisper المخصص: {exc}"
+            ) from exc
+        raise LocalWhisperError(f"فشل التفريغ بنموذج Whisper المخصص: {exc}") from exc

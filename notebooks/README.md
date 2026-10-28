@@ -24,6 +24,12 @@ Run local notebooks from anywhere inside the repo (they look for `backend/` upwa
 | 5 | [laya_run5_kaggle.ipynb](kaggle/laya_run5_kaggle.ipynb) — passages on v1 envelope (verdict only) | `laya_v2` | [finished/wahy-laya-finetuning-run5.ipynb](kaggle/finished/wahy-laya-finetuning-run5.ipynb) |
 | 6 | [laya_run6_kaggle.ipynb](kaggle/laya_run6_kaggle.ipynb) — envelope v3: clean boundary cues + mixed single & passages | `laya_v2` | [finished/wahy-laya-finetuning-run6-finished.ipynb](kaggle/finished/wahy-laya-finetuning-run6-finished.ipynb) |
 
+## `colab/` — running full app with specialized Whisper + Laya (Google Colab, GPU T4)
+
+| notebook | what it does |
+|---|---|
+| [wahy_colab_runner.ipynb](wahy_colab_runner.ipynb) | Task 2: runs full Wahy app with `Abu-Dju/whisper-large-v3-ar` + `laya-wahy-r6-v3_mixed` + Cloudflare tunnel |
+
 ## `results/` — reading a run's results locally
 
 | notebook | what it does |
