@@ -363,7 +363,6 @@ def get_specialized_whisper_pipeline(device: Optional[str] = None):
             tokenizer=processor.tokenizer,
             feature_extractor=processor.feature_extractor,
             torch_dtype=dtype,
-            device=dev if torch.cuda.is_available() else "cpu",
             return_timestamps="word",
             chunk_length_s=30,
         )
@@ -404,10 +403,12 @@ def transcribe_with_specialized_whisper(
             "language": "arabic",
             "task": "transcribe",
         }
+        batch_size = 8 if (torch is not None and torch.cuda.is_available()) else 1
         outputs = pipe(
             str(wav_path),
             generate_kwargs=generate_kwargs,
             return_timestamps="word",
+            batch_size=batch_size,
         )
 
         extracted_words: List[Dict[str, Any]] = []
