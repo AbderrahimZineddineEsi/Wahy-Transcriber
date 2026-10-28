@@ -80,7 +80,7 @@ notebook = {
                 "if not os.path.exists(REPO_DIR):\n",
                 "    !git clone -b laya-experiments https://github.com/AbderrahimZineddineEsi/Wahy-Transcriber.git {REPO_DIR}\n",
                 "else:\n",
-                "    !cd {REPO_DIR} && git checkout laya-experiments && git pull\n",
+                "    !cd {REPO_DIR} && git fetch origin laya-experiments && git reset --hard origin/laya-experiments\n",
                 "\n",
                 "%cd {REPO_DIR}\n",
                 "if str(REPO_DIR) not in sys.path:\n",
