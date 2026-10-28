@@ -1,8 +1,8 @@
 """
 Local Laya Engine Integration for Wahy-Transcriber
 Optimized for NVIDIA GTX 1050 (3GB VRAM) and CPU fallback.
-Checkpoint: ZenoAbderrahim/laya-wahy-soft_asis (convaiinnovations/laya-multilingual, mmBERT-base, fine-tuned on Wahy's
-laya_v1 data; private Hub repo, needs `hf auth login`). The base checkpoint stays selectable in the AI studio.
+Checkpoint: ZenoAbderrahim/laya-wahy-r6-v3_mixed (convaiinnovations/laya-multilingual, mmBERT-base, fine-tuned on Wahy's
+laya_v2 data with Envelope v3; private Hub repo, needs `hf auth login`). The base checkpoint stays selectable in the AI studio.
 """
 
 import os
@@ -19,7 +19,7 @@ except ImportError:
     torch = None
 
 class LocalLayaVerifier:
-    DEFAULT_CHECKPOINT = "ZenoAbderrahim/laya-wahy-soft_asis"
+    DEFAULT_CHECKPOINT = "ZenoAbderrahim/laya-wahy-r6-v3_mixed"
 
     def __init__(self):
         self.agent = None

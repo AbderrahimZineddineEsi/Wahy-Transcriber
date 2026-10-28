@@ -205,7 +205,7 @@ let currentState = {
     openRouterSearchQuery: "",
 
     // Provider 4: Local Laya
-    layaCheckpoint: "ZenoAbderrahim/laya-wahy-soft_asis",
+    layaCheckpoint: "ZenoAbderrahim/laya-wahy-r6-v3_mixed",
     layaDevice: "auto",                   // "auto" | "cuda" | "cpu"
     layaCustomCheckpointPath: "",
     layaBackendReady: false,

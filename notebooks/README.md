@@ -22,7 +22,7 @@ Run local notebooks from anywhere inside the repo (they look for `backend/` upwa
 | 3 | [laya_v2_ablation_kaggle.ipynb](kaggle/laya_v2_ablation_kaggle.ipynb) — envelope v2: passages / neighbours / yes-no boundary | `laya_v2` | [finished/wahy-finetuning-laya-v2.ipynb](kaggle/finished/wahy-finetuning-laya-v2.ipynb) |
 | 4 | [laya_run4_kaggle.ipynb](kaggle/laya_run4_kaggle.ipynb) — verdict-only / boundary-only / repeat | `laya_v2` (new version) | [finished/wahy-laya-finetuning-run4.ipynb](kaggle/finished/wahy-laya-finetuning-run4.ipynb) |
 | 5 | [laya_run5_kaggle.ipynb](kaggle/laya_run5_kaggle.ipynb) — passages on v1 envelope (verdict only) | `laya_v2` | [finished/wahy-laya-finetuning-run5.ipynb](kaggle/finished/wahy-laya-finetuning-run5.ipynb) |
-| 6 | [laya_run6_kaggle.ipynb](kaggle/laya_run6_kaggle.ipynb) — envelope v3: clean boundary cues + mixed single & passages | `laya_v2` | (ready to run: [wahy-laya-finetuning-run6.ipynb](wahy-laya-finetuning-run6.ipynb)) |
+| 6 | [laya_run6_kaggle.ipynb](kaggle/laya_run6_kaggle.ipynb) — envelope v3: clean boundary cues + mixed single & passages | `laya_v2` | [finished/wahy-laya-finetuning-run6-finished.ipynb](kaggle/finished/wahy-laya-finetuning-run6-finished.ipynb) |
 
 ## `results/` — reading a run's results locally
 

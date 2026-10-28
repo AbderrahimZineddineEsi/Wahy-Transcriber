@@ -262,6 +262,7 @@
   // ---------------------------------------------------------------------------
 
   const LAYA_ENVELOPE_V2 = 2;
+  const LAYA_ENVELOPE_V3 = 3;
   const LAYA_V2 = {
     contextWords: 25,
     passageMaxGapWords: 2,       // consecutive verses at most this many words apart are one passage
@@ -509,6 +510,64 @@
         };
       }
       out.push(Object.assign({ members: g }, buildLayaEnvelopeV2(g, words, nb)));
+    });
+    return out;
+  }
+
+  /**
+   * The v3 state for one group (Envelope v3: corpus text at TOP, clean boundary indicators, NO neighbor_findings).
+   */
+  function buildLayaEnvelopeV3(group, words) {
+    group = Array.isArray(group) ? group : [group];
+    const first = group[0], last = group[group.length - 1];
+    const W = LAYA_V2.contextWords;
+    const sFirst = buildCanonicalDecisionEnvelope(first, words, W).state;
+    const sLast = group.length > 1 ? buildCanonicalDecisionEnvelope(last, words, W).state : sFirst;
+    const sIdx = Math.max(0, first.wordStartIdx);
+    const eIdx = Math.max(sIdx, Math.min((words || []).length - 1, last.wordEndIdx));
+    const span = words && words.length ? wordsText(words, sIdx, eIdx + 1) : sFirst.matched_span_in_lecture;
+
+    const canonical = group.length > 1
+      ? group.map(d => d.canonicalText || "").join(" ")
+      : sFirst.canonical_corpus_text;
+
+    const state = {
+      source_type: sFirst.source_type,
+      candidate_reference: passageReference(group),
+      canonical_corpus_text: canonical, // Golden position: AT TOP!
+      has_citation_cue: group.some(d => Boolean(d.hasCitationCue)),
+      context_before: sFirst.context_before,
+      matched_span_in_lecture: span,
+      context_after: sLast.context_after,
+      immediate_transcript_before: sFirst.immediate_transcript_before,
+      unmatched_corpus_prefix_words: sFirst.unmatched_corpus_prefix_words,
+      prefix_words_heard: edgeWordsHeard(sFirst.unmatched_corpus_prefix_words, sFirst.immediate_transcript_before, "start"),
+      immediate_transcript_after: sLast.immediate_transcript_after,
+      unmatched_corpus_suffix_words: sLast.unmatched_corpus_suffix_words,
+      suffix_words_heard: edgeWordsHeard(sLast.unmatched_corpus_suffix_words, sLast.immediate_transcript_after, "end")
+    };
+    const qFirst = sFirst.quran_neighboring_context, qLast = sLast.quran_neighboring_context;
+    if (qFirst) {
+      state.quran_neighboring_context = {
+        surah: qFirst.surah,
+        ayah: group.length > 1 && qLast ? `${qFirst.ayah}-${qLast.ayah}` : qFirst.ayah,
+        previous_ayah_text: qFirst.previous_ayah_text,
+        next_ayah_text: (qLast || qFirst).next_ayah_text
+      };
+    }
+    return { state, questions: JSON.parse(JSON.stringify(LAYA_V2_QUESTIONS)) };
+  }
+
+  /**
+   * Laya v3 requests for a lecture: [{members, state, questions}], one per group that holds a target.
+   */
+  function buildLayaV3Requests(detections, words, options = {}, targets = null) {
+    const groups = groupLayaPassages(detections, options.passages !== false);
+    const want = targets ? new Set(targets) : null;
+    const out = [];
+    groups.forEach(g => {
+      if (want && !g.some(d => want.has(d))) return;
+      out.push(Object.assign({ members: g }, buildLayaEnvelopeV3(g, words)));
     });
     return out;
   }
@@ -1605,18 +1664,22 @@
         throw e;
       }
     }
+    const useLayaV3 = Boolean(layaEnvelope && layaEnvelope.version === LAYA_ENVELOPE_V3);
     const useLayaV2 = Boolean(layaEnvelope && layaEnvelope.version === LAYA_ENVELOPE_V2);
     // a checkpoint trained on some questions only (run 4, e.g. verdict-only) is asked only those; a boundary it was
     // not trained on comes from the word-overlap rule (boundaryByRule)
     const trainedQ = layaEnvelope && Array.isArray(layaEnvelope.questions) ? new Set(layaEnvelope.questions) : null;
     const onlyTrained = qs => (trainedQ ? Object.fromEntries(Object.entries(qs).filter(([q]) => trainedQ.has(q))) : qs);
     const targetSet = new Set(targetDetections);
-    const preparedItems = useLayaV2
-      ? buildLayaV2Requests(currentState.detections, currentState.words, layaEnvelope.options || {}, targetDetections)
-        .map((r, idx) => ({
+    const preparedItems = (useLayaV3 || useLayaV2)
+      ? (useLayaV3
+          ? buildLayaV3Requests(currentState.detections, currentState.words, layaEnvelope.options || {}, targetDetections)
+          : buildLayaV2Requests(currentState.detections, currentState.words, layaEnvelope.options || {}, targetDetections)
+        ).map((r, idx) => ({
           det: r.members[0],
           index: idx,
-          v2: true,
+          v2: useLayaV2,
+          v3: useLayaV3,
           members: r.members,
           targets: r.members.filter(d => targetSet.has(d)),
           envelope: { state: r.state, questions: onlyTrained(r.questions) }
@@ -1700,14 +1763,14 @@
               const conf = typeof evalResult.confidence === "number" ? evalResult.confidence : 0.85;
               const st = item.envelope.state;
 
-              // v2: P(start cut off) belongs to the passage's first verse, P(end cut off) to its last
+              // v2 / v3: P(start cut off) belongs to the passage's first verse, P(end cut off) to its last
               let bProbs, rawB, startP = null, endP = null;
-              const isFirst = !item.v2 || det === item.members[0];
-              const isLast = !item.v2 || det === item.members[item.members.length - 1];
+              const isFirst = (!item.v2 && !item.v3) || det === item.members[0];
+              const isLast = (!item.v2 && !item.v3) || det === item.members[item.members.length - 1];
               const q = item.envelope.questions;
               const byRule = provider === "local_laya" && !(q.start_missing || q.end_missing || q.boundary_status);
               const rule = byRule ? boundaryByRule(st) : null;
-              if (item.v2 || byRule) {
+              if (item.v2 || item.v3 || byRule) {
                 startP = isFirst ? (rule ? rule.start : (evalResult.startMissing ?? 0)) : 0;
                 endP = isLast ? (rule ? rule.end : (evalResult.endMissing ?? 0)) : 0;
                 bProbs = boundaryFromYesNo(startP, endP);
@@ -1716,7 +1779,7 @@
                 rawB = evalResult.boundary_status || "COMPLETE_SPAN";
               }
               const bStatus = normalizeBoundaryVerdict(verdictChoice, rawB, st);
-              const bConf = (item.v2 || byRule) ? bProbs[rawB] : (typeof evalResult.boundary_confidence === "number" ? evalResult.boundary_confidence : 1.0);
+              const bConf = (item.v2 || item.v3 || byRule) ? bProbs[rawB] : (typeof evalResult.boundary_confidence === "number" ? evalResult.boundary_confidence : 1.0);
               bProbs = bProbs || evalResult.boundary_probabilities || {
                 COMPLETE_SPAN: bStatus === "COMPLETE_SPAN" ? bConf : (1 - bConf) / 3,
                 MISSING_START: bStatus === "MISSING_START" ? bConf : (1 - bConf) / 3,
@@ -1732,11 +1795,11 @@
                 boundaryStatus: bStatus,
                 boundaryConfidence: bConf,
                 boundaryProbabilities: bProbs,
-                boundaryStartMissingP: startP,     // v2 / rule: the raw yes/no answers (for auto-heal)
+                boundaryStartMissingP: startP,     // v2 / v3 / rule: the raw yes/no answers (for auto-heal)
                 boundarySource: byRule ? "rule" : "model",
                 boundaryEndMissingP: endP,
-                layaEnvelope: item.v2 ? LAYA_ENVELOPE_V2 : undefined,
-                passage: item.v2 && item.members.length > 1
+                layaEnvelope: item.v3 ? LAYA_ENVELOPE_V3 : (item.v2 ? LAYA_ENVELOPE_V2 : undefined),
+                passage: (item.v2 || item.v3) && item.members.length > 1
                   ? { reference: passageReference(item.members), verses: item.members.length, position: isFirst ? "first" : isLast ? "last" : "inner" }
                   : null,
                 unmatchedPrefixPreview: isFirst ? (st.unmatched_corpus_prefix_words || "") : "",
@@ -1757,7 +1820,7 @@
               };
 
               // Persist into IndexedDB training dataset (always the canonical v1 envelope of the finding itself)
-              const env = item.v2 ? buildCanonicalDecisionEnvelope(det, currentState.words, contextWindow) : item.envelope;
+              const env = (item.v2 || item.v3) ? buildCanonicalDecisionEnvelope(det, currentState.words, contextWindow) : item.envelope;
               const layaRec = convertRecordToLayaTrainingEnvelope(det, env, timestampNow);
               if (typeof saveVerificationRecordToDB === "function") {
                 saveVerificationRecordToDB(layaRec).catch(() => {});
@@ -1778,7 +1841,7 @@
             model: providerResult.model,
             provider: providerResult.provider,
             findingsCount: chunkFindings,
-            findingsSummary: currentChunk.map(c => (c.v2 ? passageReference(c.members) : "") || c.det.displayRef || c.det.canonicalText || c.det.matchedText).join(" | "),
+            findingsSummary: currentChunk.map(c => ((c.v2 || c.v3) ? passageReference(c.members) : "") || c.det.displayRef || c.det.canonicalText || c.det.matchedText).join(" | "),
             verdicts: currentChunk.flatMap(c => itemTargets(c).map(d => d.aiVerification?.verdict || "UNKNOWN")),
             latencyMs: providerResult.latencyMs,
             inputTokens: providerResult.inputTokens,
@@ -2088,7 +2151,10 @@
     } else {
       model = currentState.aiVerification.layaCheckpoint || "laya-multilingual";
       const env = currentState.aiVerification.layaEnvelope;
-      if (env && env.version === LAYA_ENVELOPE_V2) {
+      if (env && env.version === LAYA_ENVELOPE_V3) {
+        const r = buildLayaV3Requests(currentState.detections, currentState.words, env.options || {}, [det])[0];
+        payload = { state: r.state, questions: r.questions };
+      } else if (env && env.version === LAYA_ENVELOPE_V2) {
         const r = buildLayaV2Requests(currentState.detections, currentState.words, env.options || {}, [det])[0];
         payload = { state: r.state, questions: r.questions };
       } else {
@@ -2141,10 +2207,13 @@
     PROMPT_RULES,
     buildCanonicalDecisionEnvelope,
     LAYA_ENVELOPE_V2,
+    LAYA_ENVELOPE_V3,
     LAYA_V2,
     groupLayaPassages,
     buildLayaEnvelopeV2,
+    buildLayaEnvelopeV3,
     buildLayaV2Requests,
+    buildLayaV3Requests,
     boundaryFromYesNo,
     boundaryByRule,
     findNeighborFindings,
