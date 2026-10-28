@@ -273,12 +273,39 @@
     edgeWords: 2                 // corpus words next to the span checked for the boundary evidence (eval_laya.rule_boundary's k)
   };
 
-  /** {s, a} for a Quran finding ("2:255"-style unitId), else null. */
+  /** {s, a} for a Quran finding ("2:255"-style unitId, or surah/ayah properties), else null. */
   function quranPos(det) {
-    if (!det || !(det.sourceType === "QURAN" || det.type === "ayah")) return null;
+    if (!det) return null;
+    const isQuran = (det.sourceType || "").toUpperCase() === "QURAN" || ["ayah", "quran"].includes(det.type);
+    if (!isQuran) return null;
+    if (typeof det.surah === "number" && typeof det.ayah === "number" && det.surah > 0 && det.ayah > 0) {
+      return { s: det.surah, a: det.ayah };
+    }
     const parts = String(det.unitId || "").split(":");
-    const s = parseInt(parts[parts.length - 2], 10), a = parseInt(parts[parts.length - 1], 10);
-    return s > 0 && a > 0 ? { s, a } : null;
+    if (parts.length >= 2) {
+      const s = parseInt(parts[parts.length - 2], 10);
+      const a = parseInt(parts[parts.length - 1], 10);
+      if (s > 0 && a > 0) return { s, a };
+    }
+    return null;
+  }
+
+  function detWordIndices(d, words) {
+    let s = typeof d.wordStartIdx === "number" ? d.wordStartIdx : (typeof d.tStart === "number" ? d.tStart : null);
+    let e = typeof d.wordEndIdx === "number" ? d.wordEndIdx : (typeof d.tEnd === "number" ? d.tEnd - 1 : null);
+    if ((s === null || e === null) && words && words.length && typeof d.startIndex === "number") {
+      const cStart = d.startIndex;
+      const cEnd = typeof d.endIndex === "number" ? d.endIndex : cStart;
+      s = 0;
+      for (let i = 0; i < words.length; i++) {
+        if (words[i].char_end > cStart) { s = i; break; }
+      }
+      e = s;
+      for (let i = s; i < words.length; i++) {
+        if (words[i].char_start < cEnd) { e = i; } else { break; }
+      }
+    }
+    return { s: Math.max(0, s ?? 0), e: Math.max(0, e ?? 0) };
   }
 
   /** A run of n verses -> ceil(n / passageMaxVerses) passages of near-equal size, larger first (7 -> 4 + 3, 13 -> 5 + 4 + 4):
@@ -297,17 +324,21 @@
 
   /** Detections in transcript order, cut into passages: runs of consecutive verses of one surah found back to back. */
   function groupLayaPassages(detections, usePassages = true) {
-    const sorted = (detections || [])
-      .filter(d => typeof d.wordStartIdx === "number" && typeof d.wordEndIdx === "number")
-      .slice()
-      .sort((a, b) => a.wordStartIdx - b.wordStartIdx || a.wordEndIdx - b.wordEndIdx);
+    const words = (typeof currentState === "object" && Array.isArray(currentState.words)) ? currentState.words : null;
+    const list = (detections || []).map(d => {
+      const idxs = detWordIndices(d, words);
+      return { det: d, sIdx: idxs.s, eIdx: idxs.e };
+    });
+    list.sort((a, b) => a.sIdx - b.sIdx || a.eIdx - b.eIdx);
     const runs = [];
     let cur = [];
-    for (const d of sorted) {
+    for (const item of list) {
+      const d = item.det;
       const prev = cur[cur.length - 1];
       const p = quranPos(prev), q = quranPos(d);
-      const gap = prev ? d.wordStartIdx - prev.wordEndIdx - 1 : null;
-      if (usePassages && p && q && p.s === q.s && q.a === p.a + 1 && gap >= -1 && gap <= LAYA_V2.passageMaxGapWords) {
+      const prevIndices = prev ? detWordIndices(prev, words) : null;
+      const gap = prevIndices ? item.sIdx - prevIndices.e - 1 : null;
+      if (usePassages && p && q && p.s === q.s && q.a === p.a + 1 && gap !== null && gap >= -2 && gap <= Math.max(4, LAYA_V2.passageMaxGapWords)) {
         cur.push(d);
       } else {
         if (cur.length) runs.push(cur);
@@ -370,10 +401,23 @@
   }
 
   function passageReference(group) {
+    if (!Array.isArray(group) || !group.length) return "";
     const first = group[0], last = group[group.length - 1];
-    const ref = first.displayRef || first.reference || "";
-    const lp = quranPos(last);
-    return group.length > 1 && lp ? ref.replace(/(\d+)\s*$/, `$1-${lp.a}`) : ref;
+    const fp = quranPos(first), lp = quranPos(last);
+    let ref = first.displayRef || first.reference || "";
+    if (!ref && fp) {
+      const sName = (typeof SURAH_NAMES_AR !== "undefined" && SURAH_NAMES_AR[fp.s]) || `سورة ${fp.s}`;
+      ref = `${sName}: ${fp.a}`;
+    } else if (!ref) {
+      ref = first.unitId || "";
+    }
+    if (group.length > 1 && lp) {
+      if (/\d+\s*$/.test(ref)) {
+        return ref.replace(/(\d+)\s*$/, `$1-${lp.a}`);
+      }
+      return `${ref}-${lp.a}`;
+    }
+    return ref;
   }
 
   function wordsText(words, from, to) {
@@ -1411,16 +1455,17 @@
       const r = await fetch("/api/laya/status");
       if (r.ok) status = await r.json();
     } catch (_) { /* the load below reports the error */ }
-    if (!status || !status.loaded) {
+    const wantCheckpoint = ai.layaCheckpoint || "ZenoAbderrahim/laya-wahy-r6-v3_mixed";
+    if (!status || !status.loaded || status.checkpoint !== wantCheckpoint) {
       const r = await fetch("/api/laya/load", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ checkpoint: ai.layaCheckpoint, device: ai.layaDevice || "auto" })
+        body: JSON.stringify({ checkpoint: wantCheckpoint, device: ai.layaDevice || "auto" })
       });
       if (!r.ok) throw new Error(`تعذر تحميل نموذج Laya (HTTP ${r.status}): ${(await r.text()).slice(0, 300)}`);
       status = await r.json();
     }
-    ai.layaEnvelope = status.envelope || { version: 1, options: {} };
+    ai.layaEnvelope = status.envelope || { version: 3, options: { passages: true } };
     return ai.layaEnvelope;
   }
 
@@ -1664,8 +1709,10 @@
         throw e;
       }
     }
-    const useLayaV3 = Boolean(layaEnvelope && layaEnvelope.version === LAYA_ENVELOPE_V3);
-    const useLayaV2 = Boolean(layaEnvelope && layaEnvelope.version === LAYA_ENVELOPE_V2);
+    const isLaya = provider === "local_laya";
+    const useLayaV2 = Boolean(isLaya && layaEnvelope && layaEnvelope.version === LAYA_ENVELOPE_V2);
+    // For local Laya: use Envelope v3 (with multi-verse passages) by default for both v3 and v1 models!
+    const useLayaV3 = Boolean(isLaya && !useLayaV2 && (layaEnvelope?.options?.passages !== false));
     // a checkpoint trained on some questions only (run 4, e.g. verdict-only) is asked only those; a boundary it was
     // not trained on comes from the word-overlap rule (boundaryByRule)
     const trainedQ = layaEnvelope && Array.isArray(layaEnvelope.questions) ? new Set(layaEnvelope.questions) : null;
@@ -1673,7 +1720,7 @@
     const targetSet = new Set(targetDetections);
     const preparedItems = (useLayaV3 || useLayaV2)
       ? (useLayaV3
-          ? buildLayaV3Requests(currentState.detections, currentState.words, layaEnvelope.options || {}, targetDetections)
+          ? buildLayaV3Requests(currentState.detections, currentState.words, layaEnvelope ? (layaEnvelope.options || {}) : {}, targetDetections)
           : buildLayaV2Requests(currentState.detections, currentState.words, layaEnvelope.options || {}, targetDetections)
         ).map((r, idx) => ({
           det: r.members[0],
@@ -2151,14 +2198,12 @@
     } else {
       model = currentState.aiVerification.layaCheckpoint || "laya-multilingual";
       const env = currentState.aiVerification.layaEnvelope;
-      if (env && env.version === LAYA_ENVELOPE_V3) {
-        const r = buildLayaV3Requests(currentState.detections, currentState.words, env.options || {}, [det])[0];
-        payload = { state: r.state, questions: r.questions };
-      } else if (env && env.version === LAYA_ENVELOPE_V2) {
+      if (env && env.version === LAYA_ENVELOPE_V2) {
         const r = buildLayaV2Requests(currentState.detections, currentState.words, env.options || {}, [det])[0];
         payload = { state: r.state, questions: r.questions };
       } else {
-        payload = buildLayaPayload([item]);
+        const r = buildLayaV3Requests(currentState.detections, currentState.words, env?.options || {}, [det])[0];
+        payload = r ? { state: r.state, questions: r.questions } : buildLayaPayload([item]);
       }
       endpoint = "/api/laya/predict";
     }

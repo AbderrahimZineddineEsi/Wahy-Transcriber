@@ -291,6 +291,9 @@ function loadSavedUserDatasetsAndPrefs() {
     if (savedAi) {
       const parsed = JSON.parse(savedAi);
       if (parsed && typeof parsed === "object") {
+        if (parsed.layaCheckpoint === "ZenoAbderrahim/laya-wahy-soft_asis") {
+          parsed.layaCheckpoint = "ZenoAbderrahim/laya-wahy-r6-v3_mixed";
+        }
         const currentVis = Object.assign({}, currentState.aiVerification.visibilityFilter, parsed.visibilityFilter || {});
         currentState.aiVerification = Object.assign({}, currentState.aiVerification, parsed);
         currentState.aiVerification.visibilityFilter = currentVis;

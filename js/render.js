@@ -212,6 +212,12 @@ function buildLectureHtmlContent(isEditorMode = false) {
         aiBadgeHtml = `<span class="ai-badge ai-badge-pending" title="جاري التدقيق بالذكاء الاصطناعي...">⏳ فحص...</span>`;
       }
 
+      // Passage micro-badge (group of consecutive verses audited together)
+      let passageBadgeHtml = "";
+      if (det.aiVerification && det.aiVerification.passage && det.aiVerification.passage.verses > 1) {
+        passageBadgeHtml = `<span class="px-1.5 py-0.5 rounded bg-sky-500/20 text-sky-300 border border-sky-400/30 text-[10px] font-medium inline-flex items-center gap-1" title="مقطع متصل تم تدقيقه ككتلة واحدة: ${escapeHtml(det.aiVerification.passage.reference)}">🔗 ${escapeHtml(det.aiVerification.passage.reference)}</span>`;
+      }
+
       // Boundary status warning badge
       let boundaryBadgeHtml = "";
       if (det.aiVerification && det.aiVerification.boundaryStatus && det.aiVerification.boundaryStatus !== "COMPLETE_SPAN" && v !== "FALSE") {
@@ -289,6 +295,7 @@ function buildLectureHtmlContent(isEditorMode = false) {
               data-start-time="${det.startTime || words[i].start}"
               title="انقر لفحص وتعديل المقتبس [${escapeHtml(refText)}]">
           ${aiBadgeHtml}
+          ${passageBadgeHtml}
           ${boundaryBadgeHtml}
           ${mergeBadgeHtml}
           <span class="opacity-85 select-none">${escapeHtml(brackets.open)}</span>${innerWordsHtml}<span class="opacity-85 select-none">${escapeHtml(brackets.close)}</span>
@@ -856,6 +863,12 @@ function renderFindingInspector() {
               <span class="text-slate-400">النموذج: <strong class="text-slate-200 font-mono">${escapeHtml(det.aiVerification.modelUsed || det.aiVerification.provider || "")}</strong></span>
               <span class="text-slate-400">نسبة الثقة: <strong class="text-emerald-400 font-mono">${Math.round((det.aiVerification.confidence || 0.88) * 100)}%</strong></span>
             </div>
+            ${det.aiVerification.passage && det.aiVerification.passage.verses > 1 ? `
+              <div class="flex items-center gap-1.5 text-[11px] text-sky-300 bg-sky-950/60 border border-sky-800/60 rounded px-2 py-1 font-sans">
+                <span>🔗</span>
+                <span>تدقيق ضمن مقطع تلاوة متصل: <strong class="text-sky-200 font-bold">${escapeHtml(det.aiVerification.passage.reference)}</strong> (${det.aiVerification.passage.verses} آيات متتالية)</span>
+              </div>
+            ` : ""}
             ${det.aiVerification.reason ? `
               <div class="text-[11px] text-slate-300 pt-1 text-justify border-t border-slate-800/60 leading-relaxed">
                 ${escapeHtml(det.aiVerification.reason)}
