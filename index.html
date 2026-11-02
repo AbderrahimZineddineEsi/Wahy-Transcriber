@@ -47,10 +47,10 @@
       };
     })();
   </script>
-  <link rel="stylesheet" href="css/styles.css?v=1792920000" />
+  <link rel="stylesheet" href="css/styles.css?v=1793440000" />
   <!-- Interface language layer: loaded in <head> (not deferred) so the page direction is set before first paint -->
-  <script src="js/i18n-en.js?v=1792920000"></script>
-  <script src="js/i18n.js?v=1792920000"></script>
+  <script src="js/i18n-en.js?v=1793440000"></script>
+  <script src="js/i18n.js?v=1793440000"></script>
 </head>
 
 <body class="min-h-screen flex flex-col bg-slate-950 text-slate-100 antialiased">
@@ -282,9 +282,20 @@
             <span class="tally tally-dhikr" title="الأذكار"><span class="tally-mark">〖</span>الأذكار <strong id="kpiDhikrCount">0</strong><span class="tally-mark">〗</span></span>
             <span class="tally hidden sm:inline-flex">الكابشن <strong id="kpiCaptionsCount">0</strong></span>
           </div>
+          <!-- Saved runs of this lecture: each engine re-run / bulk AI check / manual copy is its own run -->
+          <div id="lectureRunBar" class="hidden flex flex-wrap items-center gap-2 pt-1">
+            <label class="tally" for="selLectureRun">التشغيل</label>
+            <select id="selLectureRun" class="field max-w-[18rem]" title="فتح تشغيل محفوظ آخر لهذه المحاضرة (التعديلات تُحفظ تلقائياً في التشغيل المفتوح)"></select>
+            <button type="button" id="btnRenameLectureRun" class="btn btn-quiet" title="إعادة تسمية هذا التشغيل">✎ تسمية</button>
+            <button type="button" id="btnSaveRunAsNewVersion" class="btn btn-quiet" title="يبقى التشغيل الحالي كما هو الآن، وتستمر تعديلاتك في نسخة جديدة منه">💾 حفظ كنسخة جديدة</button>
+          </div>
         </div>
 
         <div class="flex flex-wrap items-center gap-2">
+          <div class="seg" role="group" aria-label="نص المقتبسات" title="نص الآيات والأحاديث: كما نُطق في المحاضرة، أو بنصه من المصدر (يشمل الكابشن والتصدير)">
+            <button type="button" class="seg-btn is-active" data-quote-text-mode="spoken">كما نُطق</button>
+            <button type="button" class="seg-btn" data-quote-text-mode="canonical">الرسم القياسي</button>
+          </div>
           <div class="seg" role="group" aria-label="طريقة العرض">
             <button type="button" id="btnLayout_SPLIT" class="seg-btn is-active">المحاضرة + الفيديو</button>
             <button type="button" id="btnLayout_LECTURE_ONLY" class="seg-btn">المحاضرة فقط</button>
@@ -320,9 +331,6 @@
               </button>
               <div class="menu-sep"></div>
               <span class="menu-label">النص</span>
-              <button type="button" id="btnSnapAllToCanonical" class="menu-item">
-                <span>توحيد بالرسم القياسي<small>استبدال كل المقتبسات بنصها من المصدر</small></span>
-              </button>
               <button type="button" id="btnToggleDisplayFormattingPanel" class="menu-item" title="خيارات تخصيص الأقواس وأرقام الآيات والمصادر والألوان">
                 <span>خيارات التنسيق والعرض<small>الأقواس، أرقام الآيات، المصادر</small></span>
               </button>
@@ -512,6 +520,10 @@
                         class="w-full bg-slate-950 border border-indigo-500/50 rounded-xl px-2.5 py-1 text-slate-100 font-mono text-[11px] focus:outline-none" />
                       <div id="tafrighChatModelList" class="hidden absolute top-full left-0 right-0 z-30 model-dropdown-list mt-1 text-xs"></div>
                       <div id="lblTafrighChatModelInfo" class="text-[10px] text-slate-500"></div>
+                      <label id="wrapTafrighThinking" class="flex items-start gap-1.5 text-[10px] text-slate-400" title="التفكير يُحسب كرموز إخراج. على محاضرة حقيقية مع DeepSeek: أرخص 6.5 مرات وأسرع 8 مرات، وتطابقت الوسوم في 18 من 20 جملة">
+                        <input type="checkbox" id="chkTafrighNoThinking" checked class="accent-amber-500 mt-0.5" />
+                        <span>تعطيل تفكير النموذج (أرخص وأسرع)</span>
+                      </label>
                     </div>
                     <div id="wrapTafrighGeminiModel" class="hidden">
                       <select id="selTafrighModel" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-2.5 py-1 font-bold text-slate-100 text-[11px]">
@@ -524,9 +536,21 @@
                   <div>
                     <label class="block font-bold text-slate-300 mb-1">نمط المعالجة</label>
                     <select id="selTafrighMode" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-2.5 py-1.5 font-bold text-slate-100">
-                      <option value="per_sentence">جملة بجملة (Per-Sentence)</option>
-                      <option value="windowed">نافذة سياقية (Windowed — Gemini / Chat فقط)</option>
+                      <option value="per_sentence">جملة بجملة (طلب لكل جملة)</option>
+                      <!-- default: on a real lecture it used ~8x fewer input tokens and gave the same labels (2026-10-29) -->
+                      <option value="windowed" selected>نافذة (عدة جمل في طلب واحد) — موصى به</option>
                     </select>
+                    <label id="wrapTafrighWindowSize" class="hidden mt-1.5 flex items-center gap-1.5 text-[11px] text-slate-400">
+                      <span>جمل في كل نافذة</span>
+                      <input type="number" id="inpTafrighWindowSize" min="2" max="40" value="15" class="w-16 bg-slate-950 border border-slate-700 rounded-lg px-2 py-0.5 font-mono text-slate-100" />
+                    </label>
+                    <label id="wrapTafrighJevOrder" class="hidden mt-1.5 block text-[11px] text-slate-400">
+                      <span class="block mb-0.5">أسئلة JEV</span>
+                      <select id="selTafrighJevOrder" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2 py-0.5 text-slate-100">
+                        <option value="combined" selected>طلب واحد بالأسئلة الثلاثة (نصف التكلفة)</option>
+                        <option value="parallel">3 طلبات متوازية لكل جملة</option>
+                      </select>
+                    </label>
                   </div>
                   <div>
                     <label class="block font-bold text-slate-300 mb-1">تصحيح أخطاء التفريغ</label>
@@ -610,6 +634,8 @@
                 <!-- Stats -->
                 <div id="tafrighSegStats" class="grid grid-cols-3 sm:grid-cols-6 gap-2 text-center"></div>
                 <div id="tafrighRangeSummary" class="text-xs text-amber-200"></div>
+                <!-- Before running: requests, tokens, cost and time for each mode -->
+                <div id="tafrighEstimate" class="rounded-xl border border-slate-800 bg-slate-950/60 text-xs overflow-x-auto"></div>
 
                 <!-- Sentence list -->
                 <div id="tafrighSegList" class="max-h-[340px] overflow-y-auto rounded-xl border border-slate-800 divide-y divide-slate-800/70 text-xs"></div>
@@ -635,11 +661,14 @@
                   </div>
                 </div>
                 <div class="flex items-center gap-3">
-                  <div class="flex-1 h-2.5 rounded-full bg-slate-900 border border-slate-800 overflow-hidden">
-                    <div id="tafrighProgressBar" class="h-full bg-gradient-to-l from-amber-500 to-amber-300 transition-all duration-300" style="width: 0%"></div>
+                  <!-- solid: sentences finished; striped: the sentences of the request being waited on -->
+                  <div class="relative flex-1 h-2.5 rounded-full bg-slate-900 border border-slate-800 overflow-hidden" dir="rtl">
+                    <div id="tafrighProgressBar" class="absolute inset-y-0 right-0 bg-gradient-to-l from-amber-500 to-amber-300 transition-all duration-300" style="width: 0%"></div>
+                    <div id="tafrighProgressInflight" class="tfg-inflight absolute inset-y-0 transition-all duration-300" style="width: 0%; right: 0%"></div>
                   </div>
                   <span id="tafrighProgressPct" class="font-mono text-xs font-bold text-amber-200 w-12 text-left" dir="ltr">0%</span>
                 </div>
+                <div id="tafrighProgressRequests" class="text-[11px] text-slate-400"></div>
                 <div id="tafrighProgressDetails" class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center"></div>
                 <div id="tafrighProgressTags" class="flex flex-wrap gap-1.5 text-[11px]"></div>
                 <div class="rounded-xl border border-slate-800 bg-slate-950/70 p-3 text-xs space-y-1">
@@ -664,6 +693,14 @@
 
               <!-- Structured Results Container -->
               <div id="tafrighResultsView" class="space-y-4 hidden">
+                <!-- Saved Tafrigh runs of this lecture (like the editor's runs): every run is kept, review edits autosave -->
+                <div id="tafrighRunBar" class="hidden flex flex-wrap items-center gap-2">
+                  <label class="tally" for="selTafrighRun">تشغيل التفريغ</label>
+                  <select id="selTafrighRun" class="field max-w-[22rem]" title="فتح تشغيل تفريغ محفوظ آخر لهذه المحاضرة (المراجعات تُحفظ تلقائياً في التشغيل المفتوح)"></select>
+                  <button type="button" id="btnRenameTafrighRun" class="btn btn-quiet" title="إعادة تسمية هذا التشغيل">✎ تسمية</button>
+                  <button type="button" id="btnSaveTafrighRunAsNew" class="btn btn-quiet" title="يبقى هذا التشغيل كما هو الآن، وتستمر مراجعاتك في نسخة جديدة منه">💾 حفظ كنسخة جديدة</button>
+                  <button type="button" id="btnDeleteTafrighRun" class="btn btn-quiet" title="حذف هذا التشغيل المحفوظ">🗑 حذف</button>
+                </div>
                 <!-- TOC Pills Bar -->
                 <div id="tafrighTocBar" class="tafrigh-toc-bar hidden"></div>
 
@@ -678,7 +715,7 @@
                   <button type="button" data-tafrigh-view="text" class="tafrigh-view-tab seg-btn is-active">📄 النص المنسق</button>
                   <button type="button" data-tafrigh-view="details" class="tafrigh-view-tab seg-btn" title="مراجعة وسم كل جملة وتعديله">🔍 تفاصيل القرارات وتعديل الوسوم</button>
                   <button type="button" id="btnOpenSaveTafrighRun" class="mr-auto px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-600/20 hover:bg-emerald-600/35 text-emerald-300 border border-emerald-500/40 flex items-center gap-1.5" title="حفظ جمل مختارة من هذا التشغيل كبيانات لتدريب Laya">
-                    <span>💾</span><span>حفظ التشغيل</span><span id="lblTafrighSavedBadge" class="hidden px-1.5 py-0.5 rounded-md bg-emerald-500/20 font-mono text-[10px]"></span>
+                    <span>🎓</span><span>حفظ لتدريب Laya</span><span id="lblTafrighSavedBadge" class="hidden px-1.5 py-0.5 rounded-md bg-emerald-500/20 font-mono text-[10px]"></span>
                   </button>
                 </div>
 
@@ -773,15 +810,17 @@
             <span id="editorMiniTimeLabel" class="text-[11px] text-slate-300 px-1">00:00.00 / 00:00.00</span>
           </div>
 
+          <div class="seg" role="group" aria-label="نص المقتبسات" title="نص الآيات والأحاديث: كما نُطق في المحاضرة، أو بنصه من المصدر (يشمل الكابشن والتصدير)">
+            <button type="button" class="seg-btn is-active" data-quote-text-mode="spoken">كما نُطق</button>
+            <button type="button" class="seg-btn" data-quote-text-mode="canonical">الرسم القياسي</button>
+          </div>
+
           <details class="menu">
             <summary class="btn" title="طريقة عرض النص أثناء التحرير">عرض <span aria-hidden="true">⌄</span></summary>
             <div class="menu-panel">
               <button type="button" id="btnToggleEditorSyncPlayback" class="menu-item menu-check btn-playback-sync-active" data-keep-open title="عند التفعيل: النقر على أي كلمة يقفز بالفيديو لتوقيتها، ويستأنف التشغيل إذا كان الفيديو يعمل">
                 <span id="editorSyncIcon" class="hidden">🔗</span>
                 <span id="editorSyncLabel">مزامنة الفيديو مع المؤشر: مفعّلة</span>
-              </button>
-              <button type="button" id="btnEditorToggleRasmQiyasi" class="menu-item menu-check" data-keep-open title="معاينة المقتبسات بالرسم القياسي / العثماني">
-                <span id="lblEditorRasmQiyasi">الرسم القياسي</span>
               </button>
               <button type="button" id="btnEditorToggleFullMatn" class="menu-item menu-check" data-keep-open title="عرض المتن كاملاً من المصدر بدل المقطع المنطوق فقط">
                 <span id="lblEditorFullMatn">المتن كاملاً</span>
@@ -2046,20 +2085,20 @@
   <!-- ===================================================================== -->
   <!-- APPLICATION SCRIPTS (Strict Execution Order: Error Trap First!)       -->
   <!-- ===================================================================== -->
-  <script defer src="js/error-handler.js?v=1792920000"></script>
-  <script defer src="js/state.js?v=1792920000"></script>
-  <script defer src="js/corpus-loader.js?v=1792920000"></script>
-  <script defer src="js/hadith-corpus.js?v=1792920000"></script>
-  <script defer src="js/engine.js?v=1792920000"></script>
-  <script defer src="js/engine_v4.js?v=1792920000"></script>
-  <script defer src="js/engine_v5.js?v=1792920000"></script>
-  <script defer src="js/caption-builder.js?v=1792920000"></script>
-  <script defer src="js/ai-verifier.js?v=1792920000"></script>
-  <script defer src="js/editor.js?v=1792920000"></script>
-  <script defer src="js/render.js?v=1792920000"></script>
-  <script defer src="js/ai-request-options.js?v=1792920000"></script>
-  <script defer src="js/events.js?v=1792920000"></script>
-  <script defer src="js/ui-menus.js?v=1792920000"></script>
+  <script defer src="js/error-handler.js?v=1793440000"></script>
+  <script defer src="js/state.js?v=1793440000"></script>
+  <script defer src="js/corpus-loader.js?v=1793440000"></script>
+  <script defer src="js/hadith-corpus.js?v=1793440000"></script>
+  <script defer src="js/engine.js?v=1793440000"></script>
+  <script defer src="js/engine_v4.js?v=1793440000"></script>
+  <script defer src="js/engine_v5.js?v=1793440000"></script>
+  <script defer src="js/caption-builder.js?v=1793440000"></script>
+  <script defer src="js/ai-verifier.js?v=1793440000"></script>
+  <script defer src="js/editor.js?v=1793440000"></script>
+  <script defer src="js/render.js?v=1793440000"></script>
+  <script defer src="js/ai-request-options.js?v=1793440000"></script>
+  <script defer src="js/events.js?v=1793440000"></script>
+  <script defer src="js/ui-menus.js?v=1793440000"></script>
 
   <!-- Diagnostic Error Fallback Elements -->
   <div class="hidden" style="display:none">

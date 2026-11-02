@@ -23,7 +23,7 @@ import threading
 import traceback
 import uuid
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 
 import httpx
 
@@ -61,6 +61,7 @@ from laya_converter import convert_verification_records_to_laya_jsonl
 try:
     from backend.tafrigh.pipeline import TafrighPipeline
     from backend.tafrigh.segmenter import SegmentationConfig, segment_transcript
+    from backend.tafrigh.estimate import estimate_run
     from backend.tafrigh.schemas import PipelineConfig
     from backend.tafrigh.matn_aligner import MatnConfig
     from backend.tafrigh.outline_repair import run_outline_repair_pass
@@ -90,6 +91,7 @@ try:
 except ImportError:
     from tafrigh.pipeline import TafrighPipeline
     from tafrigh.segmenter import SegmentationConfig, segment_transcript
+    from tafrigh.estimate import estimate_run
     from tafrigh.schemas import PipelineConfig
     from tafrigh.matn_aligner import MatnConfig
     from tafrigh.outline_repair import run_outline_repair_pass
@@ -632,6 +634,61 @@ def api_tafrigh_segment(body: Dict[str, Any]) -> JSONResponse:
     return JSONResponse({"success": True, "segments": rows, "stats": stats, "seg_config": cfg.model_dump()})
 
 
+DEFAULT_WINDOW_SIZE = 15
+
+
+def _preview_segments(body: Dict[str, Any]) -> List["TranscriptSegment"]:
+    return segment_transcript(
+        raw_text=body.get("raw_text") or "",
+        asr_words=body.get("asr_words"),
+        detection_spans=body.get("detection_spans"),
+        use_detection_boundaries=bool(body.get("use_detection_boundaries", True)),
+        config=_segmentation_config(body.get("seg_config")),
+    )
+
+
+@app.post("/api/tafrigh/estimate")
+def api_tafrigh_estimate(body: Dict[str, Any]) -> JSONResponse:
+    """Requests and tokens of a run over target_range for each processing mode, without calling any model.
+    Prices are applied by the browser, which has the OpenRouter catalogue."""
+    segs = _preview_segments(body)
+    rng = body.get("target_range") or [0, len(segs)]
+    jev_order = body.get("jev_execution_order", "parallel")
+    est = estimate_run(segs, int(rng[0]), int(rng[1]),
+                       window_size=int(body.get("window_size") or DEFAULT_WINDOW_SIZE),
+                       jev_requests_per_sentence=1 if jev_order == "combined" else (2 if jev_order == "sequential" else 3))
+    return JSONResponse({"success": True, **est})
+
+
+@app.post("/api/tafrigh/clone-run")
+def api_tafrigh_clone_run(body: Dict[str, Any]) -> JSONResponse:
+    """"Save as a new version" of a Tafrigh run: a copy with its own run id (and folder), so review edits made in
+    the copy leave the kept version as it is."""
+    session = _load_tafrigh_session(str(body.get("run_id") or ""))
+    if not session:
+        return JSONResponse(status_code=404, content={"success": False, "message": "تعذر العثور على جلسة التفريغ هذه."})
+    src_dir = Path(session["run_dir"])
+    new_id = f"run_{uuid.uuid4().hex[:12]}"
+    new_dir = src_dir.with_name(f"{src_dir.name}_v{new_id[-4:]}")
+    try:
+        shutil.copytree(src_dir, new_dir)
+    except OSError as exc:
+        return JSONResponse(status_code=500, content={"success": False, "message": f"تعذر نسخ التشغيل: {exc}"})
+    copy = {
+        "segments": [s.model_copy(deep=True) for s in session["segments"]],
+        "outline_state": session["outline_state"].model_copy(deep=True),
+        "lecture_spans": [s.model_copy(deep=True) for s in session["lecture_spans"]],
+        "manifest": {**session["manifest"], "run_id": new_id, "copied_from": session["manifest"].get("run_id")},
+        "render_cfg": session.get("render_cfg"),
+        "run_dir": str(new_dir),
+        "saved": None,
+    }
+    copy["manager"] = ReviewQueueManager(copy["segments"])
+    ACTIVE_TAFRIGH_SESSIONS[new_id] = copy
+    _save_tafrigh_session(copy)
+    return JSONResponse({"success": True, "run_id": new_id})
+
+
 @app.post("/api/tafrigh/control")
 def api_tafrigh_control(body: Dict[str, Any]) -> JSONResponse:
     job_id = str(body.get("job_id") or "")
@@ -690,8 +747,11 @@ def api_tafrigh_run(body: Dict[str, Any]) -> JSONResponse:
         processing_mode=processing_mode,
         model_candidate=model_candidate,
         jev_layout=jev_layout,
+        jev_execution_order=body.get("jev_execution_order", "parallel"),
         typo_strategy=typo_strategy,
         use_detection_boundaries=bool(body.get("use_detection_boundaries", True)),
+        # the window size used to be fixed at 20: the UI had no way to set it
+        window_size=max(1, min(40, int(body.get("window_size") or DEFAULT_WINDOW_SIZE))),
     )
 
     initial_segments = None
@@ -735,6 +795,7 @@ def api_tafrigh_run(body: Dict[str, Any]) -> JSONResponse:
         typo_strategy=typo_strategy,
         openrouter_api_key=openrouter_key if via_openrouter else None,
         openrouter_model=or_gemini_model or None,
+        disable_thinking=bool(body.get("disable_thinking")),
     )
     if openrouter_key:
         jev_cfg = JEVRequestConfig(
@@ -868,6 +929,7 @@ def api_tafrigh_run(body: Dict[str, Any]) -> JSONResponse:
         "structured_json": rendered_json,
         "review_items": [item.model_dump() for item in review_manager.get_items()],
         "report": report_data,
+        "manifest": result.run_manifest,
     })
 
 

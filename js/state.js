@@ -103,11 +103,15 @@ let currentState = {
   groqApiKey: "",
   autoFallback: true,
   lectureTitle: "محاضرة علمية — استوديو الوحيين",
+  currentLectureId: null,         // saved lecture being worked on (WahyLecturesDB)
+  currentRunId: null,             // its run that autosave writes into
+  currentRunMeta: null,           // the open run's entry until its first save ({kind, engine, ai, name})
+  lectureRuns: [],                // the open lecture's run entries, as last saved
+  tafrighRuns: [],                // the open lecture's saved Tafrigh runs (see putTafrighRun)
   mediaUrl: "",
   mediaType: "demo",
   rawText: "",
   editorPlaybackFollowsSelection: true,
-  editorViewRasmQiyasi: false,
   editorViewFullCanonicalSpan: false,
   displayFormatting: {
     showSurahNames: true,
@@ -173,6 +177,7 @@ let currentState = {
     active: false,
     viewMode: "sync",               // "sync" | "tafrigh"
     data: null,                     // Last result from /api/tafrigh/run
+    runEntryId: null,               // the saved Tafrigh run `data` belongs to (currentState.tafrighRuns)
     isLoading: false,
     provider: "gemini_all",
     processingMode: "per_sentence",
@@ -775,9 +780,14 @@ function runDetectionAndBuildCaptions(options = {}) {
   if (!activeMatcher) rebuildMatcher();
 
   if (options.rawText !== undefined) {
-    // a new transcript is a new saved session (re-running the engine on the same text keeps the same one)
+    // a new transcript is a new saved session (re-running the engine on the same text adds a run to it)
     currentState.currentLectureId = null;
     currentState.lectureCreatedAt = null;
+    currentState.currentRunId = null;
+    currentState.lectureRuns = [];
+    currentState.tafrighRuns = [];
+    Object.assign(currentState.tafrigh, { data: null, hasRun: false, runEntryId: null });
+    currentState.currentRunMeta = { kind: "engine", engine: activeEngineName(), ai: null, name: "" };
     currentState.isDemoSession = false;
     const cleanText = String(options.rawText || "").trim();
     currentState.rawText = cleanText;
@@ -785,10 +795,13 @@ function runDetectionAndBuildCaptions(options = {}) {
     currentState.words = (options.words && options.words.length)
       ? options.words
       : synthesizeWordsFromRawText(cleanText);
-  } else if (currentState.words && currentState.words.length && !currentState.rawTranscript) {
-    syncRawTextFromWords();
-  } else if (currentState.rawTranscript && (!currentState.words || !currentState.words.length)) {
-    currentState.words = synthesizeWordsFromRawText(currentState.rawTranscript);
+  } else {
+    beginNewLectureRun("engine", { engine: activeEngineName() });   // the run being left keeps its findings and edits
+    if (currentState.words && currentState.words.length && !currentState.rawTranscript) {
+      syncRawTextFromWords();
+    } else if (currentState.rawTranscript && (!currentState.words || !currentState.words.length)) {
+      currentState.words = synthesizeWordsFromRawText(currentState.rawTranscript);
+    }
   }
 
   syncRawTextFromWords();
@@ -826,6 +839,8 @@ function runDetectionAndBuildCaptions(options = {}) {
   if (typeof renderAllViews === "function") {
     renderAllViews();
   }
+  _runUntouchedFingerprint = lectureRunFingerprint();
+  if (typeof renderLectureRunPicker === "function") renderLectureRunPicker();
 }
 
 function recalculateCaptionsFromCurrentFindings() {
@@ -900,106 +915,339 @@ function buildDynamicSampleLectureFromCorpus() {
 // =============================================================================
 // IndexedDB Lecture Sessions Store (WahyLecturesDB)
 // File: js/state.js
+// A lecture record holds the title, the media and its list of runs (number, name, what produced it, stats). Each run's
+// content (words, findings, captions, smart-transcription result) is its own record in the "runs" store. A new run
+// starts whenever the engine re-runs or a bulk AI check starts; the run left behind keeps its content and edits.
 // =============================================================================
 
 const IDB_LECTURES_DB_NAME = "WahyLecturesDB";
 const IDB_LECTURES_STORE_NAME = "lectures";
+const IDB_RUNS_STORE_NAME = "runs";
+// a Tafrigh result is not part of an editor run: it is a run of its own (see "Tafrigh runs" below)
+const RUN_CONTENT_FIELDS = ["rawText", "rawTranscript", "words", "detections", "captions"];
+
+let _lecturesDbPromise = null;
+
+function newLectureRunId() {
+  return "run_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+}
+
+function runStatsOf(content) {
+  const dets = content.detections || [];
+  return {
+    wordsCount: (content.words || []).length,
+    detectionsCount: dets.length,
+    captionsCount: (content.captions || []).length,
+    aiCheckedCount: dets.filter(d => d && d.aiVerification && d.aiVerification.status === "VERIFIED").length
+  };
+}
 
 function openWahyLecturesDB() {
-  return new Promise((resolve, reject) => {
+  if (_lecturesDbPromise) return _lecturesDbPromise;
+  _lecturesDbPromise = new Promise((resolve, reject) => {
     if (!window.indexedDB) {
       return reject(new Error("IndexedDB غير مدعوم في هذا المتصفح."));
     }
-    const req = window.indexedDB.open(IDB_LECTURES_DB_NAME, 2);   // v2: an older DB of this name may exist without the store
+    // v2: an older DB of this name may exist without the store; v3: each run's content moved to the "runs" store
+    const req = window.indexedDB.open(IDB_LECTURES_DB_NAME, 3);
     req.onupgradeneeded = (e) => {
       const db = e.target.result;
+      const tx = e.target.transaction;
       if (!db.objectStoreNames.contains(IDB_LECTURES_STORE_NAME)) {
         const store = db.createObjectStore(IDB_LECTURES_STORE_NAME, { keyPath: "id" });
         store.createIndex("title", "title", { unique: false });
         store.createIndex("updated_at", "updated_at", { unique: false });
       }
+      if (!db.objectStoreNames.contains(IDB_RUNS_STORE_NAME)) {
+        db.createObjectStore(IDB_RUNS_STORE_NAME, { keyPath: "id" }).createIndex("lectureId", "lectureId", { unique: false });
+      }
+      // a lecture saved before runs existed holds its content inline: it becomes its run #1
+      const runsStore = tx.objectStore(IDB_RUNS_STORE_NAME);
+      tx.objectStore(IDB_LECTURES_STORE_NAME).openCursor().onsuccess = (ev) => {
+        const cur = ev.target.result;
+        if (!cur) return;
+        const lec = cur.value;
+        if (!Array.isArray(lec.runs)) {
+          const run = { id: newLectureRunId(), lectureId: lec.id };
+          RUN_CONTENT_FIELDS.forEach(k => { run[k] = lec[k]; delete lec[k]; });
+          lec.runs = [{
+            id: run.id, num: 1, name: "", kind: "legacy", engine: null, ai: null,
+            created_at: lec.created_at, updated_at: lec.updated_at, stats: runStatsOf(run)
+          }];
+          lec.activeRunId = run.id;
+          runsStore.put(run);
+          cur.update(lec);
+        }
+        cur.continue();
+      };
     };
-    req.onsuccess = () => resolve(req.result);
-    req.onerror = () => reject(req.error || new Error("فشل فتح قاعدة بيانات WahyLecturesDB"));
+    req.onsuccess = () => {
+      const db = req.result;
+      db.onversionchange = () => { db.close(); _lecturesDbPromise = null; };
+      resolve(db);
+    };
+    req.onerror = () => {
+      _lecturesDbPromise = null;
+      reject(req.error || new Error("فشل فتح قاعدة بيانات WahyLecturesDB"));
+    };
   });
+  return _lecturesDbPromise;
+}
+
+function idbRequest(req) {
+  return new Promise((resolve, reject) => {
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+function idbDone(tx) {
+  const done = new Promise((resolve, reject) => {
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+    tx.onabort = () => reject(tx.error || new Error("IndexedDB transaction aborted"));
+  });
+  done.catch(() => {});      // a failed request already rejects its own promise
+  return done;
+}
+
+/**
+ * Write `content` as run `runId` of lecture `lectureId` in one transaction, creating either when missing.
+ * meta: the new run's entry (kind "engine" | "ai" | "copy" | "legacy", engine, ai, name, from); activate: make it the lecture's open run.
+ */
+async function putLectureRun(lectureId, runId, content, { meta = {}, activate = true, lectureFields = {} } = {}) {
+  const db = await openWahyLecturesDB();
+  const tx = db.transaction([IDB_LECTURES_STORE_NAME, IDB_RUNS_STORE_NAME], "readwrite");
+  const done = idbDone(tx);
+  const lectures = tx.objectStore(IDB_LECTURES_STORE_NAME);
+  const now = new Date().toISOString();
+  const lec = (await idbRequest(lectures.get(lectureId))) || { id: lectureId, created_at: now, runs: [] };
+  Object.assign(lec, lectureFields);
+  lec.runs = lec.runs || [];
+  let entry = lec.runs.find(r => r.id === runId);
+  if (!entry) {
+    const num = lec.runs.reduce((m, r) => Math.max(m, r.num || 0), 0) + 1;
+    entry = { id: runId, num, name: "", kind: "engine", engine: null, ai: null, ...meta, created_at: now };
+    lec.runs.push(entry);
+  }
+  entry.updated_at = now;
+  entry.stats = runStatsOf(content);
+  if (activate || !lec.activeRunId) lec.activeRunId = runId;
+  lec.stats = (lec.runs.find(r => r.id === lec.activeRunId) || entry).stats;
+  lec.updated_at = now;
+  lectures.put(lec);
+  tx.objectStore(IDB_RUNS_STORE_NAME).put({ ...content, id: runId, lectureId });
+  await done;
+  return lec;
+}
+
+/** Read-modify-write of one lecture record; `edit(lec)` returns false to leave it unchanged. */
+async function editLectureRecord(lectureId, edit, extraStores = []) {
+  const db = await openWahyLecturesDB();
+  const tx = db.transaction([IDB_LECTURES_STORE_NAME, ...extraStores], "readwrite");
+  const done = idbDone(tx);
+  const lectures = tx.objectStore(IDB_LECTURES_STORE_NAME);
+  const lec = await idbRequest(lectures.get(lectureId));
+  if (!lec || edit(lec, tx) === false) { await done; return null; }
+  lectures.put(lec);
+  await done;
+  return lec;
+}
+
+function currentRunContent() {
+  const c = {};
+  RUN_CONTENT_FIELDS.forEach(k => { c[k] = currentState[k] ?? null; });
+  return c;
 }
 
 async function saveCurrentLectureSession(customTitle = null) {
   try {
-    const db = await openWahyLecturesDB();
     const id = currentState.currentLectureId || ("lec_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6));
     currentState.currentLectureId = id;
+    const runId = currentState.currentRunId || newLectureRunId();
+    currentState.currentRunId = runId;
     const title = customTitle || currentState.lectureTitle || "محاضرة علمية محفوطة";
 
-    const sessionPayload = {
-      id,
-      title,
-      created_at: currentState.lectureCreatedAt || new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      mediaUrl: currentState.mediaUrl || "",
-      mediaType: currentState.mediaType || "text",
-      rawText: currentState.rawText || "",
-      rawTranscript: currentState.rawTranscript || "",
-      words: currentState.words || [],
-      detections: currentState.detections || [],
-      captions: currentState.captions || [],
-      tafrighResult: currentState.tafrighResult || null,
-      stats: {
-        wordsCount: (currentState.words || []).length,
-        detectionsCount: (currentState.detections || []).length,
-        captionsCount: (currentState.captions || []).length
-      }
-    };
-
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction([IDB_LECTURES_STORE_NAME], "readwrite");
-      const store = tx.objectStore(IDB_LECTURES_STORE_NAME);
-      const req = store.put(sessionPayload);
-      req.onsuccess = () => resolve(sessionPayload);
-      req.onerror = () => reject(req.error);
+    const lec = await putLectureRun(id, runId, currentRunContent(), {
+      meta: currentState.currentRunMeta || {},
+      lectureFields: { title, mediaUrl: currentState.mediaUrl || "", mediaType: currentState.mediaType || "text" }
     });
+    if (currentState.currentLectureId === id) {
+      currentState.lectureCreatedAt = lec.created_at;
+      currentState.lectureRuns = lec.runs;
+    }
+    return lec;
   } catch (err) {
     console.error("Failed to save lecture session:", err);
     return null;
   }
 }
 
-async function loadLectureSession(sessionId) {
+/** Open a saved lecture at run `runId` (default: the run it was last on); an explicit run becomes its open run. */
+async function loadLectureSession(sessionId, runId = null) {
   try {
     const db = await openWahyLecturesDB();
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction([IDB_LECTURES_STORE_NAME], "readonly");
-      const store = tx.objectStore(IDB_LECTURES_STORE_NAME);
-      const req = store.get(sessionId);
-      req.onsuccess = () => {
-        const item = req.result;
-        if (item) {
-          currentState.currentLectureId = item.id;
-          currentState.lectureTitle = item.title;
-          currentState.lectureCreatedAt = item.created_at;
-          currentState.mediaUrl = item.mediaUrl || "";
-          currentState.mediaType = item.mediaType || "text";
-          currentState.rawText = item.rawText || "";
-          currentState.rawTranscript = item.rawTranscript || item.rawText || "";
-          currentState.words = Array.isArray(item.words) ? item.words : [];
-          currentState.detections = Array.isArray(item.detections) ? item.detections : [];
-          currentState.captions = Array.isArray(item.captions) ? item.captions : [];
-          currentState.tafrighResult = item.tafrighResult || null;
-          currentState.selectedPredIndex = -1;
-          currentState.selectedCaptionIndex = -1;
-          currentState.undoStack = [];
-          currentState.isDemoSession = false;
-          resolve(item);
-        } else {
-          reject(new Error("لم يتم العثور على الجلسة"));
-        }
-      };
-      req.onerror = () => reject(req.error);
-    });
+    const tx = db.transaction([IDB_LECTURES_STORE_NAME, IDB_RUNS_STORE_NAME], runId ? "readwrite" : "readonly");
+    const done = idbDone(tx);
+    const item = await idbRequest(tx.objectStore(IDB_LECTURES_STORE_NAME).get(sessionId));
+    const runs = (item && item.runs) || [];
+    const entry = runs.find(r => r.id === (runId || item.activeRunId)) || runs[runs.length - 1];
+    if (!entry) throw new Error("لم يتم العثور على الجلسة");
+    const run = (await idbRequest(tx.objectStore(IDB_RUNS_STORE_NAME).get(entry.id))) || {};
+    if (runId && item.activeRunId !== entry.id) {
+      item.activeRunId = entry.id;
+      item.stats = entry.stats;
+      tx.objectStore(IDB_LECTURES_STORE_NAME).put(item);
+    }
+    await done;
+
+    currentState.currentLectureId = item.id;
+    currentState.currentRunId = entry.id;
+    currentState.currentRunMeta = null;
+    currentState.lectureRuns = runs;
+    currentState.lectureTitle = item.title;
+    currentState.lectureCreatedAt = item.created_at;
+    currentState.mediaUrl = item.mediaUrl || "";
+    currentState.mediaType = item.mediaType || "text";
+    currentState.rawText = run.rawText || "";
+    currentState.rawTranscript = run.rawTranscript || run.rawText || "";
+    currentState.words = Array.isArray(run.words) ? run.words : [];
+    currentState.detections = Array.isArray(run.detections) ? run.detections : [];
+    currentState.captions = Array.isArray(run.captions) ? run.captions : [];
+    currentState.tafrighRuns = Array.isArray(item.tafrighRuns) ? item.tafrighRuns : [];
+    currentState.tafrigh.data = null;
+    currentState.tafrigh.hasRun = false;
+    currentState.tafrigh.runEntryId = null;
+    const tfgEntry = currentState.tafrighRuns.find(r => r.id === item.activeTafrighRunId) || currentState.tafrighRuns[currentState.tafrighRuns.length - 1];
+    if (tfgEntry) {
+      const content = await idbGetRunRecord(tfgEntry.id);
+      if (content && content.data) {
+        currentState.tafrigh.data = content.data;
+        currentState.tafrigh.hasRun = true;
+        currentState.tafrigh.runEntryId = tfgEntry.id;
+      }
+    }
+    currentState.selectedPredIndex = -1;
+    currentState.selectedCaptionIndex = -1;
+    currentState.undoStack = [];
+    currentState.isDemoSession = false;
+    _runUntouchedFingerprint = null;
+    return item;
   } catch (err) {
     console.error("Failed to load lecture session:", err);
     return null;
   }
+}
+
+async function idbGetRunRecord(id) {
+  const db = await openWahyLecturesDB();
+  const tx = db.transaction([IDB_RUNS_STORE_NAME], "readonly");
+  return idbRequest(tx.objectStore(IDB_RUNS_STORE_NAME).get(id));
+}
+
+
+// -----------------------------------------------------------------------------
+// Tafrigh runs: every structured transcription of a lecture is kept, numbered and named like the editor's runs.
+// The lecture record lists them (tafrighRuns, activeTafrighRunId); each result lives in the "runs" store under
+// its own id with type "tafrigh" (deleted with the lecture). Review edits autosave into the open one.
+// -----------------------------------------------------------------------------
+function newTafrighRunId() {
+  return "tfgrun_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+}
+
+function tafrighRunStatsOf(data) {
+  const rep = (data && data.report) || {};
+  return {
+    sentences: ((data && data.structured_json && data.structured_json.segments) || []).length,
+    toReview: ((data && data.review_items) || []).length,
+    requests: rep.total_requests ?? null,
+    costUsd: rep.total_cost_usd ?? null
+  };
+}
+
+/** Write Tafrigh result `data` as run `entryId` of lecture `lectureId` (created when missing) and make it the open one. */
+async function putTafrighRun(lectureId, entryId, data, meta = {}) {
+  const db = await openWahyLecturesDB();
+  const tx = db.transaction([IDB_LECTURES_STORE_NAME, IDB_RUNS_STORE_NAME], "readwrite");
+  const done = idbDone(tx);
+  const lectures = tx.objectStore(IDB_LECTURES_STORE_NAME);
+  const lec = await idbRequest(lectures.get(lectureId));
+  if (!lec) { tx.abort(); throw new Error("المحاضرة غير محفوظة بعد"); }
+  const now = new Date().toISOString();
+  lec.tafrighRuns = lec.tafrighRuns || [];
+  let entry = lec.tafrighRuns.find(r => r.id === entryId);
+  if (!entry) {
+    const num = lec.tafrighRuns.reduce((m, r) => Math.max(m, r.num || 0), 0) + 1;
+    entry = { id: entryId, num, name: "", ...meta, created_at: now };
+    lec.tafrighRuns.push(entry);
+  }
+  entry.updated_at = now;
+  entry.serverRunId = data.run_id || entry.serverRunId;
+  entry.stats = tafrighRunStatsOf(data);
+  lec.activeTafrighRunId = entryId;
+  lectures.put(lec);
+  tx.objectStore(IDB_RUNS_STORE_NAME).put({ id: entryId, lectureId, type: "tafrigh", data });
+  await done;
+  if (lectureId === currentState.currentLectureId) currentState.tafrighRuns = lec.tafrighRuns;
+  return entry;
+}
+
+async function deleteTafrighRun(lectureId, entryId) {
+  const lec = await editLectureRecord(lectureId, (rec, tx) => {
+    const runs = rec.tafrighRuns || [];
+    if (!runs.some(r => r.id === entryId)) return false;
+    rec.tafrighRuns = runs.filter(r => r.id !== entryId);
+    if (rec.activeTafrighRunId === entryId) rec.activeTafrighRunId = rec.tafrighRuns.length ? rec.tafrighRuns[rec.tafrighRuns.length - 1].id : null;
+    tx.objectStore(IDB_RUNS_STORE_NAME).delete(entryId);
+  }, [IDB_RUNS_STORE_NAME]);
+  if (lec && lectureId === currentState.currentLectureId) currentState.tafrighRuns = lec.tafrighRuns;
+  return lec;
+}
+
+async function renameTafrighRun(lectureId, entryId, name) {
+  const lec = await editLectureRecord(lectureId, rec => {
+    const e = (rec.tafrighRuns || []).find(r => r.id === entryId);
+    if (!e) return false;
+    e.name = name;
+  });
+  if (lec && lectureId === currentState.currentLectureId) currentState.tafrighRuns = lec.tafrighRuns;
+  return lec;
+}
+
+/** Open saved Tafrigh run `entryId`: returns its result (and remembers it as the lecture's open one). */
+async function openTafrighRun(lectureId, entryId) {
+  const content = await idbGetRunRecord(entryId);
+  if (!content || !content.data) return null;
+  await editLectureRecord(lectureId, rec => { rec.activeTafrighRunId = entryId; });
+  currentState.tafrigh.runEntryId = entryId;
+  return content.data;
+}
+
+function tafrighRunAutoLabel(e) {
+  if (!e) return "";
+  const model = String(e.model || "").split("/").pop() || "نموذج";
+  const mode = e.mode === "windowed" ? `نافذة ${e.windowSize || ""}`.trim() : (e.mode === "copy" ? "نسخة" : "جملة بجملة");
+  return `${model} · ${mode}` + (e.from ? ` (من #${e.from})` : "");
+}
+
+function tafrighRunLabel(e) {
+  if (!e) return "";
+  const st = e.stats || {};
+  const cost = typeof st.costUsd === "number" ? ` • $${st.costUsd.toFixed(st.costUsd < 0.01 ? 5 : 4)}` : "";
+  return `#${e.num} · ${e.name || tafrighRunAutoLabel(e)} — ${st.sentences || 0} جملة${cost}`;
+}
+
+let _tafrighAutosaveTimer = null;
+/** Review edits change the open Tafrigh result: keep its saved copy in step (debounced). */
+function scheduleTafrighRunAutosave() {
+  const lectureId = currentState.currentLectureId, entryId = currentState.tafrigh.runEntryId, data = currentState.tafrigh.data;
+  if (!lectureId || !entryId || !data || currentState.isDemoSession) return;
+  clearTimeout(_tafrighAutosaveTimer);
+  _tafrighAutosaveTimer = setTimeout(() => {
+    putTafrighRun(lectureId, entryId, data)
+      .then(() => { if (typeof renderTafrighRunPicker === "function") renderTafrighRunPicker(); })
+      .catch(err => console.error("Failed to autosave the Tafrigh run:", err));
+  }, 600);
 }
 
 async function listSavedLectureSessions() {
@@ -1024,17 +1272,126 @@ async function listSavedLectureSessions() {
 async function deleteSavedLectureSession(sessionId) {
   try {
     const db = await openWahyLecturesDB();
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction([IDB_LECTURES_STORE_NAME], "readwrite");
-      const store = tx.objectStore(IDB_LECTURES_STORE_NAME);
-      const req = store.delete(sessionId);
-      req.onsuccess = () => resolve(true);
-      req.onerror = () => reject(req.error);
-    });
+    const tx = db.transaction([IDB_LECTURES_STORE_NAME, IDB_RUNS_STORE_NAME], "readwrite");
+    const done = idbDone(tx);
+    tx.objectStore(IDB_LECTURES_STORE_NAME).delete(sessionId);
+    const runs = tx.objectStore(IDB_RUNS_STORE_NAME);
+    const keys = await idbRequest(runs.index("lectureId").getAllKeys(sessionId));
+    keys.forEach(k => runs.delete(k));
+    await done;
+    return true;
   } catch (err) {
     console.error("Failed to delete lecture session:", err);
     return false;
   }
+}
+
+/** Delete one run (never a lecture's last one). Returns the updated lecture record, or null. */
+async function deleteLectureRun(lectureId, runId) {
+  try {
+    const lec = await editLectureRecord(lectureId, (rec, tx) => {
+      const runs = rec.runs || [];
+      if (runs.length <= 1 || !runs.some(r => r.id === runId)) return false;
+      rec.runs = runs.filter(r => r.id !== runId);
+      if (rec.activeRunId === runId) rec.activeRunId = rec.runs[rec.runs.length - 1].id;
+      rec.stats = rec.runs.find(r => r.id === rec.activeRunId).stats;
+      tx.objectStore(IDB_RUNS_STORE_NAME).delete(runId);
+    }, [IDB_RUNS_STORE_NAME]);
+    if (lec && lectureId === currentState.currentLectureId) currentState.lectureRuns = lec.runs;
+    return lec;
+  } catch (err) {
+    console.error("Failed to delete run:", err);
+    return null;
+  }
+}
+
+async function renameLectureRun(lectureId, runId, newName) {
+  try {
+    const lec = await editLectureRecord(lectureId, rec => {
+      const entry = (rec.runs || []).find(r => r.id === runId);
+      if (!entry) return false;
+      entry.name = newName;
+    });
+    if (lec && lectureId === currentState.currentLectureId) currentState.lectureRuns = lec.runs;
+    return lec;
+  } catch (err) {
+    console.error("Failed to rename run:", err);
+    return null;
+  }
+}
+
+/** What a run shows when it has no name of its own. */
+function lectureRunAutoLabel(entry) {
+  if (!entry) return "";
+  if (entry.kind === "ai") return `تدقيق ${entry.ai || ""}`.trim() + (entry.engine ? ` (${entry.engine})` : "");
+  if (entry.kind === "legacy") return "محفوظ سابقاً";
+  if (entry.kind === "copy") return entry.from ? `نسخة من #${entry.from}` : "نسخة";
+  return `محرك ${entry.engine || ""}`.trim();
+}
+
+function lectureRunLabel(entry) {
+  return entry ? `#${entry.num || "?"} · ${entry.name || lectureRunAutoLabel(entry)}` : "";
+}
+
+
+// -----------------------------------------------------------------------------
+// Runs: a new one before the engine or a bulk AI check rewrites the lecture
+// -----------------------------------------------------------------------------
+let _runUntouchedFingerprint = null;   // an engine run's output, until anything changes it
+
+function lectureRunFingerprint() {
+  const s = JSON.stringify([currentState.rawTranscript, currentState.detections]);
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
+  return s.length + ":" + h;
+}
+
+/** The open run's entry: saved, or about to be (currentRunMeta). */
+function currentLectureRunEntry() {
+  const saved = (currentState.lectureRuns || []).find(r => r.id === currentState.currentRunId);
+  if (saved) return saved;
+  return currentState.currentRunMeta ? { ...currentState.currentRunMeta, id: currentState.currentRunId, num: null } : null;
+}
+
+/**
+ * Start a new run of the open lecture: the run being left is written as it is now and stays that way; what follows
+ * (the engine's output, the verifier's answers, later edits) autosaves into the new one.
+ * kind "engine" re-runs in place over an untouched output of the same engine, so slider tweaks don't pile up runs.
+ */
+function beginNewLectureRun(kind, info = {}) {
+  if (currentState.isDemoSession) return;
+  const prev = currentLectureRunEntry();
+  if (kind === "engine" && prev && prev.kind === "engine" && prev.engine === info.engine &&
+      _runUntouchedFingerprint && _runUntouchedFingerprint === lectureRunFingerprint()) return;
+
+  const lectureId = currentState.currentLectureId;
+  const prevId = currentState.currentRunId;
+  if (lectureId && prevId && (currentState.words || []).length) {
+    clearTimeout(_autosaveTimer);
+    _autosavePending = false;
+    const frozen = structuredClone(currentRunContent());
+    putLectureRun(lectureId, prevId, frozen, { meta: currentState.currentRunMeta || {}, activate: false })
+      .then(lec => { if (lectureId === currentState.currentLectureId) currentState.lectureRuns = lec.runs; })
+      .catch(err => console.error("Failed to keep the previous run:", err));
+  }
+  currentState.currentRunId = newLectureRunId();
+  currentState.currentRunMeta = {
+    kind, engine: info.engine || (prev && prev.engine) || null, ai: info.ai || null, name: "",
+    from: prev && prev.num ? prev.num : null
+  };
+  _runUntouchedFingerprint = null;
+}
+
+/** "Save as a new version": the open run stays as it is now, and editing goes on in a copy of it (a new run). */
+async function saveLectureRunAsNewVersion() {
+  if (currentState.isDemoSession || !(currentState.words || []).length) return null;
+  if (!currentState.currentLectureId || !(currentState.lectureRuns || []).some(r => r.id === currentState.currentRunId)) {
+    if (!(await saveCurrentLectureSession())) return null;      // the run being kept must be saved before it gets a copy
+  }
+  beginNewLectureRun("copy");
+  _autosavePending = true;
+  await flushSessionAutosave();
+  return currentLectureRunEntry();
 }
 
 
@@ -1060,6 +1417,7 @@ async function flushSessionAutosave() {
   const saved = await saveCurrentLectureSession();
   if (!saved) { _autosavePending = true; return; }
   if (typeof renderSavedLecturesList === "function") renderSavedLecturesList();   // keep the "unsaved" flag so the refresh warning stays on
+  if (typeof renderLectureRunPicker === "function") renderLectureRunPicker();
   try {
     const all = await listSavedLectureSessions();      // newest first
     for (const old of all.slice(MAX_SAVED_LECTURE_SESSIONS)) await deleteSavedLectureSession(old.id);
@@ -1069,7 +1427,7 @@ async function flushSessionAutosave() {
 /** Load the most recently edited saved session into currentState. Returns it, or null when none exists. */
 async function restoreLatestLectureSession() {
   const list = await listSavedLectureSessions();
-  const latest = list.find(x => Array.isArray(x.words) && x.words.length);
+  const latest = list.find(x => Array.isArray(x.runs) && x.runs.length);
   if (!latest) return null;
   return await loadLectureSession(latest.id);
 }
@@ -1086,22 +1444,10 @@ document.addEventListener("visibilitychange", () => {
 
 async function renameSavedLectureSession(sessionId, newTitle) {
   try {
-    const db = await openWahyLecturesDB();
-    return await new Promise((resolve, reject) => {
-      const tx = db.transaction([IDB_LECTURES_STORE_NAME], "readwrite");
-      const store = tx.objectStore(IDB_LECTURES_STORE_NAME);
-      const getReq = store.get(sessionId);
-      getReq.onsuccess = () => {
-        const item = getReq.result;
-        if (!item) return resolve(false);
-        item.title = newTitle;
-        item.updated_at = new Date().toISOString();
-        const putReq = store.put(item);
-        putReq.onsuccess = () => resolve(true);
-        putReq.onerror = () => reject(putReq.error);
-      };
-      getReq.onerror = () => reject(getReq.error);
-    });
+    return Boolean(await editLectureRecord(sessionId, rec => {
+      rec.title = newTitle;
+      rec.updated_at = new Date().toISOString();
+    }));
   } catch (err) {
     console.error("Failed to rename lecture session:", err);
     return false;

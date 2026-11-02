@@ -93,7 +93,7 @@ function setTranscriptionBusyUI(isBusy, statusMessage = "") {
 // -----------------------------------------------------------------------------
 // Saved lectures: apply a session loaded into currentState, and the manager list
 // -----------------------------------------------------------------------------
-function applyRestoredSessionToUi() {
+function applyRestoredSessionToUi(goToDisplay = true) {
   const ta = document.getElementById("textareaFastPathInput");
   if (ta) ta.value = currentState.rawTranscript || "";
   const titleInp = document.getElementById("inpLectureTitle");
@@ -103,32 +103,198 @@ function applyRestoredSessionToUi() {
     currentState.captions = buildSmartCaptions(currentState.words, currentState.detections, currentState.outputPrefs);
   }
   renderAllViews();
-  switchMainSection("display");
+  renderLectureRunPicker();
+  if (currentState.tafrigh.hasRun && currentState.tafrigh.data && typeof renderTafrighOutput === "function") {
+    renderTafrighOutput(currentState.tafrigh.data, { keepTab: true });
+  } else if (typeof window.resetTafrighView === "function") {
+    window.resetTafrighView();
+  }
+  renderTafrighRunPicker();
+  if (goToDisplay) switchMainSection("display");
+}
+
+const _lecturesWithRunsOpen = new Set();   // lectures whose run list is unfolded in the saved-lectures panel
+
+function fmtSavedDate(iso) {
+  try { return new Date(iso).toLocaleString((typeof WahyI18n === "object" ? WahyI18n.dateLocale() : "ar-u-nu-latn"), { dateStyle: "medium", timeStyle: "short" }); } catch (e) { return ""; }
+}
+
+const runsNewestFirst = runs => [...(runs || [])].sort((a, b) => (b.num || 0) - (a.num || 0));
+
+function runStatsLine(st) {
+  st = st || {};
+  return `${st.detectionsCount || 0} مقتبس` + (st.aiCheckedCount ? ` • ${st.aiCheckedCount} مدقق` : "");
 }
 
 async function renderSavedLecturesList() {
   const box = document.getElementById("savedLecturesList");
   if (!box) return;
-  const list = (await listSavedLectureSessions()).filter(x => Array.isArray(x.words) && x.words.length);
+  const list = (await listSavedLectureSessions()).filter(x => Array.isArray(x.runs) && x.runs.length);
   if (!list.length) {
     box.innerHTML = `<div class="text-xs text-slate-500 py-3 text-center">لا توجد محاضرات محفوظة بعد — ستُضاف هنا تلقائياً بعد كل تفريغ.</div>`;
     return;
   }
-  const fmt = iso => { try { return new Date(iso).toLocaleString((typeof WahyI18n === "object" ? WahyI18n.dateLocale() : "ar-u-nu-latn"), { dateStyle: "medium", timeStyle: "short" }); } catch (e) { return ""; } };
   box.innerHTML = list.map(x => {
     const isCurrent = x.id === currentState.currentLectureId;
     const st = x.stats || {};
+    const runs = runsNewestFirst(x.runs);
+    const openRunId = isCurrent ? currentState.currentRunId : x.activeRunId;
+    const unfolded = _lecturesWithRunsOpen.has(x.id);
+    const runRows = !unfolded ? "" : `
+      <div class="w-full space-y-1.5 pt-1">
+        ${runs.map(r => {
+          const isOpenRun = isCurrent && r.id === currentState.currentRunId;
+          return `
+          <div class="flex flex-wrap items-center gap-2 rounded-xl border px-2.5 py-1.5 ${isOpenRun ? "bg-emerald-950/40 border-emerald-500/40" : "bg-slate-900 border-slate-800"}" data-run-id="${escapeHtml(r.id)}">
+            <div class="flex-1 min-w-[180px]">
+              <div class="text-xs font-bold text-slate-100 truncate">${isOpenRun ? "● " : ""}${escapeHtml(lectureRunLabel(r))}</div>
+              <div class="text-[11px] text-slate-400">${escapeHtml(fmtSavedDate(r.updated_at))} • ${runStatsLine(r.stats)}</div>
+            </div>
+            <button type="button" data-lec-act="run-open" class="px-2.5 py-1 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/35 text-emerald-300 border border-emerald-500/40 text-[11px] font-bold transition">فتح</button>
+            <button type="button" data-lec-act="run-rename" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-[11px] font-bold transition">تسمية</button>
+            <button type="button" data-lec-act="run-delete" ${runs.length <= 1 ? "disabled" : ""} class="px-2.5 py-1 rounded-lg bg-rose-600/15 hover:bg-rose-600/30 text-rose-300 border border-rose-500/40 text-[11px] font-bold transition disabled:opacity-40">حذف</button>
+          </div>`;
+        }).join("")}
+      </div>`;
     return `
       <div class="flex flex-wrap items-center gap-2 rounded-2xl border px-3 py-2.5 ${isCurrent ? "bg-emerald-950/40 border-emerald-500/50" : "bg-slate-950 border-slate-800"}" data-lecture-id="${escapeHtml(x.id)}">
         <div class="flex-1 min-w-[200px]">
-          <div class="text-sm font-bold text-slate-100 truncate">${isCurrent ? "● " : ""}${escapeHtml(x.title || "بدون عنوان")}</div>
-          <div class="text-[11px] text-slate-400">${escapeHtml(fmt(x.updated_at))} • ${st.wordsCount || 0} كلمة • ${st.detectionsCount || 0} مقتبس${x.mediaUrl ? " • 🎬 فيديو" : ""}</div>
+          <div class="text-sm font-bold text-slate-100 truncate" data-lec-title>${isCurrent ? "● " : ""}${escapeHtml(x.title || "بدون عنوان")}</div>
+          <div class="text-[11px] text-slate-400">${escapeHtml(fmtSavedDate(x.updated_at))} • ${st.wordsCount || 0} كلمة • ${st.detectionsCount || 0} مقتبس${x.mediaUrl ? " • 🎬 فيديو" : ""} • ${runs.length} تشغيل</div>
         </div>
+        <select data-lec-run-select class="field max-w-[14rem]" title="التشغيل الذي يُفتح">
+          ${runs.map(r => `<option value="${escapeHtml(r.id)}" ${r.id === openRunId ? "selected" : ""}>${escapeHtml(lectureRunLabel(r))}</option>`).join("")}
+        </select>
         <button type="button" data-lec-act="open" class="px-3 py-1.5 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/35 text-emerald-300 border border-emerald-500/40 text-[11px] font-bold transition">فتح</button>
+        <button type="button" data-lec-act="runs" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-[11px] font-bold transition">التشغيلات ${unfolded ? "▴" : "▾"}</button>
         <button type="button" data-lec-act="rename" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-[11px] font-bold transition">إعادة تسمية</button>
         <button type="button" data-lec-act="delete" class="px-3 py-1.5 rounded-xl bg-rose-600/15 hover:bg-rose-600/30 text-rose-300 border border-rose-500/40 text-[11px] font-bold transition">حذف</button>
+        ${runRows}
       </div>`;
   }).join("");
+}
+
+/**
+ * Which text the quotes show, read from the quotes themselves: "canonical" when every quote with a reference text
+ * is snapped to it, "spoken" when none is, "mixed" after single quotes were changed by hand.
+ */
+function getQuoteTextMode() {
+  const withRef = (currentState.detections || []).filter(d => d.canonicalText && d.canonicalText.trim());
+  if (!withRef.length) return currentState.snapAllToCanonical ? "canonical" : "spoken";
+  const snapped = withRef.filter(d => d.snappedToCanonical).length;
+  return snapped === withRef.length ? "canonical" : (snapped === 0 ? "spoken" : "mixed");
+}
+
+function syncQuoteTextModeButtons() {
+  const mode = getQuoteTextMode();
+  document.querySelectorAll("[data-quote-text-mode]").forEach(btn => {
+    const on = btn.getAttribute("data-quote-text-mode") === mode;
+    btn.classList.toggle("is-active", on);
+    btn.setAttribute("aria-pressed", on ? "true" : "false");
+  });
+}
+
+/** Run picker on the main screen: the open lecture's runs, newest first, plus the open one before its first save. */
+function renderLectureRunPicker() {
+  const bar = document.getElementById("lectureRunBar");
+  const sel = document.getElementById("selLectureRun");
+  if (!bar || !sel) return;
+  const runs = runsNewestFirst(currentState.lectureRuns);
+  const cur = currentLectureRunEntry();
+  if (cur && !runs.some(r => r.id === cur.id)) {
+    runs.unshift({ ...cur, num: runs.reduce((m, r) => Math.max(m, r.num || 0), 0) + 1 });
+  }
+  if (currentState.isDemoSession || !runs.length) { bar.classList.add("hidden"); return; }
+  bar.classList.remove("hidden");
+  sel.innerHTML = runs.map(r =>
+    `<option value="${escapeHtml(r.id)}">${escapeHtml(lectureRunLabel(r))} — ${runStatsLine(r.stats || runStatsOf(currentState))}</option>`
+  ).join("");
+  sel.value = currentState.currentRunId || "";
+}
+
+/** Saved Tafrigh runs of the open lecture, in the results view: newest first, the open one selected. */
+function renderTafrighRunPicker() {
+  const bar = document.getElementById("tafrighRunBar");
+  const sel = document.getElementById("selTafrighRun");
+  if (!bar || !sel) return;
+  const runs = [...(currentState.tafrighRuns || [])].sort((a, b) => (b.num || 0) - (a.num || 0));
+  bar.classList.toggle("hidden", !runs.length || currentState.isDemoSession);
+  sel.innerHTML = runs.map(r => `<option value="${escapeHtml(r.id)}">${escapeHtml(tafrighRunLabel(r))}</option>`).join("");
+  sel.value = currentState.tafrigh.runEntryId || "";
+}
+
+/** A finished Tafrigh run becomes a new saved run of the lecture (the lecture itself is saved first if it is new). */
+async function saveFinishedTafrighRun(data, meta) {
+  if (currentState.isDemoSession || !data || !data.run_id) return null;
+  if (!currentState.currentLectureId && !(await saveCurrentLectureSession())) return null;
+  const id = newTafrighRunId();
+  currentState.tafrigh.runEntryId = id;
+  try {
+    const entry = await putTafrighRun(currentState.currentLectureId, id, data, meta);
+    renderTafrighRunPicker();
+    return entry;
+  } catch (err) {
+    console.error("Failed to save the Tafrigh run:", err);
+    currentState.tafrigh.runEntryId = null;
+    return null;
+  }
+}
+
+function aiCheckBlocksSwitch() {
+  if (typeof window.isAiVerificationRunning === "function" && window.isAiVerificationRunning()) {
+    showToast("⏳ التدقيق الذكي يكتب في التشغيل الحالي — انتظر انتهاءه أو ألغه قبل فتح تشغيل آخر.");
+    return true;
+  }
+  return false;
+}
+
+/** Open run `runId` of a saved lecture (default: the run it was last on), keeping pending edits of the one we leave. */
+async function openLectureRun(lectureId, runId = null, goToDisplay = true) {
+  if (aiCheckBlocksSwitch()) return false;
+  await flushSessionAutosave();
+  if (!(await loadLectureSession(lectureId, runId))) {
+    showToast("⚠️ تعذر فتح التشغيل المحفوظ.");
+    return false;
+  }
+  applyRestoredSessionToUi(goToDisplay);
+  renderSavedLecturesList();
+  return true;
+}
+
+async function promptRenameLectureRun(lectureId, runId) {
+  const entry = (lectureId === currentState.currentLectureId ? currentState.lectureRuns : (await listSavedLectureSessions()).find(x => x.id === lectureId)?.runs || [])
+    .find(r => r.id === runId);
+  if (!entry) return;
+  const name = prompt(`اسم التشغيل #${entry.num} (اتركه فارغاً للاسم التلقائي):`, entry.name || lectureRunAutoLabel(entry));
+  if (name === null) return;
+  const clean = name.trim() === lectureRunAutoLabel(entry) ? "" : name.trim();
+  await renameLectureRun(lectureId, runId, clean);
+  renderSavedLecturesList();
+  renderLectureRunPicker();
+}
+
+async function deleteRunWithConfirm(lectureId, runId) {
+  const isOpenRun = lectureId === currentState.currentLectureId && runId === currentState.currentRunId;
+  if (isOpenRun && aiCheckBlocksSwitch()) return;
+  if (!confirm("حذف هذا التشغيل المحفوظ وتعديلاته؟ لا يمكن التراجع.")) return;
+  if (isOpenRun) await flushSessionAutosave();          // nothing of it may land after the delete
+  const lec = await deleteLectureRun(lectureId, runId);
+  if (!lec) { showToast("⚠️ لا يمكن حذف التشغيل الوحيد — احذف المحاضرة بدلاً منه."); return; }
+  if (isOpenRun) await openLectureRun(lectureId, lec.activeRunId, false);
+  renderSavedLecturesList();
+  renderLectureRunPicker();
+}
+
+function forgetOpenLectureRecord() {
+  currentState.currentLectureId = null;
+  currentState.lectureCreatedAt = null;
+  currentState.currentRunId = null;
+  currentState.currentRunMeta = null;
+  currentState.lectureRuns = [];
+  currentState.tafrighRuns = [];
+  currentState.tafrigh.runEntryId = null;
+  renderLectureRunPicker();
+  renderTafrighRunPicker();
 }
 
 function initSavedLecturesManager() {
@@ -137,16 +303,23 @@ function initSavedLecturesManager() {
     const row = e.target.closest("[data-lecture-id]");
     if (!btn || !row) return;
     const id = row.getAttribute("data-lecture-id");
+    const runId = e.target.closest("[data-run-id]")?.getAttribute("data-run-id");
     const act = btn.getAttribute("data-lec-act");
-    if (act === "open") {
-      await flushSessionAutosave();                      // never lose pending edits of the lecture we are leaving
-      if (await loadLectureSession(id)) {
-        applyRestoredSessionToUi();
-        renderSavedLecturesList();
-        showToast(`📂 تم فتح «${currentState.lectureTitle}»`);
+    if (act === "open" || act === "run-open") {
+      const chosen = act === "open" ? row.querySelector("[data-lec-run-select]")?.value : runId;
+      if (await openLectureRun(id, chosen || null)) {
+        const entry = currentLectureRunEntry();
+        showToast(`📂 تم فتح «${currentState.lectureTitle}» — ${lectureRunLabel(entry)}`);
       }
+    } else if (act === "runs") {
+      if (_lecturesWithRunsOpen.has(id)) _lecturesWithRunsOpen.delete(id); else _lecturesWithRunsOpen.add(id);
+      renderSavedLecturesList();
+    } else if (act === "run-rename") {
+      await promptRenameLectureRun(id, runId);
+    } else if (act === "run-delete") {
+      await deleteRunWithConfirm(id, runId);
     } else if (act === "rename") {
-      const cur = row.querySelector(".font-bold")?.textContent.replace(/^● /, "") || "";
+      const cur = row.querySelector("[data-lec-title]")?.textContent.replace(/^● /, "") || "";
       const name = (prompt("العنوان الجديد للمحاضرة:", cur) || "").trim();
       if (!name) return;
       await renameSavedLectureSession(id, name);
@@ -157,22 +330,48 @@ function initSavedLecturesManager() {
       }
       renderSavedLecturesList();
     } else if (act === "delete") {
-      if (!confirm("حذف هذه المحاضرة المحفوظة؟ لا يمكن التراجع.")) return;
+      if (!confirm("حذف هذه المحاضرة المحفوظة وكل تشغيلاتها؟ لا يمكن التراجع.")) return;
       await deleteSavedLectureSession(id);
-      if (id === currentState.currentLectureId) { currentState.currentLectureId = null; currentState.lectureCreatedAt = null; }
+      if (id === currentState.currentLectureId) forgetOpenLectureRecord();
       renderSavedLecturesList();
     }
   });
   document.getElementById("btnClearAllLectures")?.addEventListener("click", async () => {
     if (!confirm("حذف جميع المحاضرات المحفوظة؟ لا يمكن التراجع.")) return;
     for (const x of await listSavedLectureSessions()) await deleteSavedLectureSession(x.id);
-    currentState.currentLectureId = null; currentState.lectureCreatedAt = null;
+    forgetOpenLectureRecord();
     renderSavedLecturesList();
   });
   // keep the saved title in sync when the user edits the title field
   document.getElementById("inpLectureTitle")?.addEventListener("change", (e) => {
     currentState.lectureTitle = e.target.value.trim() || currentState.lectureTitle;
     scheduleSessionAutosave();
+  });
+
+  // Main-screen run bar
+  document.getElementById("selLectureRun")?.addEventListener("change", async (e) => {
+    const runId = e.target.value;
+    if (!currentState.currentLectureId || runId === currentState.currentRunId) return;
+    if (await openLectureRun(currentState.currentLectureId, runId, false)) {
+      showToast(`📂 ${lectureRunLabel(currentLectureRunEntry())}`);
+    } else {
+      renderLectureRunPicker();                          // put the picker back on the run that is still open
+    }
+  });
+  document.getElementById("btnRenameLectureRun")?.addEventListener("click", async () => {
+    await flushSessionAutosave();                        // a run is renamed once it is saved
+    if (currentState.currentLectureId && currentState.currentRunId) {
+      await promptRenameLectureRun(currentState.currentLectureId, currentState.currentRunId);
+    }
+  });
+  document.getElementById("btnSaveRunAsNewVersion")?.addEventListener("click", async () => {
+    if (aiCheckBlocksSwitch()) return;
+    const keptId = currentState.currentRunId;
+    const copy = await saveLectureRunAsNewVersion();
+    if (!copy) { showToast("⚠️ لا يوجد نص محفوظ لنسخه بعد."); return; }
+    renderLectureRunPicker();
+    const kept = (currentState.lectureRuns || []).find(r => r.id === keptId);
+    showToast(`💾 حُفظ ${kept ? lectureRunLabel(kept) : `#${copy.from}`} كما هو — تعديلاتك الآن في ${lectureRunLabel(copy)}`);
   });
 }
 
@@ -1057,6 +1256,9 @@ window.addEventListener("DOMContentLoaded", () => {
     const windowed = modeSel?.querySelector('option[value="windowed"]');
     if (windowed) windowed.disabled = tfgNeedsHelper();   // windowed batches need a chat model (Gemini / OpenRouter non-JEV)
     if (modeSel && windowed?.disabled && modeSel.value === "windowed") modeSel.value = "per_sentence";
+    tfgEl("wrapTafrighWindowSize")?.classList.toggle("hidden", modeSel?.value !== "windowed");
+    tfgEl("wrapTafrighJevOrder")?.classList.toggle("hidden", !(prov === "openrouter" && tfgIsJev(tfgChatModel())));
+    tfgEl("wrapTafrighThinking")?.classList.toggle("hidden", tfgIsJev(tfgChatModel()) || !tfgModelThinks(tfgChatModel()));
     if (prov === "openrouter" || tfgNeedsHelper()) loadTafrighCatalog();
     updateTafrighRangeSummary();
   }
@@ -1166,15 +1368,116 @@ window.addEventListener("DOMContentLoaded", () => {
     const sum = tfgEl("tafrighRangeSummary");
     if (!sum || !tfg.preview) return;
     const { from, to, count } = tafrighRange();
-    const perSentence = tfgNeedsHelper() && tfgProvider() === "openrouter" ? 3.5 : 2.5;   // measured: JEV ≈ 3.5 s / sentence
     const words = tfg.preview.segments.slice(from - 1, to).reduce((a, s) => a + s.words, 0);
-    sum.textContent = `سيعمل النموذج على ${count} جملة (من ${from} إلى ${to}، ${words} كلمة) • الوقت التقريبي ≈ ${fmtSec(count * perSentence)}`;
+    sum.textContent = `سيعمل النموذج على ${count} جملة (من ${from} إلى ${to}، ${words} كلمة)`;
+    scheduleTafrighEstimate();
     const lbl = tfgEl("lblRunTafrigh");
     if (lbl) lbl.textContent = `تشغيل التفريغ على ${count} جملة`;
     tfgEl("tafrighSegList")?.querySelectorAll("[data-seg-idx]").forEach(row => {
       const k = parseInt(row.getAttribute("data-seg-idx"), 10) + 1;
       row.classList.toggle("opacity-40", k < from || k > to);
     });
+  }
+
+  // ---- Before running: requests / tokens / cost / time of each mode, from the real prompts (/api/tafrigh/estimate) ----
+  const tfgWindowSize = () => Math.max(2, Math.min(40, parseInt(tfgEl("inpTafrighWindowSize")?.value || "15", 10) || 15));
+  const tfgJevOrder = () => tfgEl("selTafrighJevOrder")?.value || "combined";
+  // measured on a JEV run of a noisy ASR lecture: 10 of 12 sentences went to the helper for typo fixes (its real cost in
+  // JEV / Laya mode), about 1 in 10 for split points; ~1,200 input and ~280 output tokens per request
+  const HELPER_IN_TOKENS = 1200, HELPER_OUT_TOKENS = 280;
+  const helperShare = () => (tfgEl("selTafrighTypoStrategy")?.value === "off" ? 0.1 : 0.95);
+  const tfgModelThinks = (id) => {
+    const m = tfgCatalog().find(x => x.id === id);
+    return Boolean(m && Array.isArray(m.supportedParameters) && m.supportedParameters.includes("reasoning"));
+  };
+  const tfgNoThinking = () => Boolean(tfgEl("chkTafrighNoThinking")?.checked);
+
+  /** $ per token {in, out} of an OpenRouter model id (null: unknown). A direct Gemini model is priced like its
+   *  OpenRouter twin; Google's free tier itself costs nothing. */
+  function tfgPriceOf(id) {
+    const m = tfgCatalog().find(x => x.id === id);
+    return m ? { in: parseFloat(m.pricing.prompt || 0), out: parseFloat(m.pricing.completion || 0), free: m.isFree } : null;
+  }
+  const fmtUsd = v => (v == null ? "—" : v < 0.01 ? `$${v.toFixed(5)}` : `$${v.toFixed(4)}`);
+  const fmtTok = n => (n >= 10000 ? `${(n / 1000).toFixed(1)}k` : String(n));
+
+  function scheduleTafrighEstimate() {
+    clearTimeout(tfg.estimateTimer);
+    tfg.estimateTimer = setTimeout(refreshTafrighEstimate, 350);
+  }
+
+  async function refreshTafrighEstimate() {
+    const box = tfgEl("tafrighEstimate");
+    if (!box || !tfg.preview) return;
+    const { from, to, count } = tafrighRange();
+    if (!count) { box.innerHTML = ""; return; }
+    try {
+      const r = await fetch("/api/tafrigh/estimate", {
+        method: "POST", headers: { "Content-Type": "application/json" }, trapError: false,
+        body: JSON.stringify({ ...tafrighSource(), seg_config: tafrighSegConfig(), target_range: [from - 1, to],
+                               window_size: tfgWindowSize(), jev_execution_order: tfgJevOrder() })
+      });
+      tfg.estimate = await r.json();
+    } catch (e) { tfg.estimate = null; }
+    renderTafrighEstimate();
+  }
+
+  function renderTafrighEstimate() {
+    const box = tfgEl("tafrighEstimate");
+    const est = tfg.estimate;
+    if (!box || !est || !est.success) { if (box) box.innerHTML = ""; return; }
+    const prov = tfgProvider();
+    const jev = prov === "openrouter" && tfgIsJev(tfgChatModel());
+    const mode = tfgEl("selTafrighMode")?.value || "per_sentence";
+    const modelId = prov === "gemini" ? `google/${tfgEl("selTafrighModel")?.value || "gemini-3.1-flash-lite"}`.replace("google/auto", "google/gemini-3.1-flash-lite") : tfgChatModel();
+    const helperId = tfgHelperDirect() ? "google/gemini-3.1-flash-lite" : (tfgHelperModel() || "google/gemini-3.1-flash-lite");
+    const cost = (row, price) => (price ? row.input_tokens * price.in + row.output_tokens * price.out : null);
+    const helperRow = () => {
+      const n = Math.ceil(est.sentences * helperShare());
+      return { requests: n, input_tokens: n * HELPER_IN_TOKENS, output_tokens: n * HELPER_OUT_TOKENS };
+    };
+    // seconds: measured on real runs (flash-lite / JEV through OpenRouter); a slow or "thinking" model takes longer
+    const rows = [];
+    if (prov === "laya" || jev) {
+      const main = jev ? est.jev : est.laya;
+      const h = helperRow();
+      rows.push({ key: "main", label: jev ? `JEV (${tfgJevOrder() === "combined" ? "طلب واحد لكل جملة" : "3 طلبات لكل جملة"})` : "Laya المحلي",
+                  model: jev ? tfgChatModel() : "laya", row: main,
+                  // JEV is missing from OpenRouter's price list: measured $ per sentence (1 / 3 requests) on 2026-11-02
+                  usd: jev ? (cost(main, tfgPriceOf(tfgChatModel())) ?? est.sentences * (tfgJevOrder() === "combined" ? 0.000063 : 0.000118)) : 0,
+                  sec: est.sentences * (jev ? 3.5 : 1.0), active: true });
+      rows.push({ key: "helper", label: "＋ نموذج المساعدة (تصحيح الأخطاء والتقسيم) — تقريبي", model: tfgHelperDirect() ? "Gemini مباشرة" : helperId,
+                  row: h, usd: tfgHelperDirect() ? 0 : cost(h, tfgPriceOf(helperId)), sec: h.requests * 2, active: true, extra: true });
+    } else {
+      const price = tfgPriceOf(modelId);
+      const freeTier = prov === "gemini";
+      rows.push({ key: "per_sentence", label: "جملة بجملة", model: modelId, row: est.per_sentence,
+                  usd: freeTier ? 0 : cost(est.per_sentence, price), paid: cost(est.per_sentence, price),
+                  sec: est.per_sentence.requests * 2.5, active: mode === "per_sentence" });
+      rows.push({ key: "windowed", label: `نافذة (${est.windowed.window_size} جمل في كل طلب)`, model: modelId, row: est.windowed,
+                  usd: freeTier ? 0 : cost(est.windowed, price), paid: cost(est.windowed, price),
+                  sec: est.windowed.requests * 4 + est.sentences * 0.5, active: mode === "windowed" });
+    }
+    const total = rows.filter(r => r.active).reduce((a, r) => a + (r.usd || 0), 0);
+    box.innerHTML = `
+      <table class="w-full text-right">
+        <thead class="text-[10px] text-slate-500"><tr>
+          <th class="px-3 py-1.5 font-normal">الطريقة</th><th class="px-2 font-normal">الطلبات</th>
+          <th class="px-2 font-normal">رموز الإدخال / الإخراج</th><th class="px-2 font-normal">التكلفة</th><th class="px-2 font-normal">الوقت</th></tr></thead>
+        <tbody>${rows.map(r => `
+          <tr class="${r.active ? "text-slate-100" : "text-slate-500"} ${r.active && !r.extra ? "bg-amber-500/10" : ""}">
+            <td class="px-3 py-1">${r.active && !r.extra ? "▶ " : ""}${escapeHtml(r.label)} <span class="font-mono text-[10px] text-slate-500" dir="ltr">${escapeHtml(r.model || "")}</span></td>
+            <td class="px-2 font-mono">${r.row.requests}</td>
+            <td class="px-2 font-mono" dir="ltr">${fmtTok(r.row.input_tokens)} / ${fmtTok(r.row.output_tokens)}</td>
+            <td class="px-2 font-mono text-emerald-300">${fmtUsd(r.usd)}${r.usd === 0 && r.paid ? ` <span class="text-[10px] text-slate-500">(مجاني؛ مدفوعاً ≈ ${fmtUsd(r.paid)})</span>` : ""}</td>
+            <td class="px-2 font-mono">≈ ${fmtSec(r.sec)}</td>
+          </tr>`).join("")}
+        </tbody>
+      </table>
+      <div class="px-3 py-1.5 text-[10px] text-slate-500 border-t border-slate-800">
+        تقدير من نص الطلبات الفعلي (±30٪): مجموع التشغيل المختار ≈ <b class="text-emerald-300">${fmtUsd(total)}</b>.
+        ${rows.some(r => r.key === "per_sentence") ? "النموذج نفسه يقسّم الجمل ويصحح الأخطاء في رده (لا نموذج مساعد). " : ""}${tfgModelThinks(modelId) && !tfgNoThinking() ? '<b class="text-amber-300">التفكير مفعّل: قد تتضاعف التكلفة عدة مرات (DeepSeek: 6.5×).</b> ' : ""} التكلفة الفعلية تظهر بعد التشغيل مفصّلة لكل نموذج وغرض.
+      </div>`;
   }
 
   function renderTafrighSegList() {
@@ -1196,13 +1499,32 @@ window.addEventListener("DOMContentLoaded", () => {
     updateTafrighRangeSummary();
   }
 
+  // Bar = finished sentences / sentences of the run (solid) + the sentences of the request being waited on
+  // (striped). A window answers many sentences at once: the stripes show what is coming instead of a frozen bar.
   function renderTafrighProgress(d) {
     const info = d.details || {};
-    const pct = Math.round(d.percent ?? 0);
+    const total = Math.max(1, info.total || 1);
+    const pct = info.total ? Math.round(100 * (info.done || 0) / total) : Math.round(d.percent ?? 0);
     const bar = tfgEl("tafrighProgressBar");
-    if (bar) bar.style.width = `${Math.max(parseFloat(bar.style.width) || 0, pct)}%`;
+    const shown = Math.max(tfg.barPct || 0, pct);
+    tfg.barPct = shown;
+    if (bar) bar.style.width = `${shown}%`;
+    const fly = tfgEl("tafrighProgressInflight");
+    if (fly) {
+      const span = info.inflight ? Math.max(0, 100 * (info.inflight.to - info.inflight.from) / total) : 0;
+      fly.style.right = `${shown}%`;
+      fly.style.width = `${Math.min(100 - shown, span)}%`;
+      const key = info.inflight ? `${info.inflight.from}-${info.inflight.to}-${info.requests_sent}` : "";
+      if (key !== tfg.inflightKey) { tfg.inflightKey = key; tfg.inflightSince = Date.now(); }
+    }
     const pctEl = tfgEl("tafrighProgressPct");
-    if (pctEl) pctEl.textContent = `${Math.max(parseInt(pctEl.textContent, 10) || 0, pct)}%`;
+    if (pctEl) pctEl.textContent = `${shown}%`;
+    const reqEl = tfgEl("tafrighProgressRequests");
+    if (reqEl && info.requests_planned != null) {
+      const waiting = info.inflight ? ` • ينتظر رد الطلب الجاري منذ ${fmtSec((Date.now() - (tfg.inflightSince || Date.now())) / 1000)} (الجمل ${info.inflight.from + 1}–${info.inflight.to})` : "";
+      reqEl.textContent = `الطلبات: ${info.requests_sent} أُرسلت من ≈ ${info.requests_planned}` +
+        (info.mode === "windowed" ? ` • نافذة ${info.window_no || 1} (${info.window_size} جمل لكل طلب)` : " • طلب لكل جملة") + waiting;
+    }
     if (tfgEl("tafrighProgressTitle") && d.message) tfgEl("tafrighProgressTitle").textContent = d.message;
     if (tfgEl("tafrighProgressSubtitle")) {
       tfgEl("tafrighProgressSubtitle").textContent = info.paused ? "⏸️ متوقف مؤقتاً — اضغط «استئناف» للمتابعة" : "";
@@ -1211,11 +1533,11 @@ window.addEventListener("DOMContentLoaded", () => {
     if (det && info.total != null) {
       det.innerHTML = [
         statCard("الجمل", `${info.done} / ${info.total}`, "text-amber-300"),
-        statCard("الوقت المنقضي", fmtSec(info.elapsed_sec)),
+        statCard("الوقت المنقضي", fmtSec(tfg.runStartedAt ? (Date.now() - tfg.runStartedAt) / 1000 : info.elapsed_sec)),
         statCard("المتبقي تقريباً", fmtSec(info.eta_sec)),
         statCard("ثانية لكل جملة", info.sec_per_sentence ?? "—"),
-        statCard("طلبات النموذج", info.model_calls ?? 0),
-        statCard("التكلفة", `$${(info.cost_usd || 0).toFixed(5)}`),
+        statCard("طلبات ناجحة", info.model_calls ?? 0),
+        statCard("التكلفة حتى الآن", `$${(info.cost_usd || 0).toFixed(5)}`),
         statCard("أخطاء", info.errors ?? 0, info.errors ? "text-rose-300" : "text-white"),
         statCard("تقسيم / تصحيح", `${info.splits ?? 0} / ${info.edits ?? 0}`)
       ].join("");
@@ -1227,7 +1549,7 @@ window.addEventListener("DOMContentLoaded", () => {
     }
     if (info.current && tfgEl("tafrighProgressCurrent")) {
       tfgEl("tafrighProgressCurrent").textContent = info.current.text || "—";
-      const purpose = { classify: "تصنيف", split: "تقسيم", correct: "تصحيح", classify_window: "تصنيف نافذة" }[info.current.purpose] || "";
+      const purpose = { classify: "تصنيف", split: "تقسيم", correct: "تصحيح", classify_window: "تصنيف نافذة", classify_window_retry: "إعادة طلب النافذة" }[info.current.purpose] || "";
       if (tfgEl("tafrighProgressPurpose")) tfgEl("tafrighProgressPurpose").textContent = purpose ? `(${purpose})` : "";
     }
   }
@@ -1285,6 +1607,11 @@ window.addEventListener("DOMContentLoaded", () => {
 
     tafrighShow("tafrighProgressWrap");
     if (tfgEl("tafrighProgressBar")) tfgEl("tafrighProgressBar").style.width = "0%";
+    if (tfgEl("tafrighProgressInflight")) tfgEl("tafrighProgressInflight").style.width = "0%";
+    if (tfgEl("tafrighProgressRequests")) tfgEl("tafrighProgressRequests").textContent = "";
+    tfg.barPct = 0;
+    tfg.inflightKey = "";
+    tfg.runStartedAt = Date.now();
     if (tfgEl("tafrighProgressPct")) tfgEl("tafrighProgressPct").textContent = "0%";
     if (tfgEl("tafrighProgressTitle")) tfgEl("tafrighProgressTitle").textContent = `جاري التحضير لـ ${count} جملة...`;
     ["tafrighProgressDetails", "tafrighProgressTags"].forEach(id => { if (tfgEl(id)) tfgEl(id).innerHTML = ""; });
@@ -1312,6 +1639,9 @@ window.addEventListener("DOMContentLoaded", () => {
       matn_config: matnText ? { mode: "upload", raw_matn_text: matnText } : { mode: "no_matn" },
       lecture_slug: (currentState.lectureTitle || "lecture").slice(0, 40),
       processing_mode: tfgEl("selTafrighMode")?.value || "per_sentence",
+      window_size: tfgWindowSize(),
+      jev_execution_order: tfgJevOrder(),
+      disable_thinking: tfgNoThinking() && tfgModelThinks(tfgChatModel()),
       ...tafrighModelPayload(),
       typo_strategy: tfgEl("selTafrighTypoStrategy")?.value || "gated",
       gemini_api_key: currentState?.aiVerification?.geminiApiKey || localStorage.getItem("wahy_gemini_api_key") || "",
@@ -1339,6 +1669,16 @@ window.addEventListener("DOMContentLoaded", () => {
       if (data.success) {
         if (typeof renderTafrighOutput === "function") renderTafrighOutput(data);
         tafrighShow("tafrighResultsView");
+        const man = data.manifest || {};
+        await saveFinishedTafrighRun(data, {
+          provider: tfgProvider(),
+          model: man.model_candidate === "jev_hybrid" ? payload.jev_model : (man.model_candidate === "laya_hybrid" ? "laya" : String(man.gemini_route || payload.model_name || "").replace(/^(openrouter|gemini):/, "")),
+          helper: man.model_candidate !== "gemini_all" ? String(man.gemini_route || "").replace(/^(openrouter|gemini):/, "") : null,
+          mode: man.processing_mode || payload.processing_mode,
+          windowSize: man.processing_mode === "windowed" ? man.window_size : null,
+          range: payload.target_range,
+          fromEditorRun: (typeof currentLectureRunEntry === "function" && currentLectureRunEntry()?.num) || null
+        });
         showToast(data.cancelled ? "⏹️ تم الإيقاف — عرض الجمل المكتملة" : "✅ اكتمل التفريغ الذكي");
       } else {
         tafrighShow("tafrighErrorWrap");
@@ -1398,7 +1738,7 @@ window.addEventListener("DOMContentLoaded", () => {
   tfgEl("btnTafrighRerunEngine")?.addEventListener("click", async () => {
     if (!(currentState.words || []).length) { showToast("لا يوجد نص لإعادة فحصه بعد"); return; }
     const choice = ENGINE_CHOICES.includes(tfgEl("selTafrighEngine")?.value) ? tfgEl("selTafrighEngine").value : "v5";
-    if (!confirm(`إعادة اكتشاف المقتبسات بالمحرك ${choice}؟ ستُستبدل المقتبسات الحالية وتعديلاتك اليدوية عليها (يمكن التراجع).`)) return;
+    if (!confirm(`إعادة اكتشاف المقتبسات بالمحرك ${choice}؟ النتيجة تُحفظ كتشغيل جديد، ويبقى التشغيل الحالي بتعديلاتك محفوظاً.`)) return;
     if (typeof pushUndoSnapshot === "function") pushUndoSnapshot(`إعادة تشغيل المحرك ${choice} قبل التفريغ`);
     try { localStorage.setItem("wahyEngine", choice); } catch (e) { /* storage blocked */ }
     ["selEngineVersion", "selEngineVersionQuick"].forEach(id => { const el = document.getElementById(id); if (el) el.value = choice; });
@@ -1433,6 +1773,20 @@ window.addEventListener("DOMContentLoaded", () => {
     tfg.previewTimer = setTimeout(refreshTafrighPreview, 250);
   }));
   ["inpTafrighFrom", "inpTafrighTo"].forEach(id => tfgEl(id)?.addEventListener("input", updateTafrighRangeSummary));
+  // mode, window size and JEV question layout: remembered, and the estimate follows them
+  [["selTafrighMode", "wahyTafrighMode"], ["inpTafrighWindowSize", "wahyTafrighWindowSize"], ["selTafrighJevOrder", "wahyTafrighJevOrder"], ["selTafrighTypoStrategy", "wahyTafrighTypo"]].forEach(([id, key]) => {
+    const el = tfgEl(id);
+    if (!el) return;
+    const saved = tfgLoad(key);
+    if (saved && (el.tagName !== "SELECT" || [...el.options].some(o => o.value === saved))) el.value = saved;
+    el.addEventListener("change", () => { tfgStore(key, el.value); syncTafrighProviderUI(); });
+  });
+  syncTafrighProviderUI();
+  tfgEl("selTafrighModel")?.addEventListener("change", scheduleTafrighEstimate);
+  if (tfgEl("chkTafrighNoThinking")) {
+    tfgEl("chkTafrighNoThinking").checked = tfgLoad("wahyTafrighNoThinking") !== "0";
+    tfgEl("chkTafrighNoThinking").addEventListener("change", (e) => { tfgStore("wahyTafrighNoThinking", e.target.checked ? "1" : "0"); scheduleTafrighEstimate(); });
+  }
   document.querySelectorAll("[data-tafrigh-range]").forEach(btn => btn.addEventListener("click", () => {
     const n = tfg.preview ? tfg.preview.segments.length : 0;
     const v = btn.getAttribute("data-tafrigh-range");
@@ -1442,6 +1796,73 @@ window.addEventListener("DOMContentLoaded", () => {
   }));
   document.querySelectorAll(".tafrigh-view-tab").forEach(b => b.addEventListener("click", () => setTafrighResultsView(b.getAttribute("data-tafrigh-view"))));
   window.openTafrighPrep = openTafrighPrep;
+  window.resetTafrighView = () => {
+    tafrighShow("tafrighEmptyState");
+    tfgEl("tafrighQuickActions")?.classList.add("hidden");
+    tfgEl("badgeTafrighStatus")?.classList.add("hidden");
+  };
+
+  const tafrighRunBusy = () => {
+    if (!tafrighRunInFlight) return false;
+    showToast("⏳ التفريغ الذكي قيد التشغيل — انتظر انتهاءه قبل فتح تشغيل آخر.");
+    return true;
+  };
+  tfgEl("selTafrighRun")?.addEventListener("change", async (e) => {
+    const id = e.target.value;
+    if (tafrighRunBusy() || !currentState.currentLectureId || id === currentState.tafrigh.runEntryId) { renderTafrighRunPicker(); return; }
+    const data = await openTafrighRun(currentState.currentLectureId, id);
+    if (!data) { showToast("⚠️ تعذر فتح تشغيل التفريغ المحفوظ."); renderTafrighRunPicker(); return; }
+    renderTafrighOutput(data);
+    tafrighShow("tafrighResultsView");
+    renderTafrighRunPicker();
+    showToast(`📂 ${tafrighRunLabel((currentState.tafrighRuns || []).find(r => r.id === id))}`);
+  });
+  tfgEl("btnRenameTafrighRun")?.addEventListener("click", async () => {
+    const e = (currentState.tafrighRuns || []).find(r => r.id === currentState.tafrigh.runEntryId);
+    if (!e) return;
+    const name = prompt(`اسم تشغيل التفريغ #${e.num} (اتركه فارغاً للاسم التلقائي):`, e.name || tafrighRunAutoLabel(e));
+    if (name === null) return;
+    await renameTafrighRun(currentState.currentLectureId, e.id, name.trim() === tafrighRunAutoLabel(e) ? "" : name.trim());
+    renderTafrighRunPicker();
+  });
+  // The open run stays as it is now; review goes on in a copy. The server copies the run too, so the two stay apart.
+  tfgEl("btnSaveTafrighRunAsNew")?.addEventListener("click", async () => {
+    const data = currentState.tafrigh.data;
+    const kept = (currentState.tafrighRuns || []).find(r => r.id === currentState.tafrigh.runEntryId);
+    if (tafrighRunBusy() || !data || !kept) return;
+    let clone;
+    try {
+      clone = await (await fetch("/api/tafrigh/clone-run", {
+        method: "POST", headers: { "Content-Type": "application/json" }, trapError: false, body: JSON.stringify({ run_id: data.run_id })
+      })).json();
+    } catch (err) { clone = { success: false, message: "تعذر الاتصال بالخادم" }; }
+    if (!clone.success) { showToast(`⚠️ ${clone.message || "تعذر نسخ التشغيل"}`); return; }
+    const copy = Object.assign(structuredClone(data), { run_id: clone.run_id });
+    const id = newTafrighRunId();
+    currentState.tafrigh.runEntryId = id;
+    currentState.tafrigh.data = copy;
+    const { id: _i, num: _n, name: _nm, created_at: _c, updated_at: _u, stats: _s, ...meta } = kept;
+    const entry = await putTafrighRun(currentState.currentLectureId, id, copy, { ...meta, from: kept.num });
+    renderTafrighRunPicker();
+    showToast(`💾 حُفظ #${kept.num} كما هو — مراجعاتك الآن في #${entry.num}`);
+  });
+  tfgEl("btnDeleteTafrighRun")?.addEventListener("click", async () => {
+    const id = currentState.tafrigh.runEntryId;
+    if (tafrighRunBusy() || !id || !confirm("حذف تشغيل التفريغ هذا ومراجعاته؟ لا يمكن التراجع.")) return;
+    const lec = await deleteTafrighRun(currentState.currentLectureId, id);
+    if (!lec) return;
+    const next = lec.activeTafrighRunId ? await openTafrighRun(lec.id, lec.activeTafrighRunId) : null;
+    if (next) {
+      renderTafrighOutput(next);
+      tafrighShow("tafrighResultsView");
+    } else {
+      Object.assign(currentState.tafrigh, { data: null, hasRun: false, runEntryId: null });
+      window.resetTafrighView();
+      openTafrighPrep();
+    }
+    renderTafrighRunPicker();
+    showToast("🗑 حُذف تشغيل التفريغ");
+  });
 
   // Tab switching buttons
   document.getElementById("btnLectureTab_SYNC")?.addEventListener("click", () => {
@@ -1581,24 +2002,24 @@ window.addEventListener("DOMContentLoaded", () => {
     showToast("📥 تم تصدير صفحة التفريغ بصيغة HTML");
   });
 
-  document.getElementById("btnSnapAllToCanonical")?.addEventListener("click", () => {
-    pushUndoSnapshot("تبديل الرسم القياسي لجميع المقتبسات");
-    currentState.snapAllToCanonical = !currentState.snapAllToCanonical;
-    currentState.detections.forEach(d => {
-      d.snappedToCanonical = currentState.snapAllToCanonical;
+  // «كما نُطق | الرسم القياسي» switch, shown on the display and editor screens. Both copies drive the same
+  // per-quote state, so captions, exports and every screen agree.
+  document.querySelectorAll("[data-quote-text-mode]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const toCanonical = btn.getAttribute("data-quote-text-mode") === "canonical";
+      if (getQuoteTextMode() === (toCanonical ? "canonical" : "spoken")) return;
+      pushUndoSnapshot("تبديل الرسم القياسي لجميع المقتبسات");
+      currentState.snapAllToCanonical = toCanonical;
+      currentState.detections.forEach(d => {
+        d.snappedToCanonical = toCanonical;
+      });
+      recalculateCaptionsFromCurrentFindings();
+      showToast(
+        toCanonical
+          ? "✅ تم استبدال جميع الآيات والأحاديث بالرسم العثماني والقياسي المعتمد"
+          : "↩️ تمت استعادة إملاء التفريغ الأصلي"
+      );
     });
-    const btn = document.getElementById("btnSnapAllToCanonical");
-    if (btn) {
-      btn.textContent = currentState.snapAllToCanonical
-        ? "✨ الرسم القياسي: مفعّل"
-        : "✨ توحيد بالرسم القياسي";
-    }
-    recalculateCaptionsFromCurrentFindings();
-    showToast(
-      currentState.snapAllToCanonical
-        ? "✅ تم استبدال جميع الآيات والأحاديث بالرسم العثماني والقياسي المعتمد"
-        : "↩️ تمت استعادة إملاء التفريغ الأصلي"
-    );
   });
 
   // ---------------------------------------------------------------------------
@@ -1675,7 +2096,7 @@ window.addEventListener("DOMContentLoaded", () => {
     if (!currentState.rawTranscript) { showToast("لا يوجد نص لإعادة فحصه بعد"); return; }
     rebuildMatcher();
     runDetectionAndBuildCaptions();
-    showToast(`🔄 تمت إعادة تشغيل المحرك (${activeEngineName()})`);
+    showToast(`🔄 تمت إعادة تشغيل المحرك (${activeEngineName()}) — ${lectureRunLabel(currentLectureRunEntry())}`);
   });
 
   document.getElementById("chkToggleAdhkarEngine")?.addEventListener("change", (e) => {
@@ -2015,10 +2436,14 @@ window.addEventListener("DOMContentLoaded", () => {
 
       isAiVerificationRunning = true;
       try {
+        // the label used to show only "processed/total" findings while the status line talked about requests;
+        // with Gemini batches or ayah passages the two counts differ, so both are shown, each with its own total
+        if (barProgress) barProgress.style.width = "0%";
+        if (lblPercent) lblPercent.textContent = "0%";
         const summary = await WahyAiVerifier.runBatchAiVerification((p) => {
           const pct = p.total > 0 ? Math.round((p.processed / p.total) * 100) : 0;
           if (barProgress) barProgress.style.width = `${pct}%`;
-          if (lblPercent) lblPercent.textContent = `${pct}% (${p.processed}/${p.total})`;
+          if (lblPercent) lblPercent.textContent = `${pct}% • مقتبسات ${p.processed}/${p.total} • طلبات ${p.requestsDone}/${p.requestsTotal}`;
           if (lblStatus) lblStatus.textContent = p.message || "جاري الفحص...";
         }, selectedIndices);
         if (summary && summary.failed) {
@@ -2472,17 +2897,7 @@ window.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // 2. Editor Rasm Qiyasi and Full Matn Toggles
-  document.getElementById("btnEditorToggleRasmQiyasi")?.addEventListener("click", () => {
-    currentState.editorViewRasmQiyasi = !currentState.editorViewRasmQiyasi;
-    const btn = document.getElementById("btnEditorToggleRasmQiyasi");
-    if (btn) {
-      btn.classList.toggle("is-on", currentState.editorViewRasmQiyasi);
-    }
-    if (typeof renderEditorLectureStage === "function") renderEditorLectureStage();
-    showToast(currentState.editorViewRasmQiyasi ? "✨ تم تفعيل عرض الرسم القياسي في لوحة التحرير" : "تم إلغاء عرض الرسم القياسي في لوحة التحرير");
-  });
-
+  // 2. Editor Full Matn Toggle
   document.getElementById("btnEditorToggleFullMatn")?.addEventListener("click", () => {
     currentState.editorViewFullCanonicalSpan = !currentState.editorViewFullCanonicalSpan;
     const btn = document.getElementById("btnEditorToggleFullMatn");

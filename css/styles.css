@@ -1469,3 +1469,11 @@ html[dir="ltr"] #tafrighRenderedContent .tfg-review-card {
     overflow: visible !important;
   }
 }
+
+/* Tafrigh progress: the sentences of the request in flight */
+.tfg-inflight {
+  background: repeating-linear-gradient(-45deg, rgba(251, 191, 36, 0.45) 0 6px, rgba(251, 191, 36, 0.15) 6px 12px);
+  background-size: 17px 17px;
+  animation: tfg-inflight-move 0.8s linear infinite;
+}
+@keyframes tfg-inflight-move { from { background-position: 0 0; } to { background-position: 17px 0; } }

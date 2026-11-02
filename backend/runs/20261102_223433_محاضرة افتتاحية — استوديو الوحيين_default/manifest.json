@@ -1,0 +1,55 @@
+{
+  "run_id": "run_384905c3ff99",
+  "processing_mode": "per_sentence",
+  "window_size": 15,
+  "model_candidate": "jev_hybrid",
+  "jev_layout": "independent_questions",
+  "jev_execution_order": "combined",
+  "typo_strategy": "gated",
+  "use_detection_boundaries": true,
+  "num_segments": 5,
+  "target_range": [
+    0,
+    5
+  ],
+  "cancelled": false,
+  "adapter_mode": "live",
+  "model_name": "auto",
+  "gemini_route": "openrouter:google/gemini-3.1-flash-lite",
+  "wall_clock_seconds": 13.1,
+  "cost_breakdown": [
+    {
+      "purpose": "classify",
+      "model": "jev:typesafe/jev-1.14",
+      "requests": 5,
+      "retries": 0,
+      "cost_usd": 0.00031336,
+      "input_tokens": 7461,
+      "output_tokens": 568
+    },
+    {
+      "purpose": "correct",
+      "model": "openrouter:google/gemini-3.1-flash-lite",
+      "requests": 4,
+      "retries": 0,
+      "cost_usd": 0.002861,
+      "input_tokens": 4868,
+      "output_tokens": 1096
+    },
+    {
+      "purpose": "split",
+      "model": "openrouter:google/gemini-3.1-flash-lite",
+      "requests": 1,
+      "retries": 0,
+      "cost_usd": 0.00068625,
+      "input_tokens": 1329,
+      "output_tokens": 236
+    }
+  ],
+  "requests_sent": 10,
+  "total_cost_usd": 0.00386061,
+  "total_input_tokens": 13658,
+  "total_output_tokens": 1900,
+  "run_dir": "runs/20261102_223433_محاضرة افتتاحية — استوديو الوحيين_default",
+  "completed_at": "2026-11-02T22:34:46.866184+00:00"
+}

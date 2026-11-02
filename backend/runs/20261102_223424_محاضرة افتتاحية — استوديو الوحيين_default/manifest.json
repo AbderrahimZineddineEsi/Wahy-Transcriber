@@ -1,0 +1,37 @@
+{
+  "run_id": "run_ba7a22961144",
+  "processing_mode": "windowed",
+  "window_size": 15,
+  "model_candidate": "gemini_all",
+  "jev_layout": "independent_questions",
+  "jev_execution_order": "combined",
+  "typo_strategy": "gated",
+  "use_detection_boundaries": true,
+  "num_segments": 16,
+  "target_range": [
+    0,
+    16
+  ],
+  "cancelled": false,
+  "adapter_mode": "live",
+  "model_name": "auto",
+  "gemini_route": "openrouter:deepseek/deepseek-v4.1-flash",
+  "wall_clock_seconds": 5.96,
+  "cost_breakdown": [
+    {
+      "purpose": "classify_window",
+      "model": "openrouter:deepseek/deepseek-v4.1-flash",
+      "requests": 2,
+      "retries": 0,
+      "cost_usd": 0.00129049,
+      "input_tokens": 3991,
+      "output_tokens": 1963
+    }
+  ],
+  "requests_sent": 2,
+  "total_cost_usd": 0.00129049,
+  "total_input_tokens": 3991,
+  "total_output_tokens": 1963,
+  "run_dir": "runs/20261102_223424_محاضرة افتتاحية — استوديو الوحيين_default",
+  "completed_at": "2026-11-02T22:34:30.370613+00:00"
+}

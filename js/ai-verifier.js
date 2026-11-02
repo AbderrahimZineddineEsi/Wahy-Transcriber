@@ -627,20 +627,101 @@
     };
   }
 
+  /** Merge question for a whole group: the finding before its first member and the one after its last. */
+  function buildGroupMergeContext(group, words) {
+    const first = group[0], last = group[group.length - 1];
+    const inGroup = new Set(group);
+    const prev = findNeighborFindings(first).previous;
+    const next = findNeighborFindings(last).next;
+    const nb = { previous: prev && !inGroup.has(prev) ? prev : null, next: next && !inGroup.has(next) ? next : null };
+    if (!nb.previous && !nb.next) return null;
+    const one = buildMergeContext(first, words) || buildMergeContext(last, words);
+    if (!one) return null;
+    const criteria = { NO_MERGE: one.questions.merge_suggestion.criteria.NO_MERGE };
+    if (nb.previous) criteria.MERGE_WITH_PREVIOUS = "This passage and the `previous` neighbour are parts of the same quotation.";
+    if (nb.next) criteria.MERGE_WITH_NEXT = "This passage and the `next` neighbour are parts of the same quotation.";
+    if (nb.previous && nb.next) criteria.MERGE_BOTH = "The `previous` neighbour, this passage and the `next` neighbour are all parts of the same quotation.";
+    return {
+      neighborIds: { previous: nb.previous ? nb.previous.id : null, next: nb.next ? nb.next.id : null },
+      neighbors: {
+        previous: nb.previous ? describeNeighbor(first, nb.previous, "previous", words) : null,
+        next: nb.next ? describeNeighbor(last, nb.next, "next", words) : null
+      },
+      questions: Object.assign({}, one.questions, { merge_suggestion: Object.assign({}, one.questions.merge_suggestion, { criteria }) })
+    };
+  }
+
+  /**
+   * The canonical envelope for a passage (consecutive ayat found back to back), for Gemini / OpenRouter / JEV: the
+   * span runs from the first ayah to the last, the boundary evidence comes from its two ends.
+   */
+  function buildPassageEnvelope(group, words, contextWindow) {
+    if (group.length === 1) return buildCanonicalDecisionEnvelope(group[0], words, contextWindow);
+    const first = buildCanonicalDecisionEnvelope(group[0], words, contextWindow);
+    const last = buildCanonicalDecisionEnvelope(group[group.length - 1], words, contextWindow);
+    const f = first.state, l = last.state;
+    const sIdx = Math.max(0, group[0].wordStartIdx), eIdx = group[group.length - 1].wordEndIdx;
+    const qf = f.quran_neighboring_context, ql = l.quran_neighboring_context;
+    const state = Object.assign({}, f, {
+      candidate_reference: passageReference(group),
+      canonical_corpus_text: group.map(d => d.canonicalText || "").join(" "),
+      matched_span_in_lecture: words && words.length ? wordsText(words, sIdx, eIdx + 1) : f.matched_span_in_lecture,
+      verses_in_passage: group.length,
+      context_after: l.context_after,
+      immediate_transcript_after: l.immediate_transcript_after,
+      unmatched_corpus_suffix_words: l.unmatched_corpus_suffix_words,
+      quran_neighboring_context: qf ? Object.assign({}, qf, { ayah: ql ? `${qf.ayah}-${ql.ayah}` : qf.ayah, current_ayah_text: undefined, next_ayah_text: (ql || qf).next_ayah_text }) : null,
+      engine_score: Math.min(...group.map(d => Number((d.totalScore || 0).toFixed(2)))),
+      has_citation_cue: group.some(d => Boolean(d.hasCitationCue))
+    });
+    const questions = JSON.parse(JSON.stringify(first.questions));
+    questions.verdict.instructions += " `verses_in_passage` consecutive ayat were found back to back: judge them together as one recitation.";
+    return { state, questions, merge: buildGroupMergeContext(group, words) };
+  }
+
+  /**
+   * Requests for the prompt-driven providers: one per finding, or (passages on) one per run of consecutive ayat.
+   * Each item: {det (first member), members, targets (members to update), passage, envelope}.
+   */
+  function buildPromptProviderItems(targetDetections, contextWindow) {
+    const words = currentState.words;
+    if (!getPromptConfig().rules.passages) {
+      return targetDetections.map((det, idx) => ({ det, index: idx, envelope: buildCanonicalDecisionEnvelope(det, words, contextWindow) }));
+    }
+    const targetSet = new Set(targetDetections);
+    return groupLayaPassages(currentState.detections, true)
+      .filter(g => g.some(d => targetSet.has(d)))
+      .map((g, idx) => ({
+        det: g[0], index: idx, members: g, targets: g.filter(d => targetSet.has(d)), passage: g.length > 1,
+        envelope: buildPassageEnvelope(g, words, contextWindow)
+      }));
+  }
+
   // ---------------------------------------------------------------------------
   // 1b. User Prompt Configuration (presets, rules, extra instructions)
   // Applied on top of the canonical envelope at request time only; the
   // canonical envelope stays untouched so Laya training records stay stable.
   // ---------------------------------------------------------------------------
 
+  // One prompt for every prompt-driven model (Gemini, OpenRouter chat). The old ones were a single sentence: the model
+  // had to guess what counts as a quote from the criteria alone. These rules spell out the cases that decide most
+  // findings (partial quotes, quotes without «قال تعالى», common phrases, narrator chains, a different text quoted).
+  // Laya is not affected: it reads the fixed envelope it was trained on.
+  const VERIFIER_SYSTEM_PROMPT = [
+    "You verify quotations that an automatic detector found in transcripts of Arabic Islamic lectures. The transcripts come from speech recognition: expect misspellings, merged or split words, missing diacritics and wrong hamzas.",
+    "The detector matched `matched_span_in_lecture` against `canonical_corpus_text` (a Quran ayah, a hadith or a dhikr, see `source_type`). It favours recall, so many of its findings are ordinary speech. Answer the questions in `questions` with their criteria keys exactly.",
+    "Verdict:",
+    "- CORRECT: the speaker actually recites or quotes this text. The span reproduces a run of the corpus words in order (allowing speech-recognition noise), even when only part of a long ayah or hadith is quoted, and even without an introduction such as «قال تعالى» or «قال ﷺ». A recitation in the middle of an explanation is still a quotation, and so is a full formula recited as such (e.g. the opening خطبة الحاجة for a dhikr).",
+    "- FALSE: the shared words are the speaker's own language: a common phrase inside a normal sentence (إن شاء الله، الحمد لله، صلى الله عليه وسلم، رضي الله عنه), a narrator chain or names alone, a few generic words that also occur in the text, or the speaker retelling the meaning in his own words.",
+    "- NOT_SURE: the transcript really does not allow a decision (heavily garbled words, a very short span that fits both readings), or the speaker clearly quotes something but it is a different text than `canonical_corpus_text` (say so in the reason).",
+    "Compare word by word, not by topic: a span about the same subject as the corpus text is not a quote unless the words follow it. Use `context_before` / `context_after` for citation cues and to see whether the recitation continues. `engine_confidence_band` and `engine_score` are the detector's own guess: weigh them, do not copy them.",
+    "Boundaries: compare what was said right before / after the span (`immediate_transcript_before` / `immediate_transcript_after`) with the corpus words just before / after the matched part (`unmatched_corpus_prefix_words` / `unmatched_corpus_suffix_words`). Report a missing start or end only when the speaker really said those corpus words there; when he stopped quoting and went back to his explanation, the span is complete.",
+    "Passages: when `verses_in_passage` is present, the span is that many consecutive ayat found back to back. Judge them together as one recitation; a missing start concerns the first ayah, a missing end the last.",
+    "Probabilities sum to 1, and `confidence` is the probability of the verdict you chose."
+  ].join("\n");
   const DEFAULT_SYSTEM_PROMPTS = {
-    gemini:
-      "أنت مدقق شرعي ولغوي خبير في تفريغ المحاضرات الإسلامية. " +
-      "مهمتك التمييز بدقة بين الاقتباس الفعلي (آية أو حديث نبوي أو ذكر) " +
-      "وبين الكلام العادي للشيخ الشارح الذي تتشابه كلماته لفظياً مع الحديث أو الآية.",
-    openrouter_chat:
-      "You are an expert Arabic Islamic text verifier. " +
-      "Given the JSON `state` and `questions`, determine whether `matched_span_in_lecture` is a genuine quotation or ordinary speech, and determine boundary status."
+    gemini: VERIFIER_SYSTEM_PROMPT,
+    openrouter_chat: VERIFIER_SYSTEM_PROMPT
   };
 
   const CHAT_OUTPUT_CONTRACT =
@@ -707,6 +788,16 @@
       hint: "يفضل النموذج «غير متأكد» بدل التخمين، فتراجعه أنت يدوياً.",
       text: "If the evidence is genuinely mixed, answer NOT_SURE rather than guessing."
     },
+    passages: {
+      label: "تجميع الآيات المتتالية في مقطع واحد",
+      hint: "الآيات المتتالية من سورة واحدة التي وجدها المحرك متجاورة تُرسل في طلب واحد ويُحكم عليها معاً (كما في Laya). أقل طلبات وحكم أدق على التلاوة الطويلة. Laya يتبع إعداد نموذجه.",
+      text: ""   // groups the findings instead of adding prompt text
+    },
+    noThinking: {
+      label: "تعطيل تفكير النموذج (OpenRouter)",
+      hint: "النماذج التي تفكر قبل الإجابة (مثل DeepSeek) تُحسب كلمات تفكيرها كإخراج مدفوع. التعطيل أرخص وأسرع.",
+      text: ""   // a request setting, not prompt text
+    },
     suggestMerges: {
       label: "اقتراح دمج المقتبسات المجزأة",
       hint: "يرسل المقتبس المجاور (حتى 12 كلمة) ليقترح النموذج دمج حديث قسّمه المحرك بسبب خطأ تفريغ أو تعليق.",
@@ -716,7 +807,7 @@
 
   const DEFAULT_PROMPT_CONFIG = {
     preset: "balanced",
-    rules: { ignoreAsrErrors: true, citationCues: true, narratorNames: false, explainingRepeat: false, preferNotSure: false, suggestMerges: true },
+    rules: { ignoreAsrErrors: true, citationCues: true, narratorNames: false, explainingRepeat: false, preferNotSure: false, passages: true, noThinking: false, suggestMerges: true },
     reasonLang: "ar",          // "ar" | "en"
     reasonDetail: "brief",     // "brief" | "detailed"
     extraInstructions: "",
@@ -1275,11 +1366,18 @@
         },
         {
           role: "user",
-          content: JSON.stringify(composeRequestEnvelope(item, "openrouter_chat"))
+          content: (() => {
+            const env = composeRequestEnvelope(item, "openrouter_chat");
+            return JSON.stringify({ questions: env.questions, state: env.state });
+          })()
         }
       ]
     };
     if (jsonMode) payload.response_format = { type: "json_object" };
+    const meta = (currentState.aiVerification.openRouterModelsCatalog || []).find(m => m.id === modelId);
+    if (getPromptConfig().rules.noThinking && meta && (meta.supportedParameters || []).includes("reasoning")) {
+      payload.reasoning = { enabled: false };
+    }
     return payload;
   }
 
@@ -1349,10 +1447,13 @@
     }
     let rawContent = data?.choices?.[0]?.message?.content || "";
     let parsed = parseModelJson(rawContent);
+    let wastedCost = 0, wastedOut = 0;
 
     // Cut off by max_tokens (usually a model that spent them thinking): one retry with more room
     if (!parsed && data?.choices?.[0]?.finish_reason === "length" && maxTokens < CHAT_MAX_TOKENS_RETRY) {
       maxTokens = CHAT_MAX_TOKENS_RETRY;
+      wastedCost = typeof data.usage?.cost === "number" ? data.usage.cost : 0;   // the cut-off reply was billed too
+      wastedOut = data.usage?.completion_tokens || 0;
       payload = buildOpenRouterChatPayload(item, modelId, jsonMode, maxTokens);
       await waitIfPaused();
       const t0 = performance.now();
@@ -1384,7 +1485,7 @@
 
     const usage = data.usage || {};
     const inTokens = usage.prompt_tokens || 0;
-    const outTokens = usage.completion_tokens || 0;
+    const outTokens = (usage.completion_tokens || 0) + wastedOut;
 
     let costUsd = 0.0;
     if (typeof usage.cost === "number") {
@@ -1415,7 +1516,7 @@
       provider: "openrouter_chat",
       inputTokens: inTokens,
       outputTokens: outTokens,
-      costUsd: costUsd,
+      costUsd: costUsd + wastedCost,
       rawResponse: data,
       requestPayload: payload
     };
@@ -1577,7 +1678,9 @@
   // ---------------------------------------------------------------------------
 
   function updateAiVerificationMetrics() {
-    const logs = currentState.aiVerification.requestLogs || [];
+    // the requests of the open run (whose verdicts are on screen), not every check made since the page was opened
+    const runId = currentState.currentRunId;
+    const logs = (currentState.aiVerification.requestLogs || []).filter(l => !runId || l.lectureRunId === runId);
     const detections = currentState.detections || [];
 
     let totalReq = logs.length;
@@ -1665,6 +1768,15 @@
     });
   }
 
+  /** Name of the checker for a saved run ("Laya laya-wahy-r6-v3_mixed", "gemini-3.5-flash-lite", ...). */
+  function aiRunLabel(provider) {
+    const ai = currentState.aiVerification;
+    if (provider === "local_laya") return "Laya " + String(ai.layaCustomCheckpointPath || ai.layaCheckpoint || "").split("/").pop();
+    if (provider === "openrouter_jev") return ai.openRouterJevModel || "JEV";
+    if (provider === "openrouter_chat") return ai.openRouterSelectedModel || "OpenRouter";
+    return ai.geminiModel || "Gemini";
+  }
+
   /**
    * Run verification over all matching detections in the active lecture
    */
@@ -1689,6 +1801,16 @@
       await assertOpenRouterChatModelExists();
     }
 
+    // A laya_v2 checkpoint reads passages / neighbours built among ALL findings of the run; one request per group
+    // that holds a target, its answer applied to the targets in it (item.targets).
+    let layaEnvelope = null;
+    if (provider === "local_laya") {
+      layaEnvelope = await ensureLayaEnvelope();
+    }
+
+    // The answers go to a new saved run: the run being left keeps its findings (and an earlier check's answers)
+    if (typeof beginNewLectureRun === "function") beginNewLectureRun("ai", { ai: aiRunLabel(provider) });
+
     // Mark as PENDING (the prior status comes back if the run stops before reaching a finding)
     const priorStatus = new Map();
     targetDetections.forEach(det => {
@@ -1697,18 +1819,6 @@
       det.aiVerification.status = "PENDING";
     });
     if (typeof window.renderAllViews === "function") window.renderAllViews();
-
-    // A laya_v2 checkpoint reads passages / neighbours built among ALL findings of the run; one request per group
-    // that holds a target, its answer applied to the targets in it (item.targets).
-    let layaEnvelope = null;
-    if (provider === "local_laya") {
-      try {
-        layaEnvelope = await ensureLayaEnvelope();
-      } catch (e) {
-        targetDetections.forEach(det => { det.aiVerification.status = priorStatus.get(det); });
-        throw e;
-      }
-    }
     const isLaya = provider === "local_laya";
     const useLayaV2 = Boolean(isLaya && layaEnvelope && layaEnvelope.version === LAYA_ENVELOPE_V2);
     // For local Laya: use Envelope v3 (with multi-verse passages) by default for both v3 and v1 models!
@@ -1731,11 +1841,13 @@
           targets: r.members.filter(d => targetSet.has(d)),
           envelope: { state: r.state, questions: onlyTrained(r.questions) }
         }))
-      : targetDetections.map((det, idx) => {
-        const env = buildCanonicalDecisionEnvelope(det, currentState.words, contextWindow);
-        if (provider === "local_laya") env.questions = onlyTrained(env.questions);
-        return { det: det, index: idx, envelope: env };
-      });
+      : isLaya
+        ? targetDetections.map((det, idx) => {
+          const env = buildCanonicalDecisionEnvelope(det, currentState.words, contextWindow);
+          env.questions = onlyTrained(env.questions);
+          return { det: det, index: idx, envelope: env };
+        })
+        : buildPromptProviderItems(targetDetections, contextWindow);
     const itemTargets = item => item.targets || [item.det];
     const countFindings = items => items.reduce((n, it) => n + itemTargets(it).length, 0);
 
@@ -1743,6 +1855,14 @@
     let failedCount = 0;
     let fatalErr = null;
     const totalCount = countFindings(preparedItems);
+    // two different counts: findings (what the bar shows) and requests (Gemini sends `batchSize` items per request,
+    // a passage is one item for several findings)
+    const totalRequests = Math.ceil(preparedItems.length / batchSize);
+    let requestsDone = 0;
+    const runId = currentState.currentRunId || null;
+    const progress = (status, message) => onProgress && onProgress({
+      processed: processedCount, total: totalCount, requestsDone, requestsTotal: totalRequests, status, message
+    });
 
     try {
       for (let i = 0; i < preparedItems.length; i += batchSize) {
@@ -1750,14 +1870,10 @@
         await waitIfPaused();
 
         const currentChunk = preparedItems.slice(i, i + batchSize);
-        if (onProgress) {
-          onProgress({
-            processed: processedCount,
-            total: totalCount,
-            status: "running",
-            message: `جاري تدقيق المقتبسات (${processedCount + 1} إلى ${Math.min(totalCount, processedCount + countFindings(currentChunk))} من ${totalCount})...`
-          });
-        }
+        const chunkN = countFindings(currentChunk);
+        progress("running", chunkN > 1
+          ? `الطلب ${requestsDone + 1} من ${totalRequests}: المقتبسات ${processedCount + 1}–${processedCount + chunkN}`
+          : `الطلب ${requestsDone + 1} من ${totalRequests}: المقتبس ${processedCount + 1}`);
 
         let providerResult = null;
         let chunkStatus = "SUCCESS";
@@ -1766,14 +1882,7 @@
         try {
           if (provider === "gemini") {
             providerResult = await callGeminiApi(currentChunk, (sec, customMsg) => {
-              if (onProgress) {
-                onProgress({
-                  processed: processedCount,
-                  total: totalCount,
-                  status: "pacing",
-                  message: customMsg || `⏳ انتظار حد الخطة المجانية (RPM): استئناف خلال ${sec} ثوانٍ...`
-                });
-              }
+              progress("pacing", customMsg || `⏳ انتظار حد الخطة المجانية (RPM): استئناف خلال ${sec} ثوانٍ...`);
             });
           } else if (provider === "openrouter_jev") {
             providerResult = await callOpenRouterJev(currentChunk[0]);
@@ -1797,9 +1906,22 @@
 
         if (chunkStatus === "SUCCESS" && providerResult) {
           const chunkFindings = countFindings(currentChunk);
-          currentChunk.forEach(item => {
+          const results = providerResult.results || [];
+          currentChunk.forEach((item, k) => {
             const findingId = item.det.id || item.det._uniqueKey || `f_${item.index}`;
-            const evalResult = (providerResult.results || []).find(r => r.finding_id === findingId) || providerResult.results?.[0];
+            // A batch reply used to fall back to results[0] for any id it could not find: every finding of the batch
+            // then got the first finding's verdict. Now: the answer with this id, else the one at the same position
+            // when the reply has one answer per item, else an error for this finding only.
+            const evalResult = results.find(r => r.finding_id === findingId)
+              || (results.length === currentChunk.length && !results.some(r => currentChunk.some(c => findingIdOf(c) === r.finding_id && c !== item)) ? results[k] : null)
+              || (currentChunk.length === 1 ? results[0] : null);
+            if (evalResult && item.passage) {
+              // passage on a 4-class provider: its boundary answer becomes "start cut off?" / "end cut off?"
+              const b = String(evalResult.boundary_status || "COMPLETE_SPAN").toUpperCase();
+              const c = typeof evalResult.boundary_confidence === "number" ? evalResult.boundary_confidence : 0.85;
+              evalResult.startMissing = (b === "MISSING_START" || b === "MISSING_BOTH") ? c : 1 - c;
+              evalResult.endMissing = (b === "MISSING_END" || b === "MISSING_BOTH") ? c : 1 - c;
+            }
 
             itemTargets(item).forEach(det => {
               if (!evalResult) {
@@ -1812,12 +1934,13 @@
 
               // v2 / v3: P(start cut off) belongs to the passage's first verse, P(end cut off) to its last
               let bProbs, rawB, startP = null, endP = null;
-              const isFirst = (!item.v2 && !item.v3) || det === item.members[0];
-              const isLast = (!item.v2 && !item.v3) || det === item.members[item.members.length - 1];
+              const grouped = item.v2 || item.v3 || item.passage;
+              const isFirst = !grouped || det === item.members[0];
+              const isLast = !grouped || det === item.members[item.members.length - 1];
               const q = item.envelope.questions;
               const byRule = provider === "local_laya" && !(q.start_missing || q.end_missing || q.boundary_status);
               const rule = byRule ? boundaryByRule(st) : null;
-              if (item.v2 || item.v3 || byRule) {
+              if (grouped || byRule) {
                 startP = isFirst ? (rule ? rule.start : (evalResult.startMissing ?? 0)) : 0;
                 endP = isLast ? (rule ? rule.end : (evalResult.endMissing ?? 0)) : 0;
                 bProbs = boundaryFromYesNo(startP, endP);
@@ -1826,7 +1949,7 @@
                 rawB = evalResult.boundary_status || "COMPLETE_SPAN";
               }
               const bStatus = normalizeBoundaryVerdict(verdictChoice, rawB, st);
-              const bConf = (item.v2 || item.v3 || byRule) ? bProbs[rawB] : (typeof evalResult.boundary_confidence === "number" ? evalResult.boundary_confidence : 1.0);
+              const bConf = (grouped || byRule) ? bProbs[rawB] : (typeof evalResult.boundary_confidence === "number" ? evalResult.boundary_confidence : 1.0);
               bProbs = bProbs || evalResult.boundary_probabilities || {
                 COMPLETE_SPAN: bStatus === "COMPLETE_SPAN" ? bConf : (1 - bConf) / 3,
                 MISSING_START: bStatus === "MISSING_START" ? bConf : (1 - bConf) / 3,
@@ -1846,13 +1969,19 @@
                 boundarySource: byRule ? "rule" : "model",
                 boundaryEndMissingP: endP,
                 layaEnvelope: item.v3 ? LAYA_ENVELOPE_V3 : (item.v2 ? LAYA_ENVELOPE_V2 : undefined),
-                passage: (item.v2 || item.v3) && item.members.length > 1
+                passage: grouped && item.members.length > 1
                   ? { reference: passageReference(item.members), verses: item.members.length, position: isFirst ? "first" : isLast ? "last" : "inner" }
                   : null,
                 unmatchedPrefixPreview: isFirst ? (st.unmatched_corpus_prefix_words || "") : "",
                 unmatchedSuffixPreview: isLast ? (st.unmatched_corpus_suffix_words || "") : "",
                 mergeSuggestion: getPromptConfig().rules.suggestMerges && providerSupportsPrompt(providerResult.provider)
-                  ? normalizeMergeSuggestion(evalResult.merge_suggestion, evalResult.merge_confidence, evalResult.merge_gap_type, item.envelope.merge)
+                  ? (() => {
+                    // a passage's merge answer belongs to its first member (previous) and its last member (next)
+                    const m = normalizeMergeSuggestion(evalResult.merge_suggestion, evalResult.merge_confidence, evalResult.merge_gap_type, item.envelope.merge);
+                    if (!m || !grouped) return m;
+                    const own = Object.assign({}, m, { previous: m.previous && isFirst, next: m.next && isLast });
+                    return own.previous || own.next ? own : null;
+                  })()
                   : null,
                 reason: evalResult.reason || "",
                 modelUsed: providerResult.model,
@@ -1867,7 +1996,7 @@
               };
 
               // Persist into IndexedDB training dataset (always the canonical v1 envelope of the finding itself)
-              const env = (item.v2 || item.v3) ? buildCanonicalDecisionEnvelope(det, currentState.words, contextWindow) : item.envelope;
+              const env = grouped ? buildCanonicalDecisionEnvelope(det, currentState.words, contextWindow) : item.envelope;
               const layaRec = convertRecordToLayaTrainingEnvelope(det, env, timestampNow);
               if (typeof saveVerificationRecordToDB === "function") {
                 saveVerificationRecordToDB(layaRec).catch(() => {});
@@ -1888,7 +2017,8 @@
             model: providerResult.model,
             provider: providerResult.provider,
             findingsCount: chunkFindings,
-            findingsSummary: currentChunk.map(c => ((c.v2 || c.v3) ? passageReference(c.members) : "") || c.det.displayRef || c.det.canonicalText || c.det.matchedText).join(" | "),
+            findingsSummary: currentChunk.map(c => ((c.v2 || c.v3 || c.passage) ? passageReference(c.members) : "") || c.det.displayRef || c.det.canonicalText || c.det.matchedText).join(" | "),
+            lectureRunId: runId,
             verdicts: currentChunk.flatMap(c => itemTargets(c).map(d => d.aiVerification?.verdict || "UNKNOWN")),
             latencyMs: providerResult.latencyMs,
             inputTokens: providerResult.inputTokens,
@@ -1916,8 +2046,9 @@
             timestamp: new Date().toLocaleTimeString((typeof WahyI18n === "object" ? WahyI18n.dateLocale() : "ar-u-nu-latn")),
             model: provider,
             provider: provider,
-            findingsCount: currentChunk.length,
+            findingsCount: countFindings(currentChunk),
             findingsSummary: currentChunk.map(c => c.det.displayRef || c.det.canonicalText).join(" | "),
+            lectureRunId: runId,
             verdicts: ["ERROR"],
             latencyMs: 0,
             inputTokens: 0,
@@ -1930,6 +2061,7 @@
         }
 
         processedCount += countFindings(currentChunk);
+        requestsDone++;
         if (chunkStatus !== "SUCCESS") failedCount += countFindings(currentChunk);
         updateAiVerificationMetrics();
         if (fatalErr) break;
@@ -1937,16 +2069,9 @@
         if (typeof window.renderAiRequestLogsTable === "function") window.renderAiRequestLogsTable();
       }
 
-      if (onProgress) {
-        onProgress({
-          processed: processedCount,
-          total: totalCount,
-          status: fatalErr ? "error" : (isVerificationCancelled ? "cancelled" : "done"),
-          message: fatalErr
-            ? `⛔ توقف التدقيق: ${fatalErr.message}`
-            : (isVerificationCancelled ? "تم إيقاف التدقيق." : `اكتمل التدقيق الذكي لـ ${processedCount - failedCount} من ${totalCount} مقتبس${failedCount ? ` (فشل ${failedCount})` : ""}.`)
-        });
-      }
+      progress(fatalErr ? "error" : (isVerificationCancelled ? "cancelled" : "done"), fatalErr
+        ? `⛔ توقف التدقيق: ${fatalErr.message}`
+        : (isVerificationCancelled ? "تم إيقاف التدقيق." : `اكتمل التدقيق الذكي لـ ${processedCount - failedCount} من ${totalCount} مقتبس في ${requestsDone} طلب${failedCount ? ` (فشل ${failedCount})` : ""}.`));
       if (fatalErr) throw fatalErr;
       return { processed: processedCount, failed: failedCount, total: totalCount, cancelled: isVerificationCancelled };
     } finally {
@@ -2175,7 +2300,7 @@
     const det = currentState.detections[detIdx];
     if (!det) return null;
     const prov = provider || currentState.aiVerification.activeProvider || "gemini";
-    const item = {
+    const item = (prov !== "local_laya" && buildPromptProviderItems([det], currentState.aiVerification.contextWindowWords || 25)[0]) || {
       det,
       index: detIdx,
       envelope: buildCanonicalDecisionEnvelope(det, currentState.words, currentState.aiVerification.contextWindowWords || 25)
@@ -2224,20 +2349,24 @@
     const targetIdx = (Array.isArray(selectedIndices)) ? selectedIndices : resolveTargetIndices();
     const count = targetIdx.length;
     const sample = count ? buildRequestPreview(targetIdx[0], provider) : null;
-    const approxTokens = count * (sample ? sample.approxTokens : 380);
+    // items = what is sent (a passage of ayat is one item); Gemini puts `geminiBatchSize` items in one request
+    const targets = targetIdx.map(i => currentState.detections[i]).filter(Boolean);
+    const items = provider === "local_laya" ? count : buildPromptProviderItems(targets, currentState.aiVerification.contextWindowWords || 25).length;
+    const requests = provider === "gemini" ? Math.ceil(items / (currentState.aiVerification.geminiBatchSize || 5)) : items;
+    const approxTokens = items * (sample ? sample.approxTokens : 380);
     let estCost = 0.0;
     if (provider === "openrouter_chat") {
       const modelId = normalizeOpenRouterModelId(currentState.aiVerification.openRouterSelectedModel);
       const meta = (currentState.aiVerification.openRouterModelsCatalog || []).find(m => m.id === modelId);
       const priceIn = meta ? parseFloat(meta.pricing.prompt || 0) : 0.14 / 1000000;
       const priceOut = meta ? parseFloat(meta.pricing.completion || 0) : 0.28 / 1000000;
-      estCost = approxTokens * priceIn + count * CHAT_EXPECTED_OUTPUT_TOKENS * priceOut;
+      estCost = approxTokens * priceIn + items * CHAT_EXPECTED_OUTPUT_TOKENS * priceOut;
     } else if (provider === "openrouter_jev") {
       estCost = (approxTokens / 1000000) * 0.042;
     }
     const rpm = provider === "gemini" ? (currentState.aiVerification.geminiRpmLimit || 12) : 60;
-    const estSeconds = Math.ceil(count / rpm) * 60;
-    return { count, approxTokens, estCost, estSeconds };
+    const estSeconds = provider === "gemini" ? Math.ceil(requests / rpm) * 60 : Math.round(requests * 2.5);
+    return { count, items, requests, approxTokens, estCost, estSeconds };
   }
 
   window.WahyAiVerifier = {

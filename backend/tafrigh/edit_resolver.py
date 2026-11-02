@@ -25,6 +25,33 @@ def _norm(text: str) -> str:
     return " ".join(w.strip(_EDGE_PUNCT) for w in t.split() if w.strip(_EDGE_PUNCT))
 
 
+def _word_span(text: str, tokens: List[Any], w_start: int, w_end: int) -> Tuple[int, int]:
+    start, end = tokens[w_start].char_start, tokens[w_end].char_end
+    # keep punctuation glued to the edge words (the model is asked about words, not commas)
+    while start < end and text[start] in _EDGE_PUNCT:
+        start += 1
+    while end > start and text[end - 1] in _EDGE_PUNCT:
+        end -= 1
+    return start, end
+
+
+RELOCATE_NEAR_WORDS = 3
+
+
+def _relocate(text: str, tokens: List[Any], original: str, near: Optional[int]) -> Optional[Tuple[int, int]]:
+    """Where the quoted words really are, when the model's index is off by a word or two (seen often in windowed
+    replies). Accepted only when unambiguous: the words occur once in the sentence, or once within
+    RELOCATE_NEAR_WORDS of the given index. The quoted words are still verified, so a wrong index can't land anywhere."""
+    n = len(_norm(original).split())
+    if not n:
+        return None
+    hits = [k for k in range(len(tokens) - n + 1)
+            if _norm(text[slice(*_word_span(text, tokens, k, k + n - 1))]) == _norm(original)]
+    if near is not None and len(hits) > 1:
+        hits = [k for k in hits if abs(k - near) <= RELOCATE_NEAR_WORDS]
+    return (hits[0], hits[0] + n - 1) if len(hits) == 1 else None
+
+
 def _get(edit: Any, *names: str) -> Any:
     for n in names:
         v = edit.get(n) if isinstance(edit, dict) else getattr(edit, n, None)
@@ -59,16 +86,18 @@ def resolve_model_edits(
             except (TypeError, ValueError):
                 rejected.append({**record, "why": "bad_word_index"})
                 continue
-            if not (0 <= w_start <= w_end < len(tokens)):
+            in_range = 0 <= w_start <= w_end < len(tokens)
+            start, end = _word_span(text, tokens, w_start, w_end) if in_range else (-1, -1)
+            if original is not None and (not in_range or _norm(str(original)) != _norm(text[start:end])):
+                moved = _relocate(text, tokens, str(original), w_start)
+                if moved:
+                    record["relocated_from"] = [w_start, w_end]
+                    w_start, w_end = moved
+                    in_range = True
+                    start, end = _word_span(text, tokens, w_start, w_end)
+            if not in_range:
                 rejected.append({**record, "why": "word_index_out_of_range"})
                 continue
-            first, last = tokens[w_start], tokens[w_end]
-            start, end = first.char_start, last.char_end
-            # keep punctuation glued to the edge words (the model is asked about words, not commas)
-            while start < end and text[start] in _EDGE_PUNCT:
-                start += 1
-            while end > start and text[end - 1] in _EDGE_PUNCT:
-                end -= 1
         else:
             start, end = _get(e, "start"), _get(e, "end")
             if start is None or end is None or original is None:

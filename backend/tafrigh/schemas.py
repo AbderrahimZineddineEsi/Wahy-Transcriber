@@ -36,7 +36,8 @@ class GeminiWindowOutputSchema(BaseModel):
 
 class JEVRequestConfig(BaseModel):
     jev_layout: Literal["independent_questions", "split_as_tag_option"] = "independent_questions"
-    execution_order: Literal["parallel", "sequential"] = "parallel"
+    # combined: the three questions in one request (the state is sent once instead of three times)
+    execution_order: Literal["parallel", "sequential", "combined"] = "parallel"
     batch_questions_in_single_request: bool = False
 
 
@@ -61,7 +62,7 @@ class PipelineConfig(BaseModel):
     context_after: int = 3
     model_candidate: Literal["gemini_all", "jev_hybrid", "laya_hybrid"] = "gemini_all"
     jev_layout: Literal["independent_questions", "split_as_tag_option"] = "independent_questions"
-    jev_execution_order: Literal["parallel", "sequential"] = "parallel"
+    jev_execution_order: Literal["parallel", "sequential", "combined"] = "parallel"
     typo_strategy: Literal["gated", "always_correct", "asr_confidence_gated", "off"] = "gated"
     # Tested on a real run: cutting at every Quran/hadith edge broke sentences mid-way ("قال الله تعالى والعصر | إن الإنسان…").
     # Detections are still attached to segments as signals and still forbid punctuation cuts inside an ayah.

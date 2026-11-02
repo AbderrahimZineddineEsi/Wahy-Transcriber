@@ -16,9 +16,9 @@ const aiOptsState = {
 };
 
 const AI_PROVIDER_CARDS = [
-  { id: "gemini", icon: "✨", name: "Google Gemini", desc: "سريع ومجاني ضمن حدود الخطة المجانية، يدقق عدة مقتبسات في طلب واحد.", tags: ["مجاني", "دفعات"] },
+  { id: "gemini", icon: "✨", name: "Google Gemini", desc: "سريع ومجاني ضمن حدود الخطة المجانية، يدقق عدة مقتبسات في طلب واحد (حجم الدفعة).", tags: ["مجاني", "دفعات"] },
   { id: "openrouter_jev", icon: "🎯", name: "OpenRouter — JEV", desc: "نموذج قرارات مخصص يرجع احتمالات معايرة، رخيص جداً. لا يكتب تعليلاً.", tags: ["رخيص جداً", "احتمالات"] },
-  { id: "openrouter_chat", icon: "💬", name: "OpenRouter — Chat", desc: "أي نموذج محادثة (DeepSeek, Qwen, Claude, GPT...). الأكثر مرونة في الموجّه.", tags: ["مرن", "تعليل مفصل"] },
+  { id: "openrouter_chat", icon: "💬", name: "OpenRouter — Chat", desc: "أي نموذج محادثة (DeepSeek, Qwen, Claude, GPT...). الأكثر مرونة في الموجّه. مقتبس واحد (أو مقطع آيات) في كل طلب.", tags: ["مرن", "تعليل مفصل"] },
   { id: "local_laya", icon: "🖥️", name: "Laya المحلي", desc: "يعمل على جهازك بلا إنترنت. نموذج مدرّب على صيغة ثابتة فلا يتأثر بتعديل الموجّه.", tags: ["محلي", "بلا تكلفة"] }
 ];
 
@@ -134,7 +134,7 @@ function refreshAiOptsFooter() {
   const indices = aiOptsState.mode === "single" ? [aiOptsState.findingIdx] : null;
   const est = WahyAiVerifier.estimateBatchVerification(indices);
   const set = (id, txt) => { const el = document.getElementById(id); if (el) el.textContent = txt; };
-  set("lblEstQuotesCount", est.count);
+  set("lblEstQuotesCount", est.requests !== est.count ? `${est.count} (${est.requests} طلب)` : `${est.count}`);
   set("lblEstTokensCount", `~${est.approxTokens.toLocaleString("en")}`);
   set("lblEstCostUsd", `$${est.estCost.toFixed(4)}`);
   set("lblEstDurationSec", `~${est.estSeconds} ث`);

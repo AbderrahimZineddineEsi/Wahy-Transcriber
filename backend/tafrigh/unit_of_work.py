@@ -22,6 +22,8 @@ class UnitOfWork(BaseModel):
     current_position_index: int = 0
     last_confirmed_heading: Optional[HeadingEntry] = None
     allowed_choices: List[Dict[str, Any]] = Field(default_factory=list)
+    previous_tag: Optional[str] = None    # tag of the sentence right before the first target (None: nothing before it)
+    in_list: bool = False                 # the outline is inside a list: a list_item is possible
 
 
 def build_units_of_work(

@@ -239,9 +239,9 @@ function buildLectureHtmlContent(isEditorMode = false) {
         ? `<span class="px-1.5 py-0.5 rounded bg-violet-500/25 text-violet-200 border border-violet-400/50 text-[10px] font-bold inline-flex items-center gap-1" title="اقتراح الذكاء الاصطناعي: هذا المقتبس جزء من نفس النص مع المقتبس المجاور — افتح المقتبس للدمج">🔗 ${mergePrev && mergeNext ? "دمج مع الطرفين" : (mergePrev ? "دمج مع السابق" : "دمج مع التالي")}</span>`
         : "";
 
-      // Which text a quote shows. Display: the reference text once snapped to it. Editor: the spoken words, unless
-      // a toggle asks for the reference text («الرسم القياسي») or the whole source («المتن كاملاً»), or the user
-      // applied reference words to this quote (shown, so the edit is visible where it was made).
+      // Which text a quote shows: the reference text once snapped to it (the «كما نُطق | الرسم القياسي» switch, or
+      // reference words applied to this one quote), else the spoken words. The editor can also show the whole
+      // source («المتن كاملاً»).
       let shownText = null;
       let shownTitle = "";
       if (isEditorMode) {
@@ -249,9 +249,9 @@ function buildLectureHtmlContent(isEditorMode = false) {
         if (currentState.editorViewFullCanonicalSpan && (unitForFull?.fullText || det.canonicalText)) {
           shownText = unitForFull?.fullText || det.canonicalText;
           shownTitle = "المتن كاملاً من المصدر";
-        } else if ((currentState.editorViewRasmQiyasi || det.snappedToCanonical) && det.canonicalText) {
+        } else if (det.snappedToCanonical && det.canonicalText) {
           shownText = det.canonicalText;
-          shownTitle = det.snappedToCanonical ? "نص المرجع المطبَّق على هذا المقتبس" : "الرسم القياسي";
+          shownTitle = "نص المرجع المطبَّق على هذا المقتبس";
         }
       } else if (det.snappedToCanonical && det.canonicalText) {
         shownText = det.canonicalText;
@@ -1676,6 +1676,7 @@ function renderDatasetsSection() {
 
 function renderAllViews() {
   renderKpiSummaryBar();
+  if (typeof syncQuoteTextModeButtons === "function") syncQuoteTextModeButtons();
   renderFormattedLectureView();
   renderEditorLectureStage();
   renderFindingInspector();
@@ -2095,7 +2096,7 @@ function switchLectureStageTab(tab) {
   }
 }
 
-function renderTafrighOutput(tafrighData) {
+function renderTafrighOutput(tafrighData, { keepTab = false } = {}) {
   if (!tafrighData) return;
 
   // Persist state
@@ -2115,15 +2116,15 @@ function renderTafrighOutput(tafrighData) {
   const reviewQueueWrap = document.getElementById("tafrighReviewQueueWrap");
   const renderedContent = document.getElementById("tafrighRenderedContent");
 
-  // Ensure tafrigh tab is active and visible
-  switchLectureStageTab("tafrigh");
+  // Ensure tafrigh tab is active and visible (not when a saved lecture is just being reopened)
+  if (!keepTab) switchLectureStageTab("tafrigh");
 
   if (emptyState) emptyState.classList.add("hidden");
   if (progressWrap) progressWrap.classList.add("hidden");
   if (errorWrap) errorWrap.classList.add("hidden");
   if (resultsView) resultsView.classList.remove("hidden");
   if (badgeStatus) badgeStatus.classList.remove("hidden");
-  if (quickActions) quickActions.classList.remove("hidden");
+  if (quickActions && !keepTab) quickActions.classList.remove("hidden");
 
   const html = tafrighData.html || "";
   const reviewItems = tafrighData.review_items || [];
@@ -2182,6 +2183,7 @@ function renderTafrighOutput(tafrighData) {
 
   // 4. Run summary + per-sentence decisions
   updateTafrighSavedBadge();
+  if (typeof renderTafrighRunPicker === "function") renderTafrighRunPicker();
   renderTafrighRunSummary(tafrighData);
   renderTafrighDetails(tafrighData);
   // stay on the details tab when re-rendering after a review action
@@ -2454,8 +2456,37 @@ function renderTafrighRunSummary(data) {
     ...(covered ? [chip(`تصحيحات داخل اقتباس (معروض من المصدر): ${covered}`, "bg-slate-800 text-slate-400")] : []),
     chip(`طلبات: ${rep.total_requests ?? "—"}`),
     chip(`التكلفة: $${(rep.total_cost_usd || 0).toFixed(5)}`),
-    chip(`الزمن: ${rep.wall_clock_seconds ?? "—"}ث`)
-  ].join("");
+    chip(`الزمن: ${rep.wall_clock_seconds ?? "—"}ث`),
+    ...(rep.processing_mode ? [chip(rep.processing_mode === "windowed" ? `نافذة ${rep.window_size} جمل` : "جملة بجملة")] : [])
+  ].join("") + tafrighCostBreakdownHtml(rep);
+}
+
+const TAFRIGH_PURPOSE_AR = {
+  classify: "تصنيف الجمل", classify_window: "تصنيف (نوافذ)", split: "نقاط التقسيم", correct: "تصحيح الأخطاء"
+};
+
+/** What the run cost, per purpose and model, as reported by the provider (OpenRouter's usage.cost). */
+function tafrighCostBreakdownHtml(rep) {
+  const rows = rep.cost_breakdown || [];
+  if (!rows.length) return "";
+  const direct = rows.some(r => String(r.model).startsWith("gemini:"));
+  const total = rows.reduce((a, r) => a + (r.cost_usd || 0), 0);
+  return `
+    <details class="w-full mt-1 rounded-xl border border-slate-800 bg-slate-950/60">
+      <summary class="cursor-pointer px-3 py-1.5 text-slate-300">💲 تفصيل التكلفة الفعلية: <b class="font-mono text-emerald-300">$${total.toFixed(6)}</b> — ${rows.length} بند</summary>
+      <table class="w-full text-right text-[11px]">
+        <thead class="text-[10px] text-slate-500"><tr><th class="px-3 py-1 font-normal">الغرض</th><th class="px-2 font-normal">النموذج</th>
+          <th class="px-2 font-normal">الطلبات</th><th class="px-2 font-normal">رموز الإدخال / الإخراج</th><th class="px-2 font-normal">التكلفة</th></tr></thead>
+        <tbody>${rows.map(r => `<tr class="text-slate-200">
+          <td class="px-3 py-1">${escapeHtml(TAFRIGH_PURPOSE_AR[r.purpose] || r.purpose)}</td>
+          <td class="px-2 font-mono text-[10px] text-slate-400" dir="ltr">${escapeHtml(r.model)}</td>
+          <td class="px-2 font-mono">${r.requests}${r.retries ? ` <span class="text-amber-300">(${r.retries} إعادة)</span>` : ""}</td>
+          <td class="px-2 font-mono" dir="ltr">${r.input_tokens} / ${r.output_tokens}</td>
+          <td class="px-2 font-mono text-emerald-300">$${(r.cost_usd || 0).toFixed(6)}</td></tr>`).join("")}
+        </tbody>
+      </table>
+      ${direct ? '<div class="px-3 py-1 text-[10px] text-slate-500">Gemini المباشر لا يُرجع التكلفة: تظهر $0 (مجانية في الخطة المجانية)؛ الرموز دقيقة.</div>' : ""}
+    </details>`;
 }
 
 function renderTafrighDetails(data) {
@@ -2546,7 +2577,7 @@ function updateTafrighSavedBadge() {
   const badge = document.getElementById("lblTafrighSavedBadge");
   if (!badge) return;
   const runId = currentState.tafrigh?.data?.run_id;
-  const saved = runId && currentState.tafrigh?.savedRuns?.[runId];
+  const saved = runId && (currentState.tafrigh?.savedRuns?.[runId] || currentState.tafrigh?.data?.layaSaved);
   badge.classList.toggle("hidden", !saved);
   if (saved) badge.textContent = `✓ ${saved.sentences}`;
 }
@@ -2560,7 +2591,7 @@ function openSaveTafrighRunModal() {
   }
   const runId = data.run_id;
   const needsReview = new Set((data.review_items || []).map(i => i.segment_id));
-  const prevSaved = currentState.tafrigh.savedRuns?.[runId];
+  const prevSaved = currentState.tafrigh.savedRuns?.[runId] || data.layaSaved;
   // Default: everything except sentences still waiting for review (uncertain labels make poor training data)
   let picked = new Set(prevSaved ? prevSaved.segmentIds : segs.filter(sg => !needsReview.has(sg.id)).map(sg => sg.id));
 
@@ -2674,6 +2705,8 @@ function openSaveTafrighRunModal() {
         }
         currentState.tafrigh.savedRuns = currentState.tafrigh.savedRuns || {};
         currentState.tafrigh.savedRuns[runId] = { segmentIds: ids, sentences: out.sentences, count: out.count, path: out.path };
+        currentState.tafrigh.data.layaSaved = currentState.tafrigh.savedRuns[runId];
+        if (typeof scheduleTafrighRunAutosave === "function") scheduleTafrighRunAutosave();
         updateTafrighSavedBadge();
         closeSaveTafrighRunModal();
         showToast(`💾 تم حفظ ${out.count} مثال تدريب في ${out.path}`);
@@ -2720,6 +2753,7 @@ async function executeTafrighReviewAction(runId, segmentId, action, extra = {}) 
       review_items: data.review_items,
       structured_json: data.structured_json || prev.structured_json
     });
+    if (typeof scheduleTafrighRunAutosave === "function") scheduleTafrighRunAutosave();   // the saved run follows the review
     const msg = { confirm: "✅ تم اعتماد الوسم", correct: "✏️ تم تصحيح الوسم وتحديث النص", reject: "↩️ أُلغي التصحيح الإملائي" }[action];
     showToast(`${msg} • متبقٍ للمراجعة: ${(data.review_items || []).length}`);
   } catch (err) {
