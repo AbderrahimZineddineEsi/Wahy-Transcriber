@@ -11,6 +11,12 @@ VERDICTS = ["CORRECT", "FALSE", "NOT_SURE"]
 BOUNDARIES = ["COMPLETE_SPAN", "MISSING_START", "MISSING_END", "MISSING_BOTH"]
 # target sharpness encodes trust (Laya has no per-sample weights)
 EPS = {"pos_strong": 0.05, "wrong_id": 0.05, "neg_weak": 0.10, "asr_mismatch": 0.15, "teacher_consensus": 0.15, "human": 0.02}
+# per label source and question, ~ how often that source disagrees with the user (docs/laya-finetune/data.md):
+# the written text agrees on 155/156 verdicts but only 128/152 boundaries; Sonnet high on 58/60 and 23/24 (blind)
+EPS_BY_SOURCE = {"user": {"verdict": 0.02, "boundary_status": 0.05},
+                 "written": {"verdict": 0.03, "boundary_status": 0.15},
+                 "sonnet_high": {"verdict": 0.08, "boundary_status": 0.10},
+                 "sonnet_medium": {"verdict": 0.12, "boundary_status": 0.15}}
 # Fields that describe the engine, not the lecture: Laya must not learn "score high => CORRECT" (plan D2).
 ENGINE_STATE_KEYS = ("engine_score", "engine_confidence_band")
 
@@ -20,8 +26,11 @@ def soft(options: List[str], choice: str, eps: float) -> Dict[str, float]:
     return {o: round(1 - eps if o == choice else rest, 4) for o in options}
 
 
-def to_laya_row(rec: Dict[str, Any], profile: str = "engine_agnostic") -> Optional[Dict[str, Any]]:
-    lab = dict(rec["label"])
+def to_laya_row(rec: Dict[str, Any], profile: str = "engine_agnostic", label: Optional[Dict[str, Any]] = None,
+                eps: Optional[Dict[str, float]] = None) -> Optional[Dict[str, Any]]:
+    """`label` ({verdict, boundary}) overrides the record's own label (e.g. a Sonnet or user answer from
+    inventory.usable); `eps` ({"verdict", "boundary_status"}) overrides the tier's smoothing, 0 = hard labels."""
+    lab = dict(label if label is not None else rec["label"])
     if lab["verdict"] == "IN_HADITH":      # a verbatim ayah inside a hadith IS a quote of the ayah (tagged `in_hadith`)
         lab["verdict"] = "CORRECT"
     if lab["verdict"] not in VERDICTS:     # None (no label) or PARAPHRASE (not an option of Laya's question yet)
@@ -30,13 +39,15 @@ def to_laya_row(rec: Dict[str, Any], profile: str = "engine_agnostic") -> Option
     if profile == "engine_agnostic":
         for k in ENGINE_STATE_KEYS:
             state.pop(k, None)
-    eps = EPS["human" if lab.get("human") else lab["tier"]]
-    gold = {"verdict": {"probabilities": soft(VERDICTS, lab["verdict"], eps)}}
+    if eps is None:
+        e = EPS["human" if lab.get("human") else lab["tier"]]
+        eps = {"verdict": e, "boundary_status": e}
+    gold = {"verdict": {"probabilities": soft(VERDICTS, lab["verdict"], eps["verdict"])}}
     if lab["verdict"] == "CORRECT" and lab.get("boundary"):
-        gold["boundary_status"] = {"probabilities": soft(BOUNDARIES, lab["boundary"], eps)}
+        gold["boundary_status"] = {"probabilities": soft(BOUNDARIES, lab["boundary"], eps["boundary_status"])}
     return {
         "id": rec["id"], "state": state, "questions": rec["envelope"]["questions"], "gold": gold,
-        "meta": {"doc_id": rec["doc_id"], "engine": rec["engine"], "tier": lab["tier"], "cases": rec["cases"],
+        "meta": {"doc_id": rec["doc_id"], "engine": rec["engine"], "tier": lab.get("tier", rec["label"]["tier"]), "cases": rec["cases"],
                  "label_source": "human" if lab.get("human") else "gt", "state_profile": profile,
                  "flags": lab.get("flags", [])},
     }

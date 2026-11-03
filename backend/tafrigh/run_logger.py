@@ -106,11 +106,13 @@ class RunLogger:
                 f.write(json.dumps(item, ensure_ascii=False) + "\n")
 
         # 3. Compute Metrics
-        total_requests = len(self.requests)
-        total_input_tokens = sum(r.get("input_tokens", 0) for r in self.requests)
-        total_output_tokens = sum(r.get("output_tokens", 0) for r in self.requests)
+        # the pipeline counts requests / tokens / cost per adapter call; the request log has a line per sentence and per
+        # window, some requests twice, and cost only on per-sentence classify lines (a windowed run showed $0)
+        total_requests = manifest.get("requests_sent", len(self.requests))
+        total_input_tokens = manifest.get("total_input_tokens", sum(r.get("input_tokens", 0) for r in self.requests))
+        total_output_tokens = manifest.get("total_output_tokens", sum(r.get("output_tokens", 0) for r in self.requests))
         total_cached_tokens = sum(r.get("cached_tokens", 0) for r in self.requests)
-        total_cost = sum(r.get("cost_estimate_usd", 0.0) for r in self.requests)
+        total_cost = manifest.get("total_cost_usd", sum(r.get("cost_estimate_usd", 0.0) for r in self.requests))
         wall_clock = manifest.get("wall_clock_seconds", 0.0)
 
         latencies_by_purpose: Dict[str, List[float]] = {}
@@ -155,6 +157,9 @@ class RunLogger:
             "total_output_tokens": total_output_tokens,
             "total_cached_tokens": total_cached_tokens,
             "total_cost_usd": round(total_cost, 6),
+            "cost_breakdown": manifest.get("cost_breakdown", []),
+            "processing_mode": manifest.get("processing_mode"),
+            "window_size": manifest.get("window_size"),
             "wall_clock_seconds": wall_clock,
             "cost_per_100_sentences_usd": cost_per_100,
             "time_per_100_sentences_sec": time_per_100,

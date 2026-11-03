@@ -1,0 +1,12 @@
+# Run outputs and logs, not project code
+runs/
+backend/runs/
+notebooks/results/*/*.json
+
+# Media and datasets
+/data/
+archive/
+
+# UI screenshots: little graph value, each one costs a vision pass
+docs/screenshots/
+.playwright-mcp/

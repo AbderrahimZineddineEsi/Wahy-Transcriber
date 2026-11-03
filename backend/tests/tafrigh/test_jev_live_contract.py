@@ -76,7 +76,8 @@ def test_progress_never_goes_backwards():
     pipe = make_pipeline(ad)
     pipe.on_progress = lambda done, total, msg, info: seen.append(100 * done / total)
     pipe.run(raw_text=". ".join(f"هذه الجملة رقم {n} وفيها كلمات كثيرة" for n in range(12)) + ".")
-    assert len(seen) >= 10 and seen == sorted(seen) and seen[-1] < 100
+    # the last event says the run is complete (the server caps the bar at 99 % until the result is ready)
+    assert len(seen) >= 10 and seen == sorted(seen) and seen[-1] == 100
 
 
 def test_matn_option_is_withheld_when_no_matn_is_configured():

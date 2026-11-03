@@ -67,9 +67,16 @@ class EngineBridge:
     def unit_words(self, ids: List[str], engine: str = "v4") -> Dict[str, Dict[str, Any]]:
         return self._call("unit_words", ids=ids, engine=engine)
 
-    def detect(self, engine: str, words: List[str]) -> List[Dict[str, Any]]:
-        """Run `engine` on ASR words; each detection carries the app's own canonical envelope."""
-        return self._call("detect", engine=engine, words=words)
+    def detect(self, engine: str, words: List[str], opts: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
+        """Run `engine` on ASR words; each detection carries the app's own canonical envelope.
+        `engine` = "v5/<tag>" with `opts` runs v5 rebuilt with params.v5 = opts (e.g. one fix switched off)."""
+        return self._call("detect", engine=engine, words=words, opts=opts)
+
+    def laya_v2(self, engine: str, words: List[str], dets: List[Dict[str, Any]], options: Dict[str, Any],
+                targets: Optional[List[int]] = None) -> List[Dict[str, Any]]:
+        """The app's Laya v2 requests (js/ai-verifier.js buildLayaV2Requests) for one engine run:
+        [{members: [index in dets], state, questions}], one per passage / finding that holds a target."""
+        return self._call("laya_v2", engine=engine, words=words, dets=dets, options=options, targets=targets)
 
     def fingerprint(self, engine: str = "") -> str:
         fp = self._call("fingerprint")

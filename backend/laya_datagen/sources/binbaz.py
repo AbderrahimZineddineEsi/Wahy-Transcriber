@@ -4,6 +4,7 @@ robots.txt only disallows /index.php. Requests are spaced and HTML is cached, so
 """
 from __future__ import annotations
 
+import html as html_lib
 import re
 import time
 from dataclasses import dataclass, asdict, field
@@ -87,7 +88,7 @@ def parse_lesson(html: str, url: str) -> Lesson:
                 if t:
                     blocks.append(Block("sheikh", t))
     return Lesson(id=f"binbaz_audio_{m.group(1) if m else 'x'}", url=url, title=h1.get_text(strip=True) if h1 else "",
-                  mp3=mp3.group(0) if mp3 else None, blocks=blocks)
+                  mp3=html_lib.unescape(mp3.group(0)) if mp3 else None, blocks=blocks)   # raw HTML: "&amp;" in some links
 
 
 def get_lesson(url: str) -> Lesson:

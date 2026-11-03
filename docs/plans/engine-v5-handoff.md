@@ -1,6 +1,10 @@
 # Handoff — engine v5 (better matching) + a "loose" profile to mine negatives for Laya
 
 Written 2026-10-24 at the end of a long session, so a fresh session can do this without its history.
+
+> **Status (2026-10-24, later):** deliverable 1 done — `js/engine_v5.js`, results and the per-fix table in
+> `docs/reports/engine-v5-report.md`, re-run with `notebooks/data/laya_engine_v5.ipynb`. Deliverable 2: the loose profile exists
+> (`v5:loose`) and is measured; labelling its findings on the lecture batches is the open step (see the report).
 Read this file, then `docs/review-notes.md` (the user's notes from reviewing ~1,100 cards: the engine problems with real
 examples and label keys).
 
@@ -67,7 +71,7 @@ if the user asks).
 Everything is in `backend/laya_datagen/` and cached (ASR is never redone; editing an engine file changes the engine
 fingerprint, so only detection reruns).
 
-- **Recall**: the 15 hand-reviewed Bin Baz lessons (`notebooks/laya_review.ipynb`, cells "Setup" + "Load lessons"; add
+- **Recall**: the 15 hand-reviewed Bin Baz lessons (`notebooks/data/laya_review.ipynb`, cells "Setup" + "Load lessons"; add
   `"v5"` to `ENGINES`). `stages.recall_table(bundles, ["v3","v4","v5"])` → recall vs 583 ground-truth quotes (499
   alignable). Today: v4 Quran 69 % / hadith 99 %, v3 58 % / 97 %. Stage 3 labels (`labels/stage3_missed.json`) say why each
   v4 miss happened (65 ASR-garbled, 49 engine's fault, 8 too short, 7 unsure, 2 bad GT): the 49 are the target.
@@ -89,7 +93,7 @@ fingerprint, so only detection reruns).
 - New lectures: `backend/laya_datagen/lectures.py` (YouTube ids per sheikh + Bin Baz URLs; the user wants many short videos
   from famous sheikhs, list in that file). Downloads `sources/youtube.py`, transcription Groq (free key in `.env`; if it
   fails ask the user for a new one), processing `pipeline.process_no_gt` (YouTube) / `pipeline.process_cached` (Bin Baz).
-- Labelling: `notebooks/laya_autolabel.ipynb` + `autolabel.py` — Sonnet through `claude -p` (headless Claude Code on the
+- Labelling: `notebooks/data/laya_autolabel.ipynb` + `autolabel.py` — Sonnet through `claude -p` (headless Claude Code on the
   user's subscription), 10 cards per call, guide = `agent_eval_files/instructions.md`. Currently effort `high`. 717 cards
   labelled so far (72 negatives). Pool for the loose run = loose findings not already labelled.
 

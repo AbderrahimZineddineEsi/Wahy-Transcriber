@@ -69,7 +69,7 @@ backend/laya_datagen/
   review.py            ipywidgets audit + review UI; human labels → labels/human.jsonl
   export.py            splits, dedup, caps → {train,val,test}.jsonl + manifest + dataset card
   validate.py          token lengths, laya dry_run, leakage, schema checks
-notebooks/laya_data_generation.ipynb
+notebooks/data/laya_data_generation.ipynb
 backend/tests/laya_datagen/   test_gt_parse, test_align, test_label, test_export_schema,
                               test_engine_bridge (needs node; mark slow)
 data/laya_datagen/            (gitignored) cache/{html,audio,asr,engine,teacher}, labels/, datasets/<ver>/
@@ -238,7 +238,7 @@ Volume (re-estimate after G1, when the real yield per lesson is known):
 
 ---
 
-## 7. Notebook outline (`notebooks/laya_data_generation.ipynb`)
+## 7. Notebook outline (`notebooks/data/laya_data_generation.ipynb`)
 
 0. Purpose, how to run, what each gate means.
 1. **Config:** engines, primary engine, hadith corpus, ASR backend, teachers, budgets, thresholds, quotas, seed, state profile.

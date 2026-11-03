@@ -31,3 +31,9 @@ def test_detects_verse_and_hadith_with_app_envelope(bridge, engine):
 
 def test_fingerprint_is_stable(bridge):
     assert bridge.fingerprint() == bridge.fingerprint()
+
+
+def test_loose_profile_is_really_loose():
+    # the harness must build v5:loose the app's way (wahyEngine = "v5:loose"); it raises if the profile did not apply
+    with EngineBridge(extra_engine_files=["js/engine_v5.js"]) as b:
+        assert b.detect("v5:loose", TEXT.split())

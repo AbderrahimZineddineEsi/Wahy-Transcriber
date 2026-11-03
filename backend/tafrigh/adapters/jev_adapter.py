@@ -98,6 +98,7 @@ class JEVAdapter(ChoiceClassifierAdapter):
         self.request_count = 0
         self.total_cost_usd = 0.0
         self.total_input_tokens = 0
+        self.total_output_tokens = 0
 
     def predict_questions(
         self,
@@ -141,6 +142,12 @@ class JEVAdapter(ChoiceClassifierAdapter):
                     data = resp.json()
                 except ValueError as exc:
                     raise JEVAPIError(f"رد JEV ليس JSON: {resp.text[:120]}", None, True) from exc
+                # billed even if an answer below is invalid and the request is retried
+                usage = data.get("usage") or {}
+                self.request_count += 1
+                self.total_cost_usd += float(usage.get("cost") or 0.0)
+                self.total_input_tokens += int(usage.get("input_tokens") or 0)
+                self.total_output_tokens += int(usage.get("output_tokens") or 0)
                 raw_answers = data.get("answers") or {}
                 answers: Dict[str, str] = {}
                 confidences: Dict[str, float] = {}
@@ -159,10 +166,6 @@ class JEVAdapter(ChoiceClassifierAdapter):
                         confidences[key] = probs[choice]
                     elif isinstance(a_obj.get("confidence"), (int, float)):
                         confidences[key] = float(a_obj["confidence"])
-                usage = data.get("usage") or {}
-                self.request_count += 1
-                self.total_cost_usd += float(usage.get("cost") or 0.0)
-                self.total_input_tokens += int(usage.get("input_tokens") or 0)
                 return {
                     "answers": answers,
                     "confidences": confidences,
@@ -235,6 +238,18 @@ class JEVAdapter(ChoiceClassifierAdapter):
         if self.config.jev_layout == "independent_questions":
             tag_choices = [self._format_tag_choice(c) for c in uow.allowed_choices if c.get("tag") != "needs_splitting"]
             trace["tag_choices"] = tag_choices
+
+            if self.config.execution_order == "combined":
+                answers = keep(self.predict_questions(state, {"tag": tag_choices, "hasTypo": ["true", "false"],
+                                                              "needsSplitting": ["true", "false"]})).get("answers", {})
+                parsed_tag = self._parse_tag_choice(answers.get("tag", "paragraph"))
+                if answers.get("needsSplitting") == "true":
+                    trace["tag_used_only_if_not_split"] = True
+                return GeminiWindowItemSchema(
+                    id=segment.id, tag=parsed_tag["tag"], level=parsed_tag["level"], parent=parsed_tag["parent"],
+                    hasTypo=answers.get("hasTypo") == "true", needsSplitting=answers.get("needsSplitting") == "true",
+                    confidence=trace["answers"].get("tag", {}).get("confidence"), trace=trace,
+                )
 
             if self.config.execution_order == "sequential":
                 needs_splitting = keep(self.predict_questions(state, {"needsSplitting": ["true", "false"]})).get("answers", {}).get("needsSplitting") == "true"

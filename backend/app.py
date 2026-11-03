@@ -23,7 +23,7 @@ import threading
 import traceback
 import uuid
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 
 import httpx
 
@@ -50,6 +50,8 @@ from transcriber import (
     get_vram_allocated_mb,
     transcribe_with_groq_chunks,
     transcribe_with_local_faster_whisper,
+    transcribe_with_specialized_whisper,
+    unload_specialized_whisper,
 )
 from progress import clear_control, get_control, get_progress, set_control, set_progress
 from corpus_sources import SOURCES as HADITH_SOURCES, CorpusSourceManager
@@ -59,6 +61,7 @@ from laya_converter import convert_verification_records_to_laya_jsonl
 try:
     from backend.tafrigh.pipeline import TafrighPipeline
     from backend.tafrigh.segmenter import SegmentationConfig, segment_transcript
+    from backend.tafrigh.estimate import estimate_run
     from backend.tafrigh.schemas import PipelineConfig
     from backend.tafrigh.matn_aligner import MatnConfig
     from backend.tafrigh.outline_repair import run_outline_repair_pass
@@ -88,6 +91,7 @@ try:
 except ImportError:
     from tafrigh.pipeline import TafrighPipeline
     from tafrigh.segmenter import SegmentationConfig, segment_transcript
+    from tafrigh.estimate import estimate_run
     from tafrigh.schemas import PipelineConfig
     from tafrigh.matn_aligner import MatnConfig
     from tafrigh.outline_repair import run_outline_repair_pass
@@ -186,6 +190,7 @@ async def api_health() -> Dict[str, Any]:
     except Exception:
         pass
 
+    is_colab = bool(os.environ.get("COLAB_GPU") or os.environ.get("COLAB_RELEASE_TAG") or "COLAB_JUPYTER_IP" in os.environ)
     return {
         "status": "ok",
         "version": "2.0.0",
@@ -194,6 +199,19 @@ async def api_health() -> Dict[str, Any]:
         "gpu_device": device_name,
         "vram_allocated_mb": get_vram_allocated_mb(),
         "groq_env_key_configured": bool(os.environ.get("GROQ_API_KEY")),
+        "specialized_whisper_supported": True,
+        "is_colab": is_colab,
+    }
+
+
+@app.get("/api/env-config")
+async def api_env_config() -> Dict[str, Any]:
+    """Expose environment configuration (e.g. from Colab secrets or environment variables)."""
+    return {
+        "groq_api_key": os.environ.get("GROQ_API_KEY", ""),
+        "gemini_api_key": os.environ.get("GEMINI_API_KEY", ""),
+        "openrouter_api_key": os.environ.get("OPENROUTER_API_KEY", ""),
+        "is_colab": bool(os.environ.get("COLAB_GPU") or os.environ.get("COLAB_RELEASE_TAG") or "COLAB_JUPYTER_IP" in os.environ),
     }
 
 
@@ -296,6 +314,32 @@ def api_transcribe(
                 actual_model_used = "local:faster-whisper-small-int8"
             except Exception:
                 raise groq_exc
+
+    elif model_selected == "specialized-whisper-large-v3-ar":
+        try:
+            device = "cuda:0" if torch is not None and torch.cuda.is_available() else "cpu"
+            raw_words = transcribe_with_specialized_whisper(
+                wav_path=wav_path, device=device, on_segment=on_segment
+            )
+            actual_model_used = "local:Abu-Dju/whisper-large-v3-ar"
+        except Exception as spec_exc:
+            if not auto_fallback:
+                raise
+            # Fallback to Groq if key exists, else small
+            if os.environ.get("GROQ_API_KEY") or groq_api_key:
+                chunks = slice_audio_for_groq(mp3_path, duration_sec=duration_sec)
+                raw_words = transcribe_with_groq_chunks(
+                    chunks=chunks,
+                    api_key=groq_api_key or "",
+                    model_name="whisper-large-v3-turbo",
+                    on_chunk_done=on_chunk_done,
+                )
+                actual_model_used = "groq:whisper-large-v3-turbo (Fallback)"
+            else:
+                raw_words = transcribe_with_local_faster_whisper(
+                    wav_path=wav_path, model_size="small", on_segment=on_segment
+                )
+                actual_model_used = "local:faster-whisper-small-int8 (Fallback)"
 
     elif model_selected == "local-turbo-int8":
         try:
@@ -416,7 +460,7 @@ async def api_laya_load(request: Request) -> Dict[str, Any]:
         body = await request.json()
     except Exception:
         pass
-    checkpoint = body.get("checkpoint") or "convaiinnovations/laya-multilingual"
+    checkpoint = body.get("checkpoint") or laya_verifier.DEFAULT_CHECKPOINT
     preferred_device = body.get("device") or "auto"
     return laya_verifier.load_model(
         checkpoint_id_or_path=checkpoint,
@@ -438,11 +482,12 @@ async def api_laya_predict(request: Request) -> Dict[str, Any]:
     """
     Run local Laya-Multilingual inference.
     Supports either:
-    1. Single envelope: { "state": {...}, "questions": {...}, "max_len": 1024 }
+    1. Single envelope: { "state": {...}, "questions": {...} }
     2. Batched findings: { "items": [ { "finding_id": "...", "state": {...}, "questions": {...} } ] }
+    `max_len` is optional: by default the checkpoint's own (1024 for laya_v1 models, 2048 for laya_v2).
     """
     body = await request.json()
-    max_len = int(body.get("max_len") or 1024)
+    max_len = int(body["max_len"]) if body.get("max_len") else None
 
     # Batch support
     if "items" in body and isinstance(body["items"], list):
@@ -589,6 +634,61 @@ def api_tafrigh_segment(body: Dict[str, Any]) -> JSONResponse:
     return JSONResponse({"success": True, "segments": rows, "stats": stats, "seg_config": cfg.model_dump()})
 
 
+DEFAULT_WINDOW_SIZE = 15
+
+
+def _preview_segments(body: Dict[str, Any]) -> List["TranscriptSegment"]:
+    return segment_transcript(
+        raw_text=body.get("raw_text") or "",
+        asr_words=body.get("asr_words"),
+        detection_spans=body.get("detection_spans"),
+        use_detection_boundaries=bool(body.get("use_detection_boundaries", True)),
+        config=_segmentation_config(body.get("seg_config")),
+    )
+
+
+@app.post("/api/tafrigh/estimate")
+def api_tafrigh_estimate(body: Dict[str, Any]) -> JSONResponse:
+    """Requests and tokens of a run over target_range for each processing mode, without calling any model.
+    Prices are applied by the browser, which has the OpenRouter catalogue."""
+    segs = _preview_segments(body)
+    rng = body.get("target_range") or [0, len(segs)]
+    jev_order = body.get("jev_execution_order", "parallel")
+    est = estimate_run(segs, int(rng[0]), int(rng[1]),
+                       window_size=int(body.get("window_size") or DEFAULT_WINDOW_SIZE),
+                       jev_requests_per_sentence=1 if jev_order == "combined" else (2 if jev_order == "sequential" else 3))
+    return JSONResponse({"success": True, **est})
+
+
+@app.post("/api/tafrigh/clone-run")
+def api_tafrigh_clone_run(body: Dict[str, Any]) -> JSONResponse:
+    """"Save as a new version" of a Tafrigh run: a copy with its own run id (and folder), so review edits made in
+    the copy leave the kept version as it is."""
+    session = _load_tafrigh_session(str(body.get("run_id") or ""))
+    if not session:
+        return JSONResponse(status_code=404, content={"success": False, "message": "تعذر العثور على جلسة التفريغ هذه."})
+    src_dir = Path(session["run_dir"])
+    new_id = f"run_{uuid.uuid4().hex[:12]}"
+    new_dir = src_dir.with_name(f"{src_dir.name}_v{new_id[-4:]}")
+    try:
+        shutil.copytree(src_dir, new_dir)
+    except OSError as exc:
+        return JSONResponse(status_code=500, content={"success": False, "message": f"تعذر نسخ التشغيل: {exc}"})
+    copy = {
+        "segments": [s.model_copy(deep=True) for s in session["segments"]],
+        "outline_state": session["outline_state"].model_copy(deep=True),
+        "lecture_spans": [s.model_copy(deep=True) for s in session["lecture_spans"]],
+        "manifest": {**session["manifest"], "run_id": new_id, "copied_from": session["manifest"].get("run_id")},
+        "render_cfg": session.get("render_cfg"),
+        "run_dir": str(new_dir),
+        "saved": None,
+    }
+    copy["manager"] = ReviewQueueManager(copy["segments"])
+    ACTIVE_TAFRIGH_SESSIONS[new_id] = copy
+    _save_tafrigh_session(copy)
+    return JSONResponse({"success": True, "run_id": new_id})
+
+
 @app.post("/api/tafrigh/control")
 def api_tafrigh_control(body: Dict[str, Any]) -> JSONResponse:
     job_id = str(body.get("job_id") or "")
@@ -647,8 +747,11 @@ def api_tafrigh_run(body: Dict[str, Any]) -> JSONResponse:
         processing_mode=processing_mode,
         model_candidate=model_candidate,
         jev_layout=jev_layout,
+        jev_execution_order=body.get("jev_execution_order", "parallel"),
         typo_strategy=typo_strategy,
         use_detection_boundaries=bool(body.get("use_detection_boundaries", True)),
+        # the window size used to be fixed at 20: the UI had no way to set it
+        window_size=max(1, min(40, int(body.get("window_size") or DEFAULT_WINDOW_SIZE))),
     )
 
     initial_segments = None
@@ -692,6 +795,7 @@ def api_tafrigh_run(body: Dict[str, Any]) -> JSONResponse:
         typo_strategy=typo_strategy,
         openrouter_api_key=openrouter_key if via_openrouter else None,
         openrouter_model=or_gemini_model or None,
+        disable_thinking=bool(body.get("disable_thinking")),
     )
     if openrouter_key:
         jev_cfg = JEVRequestConfig(
@@ -825,6 +929,7 @@ def api_tafrigh_run(body: Dict[str, Any]) -> JSONResponse:
         "structured_json": rendered_json,
         "review_items": [item.model_dump() for item in review_manager.get_items()],
         "report": report_data,
+        "manifest": result.run_manifest,
     })
 
 

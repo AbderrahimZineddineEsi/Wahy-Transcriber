@@ -80,37 +80,99 @@ def test_windowed_mode_validates_in_window_heading_introductions():
     assert res.segments[4].final_decision.parent_id == "seg_0003"
 
 
-def test_windowed_mode_fallback_on_omitted_or_scrambled_id():
+def test_windowed_mode_accepts_answers_in_any_order():
     segments = create_test_segments(3)
-
-    call_count = {"count": 0}
+    calls = {"count": 0}
 
     def mock_scrambled(payload):
-        call_count["count"] += 1
-        # Returns scrambled order: seg_0002 before seg_0001
-        return {
-            "decisions": [
-                {"id": "seg_0002", "tag": "paragraph"},
-                {"id": "seg_0001", "tag": "paragraph"},
-                {"id": "seg_0003", "tag": "paragraph"},
-            ]
-        }
+        calls["count"] += 1
+        return {"decisions": [
+            {"id": "seg_0002", "tag": "continuation"},
+            {"id": "seg_0001", "tag": "paragraph"},
+            {"id": "seg_0003", "tag": "comment", "commentKind": "made_up_kind"},
+        ]}
 
-    adapter = GeminiAdapter(mock_response_fn=mock_scrambled)
+    pipeline = TafrighPipeline(
+        pipeline_config=PipelineConfig(processing_mode="windowed", window_size=5, model_candidate="gemini_all"),
+        adapters={"gemini": GeminiAdapter(mock_response_fn=mock_scrambled)},
+    )
+    res = pipeline.run(initial_segments=segments)
+
+    assert calls["count"] == 1
+    assert [s.final_decision.tag for s in res.segments] == [StructuralTag.PARAGRAPH, StructuralTag.CONTINUATION, StructuralTag.COMMENT]
+    assert not any("WINDOW_FALLBACK_USED" in s.review_flags for s in res.segments)
+
+
+def test_windowed_mode_asks_again_only_for_left_out_sentences():
+    segments = create_test_segments(4)
+    prompts = []
+
+    def mock_partial(payload):
+        prompts.append(payload["prompt"])
+        if len(prompts) == 1:   # the window: seg_0003 left out
+            return {"decisions": [{"id": f"seg_000{k}", "tag": "paragraph"} for k in (1, 2, 4)]}
+        return {"decisions": [{"id": "seg_0003", "tag": "continuation"}]}
+
+    pipeline = TafrighPipeline(
+        pipeline_config=PipelineConfig(processing_mode="windowed", window_size=10, model_candidate="gemini_all"),
+        adapters={"gemini": GeminiAdapter(mock_response_fn=mock_partial)},
+    )
+    res = pipeline.run(initial_segments=segments)
+
+    assert len(prompts) == 2
+    # the extra request is a normal per-sentence one, with the neighbours as context
+    assert "seg_0003" in prompts[1] and "seg_0001" not in prompts[1] and "context_before" in prompts[1]
+    assert [s.id for s in res.segments if "WINDOW_FALLBACK_USED" in s.review_flags] == ["seg_0003"]
+    assert res.segments[2].final_decision.tag == StructuralTag.CONTINUATION
+    assert [log for log in res.request_logs if log.get("fallback_triggered")][0]["missing_ids"] == ["seg_0003"]
+
+
+def test_window_answers_with_renumbered_ids_are_matched_by_position():
+    segments = create_test_segments(2)
+    adapter = GeminiAdapter(mock_response_fn=lambda p: {"decisions": [{"id": "1", "tag": "paragraph"}, {"id": "2", "tag": "continuation"}]})
     pipeline = TafrighPipeline(
         pipeline_config=PipelineConfig(processing_mode="windowed", window_size=5, model_candidate="gemini_all"),
         adapters={"gemini": adapter},
     )
-
     res = pipeline.run(initial_segments=segments)
+    assert res.segments[1].final_decision.tag == StructuralTag.CONTINUATION
+    assert not any(s.review_flags for s in res.segments)
 
-    # Initial attempt + retry attempt = at least 2 calls
-    assert call_count["count"] >= 2
-    # Segments should be flagged with WINDOW_FALLBACK_USED
-    assert all("WINDOW_FALLBACK_USED" in s.review_flags for s in res.segments)
-    # Check that a fallback request was logged
-    fallback_logs = [log for log in res.request_logs if log.get("fallback_triggered")]
-    assert len(fallback_logs) > 0
+
+def test_heading_parent_is_taken_from_the_outline_not_the_model():
+    segments = create_test_segments(3)
+    adapter = GeminiAdapter(mock_response_fn=lambda p: {"decisions": [
+        {"id": "seg_0001", "tag": "heading", "level": 1, "parent": "whatever"},
+        {"id": "seg_0002", "tag": "heading", "level": "2", "parent": 7},
+        {"id": "seg_0003", "tag": "paragraph", "level": 0, "parent": ""},
+    ]})
+    pipeline = TafrighPipeline(
+        pipeline_config=PipelineConfig(processing_mode="windowed", window_size=5, model_candidate="gemini_all"),
+        adapters={"gemini": adapter},
+    )
+    res = pipeline.run(initial_segments=segments)
+    d = [s.final_decision for s in res.segments]
+    assert (d[0].tag, d[0].level, d[0].parent_id) == (StructuralTag.HEADING, 1, None)
+    assert (d[1].tag, d[1].level, d[1].parent_id) == (StructuralTag.HEADING, 2, "seg_0001")
+    assert d[2].tag == StructuralTag.PARAGRAPH
+    assert not any("INVALID_TRANSITION_FALLBACK" in s.review_flags for s in res.segments)
+
+
+def test_windowed_progress_moves_per_sentence_and_shows_the_window_in_flight():
+    segments = create_test_segments(6)
+    seen = []
+    adapter = GeminiAdapter(mock_response_fn=lambda p: {"decisions": [
+        {"id": f"seg_{k:04d}", "tag": "paragraph"} for k in range(1, 7) if f"seg_{k:04d}" in p["prompt"]]})
+    pipeline = TafrighPipeline(
+        pipeline_config=PipelineConfig(processing_mode="windowed", window_size=3, model_candidate="gemini_all"),
+        adapters={"gemini": adapter},
+    )
+    pipeline.on_progress = lambda done, total, msg, info: seen.append((done, info["inflight"], info["requests_planned"]))
+    pipeline.run(initial_segments=segments)
+    dones = [d for d, _, _ in seen]
+    assert dones == sorted(dones) and dones[-1] == 6
+    assert (0, {"from": 0, "to": 3}, 2) in seen       # first window on its way, 2 requests expected
+    assert {d for d, _, _ in seen} >= {0, 1, 2, 3, 4, 5, 6}
 
 
 def test_jev_hybrid_parallel_split_discards_tag():
@@ -188,3 +250,39 @@ def test_laya_adapter_contract_matches_jev_adapter():
     assert dec_jev[0].tag == dec_laya[0].tag
     assert dec_jev[0].hasTypo == dec_laya[0].hasTypo
     assert dec_jev[0].needsSplitting == dec_laya[0].needsSplitting
+
+
+def test_cost_is_reported_per_purpose_and_model():
+    """A split follow-up made by the helper model shows as its own line, apart from the classifier's."""
+    segments = [TranscriptSegment(id="seg_0001", original_text="فهذا هو الأصل الأول وسنذكر الآن شروط الصلاة وهي تسعة",
+                                  source_pos=SourcePosition(char_start=0, char_end=51))]
+
+    def mock(payload):
+        if "splitPoints" in payload["prompt"] and "decisions" not in payload["prompt"]:
+            return {"parsed": {"splitPoints": [4]}, "usage": {"input_tokens": 50, "output_tokens": 5}}
+        return {"parsed": {"decisions": [{"id": "seg_0001", "tag": "paragraph", "needsSplitting": True}]},
+                "usage": {"input_tokens": 900, "output_tokens": 60}}
+
+    adapter = GeminiAdapter(mock_response_fn=mock)
+    pipe = TafrighPipeline(pipeline_config=PipelineConfig(model_candidate="gemini_all"), adapters={"gemini": adapter})
+    res = pipe.run(initial_segments=segments)
+    rows = {r["purpose"]: r for r in res.run_manifest["cost_breakdown"]}
+    assert rows["split"]["input_tokens"] == 50 and rows["classify"]["input_tokens"] >= 900
+    assert res.run_manifest["requests_sent"] == sum(r["requests"] for r in res.run_manifest["cost_breakdown"])
+
+
+def test_helper_requests_do_not_get_the_classifier_prompt_and_survive_its_reply_shape():
+    """Regression: with the classifier's system prompt the helper answered {"decisions": [...]} and its fixes were lost."""
+    text = "ثم الزكاة همود أحد أركان الإسلام"
+    seg = TranscriptSegment(id="s1", original_text=text, source_pos=SourcePosition(char_start=0, char_end=len(text)))
+    seen = []
+    edit = {"wordStart": 2, "wordEnd": 2, "original": "همود", "replacement": "عمود"}
+
+    def mock(payload):
+        seen.append(payload["system"])
+        return {"decisions": [{"id": 0, "tag": "paragraph", "edits": [edit], "splitPoints": [3]}]}
+
+    adapter = GeminiAdapter(mock_response_fn=mock)
+    assert adapter.get_typo_edits(seg) == [edit]
+    assert adapter.get_split_points(seg) == [3]
+    assert all('"decisions"' not in s for s in seen)

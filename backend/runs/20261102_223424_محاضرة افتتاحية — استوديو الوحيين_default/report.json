@@ -1,0 +1,45 @@
+{
+  "run_id": "run_ba7a22961144",
+  "lecture_slug": "محاضرة افتتاحية — استوديو الوحيين",
+  "label": "default",
+  "total_requests": 2,
+  "total_input_tokens": 3991,
+  "total_output_tokens": 1963,
+  "total_cached_tokens": 0,
+  "total_cost_usd": 0.00129,
+  "cost_breakdown": [
+    {
+      "purpose": "classify_window",
+      "model": "openrouter:deepseek/deepseek-v4.1-flash",
+      "requests": 2,
+      "retries": 0,
+      "cost_usd": 0.00129049,
+      "input_tokens": 3991,
+      "output_tokens": 1963
+    }
+  ],
+  "processing_mode": "windowed",
+  "window_size": 15,
+  "wall_clock_seconds": 5.96,
+  "cost_per_100_sentences_usd": 0.0081,
+  "time_per_100_sentences_sec": 37.25,
+  "failure_rate": 0.0,
+  "retry_rate": 0.0,
+  "fallback_rate": 0.0,
+  "latency_by_purpose_ms": {
+    "classify_window": {
+      "p50": 4547.67,
+      "p95": 4547.67,
+      "max": 4547.67
+    }
+  },
+  "structural_tag_distribution": {
+    "comment": 3,
+    "paragraph": 1,
+    "continuation": 12
+  },
+  "review_flag_counts": {
+    "EDIT_CAP_EXCEEDED": 1
+  },
+  "evaluation_metrics": null
+}

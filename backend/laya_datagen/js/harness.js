@@ -49,15 +49,29 @@ function init({ hadith_path, extra_engine_files = [] }) {
 }
 
 // Same path as the app: localStorage.wahyEngine + rebuildMatcher(); then verify the class that was actually built.
-const EXPECTED_CLASS = { v3: "QuotationMatcherJS", v4: "WahyEngine" };
-function useEngine(name) {
-  const cls = EXPECTED_CLASS[name];
+// "<engine>/<tag>" with `opts` = that engine rebuilt with extra engine params (params.v5 = opts), to measure one fix;
+// "<engine>@<tag>" = the same engine under another name (e.g. a saved copy of the file loaded as an extra engine file);
+// "v5:<profile>" = v5 with localStorage.wahyEngineProfile = <profile> (e.g. "v5:loose"), the app's own switch.
+const EXPECTED_CLASS = { v3: "QuotationMatcherJS", v4: "WahyEngine", v5: "WahyEngineV5" };
+function useEngine(name, opts) {
+  const base = name.split(/[/@:]/)[0];
+  const profile = (name.match(/:([a-z]+)/) || [])[1];
+  const cls = EXPECTED_CLASS[base];
   if (!cls) throw new Error(`unknown engine ${name}`);
   if (!matchers[name]) {
-    store.wahyEngine = name;
-    run("rebuildMatcher()");
+    // the app's own switch: wahyEngine = "v5:loose" (state.js rebuildMatcher passes v5Profile from it; the older
+    // wahyEngineProfile key is still set for engine files that read it themselves)
+    store.wahyEngine = profile ? `${base}:${profile}` : base;
+    if (profile) store.wahyEngineProfile = profile;
+    try { run("rebuildMatcher()"); } finally { delete store.wahyEngineProfile; }
     const built = run("activeMatcher.constructor.name");
     if (built !== cls) throw new Error(`engine ${name} fell back to ${built}`);
+    const gotProfile = run("activeMatcher.P && activeMatcher.P.profile");
+    if (profile && gotProfile !== profile) throw new Error(`engine ${name} was built with profile ${gotProfile}, not ${profile}`);
+    if (name.includes("/")) {
+      sandbox.__opts = opts || {};
+      run("activeMatcher = (([p, a, o]) => new activeMatcher.constructor(RAW_QURAN_DATA, RAW_HADITH_DATA, Object.assign({}, p, { v5: __opts }), a, o))(activeMatcher._ctorArgs)");
+    }
     matchers[name] = run("activeMatcher");
   }
   sandbox.__m = matchers[name];
@@ -77,8 +91,8 @@ const DET_FIELDS = ["id", "unitId", "sourceType", "displayRef", "confidenceBand"
   "isAmbiguous", "wordStartIdx", "wordEndIdx", "charStart", "charEnd", "matchedText", "canonicalText",
   "segments", "qSegments", "qiraah", "candidateRefs", "embeddedQuran", "alsoAdhkar", "snappedToCanonical"];
 
-function detect({ engine, words: strs }) {
-  useEngine(engine);
+function detect({ engine, words: strs, opts }) {
+  useEngine(engine, opts);
   const words = buildWords(strs);
   const text = strs.join(" ");
   sandbox.__words = words; sandbox.__text = text;
@@ -98,8 +112,22 @@ function detect({ engine, words: strs }) {
   });
 }
 
+// Laya envelope v2 for one engine run: the app's own buildLayaV2Requests on detections we already have (no re-detect).
+// `dets` = every finding of the run (passages and neighbours are found among all of them), `targets` = indices of the
+// findings that need a row. Members come back as their index in `dets`.
+function layaV2({ engine, words: strs, dets, options = {}, targets = null }) {
+  useEngine(engine);      // its matcher's units give the corpus words around each span
+  const words = buildWords(strs);
+  sandbox.__words = words; sandbox.__dets = dets; sandbox.__opts = options;
+  sandbox.__targets = targets ? targets.map(i => dets[i]) : null;
+  run("currentState.words = __words; currentState.detections = __dets;");
+  const reqs = run("WahyAiVerifier.buildLayaV2Requests(__dets, __words, __opts, __targets)");
+  return reqs.map(r => ({ members: r.members.map(m => dets.indexOf(m)), state: r.state, questions: r.questions }));
+}
+
 const handlers = {
   init,
+  laya_v2: layaV2,
   fingerprint: () => ({ files: fileHashes, corpus: corpusHash }),
   // per-word norm tokens (a word may yield 0..n tokens), so ASR words map onto the engine's token space
   tokenize_words: ({ words }) => words.map(w => run(`tokenizeText(${JSON.stringify(w)}).map(t => t.norm)`)),

@@ -96,6 +96,8 @@ class TafrighPipeline:
         self._lock = threading.Lock()
         self._halted = False
         self._live: Optional[Dict[str, Any]] = None
+        self._inflight = 0          # target sentences of the request being waited on (progress bar's striped part)
+        self._window_no = 0
 
     def _init_default_adapters(self) -> None:
         if "gemini" not in self.adapters:
@@ -134,7 +136,8 @@ class TafrighPipeline:
             "rejected": rejected,
         }
         # a fix inside a detected quotation is not a problem: the quotation is shown from its source anyway
-        if any(r.get("why") != "inside_detected_quotation" for r in rejected):
+        # nor is a "fix" that changes nothing
+        if any(r.get("why") not in ("inside_detected_quotation", "no_change") for r in rejected):
             seg.review_flags.append("EDIT_REJECTED")
         if accepted:
             res = validate_and_apply_edits(seg, accepted, max_change_ratio=self.config.max_edit_change_ratio)
@@ -164,17 +167,58 @@ class TafrighPipeline:
     def _set_current(self, seg: TranscriptSegment, purpose: str) -> None:
         self._current = {"id": seg.id, "text": seg.original_text.strip()[:160], "purpose": purpose}
 
+    def _adapter_label(self, key: str, adapter: Any) -> str:
+        if key == "jev":
+            return f"jev:{getattr(adapter, 'model', '')}"
+        if key == "laya":
+            return "laya (local)"
+        return getattr(adapter, "provider_label", key)
+
+    def _usage(self) -> Dict[str, Tuple[str, int, float, int, int]]:
+        out = {}
+        for key, a in self.adapters.items():
+            out[key] = (self._adapter_label(key, a), int(getattr(a, "request_count", 0) or 0),
+                        float(getattr(a, "total_cost_usd", 0.0) or 0.0),
+                        int(getattr(a, "input_tokens_total", getattr(a, "total_input_tokens", 0)) or 0),
+                        int(getattr(a, "output_tokens_total", getattr(a, "total_output_tokens", 0)) or 0))
+        return out
+
+    def _account(self, purpose: str, before: Dict[str, Tuple[str, int, float, int, int]]) -> None:
+        """Attribute what this call cost to (purpose, model): the results show the classifier and any helper model
+        (splits, typo fixes, retries) on separate lines, with the cost the provider reported."""
+        group = purpose.replace("_retry", "")
+        for key, (label, req, cost, tin, tout) in self._usage().items():
+            b = before.get(key, (label, 0, 0.0, 0, 0))
+            if req == b[1] and cost == b[2] and tin == b[3]:
+                continue
+            row = self._stats.setdefault("breakdown", {}).setdefault(f"{group}|{label}", {
+                "purpose": group, "model": label, "requests": 0, "retries": 0, "cost_usd": 0.0,
+                "input_tokens": 0, "output_tokens": 0})
+            row["requests"] += req - b[1]
+            row["retries"] += (req - b[1]) if purpose.endswith("_retry") else 0
+            row["cost_usd"] = round(row["cost_usd"] + cost - b[2], 8)
+            row["input_tokens"] += tin - b[3]
+            row["output_tokens"] += tout - b[4]
+
+    def _cost_breakdown(self) -> List[Dict[str, Any]]:
+        return sorted(self._stats.get("breakdown", {}).values(), key=lambda r: -r["requests"])
+
     def _model_call(self, seg_ids: List[str], purpose: str, fn: Callable[[], Any], request_logs: List[Dict[str, Any]]) -> Any:
         """Run one model call. Config-type failures (bad key / unknown model) abort the run; transient ones
         are logged and returned as None so the caller can flag the segment and carry on."""
         t0 = time.perf_counter()
         self._current["purpose"] = purpose
+        before = self._usage()
         try:
             self._lock.release()
             try:
                 out = fn()
             finally:
                 self._lock.acquire()
+                self._account(purpose, before)
+                # real requests: a JEV sentence is 3 in parallel, a cut-off reply and its retry are 2
+                real = sum(u[1] - before.get(k, u)[1] for k, u in self._usage().items())
+                self._stats["requests"] = self._stats.get("requests", 0) + max(1, real)
             self._fail_streak = 0
             if not purpose.startswith("classify"):  # classify calls are logged by their caller with more detail
                 request_logs.append({
@@ -211,17 +255,43 @@ class TafrighPipeline:
             choices = [c for c in choices if c.get("tag") != StructuralTag.MATN_SECTION.value]
         return choices
 
+    def _windowed(self) -> bool:
+        return self.config.processing_mode == "windowed" and self.config.model_candidate == "gemini_all"
+
+    def _requests_per_sentence(self) -> int:
+        """Requests one sentence costs in per-sentence mode (JEV asks its three questions separately in parallel)."""
+        if self.config.model_candidate == "jev_hybrid":
+            cfg = getattr(self.adapters.get("jev"), "config", None)
+            if cfg is not None and cfg.jev_layout == "independent_questions" and cfg.execution_order == "parallel":
+                return 3
+        return 1
+
     def _details(self, done: int, total: int) -> Dict[str, Any]:
         calls = sum(int(getattr(a, "request_count", 0) or 0) for a in self.adapters.values())
         cost = sum(float(getattr(a, "total_cost_usd", 0.0) or 0.0) for a in self.adapters.values())
         elapsed = max(0.0, time.time() - self._started - self._paused_sec)
         per = elapsed / done if done else None
+        sent = self._stats.get("requests", 0)
+        left = max(0, total - done - self._inflight)
+        if self._windowed():
+            w = max(1, self.config.window_size)
+            planned = sent + (1 if self._inflight else 0) + -(-left // w)
+        else:
+            each = self._requests_per_sentence()
+            planned = sent + (each if self._inflight else 0) + left * each
         return {
             "done": done, "total": total,
             "elapsed_sec": round(elapsed, 1),
             "sec_per_sentence": round(per, 2) if per else None,
             "eta_sec": round(per * (total - done), 1) if per else None,
             "model_calls": calls, "cost_usd": round(cost, 6),
+            # requests: sent so far (including failed ones) and the expected total; splits, typo fixes and
+            # sentences a window left out add requests as they come up
+            "requests_sent": sent, "requests_planned": planned,
+            "mode": "windowed" if self._windowed() else "per_sentence", "window_size": self.config.window_size,
+            "window_no": self._window_no,
+            "inflight": {"from": done, "to": min(total, done + self._inflight)} if self._inflight else None,
+            "cost_breakdown": self._cost_breakdown(),
             "errors": self._stats.get("errors", 0), "splits": self._stats.get("splits", 0),
             "edits": self._stats.get("edits", 0), "tags": dict(self._stats.get("tags", {})),
             "current": dict(self._current), "last_tag": self._stats.get("last_tag"),
@@ -233,7 +303,7 @@ class TafrighPipeline:
         if not self.on_progress:
             return
         done = len(self._finalized)
-        total = max(self._total_initial, done + 1)
+        total = max(self._total_initial, done)
         info = self._details(done, total)
         info["paused"] = paused
         self.on_progress(done, total, msg.format(done=done, total=total) if msg else "", info)
@@ -259,6 +329,23 @@ class TafrighPipeline:
         if state in ("cancel", "stop") or self._halted:
             self._cancelled = True
         return not self._cancelled
+
+    @staticmethod
+    def _repair_decision(dec: StructuralDecision, outline_state: OutlineState) -> StructuralDecision:
+        """Fix what the outline already determines instead of throwing the answer away. A heading's parent is the open
+        heading one level up (a chat model cannot know segment ids, so its "parent" was usually wrong and the heading
+        fell back to a paragraph); a level deeper than the open spine allows is pulled up; a non-heading carries no
+        level / parent; nothing before it -> no continuation."""
+        if dec.tag == StructuralTag.HEADING:
+            deepest = max(outline_state.active_spine.keys(), default=0)
+            level = max(1, min(int(dec.level or 1), deepest + 1))
+            parent = outline_state.active_spine[level - 1].segment_id if level > 1 else None
+            return dec.model_copy(update={"level": level, "parent_id": parent})
+        if dec.tag == StructuralTag.CONTINUATION and outline_state.last_segment_tag is None:
+            dec = dec.model_copy(update={"tag": StructuralTag.PARAGRAPH})
+        if dec.level is not None or dec.parent_id is not None:
+            dec = dec.model_copy(update={"level": None, "parent_id": None})
+        return dec
 
     def _record(self, seg: TranscriptSegment, outline_state: OutlineState, dec: StructuralDecision) -> None:
         outline_state.record_decision(seg.id, seg.original_text, dec)
@@ -349,10 +436,12 @@ class TafrighPipeline:
         self._live = {"segments": segments, "outline_state": outline_state, "request_logs": request_logs,
                       "start": start, "end": end, "started_at": started_at}
 
-        if self.config.processing_mode == "windowed" and self.config.model_candidate == "gemini_all":
+        if self._windowed():
             segments = self._process_windowed(segments, outline_state, request_logs, start_index=start)
         else:
             segments = self._process_per_sentence(segments, outline_state, request_logs, start_index=start)
+        self._inflight = 0
+        self._report("اكتملت {done} جملة — جاري تجهيز النتيجة")
         # only what was actually classified is returned (range runs, cancelled runs)
         segments = [s for s in segments if s.id in self._finalized]
         return self._build_result(segments, outline_state, request_logs, start, end, started_at)
@@ -386,6 +475,12 @@ class TafrighPipeline:
             "model_name": getattr(self.adapters.get("gemini"), "model_name", None),
             "gemini_route": getattr(self.adapters.get("gemini"), "provider_label", None),
             "wall_clock_seconds": round(time.time() - started_at, 2),
+            # what the run really cost, per purpose and model (provider-reported cost; tokens for direct Gemini)
+            "cost_breakdown": self._cost_breakdown(),
+            "requests_sent": self._stats.get("requests", 0),
+            "total_cost_usd": round(sum(r["cost_usd"] for r in self._cost_breakdown()), 8),
+            "total_input_tokens": sum(r["input_tokens"] for r in self._cost_breakdown()),
+            "total_output_tokens": sum(r["output_tokens"] for r in self._cost_breakdown()),
         }
 
         return PipelineResult(
@@ -396,18 +491,27 @@ class TafrighPipeline:
             request_logs=request_logs,
         )
 
+    _UNSET = object()
+
     def _process_per_sentence(
         self,
         segments: List[TranscriptSegment],
         outline_state: OutlineState,
         request_logs: List[Dict[str, Any]],
         start_index: int = 0,
+        stop_id: Any = _UNSET,
+        presets: Optional[Dict[str, GeminiWindowItemSchema]] = None,
     ) -> List[TranscriptSegment]:
+        """Classify segments[start_index:] one by one until the segment `stop_id` (default: the end of the run's range).
+        `segments` is the whole lecture, edited in place (splits): neighbours are always available as context.
+        `presets` = decisions already answered by a window request; a sentence without one gets its own request."""
         adapter = self.get_active_adapter()
         gemini_adapter: GeminiAdapter = self.adapters["gemini"]  # for dedicated splits/edits if hybrid
+        if stop_id is TafrighPipeline._UNSET:
+            stop_id = self._stop_id
 
         i = start_index
-        while i < len(segments) and segments[i].id != self._stop_id:
+        while i < len(segments) and segments[i].id != stop_id:
             if not self._checkpoint():
                 break
             seg = segments[i]
@@ -428,27 +532,34 @@ class TafrighPipeline:
                 allowed_choices=self._allowed_choices(
                     outline_state, include_split_option=(self.config.jev_layout == "split_as_tag_option")
                 ),
+                previous_tag=outline_state.last_segment_tag.value if outline_state.last_segment_tag else None,
+                in_list=outline_state.in_list_context,
             )
 
+            preset = presets.pop(seg.id, None) if presets else None
+            self._inflight = 0 if preset is not None else 1
             self._report("جملة {done} من {total}")
-            t0 = time.perf_counter()
-            calls0, cost0 = getattr(adapter, "request_count", 0), getattr(adapter, "total_cost_usd", 0.0)
-            decisions = self._model_call([seg.id], "classify", lambda: adapter.classify_uow(uow), request_logs)
-            latency = (time.perf_counter() - t0) * 1000
-            if decisions is None:
-                seg.review_flags.append("MODEL_ERROR")
-                decisions = []
-
-            req_log = {
-                "request_id": f"req_{uuid.uuid4().hex[:8]}",
-                "purpose": "classify",
-                "unit_of_work_ids": [seg.id],
-                "latency_ms": round(latency, 2),
-                "fallback_triggered": False,
-                "model_calls": getattr(adapter, "request_count", 0) - calls0,
-                "cost_estimate_usd": round(getattr(adapter, "total_cost_usd", 0.0) - cost0, 8),
-            }
-            request_logs.append(req_log)
+            if preset is not None:
+                decisions = [preset]
+                latency = float((preset.trace or {}).get("latency_ms", 0.0))
+            else:
+                t0 = time.perf_counter()
+                calls0, cost0 = getattr(adapter, "request_count", 0), getattr(adapter, "total_cost_usd", 0.0)
+                decisions = self._model_call([seg.id], "classify", lambda: adapter.classify_uow(uow), request_logs)
+                latency = (time.perf_counter() - t0) * 1000
+                if decisions is None:
+                    seg.review_flags.append("MODEL_ERROR")
+                    decisions = []
+                request_logs.append({
+                    "request_id": f"req_{uuid.uuid4().hex[:8]}",
+                    "purpose": "classify",
+                    "unit_of_work_ids": [seg.id],
+                    "latency_ms": round(latency, 2),
+                    "fallback_triggered": False,
+                    "model_calls": getattr(adapter, "request_count", 0) - calls0,
+                    "cost_estimate_usd": round(getattr(adapter, "total_cost_usd", 0.0) - cost0, 8),
+                })
+            self._inflight = 0
 
             decision = decisions[0] if decisions else GeminiWindowItemSchema(id=seg.id, tag=StructuralTag.PARAGRAPH)
             seg.trace["decision"] = dict(decision.trace or {}, latency_ms=round(latency, 1))
@@ -507,14 +618,13 @@ class TafrighPipeline:
                     decision.tag = decision.tag or StructuralTag.PARAGRAPH
                     decision.needsSplitting = False
 
-            # Validate structural transition
-            struct_dec = StructuralDecision(
+            struct_dec = self._repair_decision(StructuralDecision(
                 tag=decision.tag or StructuralTag.PARAGRAPH,
                 level=decision.level,
                 parent_id=decision.parent,
                 comment_kind=decision.commentKind,
                 confidence=decision.confidence,
-            )
+            ), outline_state)
 
             val_trans = validate_structural_transition(struct_dec, outline_state)
             if not val_trans.is_valid:
@@ -538,6 +648,22 @@ class TafrighPipeline:
 
         return segments
 
+    @staticmethod
+    def _match_window_decisions(decisions: List[GeminiWindowItemSchema],
+                                target_ids: List[str]) -> Dict[str, GeminiWindowItemSchema]:
+        """Window answers by sentence id. The order does not matter; a reply with exactly one decision per target but
+        other ids (some models renumber them "1", "2"…) is matched by position."""
+        wanted = set(target_ids)
+        by_id: Dict[str, GeminiWindowItemSchema] = {}
+        for d in decisions:
+            if d.id in wanted and d.id not in by_id:
+                by_id[d.id] = d
+        if not by_id and len(decisions) == len(target_ids):
+            for tid, d in zip(target_ids, decisions):
+                d.id = tid
+                by_id[tid] = d
+        return by_id
+
     def _process_windowed(
         self,
         segments: List[TranscriptSegment],
@@ -545,18 +671,28 @@ class TafrighPipeline:
         request_logs: List[Dict[str, Any]],
         start_index: int = 0,
     ) -> List[TranscriptSegment]:
+        """One request classifies a window of sentences; then the sentence-by-sentence loop applies those answers in
+        order (validation, splits, typo fixes, context for any extra request all work exactly as in per-sentence mode).
+        A sentence the reply left out gets its own request; a window whose reply is unusable is redone sentence by
+        sentence. (Before: any missing id, a different order or one invalid field re-sent the whole window and then
+        re-did all of it one by one, and a sentence to split was re-asked without any context.)"""
         gemini_adapter: GeminiAdapter = self.adapters["gemini"]
         w_size = max(1, self.config.window_size)
 
-        def stop_index() -> int:
+        def index_of(seg_id: Optional[str]) -> int:
+            if seg_id is None:
+                return len(segments)
             ids = [x.id for x in segments]
-            return ids.index(self._stop_id) if self._stop_id in ids else len(segments)
+            return ids.index(seg_id) if seg_id in ids else len(segments)
 
         i = start_index
-        while i < stop_index():
+        self._window_no = 0
+        while i < index_of(self._stop_id):
             if not self._checkpoint():
                 break
-            window_slice = segments[i : min(stop_index(), i + w_size)]
+            window_slice = segments[i : min(index_of(self._stop_id), i + w_size)]
+            next_id = segments[i + len(window_slice)].id if i + len(window_slice) < len(segments) else None
+            self._window_no += 1
             self._set_current(window_slice[0], "classify_window")
             c_before = segments[max(0, i - self.config.context_before) : i]
             c_after = segments[i + len(window_slice) : min(len(segments), i + len(window_slice) + self.config.context_after)]
@@ -572,97 +708,44 @@ class TafrighPipeline:
                     outline_state.headings[-1] if outline_state.headings else None
                 ),
                 allowed_choices=self._allowed_choices(outline_state),
+                previous_tag=outline_state.last_segment_tag.value if outline_state.last_segment_tag else None,
+                in_list=outline_state.in_list_context,
             )
 
             target_ids = [s.id for s in window_slice]
+            first, last = len(self._finalized) + 1, len(self._finalized) + len(window_slice)
+            self._inflight = len(window_slice)
+            self._report(f"النافذة {self._window_no}: الجمل {first}–{last} في طلب واحد")
             t0 = time.perf_counter()
-            self._report("تمت معالجة {done} من {total} جملة")
-            decisions = self._model_call(target_ids, "classify_window", lambda: gemini_adapter.classify_uow(uow), request_logs) or []
+            decisions = self._model_call(target_ids, "classify_window", lambda: gemini_adapter.classify_uow(uow), request_logs)
+            if decisions is None and not self._halted:
+                # the adapter already retried transport errors; this is an unreadable reply: ask once more
+                decisions = self._model_call(target_ids, "classify_window_retry", lambda: gemini_adapter.classify_uow(uow), request_logs)
             latency = (time.perf_counter() - t0) * 1000
+            self._inflight = 0
 
-            # Window Completeness & Order Check
-            returned_ids = [d.id for d in decisions]
-            completeness_ok = (returned_ids == target_ids)
-
-            if not completeness_ok:
-                # Retry once
-                t0_retry = time.perf_counter()
-                decisions = self._model_call(target_ids, "classify_window_retry", lambda: gemini_adapter.classify_uow(uow), request_logs) or []
-                latency += (time.perf_counter() - t0_retry) * 1000
-                returned_ids = [d.id for d in decisions]
-                completeness_ok = (returned_ids == target_ids)
-
-            if not completeness_ok:
-                # Fall back to per_sentence for this window
-                req_log = {
-                    "request_id": f"req_{uuid.uuid4().hex[:8]}",
-                    "purpose": "classify_window_fallback",
-                    "unit_of_work_ids": target_ids,
-                    "latency_ms": round(latency, 2),
-                    "fallback_triggered": True,
-                }
-                request_logs.append(req_log)
-
-                for s in window_slice:
-                    s.review_flags.append("WINDOW_FALLBACK_USED")
-
-                # Process window_slice via per_sentence
-                processed_slice = self._process_per_sentence(window_slice, outline_state, request_logs)
-                segments[i : i + len(window_slice)] = processed_slice
-                i += len(processed_slice)
-                continue
-
-            req_log = {
+            by_id = self._match_window_decisions(decisions or [], target_ids)
+            missing = [sid for sid in target_ids if sid not in by_id]
+            request_logs.append({
                 "request_id": f"req_{uuid.uuid4().hex[:8]}",
                 "purpose": "classify_window",
                 "unit_of_work_ids": target_ids,
                 "latency_ms": round(latency, 2),
-                "fallback_triggered": False,
-            }
-            request_logs.append(req_log)
+                "answered": len(by_id),
+                "missing_ids": missing,
+                "fallback_triggered": bool(missing),
+            })
+            for s in window_slice:
+                if s.id in by_id:
+                    by_id[s.id].trace = dict(by_id[s.id].trace or {}, window=uow.uow_id,
+                                             window_size=len(window_slice), latency_ms=round(latency / len(window_slice), 1))
+                else:
+                    s.review_flags.append("WINDOW_FALLBACK_USED")
 
-            # Apply window decisions sequentially, updating OutlineState
-            new_window_segments: List[TranscriptSegment] = []
-            for k, (cur_seg, d) in enumerate(zip(window_slice, decisions)):
-                cur_seg.trace["decision"] = dict(d.trace or {}, window=uow.uow_id)
-                # the window's own sentences are context too: the model saw them all at once
-                w_before = (list(c_before) + window_slice[:k])[-self.config.context_before:] if self.config.context_before else []
-                w_after = (window_slice[k + 1:] + list(c_after))[:self.config.context_after]
-                cur_seg.trace["input"] = self._model_input(cur_seg, uow, w_before, w_after)
-                if d.needsSplitting:
-                    # Target segment in window requires splitting -> process via per_sentence
-                    sub_processed = self._process_per_sentence([cur_seg], outline_state, request_logs)
-                    new_window_segments.extend(sub_processed)
-                    continue
-
-                struct_dec = StructuralDecision(
-                    tag=d.tag or StructuralTag.PARAGRAPH,
-                    level=d.level,
-                    parent_id=d.parent,
-                    comment_kind=d.commentKind,
-                    confidence=d.confidence,
-                )
-
-                val_trans = validate_structural_transition(struct_dec, outline_state)
-                if not val_trans.is_valid:
-                    struct_dec = StructuralDecision(tag=StructuralTag.PARAGRAPH)
-                    cur_seg.review_flags.append("INVALID_TRANSITION_FALLBACK")
-
-                cur_seg.proposed_decision = struct_dec
-                cur_seg.final_decision = struct_dec
-                self._record(cur_seg, outline_state, struct_dec)
-
-                if self.config.typo_strategy != "off" and (d.hasTypo or self.config.typo_strategy == "always_correct"):
-                    edits, source = d.edits, "model_decision"
-                    if not edits and d.hasTypo:
-                        edits, source = self._model_call([cur_seg.id], "correct", lambda: gemini_adapter.get_typo_edits(cur_seg, uow), request_logs) or [], "gemini_correction_request"
-                    if edits:
-                        self._apply_typos(cur_seg, edits, source)
-
-                new_window_segments.append(cur_seg)
-
-            segments[i : i + len(window_slice)] = new_window_segments
-            i += len(new_window_segments)
+            self._process_per_sentence(segments, outline_state, request_logs, start_index=i, stop_id=next_id, presets=by_id)
+            if self._cancelled or self._halted:
+                break
+            i = index_of(next_id)
 
         return segments
 

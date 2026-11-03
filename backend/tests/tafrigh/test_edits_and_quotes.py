@@ -31,9 +31,22 @@ def test_word_indexed_edit_lands_exactly_on_the_quoted_word():
     assert s.versions[-1].corrected_text == REAL.replace("تقدربكم", "تقربكم")
 
 
-def test_wrong_quoted_original_is_rejected():
+def test_an_index_off_target_moves_to_the_quoted_word_never_onto_another():
+    """Index 5 is «أولادكم»; the quoted word occurs once, so the fix lands on it and «أولادكم» stays untouched."""
     s = seg(REAL)
     accepted, rejected = resolve_model_edits(s, [{"wordStart": 5, "wordEnd": 5, "original": "تقدربكم", "replacement": "تقربكم"}])
+    assert not rejected and REAL[accepted[0].start:accepted[0].end] == "تقدربكم"
+
+
+def test_wrong_quoted_original_is_rejected():
+    s = seg(REAL)
+    accepted, rejected = resolve_model_edits(s, [{"wordStart": 5, "wordEnd": 5, "original": "تقربكم", "replacement": "تقربكم"}])
+    assert not accepted and rejected[0]["why"] == "quoted_original_does_not_match_text"
+
+
+def test_an_ambiguous_quoted_word_far_from_its_index_is_rejected():
+    text = "هذا كلام طويل جدا قال فيه شيء آخر قال الشيخ"   # «قال» at 4 and 8, both two words from 6
+    accepted, rejected = resolve_model_edits(seg(text), [{"wordStart": 6, "wordEnd": 6, "original": "قال", "replacement": "وقال"}])
     assert not accepted and rejected[0]["why"] == "quoted_original_does_not_match_text"
 
 

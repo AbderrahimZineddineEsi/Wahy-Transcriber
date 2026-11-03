@@ -37,4 +37,4 @@ fi
 cd backend
 # --timeout-graceful-shutdown: a reload must not wait forever on a stalled download (e.g. a backgrounded tab
 # that stopped reading the 90 MB corpus), or the server stops answering after any backend edit
-exec uvicorn app:app --host 127.0.0.1 --port 8000 --reload --timeout-graceful-shutdown 5
+exec uvicorn app:app --host 127.0.0.1 --port 8006 --reload --timeout-graceful-shutdown 5
