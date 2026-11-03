@@ -874,5 +874,107 @@
     "seen": 1793662158.7046576,
     "ast_hash": "c84521c41aef708cb62abd1f6fb92b26",
     "semantic_hash": "c84521c41aef708cb62abd1f6fb92b26"
+  },
+  "scripts/notebooks_to_md.py": {
+    "mtime": 1793663092.0029051,
+    "seen": 1793663420.3222876,
+    "ast_hash": "5a5806c9b35b838f499e7c399656dd88",
+    "semantic_hash": "5a5806c9b35b838f499e7c399656dd88"
+  },
+  "notebooks/md/colab__wahy_colab_runner.md": {
+    "mtime": 1793663093.7416165,
+    "seen": 1793663420.3222907,
+    "ast_hash": "ce4e262d513ad1157ab64b04a252efbf",
+    "semantic_hash": "ce4e262d513ad1157ab64b04a252efbf"
+  },
+  "notebooks/md/data__laya_autolabel.md": {
+    "mtime": 1793663093.7420175,
+    "seen": 1793663420.3222933,
+    "ast_hash": "39f55c3b30435c466ccb1075edcc69bd",
+    "semantic_hash": "39f55c3b30435c466ccb1075edcc69bd"
+  },
+  "notebooks/md/data__laya_data_generation.md": {
+    "mtime": 1793663093.7425518,
+    "seen": 1793663420.322296,
+    "ast_hash": "1dce773abfc9170e0570bcdb06eabc8f",
+    "semantic_hash": "1dce773abfc9170e0570bcdb06eabc8f"
+  },
+  "notebooks/md/data__laya_dataset.md": {
+    "mtime": 1793663093.7427151,
+    "seen": 1793663420.322298,
+    "ast_hash": "095fd9d80be7db591876f668ae989253",
+    "semantic_hash": "095fd9d80be7db591876f668ae989253"
+  },
+  "notebooks/md/data__laya_engine_v5.md": {
+    "mtime": 1793663093.7438583,
+    "seen": 1793663420.3223004,
+    "ast_hash": "ed987630c9d395234c91933be6e3c196",
+    "semantic_hash": "ed987630c9d395234c91933be6e3c196"
+  },
+  "notebooks/md/data__laya_lectures.md": {
+    "mtime": 1793663093.744156,
+    "seen": 1793663420.322303,
+    "ast_hash": "08f49bfb2486e2265fffe527944e85f6",
+    "semantic_hash": "08f49bfb2486e2265fffe527944e85f6"
+  },
+  "notebooks/md/data__laya_review.md": {
+    "mtime": 1793663093.7450676,
+    "seen": 1793663420.3223052,
+    "ast_hash": "c109346c39f4ef43a47107d981520157",
+    "semantic_hash": "c109346c39f4ef43a47107d981520157"
+  },
+  "notebooks/md/kaggle__finished__laya-learning-curve-kaggle-finished.md": {
+    "mtime": 1793663093.7339249,
+    "seen": 1793663420.3223076,
+    "ast_hash": "612de5a264550f7928f61589250defd0",
+    "semantic_hash": "612de5a264550f7928f61589250defd0"
+  },
+  "notebooks/md/kaggle__finished__laya-wahy-finetuning-finished.md": {
+    "mtime": 1793663093.7364328,
+    "seen": 1793663420.3223102,
+    "ast_hash": "041439c7bf3a985a7eb08e58f364add5",
+    "semantic_hash": "041439c7bf3a985a7eb08e58f364add5"
+  },
+  "notebooks/md/kaggle__finished__wahy-finetuning-laya-v2-run3.md": {
+    "mtime": 1793663093.7378542,
+    "seen": 1793663420.3223124,
+    "ast_hash": "cb30b1e21f7f3704319940a20f42ce55",
+    "semantic_hash": "cb30b1e21f7f3704319940a20f42ce55"
+  },
+  "notebooks/md/kaggle__finished__wahy-laya-finetuning-run4.md": {
+    "mtime": 1793663093.7391117,
+    "seen": 1793663420.3223145,
+    "ast_hash": "47d1c63ab4c5693702f98e32c00405d7",
+    "semantic_hash": "47d1c63ab4c5693702f98e32c00405d7"
+  },
+  "notebooks/md/kaggle__finished__wahy-laya-finetuning-run5.md": {
+    "mtime": 1793663093.7402234,
+    "seen": 1793663420.322317,
+    "ast_hash": "c4f356f0bf35d0bef3da88dd896c8ec1",
+    "semantic_hash": "c4f356f0bf35d0bef3da88dd896c8ec1"
+  },
+  "notebooks/md/kaggle__finished__wahy-laya-finetuning-run6-finished.md": {
+    "mtime": 1793663093.7412953,
+    "seen": 1793663420.322319,
+    "ast_hash": "00bacf1459eddf24cb165840bc063474",
+    "semantic_hash": "00bacf1459eddf24cb165840bc063474"
+  },
+  "notebooks/md/kaggle__laya_finetune_kaggle.md": {
+    "mtime": 1793663093.7454214,
+    "seen": 1793663420.3223214,
+    "ast_hash": "d56bf21f27c28797f6b2439eae740ef6",
+    "semantic_hash": "d56bf21f27c28797f6b2439eae740ef6"
+  },
+  "notebooks/md/kaggle__laya_run5_kaggle.md": {
+    "mtime": 1793663093.746559,
+    "seen": 1793663420.322324,
+    "ast_hash": "85e37f6c389fb6198be13dab6823973c",
+    "semantic_hash": "85e37f6c389fb6198be13dab6823973c"
+  },
+  "notebooks/md/results__laya_v2_compare.md": {
+    "mtime": 1793663093.7478614,
+    "seen": 1793663420.3223262,
+    "ast_hash": "82f18053ececc5661101cf05f38b6055",
+    "semantic_hash": "82f18053ececc5661101cf05f38b6055"
   }
 }

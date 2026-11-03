@@ -4,7 +4,7 @@ backend/runs/
 notebooks/results/*/*.json
 
 # Media and datasets
-data/
+/data/
 archive/
 
 # UI screenshots: little graph value, each one costs a vision pass
