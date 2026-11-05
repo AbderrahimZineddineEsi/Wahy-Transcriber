@@ -1,0 +1,1155 @@
+[
+ {
+  "sourceType": "ADHKAR",
+  "unitId": "Adhkar:tahlil_full",
+  "displayRef": "ذكر",
+  "candidateRefs": [
+   "ذكر"
+  ],
+  "candidateUnitIds": [
+   "Adhkar:tahlil_full"
+  ],
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 22.2,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 12,
+  "tEnd": 20,
+  "charStart": 70,
+  "charEnd": 101,
+  "segments": [
+   [
+    12,
+    20
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    8
+   ]
+  ],
+  "canonicalSegments": [
+   "لَا إِلَٰهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "id": "finding_1",
+  "type": "dhikr",
+  "startIndex": 70,
+  "endIndex": 101,
+  "wordStartIdx": 12,
+  "wordEndIdx": 19,
+  "startTime": 8.38,
+  "endTime": 11.64,
+  "matchedText": "لا إله إلا الله وحده لا شريك له",
+  "canonicalText": "لَا إِلَٰهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ",
+  "reference": "ذكر",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "HADITH",
+  "unitId": "RiyadSalihin:353",
+  "displayRef": "رياض الصالحين (353)",
+  "candidateRefs": [
+   "رياض الصالحين (353)",
+   "بلوغ المرام (1129)",
+   "صحيح البخاري (831)",
+   "صحيح البخاري (835)",
+   "صحيح البخاري (1202)",
+   "صحيح البخاري (3522)",
+   "صحيح البخاري (6230)",
+   "صحيح البخاري (6265)",
+   "صحيح البخاري (6328)",
+   "صحيح البخاري (7381)",
+   "صحيح مسلم (554)",
+   "صحيح مسلم (897)",
+   "صحيح مسلم (904)",
+   "صحيح مسلم (4589)",
+   "صحيح مسلم (6396)",
+   "سنن أبي داود (525)",
+   "سنن أبي داود (968)",
+   "سنن أبي داود (971)",
+   "سنن أبي داود (972)",
+   "سنن أبي داود (1097)",
+   "سنن أبي داود (2118)",
+   "سنن أبي داود (2679)",
+   "جامع الترمذي (55)",
+   "جامع الترمذي (1105)",
+   "جامع الترمذي (2639)",
+   "سنن النسائي (148)",
+   "سنن النسائي (1064)",
+   "سنن النسائي (1162)",
+   "سنن النسائي (1163)",
+   "سنن النسائي (1164)",
+   "سنن النسائي (1166)",
+   "سنن النسائي (1167)",
+   "سنن النسائي (1168)",
+   "سنن النسائي (1169)",
+   "سنن النسائي (1170)",
+   "سنن النسائي (1171)",
+   "سنن النسائي (1172)",
+   "سنن النسائي (1173)",
+   "سنن النسائي (1174)",
+   "سنن النسائي (1175)",
+   "سنن النسائي (1277)",
+   "سنن النسائي (1279)",
+   "سنن النسائي (1280)",
+   "سنن النسائي (1298)",
+   "سنن النسائي (1404)",
+   "سنن النسائي (3277)",
+   "سنن النسائي (3278)",
+   "سنن ابن ماجه (419)",
+   "سنن ابن ماجه (469)",
+   "سنن ابن ماجه (470)",
+   "سنن ابن ماجه (721)",
+   "سنن ابن ماجه (899)",
+   "سنن ابن ماجه (900)",
+   "سنن ابن ماجه (901)",
+   "سنن ابن ماجه (902)",
+   "سنن ابن ماجه (1892)",
+   "موطأ مالك (202)",
+   "سنن أبي داود (1508)"
+  ],
+  "candidateUnitIds": [
+   "RiyadSalihin:353",
+   "BulughMaram:1129",
+   "Bukhari:831",
+   "Bukhari:835",
+   "Bukhari:1202",
+   "Bukhari:3522",
+   "Bukhari:6230",
+   "Bukhari:6265",
+   "Bukhari:6328",
+   "Bukhari:7381",
+   "Muslim:554",
+   "Muslim:897",
+   "Muslim:904",
+   "Muslim:4589",
+   "Muslim:6396",
+   "AbiDawud:525",
+   "AbiDawud:968",
+   "AbiDawud:971",
+   "AbiDawud:972",
+   "AbiDawud:1097",
+   "AbiDawud:2118",
+   "AbiDawud:2679",
+   "Tirmidhi:55",
+   "Tirmidhi:1105",
+   "Tirmidhi:2639",
+   "Nasai:148",
+   "Nasai:1064",
+   "Nasai:1162",
+   "Nasai:1163",
+   "Nasai:1164",
+   "Nasai:1166",
+   "Nasai:1167",
+   "Nasai:1168",
+   "Nasai:1169",
+   "Nasai:1170",
+   "Nasai:1171",
+   "Nasai:1172",
+   "Nasai:1173",
+   "Nasai:1174",
+   "Nasai:1175",
+   "Nasai:1277",
+   "Nasai:1279",
+   "Nasai:1280",
+   "Nasai:1298",
+   "Nasai:1404",
+   "Nasai:3277",
+   "Nasai:3278",
+   "IbnMajah:419",
+   "IbnMajah:469",
+   "IbnMajah:470",
+   "IbnMajah:721",
+   "IbnMajah:899",
+   "IbnMajah:900",
+   "IbnMajah:901",
+   "IbnMajah:902",
+   "IbnMajah:1892",
+   "Muwatta:202",
+   "AbiDawud:1508"
+  ],
+  "isAmbiguous": true,
+  "isOutsideCorpus": false,
+  "confidenceBand": "CANDIDATE",
+  "totalScore": 24.27,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 26,
+  "tEnd": 31,
+  "charStart": 140,
+  "charEnd": 167,
+  "segments": [
+   [
+    26,
+    31
+   ]
+  ],
+  "qSegments": [
+   [
+    21,
+    26
+   ]
+  ],
+  "canonicalSegments": [
+   "وأشهد أن محمدًا عبده ورسوله"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "",
+  "qiraahDisplay": "",
+  "id": "finding_2",
+  "type": "hadith",
+  "startIndex": 140,
+  "endIndex": 167,
+  "wordStartIdx": 26,
+  "wordEndIdx": 30,
+  "startTime": 16.66,
+  "endTime": 20.22,
+  "matchedText": "وأشهد أن محمدًا عبده ورسوله",
+  "canonicalText": "وأشهد أن محمدًا عبده ورسوله",
+  "reference": "رياض الصالحين (353)",
+  "confidence": 0.72,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "3:102",
+  "displayRef": "آل عمران: 102",
+  "candidateRefs": [
+   "آل عمران: 102"
+  ],
+  "candidateUnitIds": [
+   "3:102"
+  ],
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 43.97,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 57,
+  "tEnd": 70,
+  "charStart": 318,
+  "charEnd": 384,
+  "segments": [
+   [
+    57,
+    70
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    13
+   ]
+  ],
+  "canonicalSegments": [
+   "يَا أَيُّهَا الَّذِينَ آمَنُوا اتَّقُوا اللَّهَ حَقَّ تُقَاتِهِ وَلَا تَمُوتُنَّ إِلَّا وَأَنتُم مُّسْلِمُونَ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "id": "finding_3",
+  "type": "ayah",
+  "startIndex": 318,
+  "endIndex": 384,
+  "wordStartIdx": 57,
+  "wordEndIdx": 69,
+  "startTime": 38.78,
+  "endTime": 46.68,
+  "matchedText": "يا أيها الذين آمنوا اتقوا الله حق تقاته ولا تموتن إلا وأنتم مسلمون",
+  "canonicalText": "يَا أَيُّهَا الَّذِينَ آمَنُوا اتَّقُوا اللَّهَ حَقَّ تُقَاتِهِ وَلَا تَمُوتُنَّ إِلَّا وَأَنتُم مُّسْلِمُونَ",
+  "reference": "آل عمران: 102",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "9:119",
+  "displayRef": "التوبة: 119",
+  "candidateRefs": [
+   "التوبة: 119"
+  ],
+  "candidateUnitIds": [
+   "9:119"
+  ],
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 23.21,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 70,
+  "tEnd": 79,
+  "charStart": 385,
+  "charEnd": 435,
+  "segments": [
+   [
+    70,
+    79
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    9
+   ]
+  ],
+  "canonicalSegments": [
+   "يَا أَيُّهَا الَّذِينَ آمَنُوا اتَّقُوا اللَّهَ وَكُونُوا مَعَ الصَّادِقِينَ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "id": "finding_4",
+  "type": "ayah",
+  "startIndex": 385,
+  "endIndex": 435,
+  "wordStartIdx": 70,
+  "wordEndIdx": 78,
+  "startTime": 47.5,
+  "endTime": 52.9,
+  "matchedText": "يا أيها الذين آمنوا اتقوا الله وكونوا مع الصادقين،",
+  "canonicalText": "يَا أَيُّهَا الَّذِينَ آمَنُوا اتَّقُوا اللَّهَ وَكُونُوا مَعَ الصَّادِقِينَ",
+  "reference": "التوبة: 119",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "59:18",
+  "displayRef": "الحشر: 18",
+  "candidateRefs": [
+   "الحشر: 18"
+  ],
+  "candidateUnitIds": [
+   "59:18"
+  ],
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 47.32,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": true,
+  "tStart": 79,
+  "tEnd": 97,
+  "charStart": 436,
+  "charEnd": 530,
+  "segments": [
+   [
+    79,
+    97
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    18
+   ]
+  ],
+  "canonicalSegments": [
+   "يَا أَيُّهَا الَّذِينَ آمَنُوا اتَّقُوا اللَّهَ وَلْتَنظُرْ نَفْسٌ مَّا قَدَّمَتْ لِغَدٍ وَاتَّقُوا اللَّهَ إِنَّ اللَّهَ خَبِيرٌ بِمَا تَعْمَلُونَ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "id": "finding_5",
+  "type": "ayah",
+  "startIndex": 436,
+  "endIndex": 530,
+  "wordStartIdx": 79,
+  "wordEndIdx": 96,
+  "startTime": 52.9,
+  "endTime": 63.64,
+  "matchedText": "يا أيها الذين آمنوا اتقوا الله ولتنظر نفسهم ما قدمت لغدٍ واتقوا الله، إن الله خبيرٌ بما تعملون",
+  "canonicalText": "يَا أَيُّهَا الَّذِينَ آمَنُوا اتَّقُوا اللَّهَ وَلْتَنظُرْ نَفْسٌ مَّا قَدَّمَتْ لِغَدٍ وَاتَّقُوا اللَّهَ إِنَّ اللَّهَ خَبِيرٌ بِمَا تَعْمَلُونَ",
+  "reference": "الحشر: 18",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "41:6",
+  "displayRef": "فصلت: 6",
+  "candidateRefs": [
+   "فصلت: 6"
+  ],
+  "candidateUnitIds": [
+   "41:6"
+  ],
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 74.24,
+  "hasCitationCue": true,
+  "hasFuzzyHeal": true,
+  "tStart": 208,
+  "tEnd": 224,
+  "charStart": 1202,
+  "charEnd": 1293,
+  "segments": [
+   [
+    208,
+    224
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    16
+   ]
+  ],
+  "canonicalSegments": [
+   "قُلْ إِنَّمَا أَنَا بَشَرٌ مِّثْلُكُمْ يُوحَىٰ إِلَيَّ أَنَّمَا إِلَٰهُكُمْ إِلَٰهٌ وَاحِدٌ فَاسْتَقِيمُوا إِلَيْهِ وَاسْتَغْفِرُوهُ وَوَيْلٌ لِّلْمُشْرِكِينَ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "id": "finding_6",
+  "type": "ayah",
+  "startIndex": 1202,
+  "endIndex": 1293,
+  "wordStartIdx": 208,
+  "wordEndIdx": 223,
+  "startTime": 141,
+  "endTime": 154.48,
+  "matchedText": "قل إنما أنا بشر مثلكم يوحى إلي أنما إلهكم إله واحد فاستقيموا إليه واستغفروه، وغيل للمشركين،",
+  "canonicalText": "قُلْ إِنَّمَا أَنَا بَشَرٌ مِّثْلُكُمْ يُوحَىٰ إِلَيَّ أَنَّمَا إِلَٰهُكُمْ إِلَٰهٌ وَاحِدٌ فَاسْتَقِيمُوا إِلَيْهِ وَاسْتَغْفِرُوهُ وَوَيْلٌ لِّلْمُشْرِكِينَ",
+  "reference": "فصلت: 6",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "6:153",
+  "displayRef": "الأنعام: 153",
+  "candidateRefs": [
+   "الأنعام: 153"
+  ],
+  "candidateUnitIds": [
+   "6:153"
+  ],
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 55.35,
+  "hasCitationCue": true,
+  "hasFuzzyHeal": true,
+  "tStart": 229,
+  "tEnd": 241,
+  "charStart": 1321,
+  "charEnd": 1396,
+  "segments": [
+   [
+    229,
+    241
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    12
+   ]
+  ],
+  "canonicalSegments": [
+   "وَأَنَّ هَٰذَا صِرَاطِي مُسْتَقِيمًا فَاتَّبِعُوهُ وَلَا تَتَّبِعُوا السُّبُلَ فَتَفَرَّقَ بِكُمْ عَن سَبِيلِهِ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "id": "finding_7",
+  "type": "ayah",
+  "startIndex": 1321,
+  "endIndex": 1396,
+  "wordStartIdx": 229,
+  "wordEndIdx": 240,
+  "startTime": 157.78,
+  "endTime": 166.2,
+  "matchedText": "وأن هذا صراطي مُستقيماً فاتبِعوه، ولا تتبِعوا السُّول فتفرَّق بكم عن سبيله،",
+  "canonicalText": "وَأَنَّ هَٰذَا صِرَاطِي مُسْتَقِيمًا فَاتَّبِعُوهُ وَلَا تَتَّبِعُوا السُّبُلَ فَتَفَرَّقَ بِكُمْ عَن سَبِيلِهِ",
+  "reference": "الأنعام: 153",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "11:112",
+  "displayRef": "هود: 112",
+  "candidateRefs": [
+   "هود: 112"
+  ],
+  "candidateUnitIds": [
+   "11:112"
+  ],
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 35.77,
+  "hasCitationCue": true,
+  "hasFuzzyHeal": false,
+  "tStart": 293,
+  "tEnd": 300,
+  "charStart": 1704,
+  "charEnd": 1736,
+  "segments": [
+   [
+    293,
+    300
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    7
+   ]
+  ],
+  "canonicalSegments": [
+   "فَاسْتَقِمْ كَمَا أُمِرْتَ وَمَن تَابَ مَعَكَ وَلَا"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "id": "finding_8",
+  "type": "ayah",
+  "startIndex": 1704,
+  "endIndex": 1736,
+  "wordStartIdx": 293,
+  "wordEndIdx": 299,
+  "startTime": 200.2,
+  "endTime": 204.36,
+  "matchedText": "فاستقم كما أُمرت ومن تاب معك ولا",
+  "canonicalText": "فَاسْتَقِمْ كَمَا أُمِرْتَ وَمَن تَابَ مَعَكَ وَلَا",
+  "reference": "هود: 112",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "42:15",
+  "displayRef": "الشورى: 15",
+  "candidateRefs": [
+   "الشورى: 15"
+  ],
+  "candidateUnitIds": [
+   "42:15"
+  ],
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 34.52,
+  "hasCitationCue": true,
+  "hasFuzzyHeal": true,
+  "tStart": 304,
+  "tEnd": 310,
+  "charStart": 1763,
+  "charEnd": 1796,
+  "segments": [
+   [
+    304,
+    310
+   ]
+  ],
+  "qSegments": [
+   [
+    2,
+    8
+   ]
+  ],
+  "canonicalSegments": [
+   "وَاسْتَقِمْ كَمَا أُمِرْتَ وَلَا تَتَّبِعْ أَهْوَاءَهُمْ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "id": "finding_9",
+  "type": "ayah",
+  "startIndex": 1763,
+  "endIndex": 1796,
+  "wordStartIdx": 304,
+  "wordEndIdx": 309,
+  "startTime": 207.9,
+  "endTime": 212.51999,
+  "matchedText": "واستقم كما أُمرت ولا تتبع أهوأهم،",
+  "canonicalText": "وَاسْتَقِمْ كَمَا أُمِرْتَ وَلَا تَتَّبِعْ أَهْوَاءَهُمْ",
+  "reference": "الشورى: 15",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "HADITH",
+  "unitId": "Muslim:6889",
+  "displayRef": "صحيح مسلم (6889)",
+  "candidateRefs": [
+   "صحيح مسلم (6889)",
+   "صحيح البخاري (6346)",
+   "صحيح مسلم (6921)"
+  ],
+  "candidateUnitIds": [
+   "Muslim:6889",
+   "Bukhari:6346",
+   "Muslim:6921"
+  ],
+  "isAmbiguous": true,
+  "isOutsideCorpus": false,
+  "confidenceBand": "CANDIDATE",
+  "totalScore": 33.02,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": true,
+  "tStart": 457,
+  "tEnd": 464,
+  "charStart": 2657,
+  "charEnd": 2695,
+  "segments": [
+   [
+    457,
+    464
+   ]
+  ],
+  "qSegments": [
+   [
+    17,
+    24
+   ]
+  ],
+  "canonicalSegments": [
+   "رَبَّ السَّمَوَاتِ وَرَبَّ الأَرْضِ وَرَبَّ الْعَرْشِ الْعَظِيمِ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "",
+  "qiraahDisplay": "",
+  "embeddedQuran": [
+   {
+    "tStart": 457,
+    "tEnd": 462,
+    "qStart": 2,
+    "qEnd": 7,
+    "unitId": "45:36",
+    "displayRef": "الجاثية: 36",
+    "canonical": "رَبِّ السَّمَاوَاتِ وَرَبِّ الْأَرْضِ رَبِّ"
+   }
+  ],
+  "id": "finding_10",
+  "type": "hadith",
+  "startIndex": 2657,
+  "endIndex": 2695,
+  "wordStartIdx": 457,
+  "wordEndIdx": 463,
+  "startTime": 300.16,
+  "endTime": 304.1,
+  "matchedText": "رب السماوات ورب الأرض رب العرش العظيم،",
+  "canonicalText": "رَبَّ السَّمَوَاتِ وَرَبَّ الأَرْضِ وَرَبَّ الْعَرْشِ الْعَظِيمِ",
+  "reference": "صحيح مسلم (6889)",
+  "confidence": 0.72,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "ADHKAR",
+  "unitId": "Adhkar:tahlil_full",
+  "displayRef": "ذكر",
+  "candidateRefs": [
+   "ذكر"
+  ],
+  "candidateUnitIds": [
+   "Adhkar:tahlil_full"
+  ],
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 22.2,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 466,
+  "tEnd": 474,
+  "charStart": 2705,
+  "charEnd": 2736,
+  "segments": [
+   [
+    466,
+    474
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    8
+   ]
+  ],
+  "canonicalSegments": [
+   "لَا إِلَٰهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "id": "finding_11",
+  "type": "dhikr",
+  "startIndex": 2705,
+  "endIndex": 2736,
+  "wordStartIdx": 466,
+  "wordEndIdx": 473,
+  "startTime": 304.74,
+  "endTime": 307.96,
+  "matchedText": "لا إله إلا الله وحده لا شريك له",
+  "canonicalText": "لَا إِلَٰهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ",
+  "reference": "ذكر",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "HADITH",
+  "unitId": "RiyadSalihin:353",
+  "displayRef": "رياض الصالحين (353)",
+  "candidateRefs": [
+   "رياض الصالحين (353)",
+   "بلوغ المرام (1129)",
+   "صحيح البخاري (831)",
+   "صحيح البخاري (835)",
+   "صحيح البخاري (1202)",
+   "صحيح البخاري (3522)",
+   "صحيح البخاري (6230)",
+   "صحيح البخاري (6265)",
+   "صحيح البخاري (6328)",
+   "صحيح البخاري (7381)",
+   "صحيح مسلم (554)",
+   "صحيح مسلم (897)",
+   "صحيح مسلم (904)",
+   "صحيح مسلم (4589)",
+   "صحيح مسلم (6396)",
+   "سنن أبي داود (525)",
+   "سنن أبي داود (968)",
+   "سنن أبي داود (971)",
+   "سنن أبي داود (972)",
+   "سنن أبي داود (1097)",
+   "سنن أبي داود (2118)",
+   "سنن أبي داود (2679)",
+   "جامع الترمذي (55)",
+   "جامع الترمذي (1105)",
+   "جامع الترمذي (2639)",
+   "سنن النسائي (148)",
+   "سنن النسائي (1064)",
+   "سنن النسائي (1162)",
+   "سنن النسائي (1163)",
+   "سنن النسائي (1164)",
+   "سنن النسائي (1166)",
+   "سنن النسائي (1167)",
+   "سنن النسائي (1168)",
+   "سنن النسائي (1169)",
+   "سنن النسائي (1170)",
+   "سنن النسائي (1171)",
+   "سنن النسائي (1172)",
+   "سنن النسائي (1173)",
+   "سنن النسائي (1174)",
+   "سنن النسائي (1175)",
+   "سنن النسائي (1277)",
+   "سنن النسائي (1279)",
+   "سنن النسائي (1280)",
+   "سنن النسائي (1298)",
+   "سنن النسائي (1404)",
+   "سنن النسائي (3277)",
+   "سنن النسائي (3278)",
+   "سنن ابن ماجه (419)",
+   "سنن ابن ماجه (469)",
+   "سنن ابن ماجه (470)",
+   "سنن ابن ماجه (721)",
+   "سنن ابن ماجه (899)",
+   "سنن ابن ماجه (900)",
+   "سنن ابن ماجه (901)",
+   "سنن ابن ماجه (902)",
+   "سنن ابن ماجه (1892)",
+   "موطأ مالك (202)",
+   "سنن أبي داود (1508)"
+  ],
+  "candidateUnitIds": [
+   "RiyadSalihin:353",
+   "BulughMaram:1129",
+   "Bukhari:831",
+   "Bukhari:835",
+   "Bukhari:1202",
+   "Bukhari:3522",
+   "Bukhari:6230",
+   "Bukhari:6265",
+   "Bukhari:6328",
+   "Bukhari:7381",
+   "Muslim:554",
+   "Muslim:897",
+   "Muslim:904",
+   "Muslim:4589",
+   "Muslim:6396",
+   "AbiDawud:525",
+   "AbiDawud:968",
+   "AbiDawud:971",
+   "AbiDawud:972",
+   "AbiDawud:1097",
+   "AbiDawud:2118",
+   "AbiDawud:2679",
+   "Tirmidhi:55",
+   "Tirmidhi:1105",
+   "Tirmidhi:2639",
+   "Nasai:148",
+   "Nasai:1064",
+   "Nasai:1162",
+   "Nasai:1163",
+   "Nasai:1164",
+   "Nasai:1166",
+   "Nasai:1167",
+   "Nasai:1168",
+   "Nasai:1169",
+   "Nasai:1170",
+   "Nasai:1171",
+   "Nasai:1172",
+   "Nasai:1173",
+   "Nasai:1174",
+   "Nasai:1175",
+   "Nasai:1277",
+   "Nasai:1279",
+   "Nasai:1280",
+   "Nasai:1298",
+   "Nasai:1404",
+   "Nasai:3277",
+   "Nasai:3278",
+   "IbnMajah:419",
+   "IbnMajah:469",
+   "IbnMajah:470",
+   "IbnMajah:721",
+   "IbnMajah:899",
+   "IbnMajah:900",
+   "IbnMajah:901",
+   "IbnMajah:902",
+   "IbnMajah:1892",
+   "Muwatta:202",
+   "AbiDawud:1508"
+  ],
+  "isAmbiguous": true,
+  "isOutsideCorpus": false,
+  "confidenceBand": "CANDIDATE",
+  "totalScore": 24.27,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 477,
+  "tEnd": 482,
+  "charStart": 2753,
+  "charEnd": 2780,
+  "segments": [
+   [
+    477,
+    482
+   ]
+  ],
+  "qSegments": [
+   [
+    21,
+    26
+   ]
+  ],
+  "canonicalSegments": [
+   "وأشهد أن محمدًا عبده ورسوله"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "",
+  "qiraahDisplay": "",
+  "id": "finding_12",
+  "type": "hadith",
+  "startIndex": 2753,
+  "endIndex": 2780,
+  "wordStartIdx": 477,
+  "wordEndIdx": 481,
+  "startTime": 309.76,
+  "endTime": 312.72,
+  "matchedText": "وأشهد أن محمدًا عبده ورسوله",
+  "canonicalText": "وأشهد أن محمدًا عبده ورسوله",
+  "reference": "رياض الصالحين (353)",
+  "confidence": 0.72,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "HADITH",
+  "unitId": "Bukhari:3370",
+  "displayRef": "صحيح البخاري (3370)",
+  "candidateRefs": [
+   "صحيح البخاري (3370)",
+   "سنن ابن ماجه (906)"
+  ],
+  "candidateUnitIds": [
+   "Bukhari:3370",
+   "IbnMajah:906"
+  ],
+  "isAmbiguous": true,
+  "isOutsideCorpus": false,
+  "confidenceBand": "CANDIDATE",
+  "totalScore": 109.24,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 485,
+  "tEnd": 521,
+  "charStart": 2806,
+  "charEnd": 2991,
+  "segments": [
+   [
+    485,
+    508
+   ],
+   [
+    511,
+    521
+   ]
+  ],
+  "qSegments": [
+   [
+    17,
+    40
+   ],
+   [
+    41,
+    51
+   ]
+  ],
+  "canonicalSegments": [
+   "اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ كَمَا صَلَّيْتَ عَلَى إِبْرَاهِيمَ وَعَلَى آلِ إِبْرَاهِيمَ إِنَّكَ حَمِيدٌ مَجِيدٌ اللَّهُمَّ بَارِكْ عَلَى مُحَمَّدٍ وَعَلَى آلِ",
+   "كَمَا بَارَكْتَ عَلَى إِبْرَاهِيمَ وَعَلَى آلِ إِبْرَاهِيمَ إِنَّكَ حَمِيدٌ مَجِيدٌ"
+  ],
+  "commentaryGaps": [
+   [
+    508,
+    511
+   ]
+  ],
+  "qiraah": "",
+  "qiraahDisplay": "",
+  "id": "finding_13",
+  "type": "hadith",
+  "startIndex": 2806,
+  "endIndex": 2991,
+  "wordStartIdx": 485,
+  "wordEndIdx": 520,
+  "startTime": 315.58002,
+  "endTime": 331.88,
+  "matchedText": "اللهم صل على محمدٍ وعلى آل محمدٍ كما صليت على إبراهيم وعلى آل إبراهيم إنك حميدٌ مجيد، اللهم بارِك على محمدٍ وعلى آل محمدٍ، قال حمد كما باركت على إبراهيم وعلى آل إبراهيم، إنك حميدٌ مجيدٌ",
+  "canonicalText": "اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ كَمَا صَلَّيْتَ عَلَى إِبْرَاهِيمَ وَعَلَى آلِ إِبْرَاهِيمَ إِنَّكَ حَمِيدٌ مَجِيدٌ اللَّهُمَّ بَارِكْ عَلَى مُحَمَّدٍ وَعَلَى آلِ كَمَا بَارَكْتَ عَلَى إِبْرَاهِيمَ وَعَلَى آلِ إِبْرَاهِيمَ إِنَّكَ حَمِيدٌ مَجِيدٌ",
+  "reference": "صحيح البخاري (3370)",
+  "confidence": 0.72,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "41:6",
+  "displayRef": "فصلت: 6",
+  "candidateRefs": [
+   "فصلت: 6"
+  ],
+  "candidateUnitIds": [
+   "41:6"
+  ],
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 18.2,
+  "hasCitationCue": true,
+  "hasFuzzyHeal": true,
+  "tStart": 538,
+  "tEnd": 541,
+  "charStart": 3099,
+  "charEnd": 3124,
+  "segments": [
+   [
+    538,
+    541
+   ]
+  ],
+  "qSegments": [
+   [
+    11,
+    14
+   ]
+  ],
+  "canonicalSegments": [
+   "فَاسْتَقِيمُوا إِلَيْهِ وَاسْتَغْفِرُوهُ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "id": "finding_14",
+  "type": "ayah",
+  "startIndex": 3099,
+  "endIndex": 3124,
+  "wordStartIdx": 538,
+  "wordEndIdx": 540,
+  "startTime": 343.38,
+  "endTime": 345.68,
+  "matchedText": "فياستقيموا إليه واستغفروه",
+  "canonicalText": "فَاسْتَقِيمُوا إِلَيْهِ وَاسْتَغْفِرُوهُ",
+  "reference": "فصلت: 6",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "11:112",
+  "displayRef": "هود: 112",
+  "candidateRefs": [
+   "هود: 112"
+  ],
+  "candidateUnitIds": [
+   "11:112"
+  ],
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 35.46,
+  "hasCitationCue": true,
+  "hasFuzzyHeal": false,
+  "tStart": 543,
+  "tEnd": 550,
+  "charStart": 3136,
+  "charEnd": 3172,
+  "segments": [
+   [
+    543,
+    550
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    7
+   ]
+  ],
+  "canonicalSegments": [
+   "فَاسْتَقِمْ كَمَا أُمِرْتَ وَمَن تَابَ مَعَكَ وَلَا"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "id": "finding_15",
+  "type": "ayah",
+  "startIndex": 3136,
+  "endIndex": 3172,
+  "wordStartIdx": 543,
+  "wordEndIdx": 549,
+  "startTime": 347.1,
+  "endTime": 350.38,
+  "matchedText": "فاستقِم كما أُمرتَ ومن تابَ معاك ولا",
+  "canonicalText": "فَاسْتَقِمْ كَمَا أُمِرْتَ وَمَن تَابَ مَعَكَ وَلَا",
+  "reference": "هود: 112",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "41:30",
+  "displayRef": "فصلت: 30",
+  "candidateRefs": [
+   "فصلت: 30",
+   "الأحقاف: 13"
+  ],
+  "candidateUnitIds": [
+   "41:30",
+   "46:13"
+  ],
+  "isAmbiguous": true,
+  "isOutsideCorpus": false,
+  "confidenceBand": "AMBIGUOUS",
+  "totalScore": 16.02,
+  "hasCitationCue": true,
+  "hasFuzzyHeal": false,
+  "tStart": 573,
+  "tEnd": 580,
+  "charStart": 3303,
+  "charEnd": 3339,
+  "segments": [
+   [
+    573,
+    580
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    7
+   ]
+  ],
+  "canonicalSegments": [
+   "إِنَّ الَّذِينَ قَالُوا رَبُّنَا اللَّهُ ثُمَّ اسْتَقَامُوا"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "id": "finding_16",
+  "type": "ayah",
+  "startIndex": 3303,
+  "endIndex": 3339,
+  "wordStartIdx": 573,
+  "wordEndIdx": 579,
+  "startTime": 364.94,
+  "endTime": 369.08,
+  "matchedText": "ان الذين قالوا ربنا الله ثم استقاموا",
+  "canonicalText": "إِنَّ الَّذِينَ قَالُوا رَبُّنَا اللَّهُ ثُمَّ اسْتَقَامُوا",
+  "reference": "فصلت: 30",
+  "confidence": 0.82,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "HADITH",
+  "unitId": "RiyadSalihin:789",
+  "displayRef": "رياض الصالحين (789)",
+  "candidateRefs": [
+   "رياض الصالحين (789)",
+   "رياض الصالحين (1288)",
+   "صحيح مسلم (6904)",
+   "جامع الترمذي (3489)",
+   "سنن ابن ماجه (3832)"
+  ],
+  "candidateUnitIds": [
+   "RiyadSalihin:789",
+   "RiyadSalihin:1288",
+   "Muslim:6904",
+   "Tirmidhi:3489",
+   "IbnMajah:3832"
+  ],
+  "isAmbiguous": true,
+  "isOutsideCorpus": false,
+  "confidenceBand": "CANDIDATE",
+  "totalScore": 27.03,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 683,
+  "tEnd": 687,
+  "charStart": 4088,
+  "charEnd": 4116,
+  "segments": [
+   [
+    683,
+    687
+   ]
+  ],
+  "qSegments": [
+   [
+    5,
+    9
+   ]
+  ],
+  "canonicalSegments": [
+   "الهدى والتقى والعفاف والغنى"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "",
+  "qiraahDisplay": "",
+  "id": "finding_17",
+  "type": "hadith",
+  "startIndex": 4088,
+  "endIndex": 4116,
+  "wordStartIdx": 683,
+  "wordEndIdx": 686,
+  "startTime": 438.3,
+  "endTime": 441.58002,
+  "matchedText": "الهدى والتقى والعفاف والغنى،",
+  "canonicalText": "الهدى والتقى والعفاف والغنى",
+  "reference": "رياض الصالحين (789)",
+  "confidence": 0.72,
+  "snappedToCanonical": false
+ }
+]

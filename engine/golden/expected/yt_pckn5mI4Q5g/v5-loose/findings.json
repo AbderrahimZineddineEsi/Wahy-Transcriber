@@ -1,0 +1,6293 @@
+[
+ {
+  "sourceType": "HADITH",
+  "unitId": "IbnMajah:1892",
+  "displayRef": "سنن ابن ماجه (1892)",
+  "candidateRefs": [
+   "سنن ابن ماجه (1892)",
+   "سنن ابن ماجه (1893)"
+  ],
+  "candidateUnitIds": [
+   "IbnMajah:1892",
+   "IbnMajah:1893"
+  ],
+  "candidateCount": 2,
+  "isAmbiguous": true,
+  "isOutsideCorpus": false,
+  "confidenceBand": "CANDIDATE",
+  "totalScore": 30.04,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 0,
+  "tEnd": 25,
+  "charStart": 0,
+  "charEnd": 131,
+  "segments": [
+   [
+    0,
+    25
+   ]
+  ],
+  "qSegments": [
+   [
+    44,
+    69
+   ]
+  ],
+  "canonicalSegments": [
+   "إِنَّ الْحَمْدَ لِلَّهِ نَحْمَدُهُ وَنَسْتَعِينُهُ وَنَسْتَغْفِرُهُ وَنَعُوذُ بِاللَّهِ مِنْ شُرُورِ أَنْفُسِنَا وَمِنْ سَيِّئَاتِ أَعْمَالِنَا مَنْ يَهْدِهِ اللَّهُ فَلاَ مُضِلَّ لَهُ وَمَنْ يُضْلِلْ فَلاَ هَادِيَ لَهُ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "",
+  "qiraahDisplay": "",
+  "evidence": {
+   "S": 30,
+   "E": 30,
+   "matched": 25,
+   "content": 13,
+   "exactRun": 25,
+   "coverage": 0.2,
+   "margin": 0
+  },
+  "chainedAyah": false,
+  "id": "finding_1",
+  "type": "hadith",
+  "startIndex": 0,
+  "endIndex": 131,
+  "wordStartIdx": 0,
+  "wordEndIdx": 24,
+  "startTime": 0.02,
+  "endTime": 15.88,
+  "matchedText": "إن الحمد لله نحمده ونستعينه ونستغفره، ونعوذ بالله من شرور أنفسنا ومن سيئات أعمالنا، من يهديه الله فلا مضل له، ومن يضلل فلا هادي له،",
+  "canonicalText": "إِنَّ الْحَمْدَ لِلَّهِ نَحْمَدُهُ وَنَسْتَعِينُهُ وَنَسْتَغْفِرُهُ وَنَعُوذُ بِاللَّهِ مِنْ شُرُورِ أَنْفُسِنَا وَمِنْ سَيِّئَاتِ أَعْمَالِنَا مَنْ يَهْدِهِ اللَّهُ فَلاَ مُضِلَّ لَهُ وَمَنْ يُضْلِلْ فَلاَ هَادِيَ لَهُ",
+  "reference": "سنن ابن ماجه (1892)",
+  "confidence": 0.72,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "3:102",
+  "displayRef": "آل عمران: 102",
+  "candidateRefs": [
+   "آل عمران: 102"
+  ],
+  "candidateUnitIds": [
+   "3:102"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 45.31,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 25,
+  "tEnd": 38,
+  "charStart": 132,
+  "charEnd": 199,
+  "segments": [
+   [
+    25,
+    38
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    13
+   ]
+  ],
+  "canonicalSegments": [
+   "يَا أَيُّهَا الَّذِينَ آمَنُوا اتَّقُوا اللَّهَ حَقَّ تُقَاتِهِ وَلَا تَمُوتُنَّ إِلَّا وَأَنتُم مُّسْلِمُونَ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 45.3,
+   "E": 45.3,
+   "matched": 13,
+   "content": 7,
+   "exactRun": 7,
+   "coverage": 1,
+   "margin": 23.6
+  },
+  "chainedAyah": false,
+  "id": "finding_2",
+  "type": "ayah",
+  "startIndex": 132,
+  "endIndex": 199,
+  "wordStartIdx": 25,
+  "wordEndIdx": 37,
+  "startTime": 15.88,
+  "endTime": 24.42,
+  "matchedText": "يا أيها الذين آمنوا اتقوا الله حق ثقاته، ولا تموتن إلا وأنتم مسلمون",
+  "canonicalText": "يَا أَيُّهَا الَّذِينَ آمَنُوا اتَّقُوا اللَّهَ حَقَّ تُقَاتِهِ وَلَا تَمُوتُنَّ إِلَّا وَأَنتُم مُّسْلِمُونَ",
+  "reference": "آل عمران: 102",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "4:1",
+  "displayRef": "النساء: 1",
+  "candidateRefs": [
+   "النساء: 1"
+  ],
+  "candidateUnitIds": [
+   "4:1"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 117.43,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 38,
+  "tEnd": 67,
+  "charStart": 200,
+  "charEnd": 356,
+  "segments": [
+   [
+    38,
+    67
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    29
+   ]
+  ],
+  "canonicalSegments": [
+   "يَا أَيُّهَا النَّاسُ اتَّقُوا رَبَّكُمُ الَّذِي خَلَقَكُم مِّن نَّفْسٍ وَاحِدَةٍ وَخَلَقَ مِنْهَا زَوْجَهَا وَبَثَّ مِنْهُمَا رِجَالًا كَثِيرًا وَنِسَاءً وَاتَّقُوا اللَّهَ الَّذِي تَسَاءَلُونَ بِهِ وَالْأَرْحَامَ إِنَّ اللَّهَ كَانَ عَلَيْكُمْ رَقِيبًا"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 117.4,
+   "E": 117.4,
+   "matched": 29,
+   "content": 18,
+   "exactRun": 29,
+   "coverage": 1,
+   "margin": 93.9
+  },
+  "chainedAyah": false,
+  "id": "finding_3",
+  "type": "ayah",
+  "startIndex": 200,
+  "endIndex": 356,
+  "wordStartIdx": 38,
+  "wordEndIdx": 66,
+  "startTime": 25.2,
+  "endTime": 47.24,
+  "matchedText": "يا أيها الناس اتقوا ربكم الذي خلقكم من نفس واحدة، وخلق منها زوجها، وبث منهما رجالا كثيرا ونساء، واتقوا الله الذي تساءلون به والأرحم، إن الله كان عليكم رقيبا",
+  "canonicalText": "يَا أَيُّهَا النَّاسُ اتَّقُوا رَبَّكُمُ الَّذِي خَلَقَكُم مِّن نَّفْسٍ وَاحِدَةٍ وَخَلَقَ مِنْهَا زَوْجَهَا وَبَثَّ مِنْهُمَا رِجَالًا كَثِيرًا وَنِسَاءً وَاتَّقُوا اللَّهَ الَّذِي تَسَاءَلُونَ بِهِ وَالْأَرْحَامَ إِنَّ اللَّهَ كَانَ عَلَيْكُمْ رَقِيبًا",
+  "reference": "النساء: 1",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "33:70",
+  "displayRef": "الأحزاب: 70",
+  "candidateRefs": [
+   "الأحزاب: 70"
+  ],
+  "candidateUnitIds": [
+   "33:70"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 36.85,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 67,
+  "tEnd": 76,
+  "charStart": 357,
+  "charEnd": 407,
+  "segments": [
+   [
+    67,
+    76
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    9
+   ]
+  ],
+  "canonicalSegments": [
+   "يَا أَيُّهَا الَّذِينَ آمَنُوا اتَّقُوا اللَّهَ وَقُولُوا قَوْلًا سَدِيدًا"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 31.8,
+   "E": 31.8,
+   "matched": 9,
+   "content": 5,
+   "exactRun": 9,
+   "coverage": 1,
+   "margin": 18.3
+  },
+  "chainedAyah": true,
+  "id": "finding_4",
+  "type": "ayah",
+  "startIndex": 357,
+  "endIndex": 407,
+  "wordStartIdx": 67,
+  "wordEndIdx": 75,
+  "startTime": 47.56,
+  "endTime": 53.46,
+  "matchedText": "يا أيها الذين آمنوا اتقوا الله وقولوا قولاً سديداً",
+  "canonicalText": "يَا أَيُّهَا الَّذِينَ آمَنُوا اتَّقُوا اللَّهَ وَقُولُوا قَوْلًا سَدِيدًا",
+  "reference": "الأحزاب: 70",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "33:71",
+  "displayRef": "الأحزاب: 71",
+  "candidateRefs": [
+   "الأحزاب: 71"
+  ],
+  "candidateUnitIds": [
+   "33:71"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 72.83,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 76,
+  "tEnd": 90,
+  "charStart": 408,
+  "charEnd": 482,
+  "segments": [
+   [
+    76,
+    90
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    14
+   ]
+  ],
+  "canonicalSegments": [
+   "يُصْلِحْ لَكُمْ أَعْمَالَكُمْ وَيَغْفِرْ لَكُمْ ذُنُوبَكُمْ وَمَن يُطِعِ اللَّهَ وَرَسُولَهُ فَقَدْ فَازَ فَوْزًا عَظِيمًا"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 67.8,
+   "E": 67.8,
+   "matched": 14,
+   "content": 10,
+   "exactRun": 14,
+   "coverage": 1,
+   "margin": 53.7
+  },
+  "chainedAyah": true,
+  "id": "finding_5",
+  "type": "ayah",
+  "startIndex": 408,
+  "endIndex": 482,
+  "wordStartIdx": 76,
+  "wordEndIdx": 89,
+  "startTime": 53.46,
+  "endTime": 63.3,
+  "matchedText": "يصلح لكم أعمالكم ويغفر لكم ذنوبكم ومن يطع الله ورسوله فقد فاز فوزاً عظيماً",
+  "canonicalText": "يُصْلِحْ لَكُمْ أَعْمَالَكُمْ وَيَغْفِرْ لَكُمْ ذُنُوبَكُمْ وَمَن يُطِعِ اللَّهَ وَرَسُولَهُ فَقَدْ فَازَ فَوْزًا عَظِيمًا",
+  "reference": "الأحزاب: 71",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "HADITH",
+  "unitId": "Nasai:1578",
+  "displayRef": "سنن النسائي (1578)",
+  "candidateRefs": [
+   "سنن النسائي (1578)"
+  ],
+  "candidateUnitIds": [
+   "Nasai:1578"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 103.83,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": true,
+  "tStart": 92,
+  "tEnd": 114,
+  "charStart": 491,
+  "charEnd": 610,
+  "segments": [
+   [
+    92,
+    114
+   ]
+  ],
+  "qSegments": [
+   [
+    11,
+    29
+   ]
+  ],
+  "canonicalSegments": [
+   "إِنَّ أَصْدَقَ الْحَدِيثِ كِتَابُ اللَّهِ وَأَحْسَنَ الْهَدْىِ هَدْىُ مُحَمَّدٍ وَشَرَّ الأُمُورِ مُحْدَثَاتُهَا وَكُلَّ مُحْدَثَةٍ بِدْعَةٌ وَكُلَّ بِدْعَةٍ ضَلاَلَةٌ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "",
+  "qiraahDisplay": "",
+  "evidence": {
+   "S": 103.8,
+   "E": 103.8,
+   "matched": 18,
+   "content": 16,
+   "exactRun": 9,
+   "coverage": 0.25,
+   "margin": 28.7
+  },
+  "chainedAyah": false,
+  "id": "finding_6",
+  "type": "hadith",
+  "startIndex": 491,
+  "endIndex": 610,
+  "wordStartIdx": 92,
+  "wordEndIdx": 113,
+  "startTime": 64.42,
+  "endTime": 80.38,
+  "matchedText": "فإن أصدق الحديث كتاب الله، وأحسن الهدي هدي محمد صلى الله عليه وسلم، وشر الأمور محدثاتها، وكل محدثة بدعة، وكل بدعة ضلالة",
+  "canonicalText": "إِنَّ أَصْدَقَ الْحَدِيثِ كِتَابُ اللَّهِ وَأَحْسَنَ الْهَدْىِ هَدْىُ مُحَمَّدٍ وَشَرَّ الأُمُورِ مُحْدَثَاتُهَا وَكُلَّ مُحْدَثَةٍ بِدْعَةٌ وَكُلَّ بِدْعَةٍ ضَلاَلَةٌ",
+  "reference": "سنن النسائي (1578)",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "59:18",
+  "displayRef": "الحشر: 18",
+  "candidateRefs": [
+   "الحشر: 18"
+  ],
+  "candidateUnitIds": [
+   "59:18"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 48.9,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": true,
+  "tStart": 126,
+  "tEnd": 144,
+  "charStart": 680,
+  "charEnd": 769,
+  "segments": [
+   [
+    126,
+    144
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    18
+   ]
+  ],
+  "canonicalSegments": [
+   "يَا أَيُّهَا الَّذِينَ آمَنُوا اتَّقُوا اللَّهَ وَلْتَنظُرْ نَفْسٌ مَّا قَدَّمَتْ لِغَدٍ وَاتَّقُوا اللَّهَ إِنَّ اللَّهَ خَبِيرٌ بِمَا تَعْمَلُونَ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 48.9,
+   "E": 51.3,
+   "matched": 17,
+   "content": 8,
+   "exactRun": 15,
+   "coverage": 0.94,
+   "margin": 37.2
+  },
+  "chainedAyah": false,
+  "id": "finding_7",
+  "type": "ayah",
+  "startIndex": 680,
+  "endIndex": 769,
+  "wordStartIdx": 126,
+  "wordEndIdx": 143,
+  "startTime": 89.98,
+  "endTime": 102,
+  "matchedText": "يا أيها الذين آمنوا اتقوا الله ولتنظر نفس ما قدمت لغد واتقوا الله إن الله صبير بما تعملون",
+  "canonicalText": "يَا أَيُّهَا الَّذِينَ آمَنُوا اتَّقُوا اللَّهَ وَلْتَنظُرْ نَفْسٌ مَّا قَدَّمَتْ لِغَدٍ وَاتَّقُوا اللَّهَ إِنَّ اللَّهَ خَبِيرٌ بِمَا تَعْمَلُونَ",
+  "reference": "الحشر: 18",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "82:6",
+  "displayRef": "الانفطار: 6",
+  "candidateRefs": [
+   "الانفطار: 6"
+  ],
+  "candidateUnitIds": [
+   "82:6"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 38.12,
+  "hasCitationCue": true,
+  "hasFuzzyHeal": false,
+  "tStart": 232,
+  "tEnd": 239,
+  "charStart": 1270,
+  "charEnd": 1304,
+  "segments": [
+   [
+    232,
+    239
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    7
+   ]
+  ],
+  "canonicalSegments": [
+   "يَا أَيُّهَا الْإِنسَانُ مَا غَرَّكَ بِرَبِّكَ الْكَرِيمِ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 30.1,
+   "E": 30.1,
+   "matched": 7,
+   "content": 4,
+   "exactRun": 7,
+   "coverage": 1,
+   "margin": 23.1
+  },
+  "chainedAyah": true,
+  "id": "finding_8",
+  "type": "ayah",
+  "startIndex": 1270,
+  "endIndex": 1304,
+  "wordStartIdx": 232,
+  "wordEndIdx": 238,
+  "startTime": 163.1,
+  "endTime": 167.88,
+  "matchedText": "يا أيها الإنسان ما غرك بربك الكريم",
+  "canonicalText": "يَا أَيُّهَا الْإِنسَانُ مَا غَرَّكَ بِرَبِّكَ الْكَرِيمِ",
+  "reference": "الانفطار: 6",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "82:7",
+  "displayRef": "الانفطار: 7",
+  "candidateRefs": [
+   "الانفطار: 7"
+  ],
+  "candidateUnitIds": [
+   "82:7"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 35.44,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 239,
+  "tEnd": 243,
+  "charStart": 1305,
+  "charEnd": 1326,
+  "segments": [
+   [
+    239,
+    243
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    4
+   ]
+  ],
+  "canonicalSegments": [
+   "الَّذِي خَلَقَكَ فَسَوَّاكَ فَعَدَلَكَ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 25.4,
+   "E": 25.4,
+   "matched": 4,
+   "content": 3,
+   "exactRun": 4,
+   "coverage": 1,
+   "margin": 25.4
+  },
+  "chainedAyah": true,
+  "id": "finding_9",
+  "type": "ayah",
+  "startIndex": 1305,
+  "endIndex": 1326,
+  "wordStartIdx": 239,
+  "wordEndIdx": 242,
+  "startTime": 167.88,
+  "endTime": 171.36,
+  "matchedText": "الذي خلقك فسواك فعدلك",
+  "canonicalText": "الَّذِي خَلَقَكَ فَسَوَّاكَ فَعَدَلَكَ",
+  "reference": "الانفطار: 7",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "82:8",
+  "displayRef": "الانفطار: 8",
+  "candidateRefs": [
+   "الانفطار: 8"
+  ],
+  "candidateUnitIds": [
+   "82:8"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 29.55,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 243,
+  "tEnd": 249,
+  "charStart": 1327,
+  "charEnd": 1350,
+  "segments": [
+   [
+    243,
+    249
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    6
+   ]
+  ],
+  "canonicalSegments": [
+   "فِي أَيِّ صُورَةٍ مَّا شَاءَ رَكَّبَكَ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 24.6,
+   "E": 24.6,
+   "matched": 6,
+   "content": 3,
+   "exactRun": 6,
+   "coverage": 1,
+   "margin": 16.7
+  },
+  "chainedAyah": true,
+  "id": "finding_10",
+  "type": "ayah",
+  "startIndex": 1327,
+  "endIndex": 1350,
+  "wordStartIdx": 243,
+  "wordEndIdx": 248,
+  "startTime": 171.36,
+  "endTime": 175.62,
+  "matchedText": "في أي صورة ما شاء ركبك،",
+  "canonicalText": "فِي أَيِّ صُورَةٍ مَّا شَاءَ رَكَّبَكَ",
+  "reference": "الانفطار: 8",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "84:6",
+  "displayRef": "الانشقاق: 6",
+  "candidateRefs": [
+   "الانشقاق: 6"
+  ],
+  "candidateUnitIds": [
+   "84:6"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 48.7,
+  "hasCitationCue": true,
+  "hasFuzzyHeal": false,
+  "tStart": 253,
+  "tEnd": 262,
+  "charStart": 1375,
+  "charEnd": 1420,
+  "segments": [
+   [
+    253,
+    262
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    9
+   ]
+  ],
+  "canonicalSegments": [
+   "يَا أَيُّهَا الْإِنسَانُ إِنَّكَ كَادِحٌ إِلَىٰ رَبِّكَ كَدْحًا فَمُلَاقِيهِ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 40.7,
+   "E": 40.7,
+   "matched": 9,
+   "content": 6,
+   "exactRun": 9,
+   "coverage": 1,
+   "margin": 34
+  },
+  "chainedAyah": true,
+  "id": "finding_11",
+  "type": "ayah",
+  "startIndex": 1375,
+  "endIndex": 1420,
+  "wordStartIdx": 253,
+  "wordEndIdx": 261,
+  "startTime": 178.7,
+  "endTime": 185.74,
+  "matchedText": "يا أيها الإنسان إنك كادح إلى ربك كدحا فملاقيه",
+  "canonicalText": "يَا أَيُّهَا الْإِنسَانُ إِنَّكَ كَادِحٌ إِلَىٰ رَبِّكَ كَدْحًا فَمُلَاقِيهِ",
+  "reference": "الانشقاق: 6",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "84:7",
+  "displayRef": "الانشقاق: 7",
+  "candidateRefs": [
+   "الانشقاق: 7"
+  ],
+  "candidateUnitIds": [
+   "84:7"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 40.72,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 262,
+  "tEnd": 267,
+  "charStart": 1421,
+  "charEnd": 1445,
+  "segments": [
+   [
+    262,
+    267
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    5
+   ]
+  ],
+  "canonicalSegments": [
+   "فَأَمَّا مَنْ أُوتِيَ كِتَابَهُ بِيَمِينِهِ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 25.7,
+   "E": 25.7,
+   "matched": 5,
+   "content": 4,
+   "exactRun": 5,
+   "coverage": 1,
+   "margin": 4.9
+  },
+  "chainedAyah": true,
+  "id": "finding_12",
+  "type": "ayah",
+  "startIndex": 1421,
+  "endIndex": 1445,
+  "wordStartIdx": 262,
+  "wordEndIdx": 266,
+  "startTime": 186.22,
+  "endTime": 189.06,
+  "matchedText": "أما من أوتي كتابه بيمينه",
+  "canonicalText": "فَأَمَّا مَنْ أُوتِيَ كِتَابَهُ بِيَمِينِهِ",
+  "reference": "الانشقاق: 7",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "84:8",
+  "displayRef": "الانشقاق: 8",
+  "candidateRefs": [
+   "الانشقاق: 8"
+  ],
+  "candidateUnitIds": [
+   "84:8"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 37.75,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 267,
+  "tEnd": 271,
+  "charStart": 1446,
+  "charEnd": 1468,
+  "segments": [
+   [
+    267,
+    271
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    4
+   ]
+  ],
+  "canonicalSegments": [
+   "فَسَوْفَ يُحَاسَبُ حِسَابًا يَسِيرًا"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 27.8,
+   "E": 27.8,
+   "matched": 4,
+   "content": 4,
+   "exactRun": 4,
+   "coverage": 1,
+   "margin": 20.5
+  },
+  "chainedAyah": true,
+  "id": "finding_13",
+  "type": "ayah",
+  "startIndex": 1446,
+  "endIndex": 1468,
+  "wordStartIdx": 267,
+  "wordEndIdx": 270,
+  "startTime": 189.06,
+  "endTime": 192.66,
+  "matchedText": "فسوف يحاسب حسابا يسيرا",
+  "canonicalText": "فَسَوْفَ يُحَاسَبُ حِسَابًا يَسِيرًا",
+  "reference": "الانشقاق: 8",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "84:9",
+  "displayRef": "الانشقاق: 9",
+  "candidateRefs": [
+   "الانشقاق: 9"
+  ],
+  "candidateUnitIds": [
+   "84:9"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 33.11,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 271,
+  "tEnd": 275,
+  "charStart": 1469,
+  "charEnd": 1491,
+  "segments": [
+   [
+    271,
+    275
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    4
+   ]
+  ],
+  "canonicalSegments": [
+   "وَيَنقَلِبُ إِلَىٰ أَهْلِهِ مَسْرُورًا"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 23.1,
+   "E": 23.1,
+   "matched": 4,
+   "content": 3,
+   "exactRun": 4,
+   "coverage": 1,
+   "margin": 16.2
+  },
+  "chainedAyah": true,
+  "id": "finding_14",
+  "type": "ayah",
+  "startIndex": 1469,
+  "endIndex": 1491,
+  "wordStartIdx": 271,
+  "wordEndIdx": 274,
+  "startTime": 192.66,
+  "endTime": 196.36,
+  "matchedText": "وينقلب إلى أهله مسرورا",
+  "canonicalText": "وَيَنقَلِبُ إِلَىٰ أَهْلِهِ مَسْرُورًا",
+  "reference": "الانشقاق: 9",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "84:10",
+  "displayRef": "الانشقاق: 10",
+  "candidateRefs": [
+   "الانشقاق: 10"
+  ],
+  "candidateUnitIds": [
+   "84:10"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 42.64,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 275,
+  "tEnd": 281,
+  "charStart": 1492,
+  "charEnd": 1520,
+  "segments": [
+   [
+    275,
+    281
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    6
+   ]
+  ],
+  "canonicalSegments": [
+   "وَأَمَّا مَنْ أُوتِيَ كِتَابَهُ وَرَاءَ ظَهْرِهِ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 32.6,
+   "E": 32.6,
+   "matched": 6,
+   "content": 5,
+   "exactRun": 6,
+   "coverage": 1,
+   "margin": 14
+  },
+  "chainedAyah": true,
+  "id": "finding_15",
+  "type": "ayah",
+  "startIndex": 1492,
+  "endIndex": 1520,
+  "wordStartIdx": 275,
+  "wordEndIdx": 280,
+  "startTime": 196.92,
+  "endTime": 201.16,
+  "matchedText": "وأما من أوتي كتابه وراء ظهره",
+  "canonicalText": "وَأَمَّا مَنْ أُوتِيَ كِتَابَهُ وَرَاءَ ظَهْرِهِ",
+  "reference": "الانشقاق: 10",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "84:11",
+  "displayRef": "الانشقاق: 11",
+  "candidateRefs": [
+   "الانشقاق: 11"
+  ],
+  "candidateUnitIds": [
+   "84:11"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 29.54,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 281,
+  "tEnd": 284,
+  "charStart": 1521,
+  "charEnd": 1536,
+  "segments": [
+   [
+    281,
+    284
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    3
+   ]
+  ],
+  "canonicalSegments": [
+   "فَسَوْفَ يَدْعُو ثُبُورًا"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 19.5,
+   "E": 19.5,
+   "matched": 3,
+   "content": 3,
+   "exactRun": 3,
+   "coverage": 1,
+   "margin": 12.1
+  },
+  "chainedAyah": true,
+  "id": "finding_16",
+  "type": "ayah",
+  "startIndex": 1521,
+  "endIndex": 1536,
+  "wordStartIdx": 281,
+  "wordEndIdx": 283,
+  "startTime": 201.16,
+  "endTime": 203.52,
+  "matchedText": "فسوف يدعو ثبورا",
+  "canonicalText": "فَسَوْفَ يَدْعُو ثُبُورًا",
+  "reference": "الانشقاق: 11",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "84:12",
+  "displayRef": "الانشقاق: 12",
+  "candidateRefs": [
+   "الانشقاق: 12"
+  ],
+  "candidateUnitIds": [
+   "84:12"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "CANDIDATE",
+  "totalScore": 25.06,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 284,
+  "tEnd": 286,
+  "charStart": 1537,
+  "charEnd": 1548,
+  "segments": [
+   [
+    284,
+    286
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    2
+   ]
+  ],
+  "canonicalSegments": [
+   "وَيَصْلَىٰ سَعِيرًا"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 15.1,
+   "E": 15.1,
+   "matched": 2,
+   "content": 2,
+   "exactRun": 2,
+   "coverage": 1,
+   "margin": 15.1
+  },
+  "chainedAyah": true,
+  "id": "finding_17",
+  "type": "ayah",
+  "startIndex": 1537,
+  "endIndex": 1548,
+  "wordStartIdx": 284,
+  "wordEndIdx": 285,
+  "startTime": 203.52,
+  "endTime": 205.54,
+  "matchedText": "ويصلى سعيرا",
+  "canonicalText": "وَيَصْلَىٰ سَعِيرًا",
+  "reference": "الانشقاق: 12",
+  "confidence": 0.72,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "84:13",
+  "displayRef": "الانشقاق: 13",
+  "candidateRefs": [
+   "الانشقاق: 13"
+  ],
+  "candidateUnitIds": [
+   "84:13"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 26.49,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 286,
+  "tEnd": 291,
+  "charStart": 1549,
+  "charEnd": 1572,
+  "segments": [
+   [
+    286,
+    291
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    5
+   ]
+  ],
+  "canonicalSegments": [
+   "إِنَّهُ كَانَ فِي أَهْلِهِ مَسْرُورًا"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 16.5,
+   "E": 16.5,
+   "matched": 5,
+   "content": 2,
+   "exactRun": 5,
+   "coverage": 1,
+   "margin": 16.5
+  },
+  "chainedAyah": true,
+  "id": "finding_18",
+  "type": "ayah",
+  "startIndex": 1549,
+  "endIndex": 1572,
+  "wordStartIdx": 286,
+  "wordEndIdx": 290,
+  "startTime": 205.68,
+  "endTime": 209.8,
+  "matchedText": "إنه كان في أهله مسرورا،",
+  "canonicalText": "إِنَّهُ كَانَ فِي أَهْلِهِ مَسْرُورًا",
+  "reference": "الانشقاق: 13",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "84:14",
+  "displayRef": "الانشقاق: 14",
+  "candidateRefs": [
+   "الانشقاق: 14"
+  ],
+  "candidateUnitIds": [
+   "84:14"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 27.87,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 291,
+  "tEnd": 296,
+  "charStart": 1573,
+  "charEnd": 1590,
+  "segments": [
+   [
+    291,
+    296
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    5
+   ]
+  ],
+  "canonicalSegments": [
+   "إِنَّهُ ظَنَّ أَن لَّن يَحُورَ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 17.9,
+   "E": 17.9,
+   "matched": 5,
+   "content": 2,
+   "exactRun": 5,
+   "coverage": 1,
+   "margin": 17.9
+  },
+  "chainedAyah": true,
+  "id": "finding_19",
+  "type": "ayah",
+  "startIndex": 1573,
+  "endIndex": 1590,
+  "wordStartIdx": 291,
+  "wordEndIdx": 295,
+  "startTime": 209.8,
+  "endTime": 212.72533,
+  "matchedText": "إنه ظن أن لن يحور",
+  "canonicalText": "إِنَّهُ ظَنَّ أَن لَّن يَحُورَ",
+  "reference": "الانشقاق: 14",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "84:15",
+  "displayRef": "الانشقاق: 15",
+  "candidateRefs": [
+   "الانشقاق: 15"
+  ],
+  "candidateUnitIds": [
+   "84:15"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 22.46,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 296,
+  "tEnd": 302,
+  "charStart": 1591,
+  "charEnd": 1614,
+  "segments": [
+   [
+    296,
+    302
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    6
+   ]
+  ],
+  "canonicalSegments": [
+   "بَلَىٰ إِنَّ رَبَّهُ كَانَ بِهِ بَصِيرًا"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 17.5,
+   "E": 17.5,
+   "matched": 6,
+   "content": 3,
+   "exactRun": 6,
+   "coverage": 1,
+   "margin": 10.4
+  },
+  "chainedAyah": true,
+  "id": "finding_20",
+  "type": "ayah",
+  "startIndex": 1591,
+  "endIndex": 1614,
+  "wordStartIdx": 296,
+  "wordEndIdx": 301,
+  "startTime": 212.72533,
+  "endTime": 217.02533,
+  "matchedText": "بلى إن ربه كان به بصراً",
+  "canonicalText": "بَلَىٰ إِنَّ رَبَّهُ كَانَ بِهِ بَصِيرًا",
+  "reference": "الانشقاق: 15",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "39:67",
+  "displayRef": "الزمر: 67",
+  "candidateRefs": [
+   "الزمر: 67",
+   "الروم: 40",
+   "الأنعام: 100",
+   "يونس: 18",
+   "النحل: 1",
+   "الإسراء: 43"
+  ],
+  "candidateUnitIds": [
+   "39:67",
+   "30:40",
+   "6:100",
+   "10:18",
+   "16:1",
+   "17:43"
+  ],
+  "candidateCount": 6,
+  "isAmbiguous": true,
+  "isOutsideCorpus": false,
+  "confidenceBand": "CANDIDATE",
+  "totalScore": 15.79,
+  "hasCitationCue": true,
+  "hasFuzzyHeal": false,
+  "tStart": 312,
+  "tEnd": 314,
+  "charStart": 1677,
+  "charEnd": 1690,
+  "segments": [
+   [
+    312,
+    314
+   ]
+  ],
+  "qSegments": [
+   [
+    13,
+    15
+   ]
+  ],
+  "canonicalSegments": [
+   "سُبْحَانَهُ وَتَعَالَىٰ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 12.8,
+   "E": 12.8,
+   "matched": 2,
+   "content": 2,
+   "exactRun": 2,
+   "coverage": 0.12,
+   "margin": 0
+  },
+  "chainedAyah": false,
+  "id": "finding_21",
+  "type": "ayah",
+  "startIndex": 1677,
+  "endIndex": 1690,
+  "wordStartIdx": 312,
+  "wordEndIdx": 313,
+  "startTime": 224.90532,
+  "endTime": 226.62532,
+  "matchedText": "سبحانه وتعالى",
+  "canonicalText": "سُبْحَانَهُ وَتَعَالَىٰ",
+  "reference": "الزمر: 67",
+  "confidence": 0.72,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "82:6",
+  "displayRef": "الانفطار: 6",
+  "candidateRefs": [
+   "الانفطار: 6"
+  ],
+  "candidateUnitIds": [
+   "82:6"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 33.12,
+  "hasCitationCue": true,
+  "hasFuzzyHeal": false,
+  "tStart": 340,
+  "tEnd": 347,
+  "charStart": 1834,
+  "charEnd": 1870,
+  "segments": [
+   [
+    340,
+    347
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    7
+   ]
+  ],
+  "canonicalSegments": [
+   "يَا أَيُّهَا الْإِنسَانُ مَا غَرَّكَ بِرَبِّكَ الْكَرِيمِ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 30.1,
+   "E": 30.1,
+   "matched": 7,
+   "content": 4,
+   "exactRun": 7,
+   "coverage": 1,
+   "margin": 22
+  },
+  "chainedAyah": false,
+  "id": "finding_22",
+  "type": "ayah",
+  "startIndex": 1834,
+  "endIndex": 1870,
+  "wordStartIdx": 340,
+  "wordEndIdx": 346,
+  "startTime": 243.92532,
+  "endTime": 248.72533,
+  "matchedText": "يا أيها الإنسان ما غرَّك بربك الكريم",
+  "canonicalText": "يَا أَيُّهَا الْإِنسَانُ مَا غَرَّكَ بِرَبِّكَ الْكَرِيمِ",
+  "reference": "الانفطار: 6",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "82:7",
+  "displayRef": "الانفطار: 7",
+  "candidateRefs": [
+   "الانفطار: 7"
+  ],
+  "candidateUnitIds": [
+   "82:7"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 25.44,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 367,
+  "tEnd": 371,
+  "charStart": 1971,
+  "charEnd": 1992,
+  "segments": [
+   [
+    367,
+    371
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    4
+   ]
+  ],
+  "canonicalSegments": [
+   "الَّذِي خَلَقَكَ فَسَوَّاكَ فَعَدَلَكَ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 25.4,
+   "E": 25.4,
+   "matched": 4,
+   "content": 3,
+   "exactRun": 4,
+   "coverage": 1,
+   "margin": 25.4
+  },
+  "chainedAyah": false,
+  "id": "finding_23",
+  "type": "ayah",
+  "startIndex": 1971,
+  "endIndex": 1992,
+  "wordStartIdx": 367,
+  "wordEndIdx": 370,
+  "startTime": 260.34534,
+  "endTime": 263.58533,
+  "matchedText": "الذي خلقك فسواك فعدلك",
+  "canonicalText": "الَّذِي خَلَقَكَ فَسَوَّاكَ فَعَدَلَكَ",
+  "reference": "الانفطار: 7",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "82:8",
+  "displayRef": "الانفطار: 8",
+  "candidateRefs": [
+   "الانفطار: 8"
+  ],
+  "candidateUnitIds": [
+   "82:8"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "CANDIDATE",
+  "totalScore": 21.99,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 375,
+  "tEnd": 379,
+  "charStart": 2007,
+  "charEnd": 2025,
+  "segments": [
+   [
+    375,
+    379
+   ]
+  ],
+  "qSegments": [
+   [
+    2,
+    6
+   ]
+  ],
+  "canonicalSegments": [
+   "صُورَةٍ مَّا شَاءَ رَكَّبَكَ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 22,
+   "E": 22,
+   "matched": 4,
+   "content": 3,
+   "exactRun": 4,
+   "coverage": 0.67,
+   "margin": 14.1
+  },
+  "chainedAyah": false,
+  "id": "finding_24",
+  "type": "ayah",
+  "startIndex": 2007,
+  "endIndex": 2025,
+  "wordStartIdx": 375,
+  "wordEndIdx": 378,
+  "startTime": 265.02533,
+  "endTime": 267.06534,
+  "matchedText": "صورةٍ ما شاء ركبك،",
+  "canonicalText": "صُورَةٍ مَّا شَاءَ رَكَّبَكَ",
+  "reference": "الانفطار: 8",
+  "confidence": 0.72,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "16:4",
+  "displayRef": "النحل: 4",
+  "candidateRefs": [
+   "النحل: 4",
+   "الأنبياء: 37",
+   "السجدة: 7",
+   "الرحمن: 3",
+   "الرحمن: 14",
+   "العلق: 2"
+  ],
+  "candidateUnitIds": [
+   "16:4",
+   "21:37",
+   "32:7",
+   "55:3",
+   "55:14",
+   "96:2"
+  ],
+  "candidateCount": 6,
+  "isAmbiguous": true,
+  "isOutsideCorpus": false,
+  "confidenceBand": "CANDIDATE",
+  "totalScore": 9.05,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 387,
+  "tEnd": 389,
+  "charStart": 2063,
+  "charEnd": 2074,
+  "segments": [
+   [
+    387,
+    389
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    2
+   ]
+  ],
+  "canonicalSegments": [
+   "خَلَقَ الْإِنسَانَ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 9.1,
+   "E": 9.1,
+   "matched": 2,
+   "content": 2,
+   "exactRun": 2,
+   "coverage": 0.25,
+   "margin": 0
+  },
+  "chainedAyah": false,
+  "id": "finding_25",
+  "type": "ayah",
+  "startIndex": 2063,
+  "endIndex": 2074,
+  "wordStartIdx": 387,
+  "wordEndIdx": 388,
+  "startTime": 270.98532,
+  "endTime": 272.3853,
+  "matchedText": "خلق الإنسان",
+  "canonicalText": "خَلَقَ الْإِنسَانَ",
+  "reference": "النحل: 4",
+  "confidence": 0.72,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "95:4",
+  "displayRef": "التين: 4",
+  "candidateRefs": [
+   "التين: 4"
+  ],
+  "candidateUnitIds": [
+   "95:4"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 28.93,
+  "hasCitationCue": true,
+  "hasFuzzyHeal": false,
+  "tStart": 399,
+  "tEnd": 405,
+  "charStart": 2126,
+  "charEnd": 2158,
+  "segments": [
+   [
+    399,
+    405
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    6
+   ]
+  ],
+  "canonicalSegments": [
+   "لَقَدْ خَلَقْنَا الْإِنسَانَ فِي أَحْسَنِ تَقْوِيمٍ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 25.9,
+   "E": 25.9,
+   "matched": 6,
+   "content": 4,
+   "exactRun": 6,
+   "coverage": 1,
+   "margin": 13.6
+  },
+  "chainedAyah": false,
+  "id": "finding_26",
+  "type": "ayah",
+  "startIndex": 2126,
+  "endIndex": 2158,
+  "wordStartIdx": 399,
+  "wordEndIdx": 404,
+  "startTime": 278.46533,
+  "endTime": 282.46533,
+  "matchedText": "لقد خلقنا الإنسان في أحسن تقويم،",
+  "canonicalText": "لَقَدْ خَلَقْنَا الْإِنسَانَ فِي أَحْسَنِ تَقْوِيمٍ",
+  "reference": "التين: 4",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "42:8",
+  "displayRef": "الشورى: 8",
+  "candidateRefs": [
+   "الشورى: 8",
+   "الفرقان: 45",
+   "المائدة: 48",
+   "النحل: 93"
+  ],
+  "candidateUnitIds": [
+   "42:8",
+   "25:45",
+   "5:48",
+   "16:93"
+  ],
+  "candidateCount": 4,
+  "isAmbiguous": true,
+  "isOutsideCorpus": false,
+  "confidenceBand": "CANDIDATE",
+  "totalScore": 15.97,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": true,
+  "tStart": 416,
+  "tEnd": 422,
+  "charStart": 2212,
+  "charEnd": 2237,
+  "segments": [
+   [
+    416,
+    422
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    4
+   ]
+  ],
+  "canonicalSegments": [
+   "وَلَوْ شَاءَ اللَّهُ لَجَعَلَهُمْ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 16,
+   "E": 16,
+   "matched": 4,
+   "content": 3,
+   "exactRun": 3,
+   "coverage": 0.21,
+   "margin": 0
+  },
+  "chainedAyah": false,
+  "id": "finding_27",
+  "type": "ayah",
+  "startIndex": 2212,
+  "endIndex": 2237,
+  "wordStartIdx": 416,
+  "wordEndIdx": 421,
+  "startTime": 288.14532,
+  "endTime": 290.98532,
+  "matchedText": "ولو شاء الله عز وجل لجعله",
+  "canonicalText": "وَلَوْ شَاءَ اللَّهُ لَجَعَلَهُمْ",
+  "reference": "الشورى: 8",
+  "confidence": 0.72,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "39:67",
+  "displayRef": "الزمر: 67",
+  "candidateRefs": [
+   "الزمر: 67",
+   "الروم: 40",
+   "الأنعام: 100",
+   "يونس: 18",
+   "النحل: 1",
+   "الإسراء: 43"
+  ],
+  "candidateUnitIds": [
+   "39:67",
+   "30:40",
+   "6:100",
+   "10:18",
+   "16:1",
+   "17:43"
+  ],
+  "candidateCount": 6,
+  "isAmbiguous": true,
+  "isOutsideCorpus": false,
+  "confidenceBand": "CANDIDATE",
+  "totalScore": 15.79,
+  "hasCitationCue": true,
+  "hasFuzzyHeal": false,
+  "tStart": 439,
+  "tEnd": 441,
+  "charStart": 2330,
+  "charEnd": 2343,
+  "segments": [
+   [
+    439,
+    441
+   ]
+  ],
+  "qSegments": [
+   [
+    13,
+    15
+   ]
+  ],
+  "canonicalSegments": [
+   "سُبْحَانَهُ وَتَعَالَىٰ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 12.8,
+   "E": 12.8,
+   "matched": 2,
+   "content": 2,
+   "exactRun": 2,
+   "coverage": 0.12,
+   "margin": 0
+  },
+  "chainedAyah": false,
+  "id": "finding_28",
+  "type": "ayah",
+  "startIndex": 2330,
+  "endIndex": 2343,
+  "wordStartIdx": 439,
+  "wordEndIdx": 440,
+  "startTime": 306.02533,
+  "endTime": 307.54532,
+  "matchedText": "سبحانه وتعالى",
+  "canonicalText": "سُبْحَانَهُ وَتَعَالَىٰ",
+  "reference": "الزمر: 67",
+  "confidence": 0.72,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "36:77",
+  "displayRef": "يس: 77",
+  "candidateRefs": [
+   "يس: 77"
+  ],
+  "candidateUnitIds": [
+   "36:77"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 37.57,
+  "hasCitationCue": true,
+  "hasFuzzyHeal": true,
+  "tStart": 456,
+  "tEnd": 466,
+  "charStart": 2435,
+  "charEnd": 2515,
+  "segments": [
+   [
+    456,
+    466
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    10
+   ]
+  ],
+  "canonicalSegments": [
+   "أَوَلَمْ يَرَ الْإِنسَانُ أَنَّا خَلَقْنَاهُ مِن نُّطْفَةٍ فَإِذَا هُوَ خَصِيمٌ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 34.6,
+   "E": 37.2,
+   "matched": 9,
+   "content": 6,
+   "exactRun": 8,
+   "coverage": 0.82,
+   "margin": 16.2
+  },
+  "chainedAyah": false,
+  "id": "finding_29",
+  "type": "ayah",
+  "startIndex": 2435,
+  "endIndex": 2515,
+  "wordStartIdx": 456,
+  "wordEndIdx": 465,
+  "startTime": 318.22534,
+  "endTime": 324.74533,
+  "matchedText": "أَوَلَمْ يَرَى الْإِنسَانُ أَنَّا خَلَقْنَاهُ مِنْ نُطْفَةَ فَإِذَا هُوَ خَصِيمٌ",
+  "canonicalText": "أَوَلَمْ يَرَ الْإِنسَانُ أَنَّا خَلَقْنَاهُ مِن نُّطْفَةٍ فَإِذَا هُوَ خَصِيمٌ",
+  "reference": "يس: 77",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "96:1",
+  "displayRef": "العلق: 1",
+  "candidateRefs": [
+   "العلق: 1"
+  ],
+  "candidateUnitIds": [
+   "96:1"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 26.44,
+  "hasCitationCue": true,
+  "hasFuzzyHeal": false,
+  "tStart": 479,
+  "tEnd": 484,
+  "charStart": 2622,
+  "charEnd": 2644,
+  "segments": [
+   [
+    479,
+    484
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    5
+   ]
+  ],
+  "canonicalSegments": [
+   "اقْرَأْ بِاسْمِ رَبِّكَ الَّذِي خَلَقَ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 23.4,
+   "E": 23.4,
+   "matched": 5,
+   "content": 4,
+   "exactRun": 5,
+   "coverage": 1,
+   "margin": 12.8
+  },
+  "chainedAyah": false,
+  "id": "finding_30",
+  "type": "ayah",
+  "startIndex": 2622,
+  "endIndex": 2644,
+  "wordStartIdx": 479,
+  "wordEndIdx": 483,
+  "startTime": 327.86533,
+  "endTime": 330.5653,
+  "matchedText": "اقرأ باسم ربك الذي خلق",
+  "canonicalText": "اقْرَأْ بِاسْمِ رَبِّكَ الَّذِي خَلَقَ",
+  "reference": "العلق: 1",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "76:2",
+  "displayRef": "الإنسان: 2",
+  "candidateRefs": [
+   "الإنسان: 2"
+  ],
+  "candidateUnitIds": [
+   "76:2"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 59.49,
+  "hasCitationCue": true,
+  "hasFuzzyHeal": false,
+  "tStart": 490,
+  "tEnd": 500,
+  "charStart": 2682,
+  "charEnd": 2744,
+  "segments": [
+   [
+    490,
+    500
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    10
+   ]
+  ],
+  "canonicalSegments": [
+   "إِنَّا خَلَقْنَا الْإِنسَانَ مِن نُّطْفَةٍ أَمْشَاجٍ نَّبْتَلِيهِ فَجَعَلْنَاهُ سَمِيعًا بَصِيرًا"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 56.5,
+   "E": 56.5,
+   "matched": 10,
+   "content": 9,
+   "exactRun": 10,
+   "coverage": 1,
+   "margin": 41.9
+  },
+  "chainedAyah": false,
+  "id": "finding_31",
+  "type": "ayah",
+  "startIndex": 2682,
+  "endIndex": 2744,
+  "wordStartIdx": 490,
+  "wordEndIdx": 499,
+  "startTime": 335.98532,
+  "endTime": 344.70532,
+  "matchedText": "إنا خلقنا الإنسان من نطفة أمشاج نبتريه، فجعلناه سميعاً بصيراً،",
+  "canonicalText": "إِنَّا خَلَقْنَا الْإِنسَانَ مِن نُّطْفَةٍ أَمْشَاجٍ نَّبْتَلِيهِ فَجَعَلْنَاهُ سَمِيعًا بَصِيرًا",
+  "reference": "الإنسان: 2",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "75:36",
+  "displayRef": "القيامة: 36",
+  "candidateRefs": [
+   "القيامة: 36"
+  ],
+  "candidateUnitIds": [
+   "75:36"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 28.73,
+  "hasCitationCue": true,
+  "hasFuzzyHeal": false,
+  "tStart": 502,
+  "tEnd": 506,
+  "charStart": 2756,
+  "charEnd": 2778,
+  "segments": [
+   [
+    502,
+    506
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    4
+   ]
+  ],
+  "canonicalSegments": [
+   "أَيَحْسَبُ الْإِنسَانُ أَن يُتْرَكَ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 20.7,
+   "E": 20.7,
+   "matched": 4,
+   "content": 3,
+   "exactRun": 4,
+   "coverage": 0.8,
+   "margin": 8.8
+  },
+  "chainedAyah": true,
+  "id": "finding_32",
+  "type": "ayah",
+  "startIndex": 2756,
+  "endIndex": 2778,
+  "wordStartIdx": 502,
+  "wordEndIdx": 505,
+  "startTime": 345.76532,
+  "endTime": 348.3853,
+  "matchedText": "أيحسب الإنسان أن يُترك",
+  "canonicalText": "أَيَحْسَبُ الْإِنسَانُ أَن يُتْرَكَ",
+  "reference": "القيامة: 36",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "75:37",
+  "displayRef": "القيامة: 37",
+  "candidateRefs": [
+   "القيامة: 37"
+  ],
+  "candidateUnitIds": [
+   "75:37"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 29.82,
+  "hasCitationCue": true,
+  "hasFuzzyHeal": true,
+  "tStart": 507,
+  "tEnd": 513,
+  "charStart": 2786,
+  "charEnd": 2813,
+  "segments": [
+   [
+    507,
+    513
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    6
+   ]
+  ],
+  "canonicalSegments": [
+   "أَلَمْ يَكُ نُطْفَةً مِّن مَّنِيٍّ يُمْنَىٰ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 21.8,
+   "E": 24.4,
+   "matched": 5,
+   "content": 4,
+   "exactRun": 4,
+   "coverage": 0.83,
+   "margin": 14.4
+  },
+  "chainedAyah": true,
+  "id": "finding_33",
+  "type": "ayah",
+  "startIndex": 2786,
+  "endIndex": 2813,
+  "wordStartIdx": 507,
+  "wordEndIdx": 512,
+  "startTime": 349.08533,
+  "endTime": 352.36533,
+  "matchedText": "ألم يكن نطفةً من مني يُمنا،",
+  "canonicalText": "أَلَمْ يَكُ نُطْفَةً مِّن مَّنِيٍّ يُمْنَىٰ",
+  "reference": "القيامة: 37",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "82:6",
+  "displayRef": "الانفطار: 6",
+  "candidateRefs": [
+   "الانفطار: 6"
+  ],
+  "candidateUnitIds": [
+   "82:6"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 35.12,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 558,
+  "tEnd": 565,
+  "charStart": 3033,
+  "charEnd": 3069,
+  "segments": [
+   [
+    558,
+    565
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    7
+   ]
+  ],
+  "canonicalSegments": [
+   "يَا أَيُّهَا الْإِنسَانُ مَا غَرَّكَ بِرَبِّكَ الْكَرِيمِ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 30.1,
+   "E": 30.1,
+   "matched": 7,
+   "content": 4,
+   "exactRun": 7,
+   "coverage": 1,
+   "margin": 23.1
+  },
+  "chainedAyah": true,
+  "id": "finding_34",
+  "type": "ayah",
+  "startIndex": 3033,
+  "endIndex": 3069,
+  "wordStartIdx": 558,
+  "wordEndIdx": 564,
+  "startTime": 377.92532,
+  "endTime": 382.82532,
+  "matchedText": "يا أيها الإنسان ما غرَّك بربك الكريم",
+  "canonicalText": "يَا أَيُّهَا الْإِنسَانُ مَا غَرَّكَ بِرَبِّكَ الْكَرِيمِ",
+  "reference": "الانفطار: 6",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "82:7",
+  "displayRef": "الانفطار: 7",
+  "candidateRefs": [
+   "الانفطار: 7"
+  ],
+  "candidateUnitIds": [
+   "82:7"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 35.44,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 565,
+  "tEnd": 569,
+  "charStart": 3070,
+  "charEnd": 3091,
+  "segments": [
+   [
+    565,
+    569
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    4
+   ]
+  ],
+  "canonicalSegments": [
+   "الَّذِي خَلَقَكَ فَسَوَّاكَ فَعَدَلَكَ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 25.4,
+   "E": 25.4,
+   "matched": 4,
+   "content": 3,
+   "exactRun": 4,
+   "coverage": 1,
+   "margin": 25.4
+  },
+  "chainedAyah": true,
+  "id": "finding_35",
+  "type": "ayah",
+  "startIndex": 3070,
+  "endIndex": 3091,
+  "wordStartIdx": 565,
+  "wordEndIdx": 568,
+  "startTime": 382.82532,
+  "endTime": 386.22534,
+  "matchedText": "الذي خلقك فسواك فعدلك",
+  "canonicalText": "الَّذِي خَلَقَكَ فَسَوَّاكَ فَعَدَلَكَ",
+  "reference": "الانفطار: 7",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "82:8",
+  "displayRef": "الانفطار: 8",
+  "candidateRefs": [
+   "الانفطار: 8"
+  ],
+  "candidateUnitIds": [
+   "82:8"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 29.55,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 569,
+  "tEnd": 575,
+  "charStart": 3092,
+  "charEnd": 3117,
+  "segments": [
+   [
+    569,
+    575
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    6
+   ]
+  ],
+  "canonicalSegments": [
+   "فِي أَيِّ صُورَةٍ مَّا شَاءَ رَكَّبَكَ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 24.6,
+   "E": 24.6,
+   "matched": 6,
+   "content": 3,
+   "exactRun": 6,
+   "coverage": 1,
+   "margin": 16.7
+  },
+  "chainedAyah": true,
+  "id": "finding_36",
+  "type": "ayah",
+  "startIndex": 3092,
+  "endIndex": 3117,
+  "wordStartIdx": 569,
+  "wordEndIdx": 574,
+  "startTime": 386.22534,
+  "endTime": 389.64532,
+  "matchedText": "في أي صورة ما شاء ركَّبك،",
+  "canonicalText": "فِي أَيِّ صُورَةٍ مَّا شَاءَ رَكَّبَكَ",
+  "reference": "الانفطار: 8",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "84:6",
+  "displayRef": "الانشقاق: 6",
+  "candidateRefs": [
+   "الانشقاق: 6"
+  ],
+  "candidateUnitIds": [
+   "84:6"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 40.7,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 593,
+  "tEnd": 602,
+  "charStart": 3218,
+  "charEnd": 3268,
+  "segments": [
+   [
+    593,
+    602
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    9
+   ]
+  ],
+  "canonicalSegments": [
+   "يَا أَيُّهَا الْإِنسَانُ إِنَّكَ كَادِحٌ إِلَىٰ رَبِّكَ كَدْحًا فَمُلَاقِيهِ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 40.7,
+   "E": 40.7,
+   "matched": 9,
+   "content": 6,
+   "exactRun": 9,
+   "coverage": 1,
+   "margin": 34
+  },
+  "chainedAyah": false,
+  "id": "finding_37",
+  "type": "ayah",
+  "startIndex": 3218,
+  "endIndex": 3268,
+  "wordStartIdx": 593,
+  "wordEndIdx": 601,
+  "startTime": 399.84534,
+  "endTime": 406.70532,
+  "matchedText": "يا أيها الإنسان إنك كادِحٌ إلى ربك كدحًا فمُلاقيه،",
+  "canonicalText": "يَا أَيُّهَا الْإِنسَانُ إِنَّكَ كَادِحٌ إِلَىٰ رَبِّكَ كَدْحًا فَمُلَاقِيهِ",
+  "reference": "الانشقاق: 6",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "3:195",
+  "displayRef": "آل عمران: 195",
+  "candidateRefs": [
+   "آل عمران: 195"
+  ],
+  "candidateUnitIds": [
+   "3:195"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "CANDIDATE",
+  "totalScore": 9.67,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": true,
+  "tStart": 603,
+  "tEnd": 608,
+  "charStart": 3277,
+  "charEnd": 3314,
+  "segments": [
+   [
+    603,
+    608
+   ]
+  ],
+  "qSegments": [
+   [
+    6,
+    8
+   ]
+  ],
+  "canonicalSegments": [
+   "عَمَلَ عَامِلٍ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 9.7,
+   "E": 12,
+   "matched": 2,
+   "content": 2,
+   "exactRun": 1,
+   "coverage": 0.05,
+   "margin": 2.4
+  },
+  "chainedAyah": false,
+  "id": "finding_38",
+  "type": "ayah",
+  "startIndex": 3277,
+  "endIndex": 3314,
+  "wordStartIdx": 603,
+  "wordEndIdx": 607,
+  "startTime": 407.84534,
+  "endTime": 410.5653,
+  "matchedText": "عَامِلٌ لِلَّهِ عَزَّ وَجَلَّ عَمَلًا",
+  "canonicalText": "عَمَلَ عَامِلٍ",
+  "reference": "آل عمران: 195",
+  "confidence": 0.72,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "41:34",
+  "displayRef": "فصلت: 34",
+  "candidateRefs": [
+   "فصلت: 34"
+  ],
+  "candidateUnitIds": [
+   "41:34"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "CANDIDATE",
+  "totalScore": 15.31,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 615,
+  "tEnd": 617,
+  "charStart": 3362,
+  "charEnd": 3372,
+  "segments": [
+   [
+    615,
+    617
+   ]
+  ],
+  "qSegments": [
+   [
+    11,
+    13
+   ]
+  ],
+  "canonicalSegments": [
+   "بَيْنَكَ وَبَيْنَهُ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 15.3,
+   "E": 15.3,
+   "matched": 2,
+   "content": 2,
+   "exactRun": 2,
+   "coverage": 0.12,
+   "margin": 5.8
+  },
+  "chainedAyah": false,
+  "id": "finding_39",
+  "type": "ayah",
+  "startIndex": 3362,
+  "endIndex": 3372,
+  "wordStartIdx": 615,
+  "wordEndIdx": 616,
+  "startTime": 415.98532,
+  "endTime": 417.4453,
+  "matchedText": "بينك وبينه",
+  "canonicalText": "بَيْنَكَ وَبَيْنَهُ",
+  "reference": "فصلت: 34",
+  "confidence": 0.72,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "39:67",
+  "displayRef": "الزمر: 67",
+  "candidateRefs": [
+   "الزمر: 67",
+   "الروم: 40",
+   "الأنعام: 100",
+   "يونس: 18",
+   "النحل: 1",
+   "الإسراء: 43"
+  ],
+  "candidateUnitIds": [
+   "39:67",
+   "30:40",
+   "6:100",
+   "10:18",
+   "16:1",
+   "17:43"
+  ],
+  "candidateCount": 6,
+  "isAmbiguous": true,
+  "isOutsideCorpus": false,
+  "confidenceBand": "CANDIDATE",
+  "totalScore": 15.79,
+  "hasCitationCue": true,
+  "hasFuzzyHeal": false,
+  "tStart": 630,
+  "tEnd": 632,
+  "charStart": 3452,
+  "charEnd": 3466,
+  "segments": [
+   [
+    630,
+    632
+   ]
+  ],
+  "qSegments": [
+   [
+    13,
+    15
+   ]
+  ],
+  "canonicalSegments": [
+   "سُبْحَانَهُ وَتَعَالَىٰ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 12.8,
+   "E": 12.8,
+   "matched": 2,
+   "content": 2,
+   "exactRun": 2,
+   "coverage": 0.12,
+   "margin": 0
+  },
+  "chainedAyah": false,
+  "id": "finding_40",
+  "type": "ayah",
+  "startIndex": 3452,
+  "endIndex": 3466,
+  "wordStartIdx": 630,
+  "wordEndIdx": 631,
+  "startTime": 425.69064,
+  "endTime": 427.89066,
+  "matchedText": "سبحانه وتعالى،",
+  "canonicalText": "سُبْحَانَهُ وَتَعَالَىٰ",
+  "reference": "الزمر: 67",
+  "confidence": 0.72,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "84:7",
+  "displayRef": "الانشقاق: 7",
+  "candidateRefs": [
+   "الانشقاق: 7"
+  ],
+  "candidateUnitIds": [
+   "84:7"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 39.26,
+  "hasCitationCue": true,
+  "hasFuzzyHeal": false,
+  "tStart": 632,
+  "tEnd": 637,
+  "charStart": 3467,
+  "charEnd": 3493,
+  "segments": [
+   [
+    632,
+    637
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    5
+   ]
+  ],
+  "canonicalSegments": [
+   "فَأَمَّا مَنْ أُوتِيَ كِتَابَهُ بِيَمِينِهِ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 26.3,
+   "E": 26.3,
+   "matched": 5,
+   "content": 4,
+   "exactRun": 5,
+   "coverage": 1,
+   "margin": 5.4
+  },
+  "chainedAyah": true,
+  "id": "finding_41",
+  "type": "ayah",
+  "startIndex": 3467,
+  "endIndex": 3493,
+  "wordStartIdx": 632,
+  "wordEndIdx": 636,
+  "startTime": 427.89066,
+  "endTime": 430.97064,
+  "matchedText": "فأما من أوتي كتابه بيمينه،",
+  "canonicalText": "فَأَمَّا مَنْ أُوتِيَ كِتَابَهُ بِيَمِينِهِ",
+  "reference": "الانشقاق: 7",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "84:8",
+  "displayRef": "الانشقاق: 8",
+  "candidateRefs": [
+   "الانشقاق: 8"
+  ],
+  "candidateUnitIds": [
+   "84:8"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 37.75,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 637,
+  "tEnd": 641,
+  "charStart": 3494,
+  "charEnd": 3519,
+  "segments": [
+   [
+    637,
+    641
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    4
+   ]
+  ],
+  "canonicalSegments": [
+   "فَسَوْفَ يُحَاسَبُ حِسَابًا يَسِيرًا"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 27.8,
+   "E": 27.8,
+   "matched": 4,
+   "content": 4,
+   "exactRun": 4,
+   "coverage": 1,
+   "margin": 20.5
+  },
+  "chainedAyah": true,
+  "id": "finding_42",
+  "type": "ayah",
+  "startIndex": 3494,
+  "endIndex": 3519,
+  "wordStartIdx": 637,
+  "wordEndIdx": 640,
+  "startTime": 430.97064,
+  "endTime": 434.37064,
+  "matchedText": "فسوف يحاسب حسابًا يسيرًا،",
+  "canonicalText": "فَسَوْفَ يُحَاسَبُ حِسَابًا يَسِيرًا",
+  "reference": "الانشقاق: 8",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "84:9",
+  "displayRef": "الانشقاق: 9",
+  "candidateRefs": [
+   "الانشقاق: 9"
+  ],
+  "candidateUnitIds": [
+   "84:9"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 26.94,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 641,
+  "tEnd": 645,
+  "charStart": 3520,
+  "charEnd": 3543,
+  "segments": [
+   [
+    641,
+    645
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    4
+   ]
+  ],
+  "canonicalSegments": [
+   "وَيَنقَلِبُ إِلَىٰ أَهْلِهِ مَسْرُورًا"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 21.9,
+   "E": 21.9,
+   "matched": 4,
+   "content": 3,
+   "exactRun": 4,
+   "coverage": 1,
+   "margin": 14.9
+  },
+  "chainedAyah": true,
+  "id": "finding_43",
+  "type": "ayah",
+  "startIndex": 3520,
+  "endIndex": 3543,
+  "wordStartIdx": 641,
+  "wordEndIdx": 644,
+  "startTime": 434.37064,
+  "endTime": 437.63065,
+  "matchedText": "وينقلب إلى أهله مسورًا،",
+  "canonicalText": "وَيَنقَلِبُ إِلَىٰ أَهْلِهِ مَسْرُورًا",
+  "reference": "الانشقاق: 9",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "60:13",
+  "displayRef": "الممتحنة: 13",
+  "candidateRefs": [
+   "الممتحنة: 13"
+  ],
+  "candidateUnitIds": [
+   "60:13"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "CANDIDATE",
+  "totalScore": 9.17,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 657,
+  "tEnd": 659,
+  "charStart": 3611,
+  "charEnd": 3622,
+  "segments": [
+   [
+    657,
+    659
+   ]
+  ],
+  "qSegments": [
+   [
+    13,
+    15
+   ]
+  ],
+  "canonicalSegments": [
+   "الْآخِرَةِ كَمَا"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 9.2,
+   "E": 9.2,
+   "matched": 2,
+   "content": 2,
+   "exactRun": 2,
+   "coverage": 0.1,
+   "margin": 9.2
+  },
+  "chainedAyah": false,
+  "id": "finding_44",
+  "type": "ayah",
+  "startIndex": 3611,
+  "endIndex": 3622,
+  "wordStartIdx": 657,
+  "wordEndIdx": 658,
+  "startTime": 445.15063,
+  "endTime": 446.39066,
+  "matchedText": "الآخرة، كما",
+  "canonicalText": "الْآخِرَةِ كَمَا",
+  "reference": "الممتحنة: 13",
+  "confidence": 0.72,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "84:10",
+  "displayRef": "الانشقاق: 10",
+  "candidateRefs": [
+   "الانشقاق: 10"
+  ],
+  "candidateUnitIds": [
+   "84:10"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 39.64,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": true,
+  "tStart": 668,
+  "tEnd": 676,
+  "charStart": 3674,
+  "charEnd": 3713,
+  "segments": [
+   [
+    668,
+    676
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    6
+   ]
+  ],
+  "canonicalSegments": [
+   "وَأَمَّا مَنْ أُوتِيَ كِتَابَهُ وَرَاءَ ظَهْرِهِ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 29.6,
+   "E": 32.6,
+   "matched": 6,
+   "content": 5,
+   "exactRun": 4,
+   "coverage": 1,
+   "margin": 2.6
+  },
+  "chainedAyah": true,
+  "id": "finding_45",
+  "type": "ayah",
+  "startIndex": 3674,
+  "endIndex": 3713,
+  "wordStartIdx": 668,
+  "wordEndIdx": 675,
+  "startTime": 452.33066,
+  "endTime": 457.49066,
+  "matchedText": "وأما من أوتي كتابه بشماله من وراء ظهره،",
+  "canonicalText": "وَأَمَّا مَنْ أُوتِيَ كِتَابَهُ وَرَاءَ ظَهْرِهِ",
+  "reference": "الانشقاق: 10",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "84:11",
+  "displayRef": "الانشقاق: 11",
+  "candidateRefs": [
+   "الانشقاق: 11"
+  ],
+  "candidateUnitIds": [
+   "84:11"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 29.54,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 676,
+  "tEnd": 679,
+  "charStart": 3714,
+  "charEnd": 3731,
+  "segments": [
+   [
+    676,
+    679
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    3
+   ]
+  ],
+  "canonicalSegments": [
+   "فَسَوْفَ يَدْعُو ثُبُورًا"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 19.5,
+   "E": 19.5,
+   "matched": 3,
+   "content": 3,
+   "exactRun": 3,
+   "coverage": 1,
+   "margin": 12.1
+  },
+  "chainedAyah": true,
+  "id": "finding_46",
+  "type": "ayah",
+  "startIndex": 3714,
+  "endIndex": 3731,
+  "wordStartIdx": 676,
+  "wordEndIdx": 678,
+  "startTime": 457.49066,
+  "endTime": 459.87067,
+  "matchedText": "فسوف يدعو ثبوراً،",
+  "canonicalText": "فَسَوْفَ يَدْعُو ثُبُورًا",
+  "reference": "الانشقاق: 11",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "84:12",
+  "displayRef": "الانشقاق: 12",
+  "candidateRefs": [
+   "الانشقاق: 12"
+  ],
+  "candidateUnitIds": [
+   "84:12"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "CANDIDATE",
+  "totalScore": 20.06,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 681,
+  "tEnd": 683,
+  "charStart": 3742,
+  "charEnd": 3755,
+  "segments": [
+   [
+    681,
+    683
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    2
+   ]
+  ],
+  "canonicalSegments": [
+   "وَيَصْلَىٰ سَعِيرًا"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 15.1,
+   "E": 15.1,
+   "matched": 2,
+   "content": 2,
+   "exactRun": 2,
+   "coverage": 1,
+   "margin": 15.1
+  },
+  "chainedAyah": true,
+  "id": "finding_47",
+  "type": "ayah",
+  "startIndex": 3742,
+  "endIndex": 3755,
+  "wordStartIdx": 681,
+  "wordEndIdx": 682,
+  "startTime": 460.95065,
+  "endTime": 462.93066,
+  "matchedText": "ويصلى سعيراً،",
+  "canonicalText": "وَيَصْلَىٰ سَعِيرًا",
+  "reference": "الانشقاق: 12",
+  "confidence": 0.72,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "71:21",
+  "displayRef": "نوح: 21",
+  "candidateRefs": [
+   "نوح: 21"
+  ],
+  "candidateUnitIds": [
+   "71:21"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "CANDIDATE",
+  "totalScore": 14.51,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 699,
+  "tEnd": 701,
+  "charStart": 3837,
+  "charEnd": 3849,
+  "segments": [
+   [
+    699,
+    701
+   ]
+  ],
+  "qSegments": [
+   [
+    9,
+    11
+   ]
+  ],
+  "canonicalSegments": [
+   "مَالُهُ وَوَلَدُهُ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 14.5,
+   "E": 14.5,
+   "matched": 2,
+   "content": 2,
+   "exactRun": 2,
+   "coverage": 0.15,
+   "margin": 14.5
+  },
+  "chainedAyah": false,
+  "id": "finding_48",
+  "type": "ayah",
+  "startIndex": 3837,
+  "endIndex": 3849,
+  "wordStartIdx": 699,
+  "wordEndIdx": 700,
+  "startTime": 473.05066,
+  "endTime": 474.63065,
+  "matchedText": "وماله وولده،",
+  "canonicalText": "مَالُهُ وَوَلَدُهُ",
+  "reference": "نوح: 21",
+  "confidence": 0.72,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "84:11",
+  "displayRef": "الانشقاق: 11",
+  "candidateRefs": [
+   "الانشقاق: 11"
+  ],
+  "candidateUnitIds": [
+   "84:11"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 24.54,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 706,
+  "tEnd": 709,
+  "charStart": 3881,
+  "charEnd": 3897,
+  "segments": [
+   [
+    706,
+    709
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    3
+   ]
+  ],
+  "canonicalSegments": [
+   "فَسَوْفَ يَدْعُو ثُبُورًا"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 19.5,
+   "E": 19.5,
+   "matched": 3,
+   "content": 3,
+   "exactRun": 3,
+   "coverage": 1,
+   "margin": 12.1
+  },
+  "chainedAyah": true,
+  "id": "finding_49",
+  "type": "ayah",
+  "startIndex": 3881,
+  "endIndex": 3897,
+  "wordStartIdx": 706,
+  "wordEndIdx": 708,
+  "startTime": 478.63065,
+  "endTime": 480.81064,
+  "matchedText": "فسوف يدعو ثبوراً",
+  "canonicalText": "فَسَوْفَ يَدْعُو ثُبُورًا",
+  "reference": "الانشقاق: 11",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "84:12",
+  "displayRef": "الانشقاق: 12",
+  "candidateRefs": [
+   "الانشقاق: 12"
+  ],
+  "candidateUnitIds": [
+   "84:12"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "CANDIDATE",
+  "totalScore": 25.06,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 709,
+  "tEnd": 711,
+  "charStart": 3898,
+  "charEnd": 3910,
+  "segments": [
+   [
+    709,
+    711
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    2
+   ]
+  ],
+  "canonicalSegments": [
+   "وَيَصْلَىٰ سَعِيرًا"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 15.1,
+   "E": 15.1,
+   "matched": 2,
+   "content": 2,
+   "exactRun": 2,
+   "coverage": 1,
+   "margin": 15.1
+  },
+  "chainedAyah": true,
+  "id": "finding_50",
+  "type": "ayah",
+  "startIndex": 3898,
+  "endIndex": 3910,
+  "wordStartIdx": 709,
+  "wordEndIdx": 710,
+  "startTime": 480.81064,
+  "endTime": 482.75064,
+  "matchedText": "ويصلى سعيراً",
+  "canonicalText": "وَيَصْلَىٰ سَعِيرًا",
+  "reference": "الانشقاق: 12",
+  "confidence": 0.72,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "84:13",
+  "displayRef": "الانشقاق: 13",
+  "candidateRefs": [
+   "الانشقاق: 13"
+  ],
+  "candidateUnitIds": [
+   "84:13"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 26.49,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 711,
+  "tEnd": 716,
+  "charStart": 3911,
+  "charEnd": 3934,
+  "segments": [
+   [
+    711,
+    716
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    5
+   ]
+  ],
+  "canonicalSegments": [
+   "إِنَّهُ كَانَ فِي أَهْلِهِ مَسْرُورًا"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 16.5,
+   "E": 16.5,
+   "matched": 5,
+   "content": 2,
+   "exactRun": 5,
+   "coverage": 1,
+   "margin": 2.5
+  },
+  "chainedAyah": true,
+  "id": "finding_51",
+  "type": "ayah",
+  "startIndex": 3911,
+  "endIndex": 3934,
+  "wordStartIdx": 711,
+  "wordEndIdx": 715,
+  "startTime": 482.75064,
+  "endTime": 486.21063,
+  "matchedText": "إنه كان في أهله مسروراً",
+  "canonicalText": "إِنَّهُ كَانَ فِي أَهْلِهِ مَسْرُورًا",
+  "reference": "الانشقاق: 13",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "84:14",
+  "displayRef": "الانشقاق: 14",
+  "candidateRefs": [
+   "الانشقاق: 14"
+  ],
+  "candidateUnitIds": [
+   "84:14"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 22.87,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 716,
+  "tEnd": 721,
+  "charStart": 3935,
+  "charEnd": 3952,
+  "segments": [
+   [
+    716,
+    721
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    5
+   ]
+  ],
+  "canonicalSegments": [
+   "إِنَّهُ ظَنَّ أَن لَّن يَحُورَ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 17.9,
+   "E": 17.9,
+   "matched": 5,
+   "content": 2,
+   "exactRun": 5,
+   "coverage": 1,
+   "margin": 17.9
+  },
+  "chainedAyah": true,
+  "id": "finding_52",
+  "type": "ayah",
+  "startIndex": 3935,
+  "endIndex": 3952,
+  "wordStartIdx": 716,
+  "wordEndIdx": 720,
+  "startTime": 486.21063,
+  "endTime": 488.57065,
+  "matchedText": "إنه ظن أن لن يحور",
+  "canonicalText": "إِنَّهُ ظَنَّ أَن لَّن يَحُورَ",
+  "reference": "الانشقاق: 14",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "84:15",
+  "displayRef": "الانشقاق: 15",
+  "candidateRefs": [
+   "الانشقاق: 15"
+  ],
+  "candidateUnitIds": [
+   "84:15"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 18.36,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 727,
+  "tEnd": 733,
+  "charStart": 3982,
+  "charEnd": 4006,
+  "segments": [
+   [
+    727,
+    733
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    6
+   ]
+  ],
+  "canonicalSegments": [
+   "بَلَىٰ إِنَّ رَبَّهُ كَانَ بِهِ بَصِيرًا"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 18.4,
+   "E": 18.4,
+   "matched": 6,
+   "content": 3,
+   "exactRun": 6,
+   "coverage": 1,
+   "margin": 12.3
+  },
+  "chainedAyah": false,
+  "id": "finding_53",
+  "type": "ayah",
+  "startIndex": 3982,
+  "endIndex": 4006,
+  "wordStartIdx": 727,
+  "wordEndIdx": 732,
+  "startTime": 492.25064,
+  "endTime": 495.89066,
+  "matchedText": "بلى إن ربه كان به بصيراً",
+  "canonicalText": "بَلَىٰ إِنَّ رَبَّهُ كَانَ بِهِ بَصِيرًا",
+  "reference": "الانشقاق: 15",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "39:67",
+  "displayRef": "الزمر: 67",
+  "candidateRefs": [
+   "الزمر: 67",
+   "الروم: 40",
+   "الأنعام: 100",
+   "يونس: 18",
+   "النحل: 1",
+   "الإسراء: 43"
+  ],
+  "candidateUnitIds": [
+   "39:67",
+   "30:40",
+   "6:100",
+   "10:18",
+   "16:1",
+   "17:43"
+  ],
+  "candidateCount": 6,
+  "isAmbiguous": true,
+  "isOutsideCorpus": false,
+  "confidenceBand": "CANDIDATE",
+  "totalScore": 15.79,
+  "hasCitationCue": true,
+  "hasFuzzyHeal": false,
+  "tStart": 743,
+  "tEnd": 745,
+  "charStart": 4057,
+  "charEnd": 4070,
+  "segments": [
+   [
+    743,
+    745
+   ]
+  ],
+  "qSegments": [
+   [
+    13,
+    15
+   ]
+  ],
+  "canonicalSegments": [
+   "سُبْحَانَهُ وَتَعَالَىٰ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 12.8,
+   "E": 12.8,
+   "matched": 2,
+   "content": 2,
+   "exactRun": 2,
+   "coverage": 0.12,
+   "margin": 0
+  },
+  "chainedAyah": false,
+  "id": "finding_54",
+  "type": "ayah",
+  "startIndex": 4057,
+  "endIndex": 4070,
+  "wordStartIdx": 743,
+  "wordEndIdx": 744,
+  "startTime": 501.51065,
+  "endTime": 503.23065,
+  "matchedText": "سبحانه وتعالى",
+  "canonicalText": "سُبْحَانَهُ وَتَعَالَىٰ",
+  "reference": "الزمر: 67",
+  "confidence": 0.72,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "32:18",
+  "displayRef": "السجدة: 18",
+  "candidateRefs": [
+   "السجدة: 18"
+  ],
+  "candidateUnitIds": [
+   "32:18"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 33.01,
+  "hasCitationCue": true,
+  "hasFuzzyHeal": false,
+  "tStart": 745,
+  "tEnd": 752,
+  "charStart": 4071,
+  "charEnd": 4104,
+  "segments": [
+   [
+    745,
+    752
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    7
+   ]
+  ],
+  "canonicalSegments": [
+   "أَفَمَن كَانَ مُؤْمِنًا كَمَن كَانَ فَاسِقًا لَّا"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 30,
+   "E": 30,
+   "matched": 7,
+   "content": 4,
+   "exactRun": 7,
+   "coverage": 0.88,
+   "margin": 22.5
+  },
+  "chainedAyah": false,
+  "id": "finding_55",
+  "type": "ayah",
+  "startIndex": 4071,
+  "endIndex": 4104,
+  "wordStartIdx": 745,
+  "wordEndIdx": 751,
+  "startTime": 503.23065,
+  "endTime": 507.67065,
+  "matchedText": "أفمن كان مؤمناً كمن كان فاسقاً لا",
+  "canonicalText": "أَفَمَن كَانَ مُؤْمِنًا كَمَن كَانَ فَاسِقًا لَّا",
+  "reference": "السجدة: 18",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "30:16",
+  "displayRef": "الروم: 16",
+  "candidateRefs": [
+   "الروم: 16",
+   "البقرة: 26",
+   "الجاثية: 31"
+  ],
+  "candidateUnitIds": [
+   "30:16",
+   "2:26",
+   "45:31"
+  ],
+  "candidateCount": 3,
+  "isAmbiguous": true,
+  "isOutsideCorpus": false,
+  "confidenceBand": "CANDIDATE",
+  "totalScore": 9.19,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 753,
+  "tEnd": 756,
+  "charStart": 4112,
+  "charEnd": 4128,
+  "segments": [
+   [
+    753,
+    756
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    3
+   ]
+  ],
+  "canonicalSegments": [
+   "وَأَمَّا الَّذِينَ كَفَرُوا"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 9.2,
+   "E": 9.2,
+   "matched": 3,
+   "content": 2,
+   "exactRun": 3,
+   "coverage": 0.27,
+   "margin": 0
+  },
+  "chainedAyah": false,
+  "id": "finding_56",
+  "type": "ayah",
+  "startIndex": 4112,
+  "endIndex": 4128,
+  "wordStartIdx": 753,
+  "wordEndIdx": 755,
+  "startTime": 509.01065,
+  "endTime": 511.01065,
+  "matchedText": "وأما الذين كفروا",
+  "canonicalText": "وَأَمَّا الَّذِينَ كَفَرُوا",
+  "reference": "الروم: 16",
+  "confidence": 0.72,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "82:6",
+  "displayRef": "الانفطار: 6",
+  "candidateRefs": [
+   "الانفطار: 6"
+  ],
+  "candidateUnitIds": [
+   "82:6"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 35.02,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 765,
+  "tEnd": 772,
+  "charStart": 4180,
+  "charEnd": 4215,
+  "segments": [
+   [
+    765,
+    772
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    7
+   ]
+  ],
+  "canonicalSegments": [
+   "يَا أَيُّهَا الْإِنسَانُ مَا غَرَّكَ بِرَبِّكَ الْكَرِيمِ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 30,
+   "E": 30,
+   "matched": 7,
+   "content": 4,
+   "exactRun": 7,
+   "coverage": 1,
+   "margin": 23
+  },
+  "chainedAyah": true,
+  "id": "finding_57",
+  "type": "ayah",
+  "startIndex": 4180,
+  "endIndex": 4215,
+  "wordStartIdx": 765,
+  "wordEndIdx": 771,
+  "startTime": 517.0106,
+  "endTime": 526.73065,
+  "matchedText": "فيا أيها الإنسان ما غرك بربك الكريم",
+  "canonicalText": "يَا أَيُّهَا الْإِنسَانُ مَا غَرَّكَ بِرَبِّكَ الْكَرِيمِ",
+  "reference": "الانفطار: 6",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "82:7",
+  "displayRef": "الانفطار: 7",
+  "candidateRefs": [
+   "الانفطار: 7"
+  ],
+  "candidateUnitIds": [
+   "82:7"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 35.44,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 772,
+  "tEnd": 776,
+  "charStart": 4216,
+  "charEnd": 4237,
+  "segments": [
+   [
+    772,
+    776
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    4
+   ]
+  ],
+  "canonicalSegments": [
+   "الَّذِي خَلَقَكَ فَسَوَّاكَ فَعَدَلَكَ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 25.4,
+   "E": 25.4,
+   "matched": 4,
+   "content": 3,
+   "exactRun": 4,
+   "coverage": 1,
+   "margin": 25.4
+  },
+  "chainedAyah": true,
+  "id": "finding_58",
+  "type": "ayah",
+  "startIndex": 4216,
+  "endIndex": 4237,
+  "wordStartIdx": 772,
+  "wordEndIdx": 775,
+  "startTime": 526.73065,
+  "endTime": 530.11066,
+  "matchedText": "الذي خلقك فسواك فعدلك",
+  "canonicalText": "الَّذِي خَلَقَكَ فَسَوَّاكَ فَعَدَلَكَ",
+  "reference": "الانفطار: 7",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "82:8",
+  "displayRef": "الانفطار: 8",
+  "candidateRefs": [
+   "الانفطار: 8"
+  ],
+  "candidateUnitIds": [
+   "82:8"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "CANDIDATE",
+  "totalScore": 16.48,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 776,
+  "tEnd": 780,
+  "charStart": 4238,
+  "charEnd": 4251,
+  "segments": [
+   [
+    776,
+    780
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    4
+   ]
+  ],
+  "canonicalSegments": [
+   "فِي أَيِّ صُورَةٍ مَّا"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 11.5,
+   "E": 11.5,
+   "matched": 4,
+   "content": 1,
+   "exactRun": 4,
+   "coverage": 0.67,
+   "margin": 11.5
+  },
+  "chainedAyah": true,
+  "id": "finding_59",
+  "type": "ayah",
+  "startIndex": 4238,
+  "endIndex": 4251,
+  "wordStartIdx": 776,
+  "wordEndIdx": 779,
+  "startTime": 530.11066,
+  "endTime": 532.11066,
+  "matchedText": "في أي صورة ما",
+  "canonicalText": "فِي أَيِّ صُورَةٍ مَّا",
+  "reference": "الانفطار: 8",
+  "confidence": 0.72,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "84:6",
+  "displayRef": "الانشقاق: 6",
+  "candidateRefs": [
+   "الانشقاق: 6"
+  ],
+  "candidateUnitIds": [
+   "84:6"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 45.7,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 781,
+  "tEnd": 790,
+  "charStart": 4259,
+  "charEnd": 4306,
+  "segments": [
+   [
+    781,
+    790
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    9
+   ]
+  ],
+  "canonicalSegments": [
+   "يَا أَيُّهَا الْإِنسَانُ إِنَّكَ كَادِحٌ إِلَىٰ رَبِّكَ كَدْحًا فَمُلَاقِيهِ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 40.7,
+   "E": 40.7,
+   "matched": 9,
+   "content": 6,
+   "exactRun": 9,
+   "coverage": 1,
+   "margin": 40.7
+  },
+  "chainedAyah": true,
+  "id": "finding_60",
+  "type": "ayah",
+  "startIndex": 4259,
+  "endIndex": 4306,
+  "wordStartIdx": 781,
+  "wordEndIdx": 789,
+  "startTime": 533.53064,
+  "endTime": 540.3906,
+  "matchedText": "يا أيها الإنسان إنك كادح إلى ربك كدحًا فملاقيه،",
+  "canonicalText": "يَا أَيُّهَا الْإِنسَانُ إِنَّكَ كَادِحٌ إِلَىٰ رَبِّكَ كَدْحًا فَمُلَاقِيهِ",
+  "reference": "الانشقاق: 6",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "84:7",
+  "displayRef": "الانشقاق: 7",
+  "candidateRefs": [
+   "الانشقاق: 7"
+  ],
+  "candidateUnitIds": [
+   "84:7"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 41.26,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 790,
+  "tEnd": 795,
+  "charStart": 4307,
+  "charEnd": 4333,
+  "segments": [
+   [
+    790,
+    795
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    5
+   ]
+  ],
+  "canonicalSegments": [
+   "فَأَمَّا مَنْ أُوتِيَ كِتَابَهُ بِيَمِينِهِ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 26.3,
+   "E": 26.3,
+   "matched": 5,
+   "content": 4,
+   "exactRun": 5,
+   "coverage": 1,
+   "margin": 5.4
+  },
+  "chainedAyah": true,
+  "id": "finding_61",
+  "type": "ayah",
+  "startIndex": 4307,
+  "endIndex": 4333,
+  "wordStartIdx": 790,
+  "wordEndIdx": 794,
+  "startTime": 540.3906,
+  "endTime": 544.5106,
+  "matchedText": "فأما من أوتي كتابه بيمينه،",
+  "canonicalText": "فَأَمَّا مَنْ أُوتِيَ كِتَابَهُ بِيَمِينِهِ",
+  "reference": "الانشقاق: 7",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "84:8",
+  "displayRef": "الانشقاق: 8",
+  "candidateRefs": [
+   "الانشقاق: 8"
+  ],
+  "candidateUnitIds": [
+   "84:8"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 37.75,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 795,
+  "tEnd": 799,
+  "charStart": 4334,
+  "charEnd": 4359,
+  "segments": [
+   [
+    795,
+    799
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    4
+   ]
+  ],
+  "canonicalSegments": [
+   "فَسَوْفَ يُحَاسَبُ حِسَابًا يَسِيرًا"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 27.8,
+   "E": 27.8,
+   "matched": 4,
+   "content": 4,
+   "exactRun": 4,
+   "coverage": 1,
+   "margin": 20.5
+  },
+  "chainedAyah": true,
+  "id": "finding_62",
+  "type": "ayah",
+  "startIndex": 4334,
+  "endIndex": 4359,
+  "wordStartIdx": 795,
+  "wordEndIdx": 798,
+  "startTime": 544.5106,
+  "endTime": 547.71063,
+  "matchedText": "فسوف يحاسب حسابًا يسيرًا،",
+  "canonicalText": "فَسَوْفَ يُحَاسَبُ حِسَابًا يَسِيرًا",
+  "reference": "الانشقاق: 8",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "84:9",
+  "displayRef": "الانشقاق: 9",
+  "candidateRefs": [
+   "الانشقاق: 9"
+  ],
+  "candidateUnitIds": [
+   "84:9"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 31.94,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 799,
+  "tEnd": 803,
+  "charStart": 4360,
+  "charEnd": 4383,
+  "segments": [
+   [
+    799,
+    803
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    4
+   ]
+  ],
+  "canonicalSegments": [
+   "وَيَنقَلِبُ إِلَىٰ أَهْلِهِ مَسْرُورًا"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 21.9,
+   "E": 21.9,
+   "matched": 4,
+   "content": 3,
+   "exactRun": 4,
+   "coverage": 1,
+   "margin": 14.9
+  },
+  "chainedAyah": true,
+  "id": "finding_63",
+  "type": "ayah",
+  "startIndex": 4360,
+  "endIndex": 4383,
+  "wordStartIdx": 799,
+  "wordEndIdx": 802,
+  "startTime": 547.71063,
+  "endTime": 550.91064,
+  "matchedText": "وينقلب إلى أهله مسورًا،",
+  "canonicalText": "وَيَنقَلِبُ إِلَىٰ أَهْلِهِ مَسْرُورًا",
+  "reference": "الانشقاق: 9",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "84:10",
+  "displayRef": "الانشقاق: 10",
+  "candidateRefs": [
+   "الانشقاق: 10"
+  ],
+  "candidateUnitIds": [
+   "84:10"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 42.64,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 803,
+  "tEnd": 809,
+  "charStart": 4384,
+  "charEnd": 4413,
+  "segments": [
+   [
+    803,
+    809
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    6
+   ]
+  ],
+  "canonicalSegments": [
+   "وَأَمَّا مَنْ أُوتِيَ كِتَابَهُ وَرَاءَ ظَهْرِهِ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 32.6,
+   "E": 32.6,
+   "matched": 6,
+   "content": 5,
+   "exactRun": 6,
+   "coverage": 1,
+   "margin": 14
+  },
+  "chainedAyah": true,
+  "id": "finding_64",
+  "type": "ayah",
+  "startIndex": 4384,
+  "endIndex": 4413,
+  "wordStartIdx": 803,
+  "wordEndIdx": 808,
+  "startTime": 550.91064,
+  "endTime": 555.03064,
+  "matchedText": "وأما من أوتي كتابه وراء ظهره،",
+  "canonicalText": "وَأَمَّا مَنْ أُوتِيَ كِتَابَهُ وَرَاءَ ظَهْرِهِ",
+  "reference": "الانشقاق: 10",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "84:11",
+  "displayRef": "الانشقاق: 11",
+  "candidateRefs": [
+   "الانشقاق: 11"
+  ],
+  "candidateUnitIds": [
+   "84:11"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 28.05,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 809,
+  "tEnd": 812,
+  "charStart": 4414,
+  "charEnd": 4431,
+  "segments": [
+   [
+    809,
+    812
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    3
+   ]
+  ],
+  "canonicalSegments": [
+   "فَسَوْفَ يَدْعُو ثُبُورًا"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 18,
+   "E": 18,
+   "matched": 3,
+   "content": 2,
+   "exactRun": 2,
+   "coverage": 1,
+   "margin": 11.8
+  },
+  "chainedAyah": true,
+  "id": "finding_65",
+  "type": "ayah",
+  "startIndex": 4414,
+  "endIndex": 4431,
+  "wordStartIdx": 809,
+  "wordEndIdx": 811,
+  "startTime": 555.03064,
+  "endTime": 557.3906,
+  "matchedText": "فسوف يدعو ذبورًا،",
+  "canonicalText": "فَسَوْفَ يَدْعُو ثُبُورًا",
+  "reference": "الانشقاق: 11",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "84:12",
+  "displayRef": "الانشقاق: 12",
+  "candidateRefs": [
+   "الانشقاق: 12"
+  ],
+  "candidateUnitIds": [
+   "84:12"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "CANDIDATE",
+  "totalScore": 25.06,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 812,
+  "tEnd": 814,
+  "charStart": 4432,
+  "charEnd": 4445,
+  "segments": [
+   [
+    812,
+    814
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    2
+   ]
+  ],
+  "canonicalSegments": [
+   "وَيَصْلَىٰ سَعِيرًا"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 15.1,
+   "E": 15.1,
+   "matched": 2,
+   "content": 2,
+   "exactRun": 2,
+   "coverage": 1,
+   "margin": 15.1
+  },
+  "chainedAyah": true,
+  "id": "finding_66",
+  "type": "ayah",
+  "startIndex": 4432,
+  "endIndex": 4445,
+  "wordStartIdx": 812,
+  "wordEndIdx": 813,
+  "startTime": 557.3906,
+  "endTime": 559.35065,
+  "matchedText": "ويصلى سعيرًا،",
+  "canonicalText": "وَيَصْلَىٰ سَعِيرًا",
+  "reference": "الانشقاق: 12",
+  "confidence": 0.72,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "84:13",
+  "displayRef": "الانشقاق: 13",
+  "candidateRefs": [
+   "الانشقاق: 13"
+  ],
+  "candidateUnitIds": [
+   "84:13"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 25.32,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 814,
+  "tEnd": 819,
+  "charStart": 4446,
+  "charEnd": 4469,
+  "segments": [
+   [
+    814,
+    819
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    5
+   ]
+  ],
+  "canonicalSegments": [
+   "إِنَّهُ كَانَ فِي أَهْلِهِ مَسْرُورًا"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 15.3,
+   "E": 15.3,
+   "matched": 5,
+   "content": 2,
+   "exactRun": 5,
+   "coverage": 1,
+   "margin": 15.3
+  },
+  "chainedAyah": true,
+  "id": "finding_67",
+  "type": "ayah",
+  "startIndex": 4446,
+  "endIndex": 4469,
+  "wordStartIdx": 814,
+  "wordEndIdx": 818,
+  "startTime": 559.35065,
+  "endTime": 562.59064,
+  "matchedText": "إنه كان في أهله مسورًا،",
+  "canonicalText": "إِنَّهُ كَانَ فِي أَهْلِهِ مَسْرُورًا",
+  "reference": "الانشقاق: 13",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "84:14",
+  "displayRef": "الانشقاق: 14",
+  "candidateRefs": [
+   "الانشقاق: 14"
+  ],
+  "candidateUnitIds": [
+   "84:14"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "CANDIDATE",
+  "totalScore": 23.87,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 819,
+  "tEnd": 823,
+  "charStart": 4470,
+  "charEnd": 4486,
+  "segments": [
+   [
+    819,
+    823
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    5
+   ]
+  ],
+  "canonicalSegments": [
+   "إِنَّهُ ظَنَّ أَن لَّن يَحُورَ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 13.9,
+   "E": 15.6,
+   "matched": 4,
+   "content": 2,
+   "exactRun": 3,
+   "coverage": 0.8,
+   "margin": 13.9
+  },
+  "chainedAyah": true,
+  "id": "finding_68",
+  "type": "ayah",
+  "startIndex": 4470,
+  "endIndex": 4486,
+  "wordStartIdx": 819,
+  "wordEndIdx": 822,
+  "startTime": 563.31067,
+  "endTime": 565.99066,
+  "matchedText": "إنه ظن أن ليحور،",
+  "canonicalText": "إِنَّهُ ظَنَّ أَن لَّن يَحُورَ",
+  "reference": "الانشقاق: 14",
+  "confidence": 0.72,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "84:15",
+  "displayRef": "الانشقاق: 15",
+  "candidateRefs": [
+   "الانشقاق: 15"
+  ],
+  "candidateUnitIds": [
+   "84:15"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 23.36,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 823,
+  "tEnd": 829,
+  "charStart": 4487,
+  "charEnd": 4511,
+  "segments": [
+   [
+    823,
+    829
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    6
+   ]
+  ],
+  "canonicalSegments": [
+   "بَلَىٰ إِنَّ رَبَّهُ كَانَ بِهِ بَصِيرًا"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 18.4,
+   "E": 18.4,
+   "matched": 6,
+   "content": 3,
+   "exactRun": 6,
+   "coverage": 1,
+   "margin": 12.3
+  },
+  "chainedAyah": true,
+  "id": "finding_69",
+  "type": "ayah",
+  "startIndex": 4487,
+  "endIndex": 4511,
+  "wordStartIdx": 823,
+  "wordEndIdx": 828,
+  "startTime": 565.99066,
+  "endTime": 569.7507,
+  "matchedText": "بلى إن ربه كان به بصيرا،",
+  "canonicalText": "بَلَىٰ إِنَّ رَبَّهُ كَانَ بِهِ بَصِيرًا",
+  "reference": "الانشقاق: 15",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "2:255",
+  "displayRef": "البقرة: 255",
+  "candidateRefs": [
+   "البقرة: 255",
+   "الشورى: 4"
+  ],
+  "candidateUnitIds": [
+   "2:255",
+   "42:4"
+  ],
+  "candidateCount": 2,
+  "isAmbiguous": true,
+  "isOutsideCorpus": false,
+  "confidenceBand": "CANDIDATE",
+  "totalScore": 11.74,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 834,
+  "tEnd": 836,
+  "charStart": 4541,
+  "charEnd": 4553,
+  "segments": [
+   [
+    834,
+    836
+   ]
+  ],
+  "qSegments": [
+   [
+    48,
+    50
+   ]
+  ],
+  "canonicalSegments": [
+   "الْعَلِيُّ الْعَظِيمُ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 11.7,
+   "E": 11.7,
+   "matched": 2,
+   "content": 2,
+   "exactRun": 2,
+   "coverage": 0.04,
+   "margin": 0
+  },
+  "chainedAyah": false,
+  "id": "finding_70",
+  "type": "ayah",
+  "startIndex": 4541,
+  "endIndex": 4553,
+  "wordStartIdx": 834,
+  "wordEndIdx": 835,
+  "startTime": 572.0707,
+  "endTime": 572.8307,
+  "matchedText": "العلي العظيم",
+  "canonicalText": "الْعَلِيُّ الْعَظِيمُ",
+  "reference": "البقرة: 255",
+  "confidence": 0.72,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "12:98",
+  "displayRef": "يوسف: 98",
+  "candidateRefs": [
+   "يوسف: 98",
+   "القصص: 16",
+   "الزمر: 53",
+   "الشورى: 5",
+   "يونس: 107",
+   "الأحقاف: 8"
+  ],
+  "candidateUnitIds": [
+   "12:98",
+   "28:16",
+   "39:53",
+   "42:5",
+   "10:107",
+   "46:8"
+  ],
+  "candidateCount": 6,
+  "isAmbiguous": true,
+  "isOutsideCorpus": false,
+  "confidenceBand": "CANDIDATE",
+  "totalScore": 16.55,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 839,
+  "tEnd": 843,
+  "charStart": 4572,
+  "charEnd": 4592,
+  "segments": [
+   [
+    839,
+    843
+   ]
+  ],
+  "qSegments": [
+   [
+    5,
+    9
+   ]
+  ],
+  "canonicalSegments": [
+   "إِنَّهُ هُوَ الْغَفُورُ الرَّحِيمُ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 13.6,
+   "E": 13.6,
+   "matched": 4,
+   "content": 2,
+   "exactRun": 4,
+   "coverage": 0.44,
+   "margin": 0
+  },
+  "chainedAyah": false,
+  "id": "finding_71",
+  "type": "ayah",
+  "startIndex": 4572,
+  "endIndex": 4592,
+  "wordStartIdx": 839,
+  "wordEndIdx": 842,
+  "startTime": 574.1306,
+  "endTime": 575.85065,
+  "matchedText": "إنه هو الغفور الرحيم",
+  "canonicalText": "إِنَّهُ هُوَ الْغَفُورُ الرَّحِيمُ",
+  "reference": "يوسف: 98",
+  "confidence": 0.72,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "HADITH",
+  "unitId": "Muslim:554",
+  "displayRef": "صحيح مسلم (554)",
+  "candidateRefs": [
+   "صحيح مسلم (554)",
+   "سنن أبي داود (525)",
+   "جامع الترمذي (55)",
+   "سنن النسائي (3278)",
+   "سنن النسائي (1168)",
+   "سنن النسائي (1173)",
+   "سنن ابن ماجه (1892)",
+   "سنن ابن ماجه (469)",
+   "سنن ابن ماجه (721)",
+   "رياض الصالحين (353)"
+  ],
+  "candidateUnitIds": [
+   "Muslim:554",
+   "AbiDawud:525",
+   "Tirmidhi:55",
+   "Nasai:3278",
+   "Nasai:1168",
+   "Nasai:1173",
+   "IbnMajah:1892",
+   "IbnMajah:469",
+   "IbnMajah:721",
+   "RiyadSalihin:353"
+  ],
+  "candidateCount": 10,
+  "isAmbiguous": true,
+  "isOutsideCorpus": false,
+  "confidenceBand": "AMBIGUOUS",
+  "totalScore": 35.98,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 851,
+  "tEnd": 869,
+  "charStart": 4642,
+  "charEnd": 4724,
+  "segments": [
+   [
+    851,
+    861
+   ],
+   [
+    864,
+    869
+   ]
+  ],
+  "qSegments": [
+   [
+    3,
+    13
+   ],
+   [
+    13,
+    18
+   ]
+  ],
+  "canonicalSegments": [
+   "أَشْهَدُ أَنْ لاَ إِلَهَ إِلاَّ اللَّهُ وَحْدَهُ لاَ شَرِيكَ لَهُ",
+   "وَأَشْهَدُ أَنَّ مُحَمَّدًا عَبْدُهُ وَرَسُولُهُ"
+  ],
+  "commentaryGaps": [
+   [
+    861,
+    864
+   ]
+  ],
+  "qiraah": "",
+  "qiraahDisplay": "",
+  "evidence": {
+   "S": 34.5,
+   "E": 38.2,
+   "matched": 15,
+   "content": 9,
+   "exactRun": 10,
+   "coverage": 0.83,
+   "margin": 0
+  },
+  "chainedAyah": false,
+  "id": "finding_72",
+  "type": "hadith",
+  "startIndex": 4642,
+  "endIndex": 4724,
+  "wordStartIdx": 851,
+  "wordEndIdx": 868,
+  "startTime": 583.85065,
+  "endTime": 593.53064,
+  "matchedText": "وأشهد أن لا إله إلا الله وحده لا شريك له هو الحق المبين واشهد أن محمدا عبده ورسوله",
+  "canonicalText": "أَشْهَدُ أَنْ لاَ إِلَهَ إِلاَّ اللَّهُ وَحْدَهُ لاَ شَرِيكَ لَهُ وَأَشْهَدُ أَنَّ مُحَمَّدًا عَبْدُهُ وَرَسُولُهُ",
+  "reference": "صحيح مسلم (554)",
+  "confidence": 0.82,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "24:25",
+  "displayRef": "النور: 25",
+  "candidateRefs": [
+   "النور: 25",
+   "النمل: 79"
+  ],
+  "candidateUnitIds": [
+   "24:25",
+   "27:79"
+  ],
+  "candidateCount": 2,
+  "isAmbiguous": true,
+  "isOutsideCorpus": false,
+  "confidenceBand": "CANDIDATE",
+  "totalScore": 10.7,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 861,
+  "tEnd": 864,
+  "charStart": 4683,
+  "charEnd": 4697,
+  "segments": [
+   [
+    861,
+    864
+   ]
+  ],
+  "qSegments": [
+   [
+    8,
+    11
+   ]
+  ],
+  "canonicalSegments": [
+   "هُوَ الْحَقُّ الْمُبِينُ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 10.7,
+   "E": 10.7,
+   "matched": 3,
+   "content": 2,
+   "exactRun": 3,
+   "coverage": 0.27,
+   "margin": 0
+  },
+  "chainedAyah": false,
+  "id": "finding_73",
+  "type": "ayah",
+  "startIndex": 4683,
+  "endIndex": 4697,
+  "wordStartIdx": 861,
+  "wordEndIdx": 863,
+  "startTime": 587.85065,
+  "endTime": 589.67065,
+  "matchedText": "هو الحق المبين",
+  "canonicalText": "هُوَ الْحَقُّ الْمُبِينُ",
+  "reference": "النور: 25",
+  "confidence": 0.72,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "HADITH",
+  "unitId": "Bukhari:3370",
+  "displayRef": "صحيح البخاري (3370)",
+  "candidateRefs": [
+   "صحيح البخاري (3370)",
+   "سنن ابن ماجه (906)"
+  ],
+  "candidateUnitIds": [
+   "Bukhari:3370",
+   "IbnMajah:906"
+  ],
+  "candidateCount": 2,
+  "isAmbiguous": true,
+  "isOutsideCorpus": false,
+  "confidenceBand": "AMBIGUOUS",
+  "totalScore": 128.49,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 876,
+  "tEnd": 910,
+  "charStart": 4765,
+  "charEnd": 4935,
+  "segments": [
+   [
+    876,
+    910
+   ]
+  ],
+  "qSegments": [
+   [
+    1,
+    35
+   ]
+  ],
+  "canonicalSegments": [
+   "اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ كَمَا صَلَّيْتَ عَلَى إِبْرَاهِيمَ وَعَلَى آلِ إِبْرَاهِيمَ إِنَّكَ حَمِيدٌ مَجِيدٌ اللَّهُمَّ بَارِكْ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ كَمَا بَارَكْتَ عَلَى إِبْرَاهِيمَ وَعَلَى آلِ إِبْرَاهِيمَ إِنَّكَ حَمِيدٌ مَجِيدٌ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "",
+  "qiraahDisplay": "",
+  "evidence": {
+   "S": 128.5,
+   "E": 128.5,
+   "matched": 34,
+   "content": 26,
+   "exactRun": 34,
+   "coverage": 0.97,
+   "margin": 0
+  },
+  "chainedAyah": false,
+  "id": "finding_74",
+  "type": "hadith",
+  "startIndex": 4765,
+  "endIndex": 4935,
+  "wordStartIdx": 876,
+  "wordEndIdx": 909,
+  "startTime": 598.79065,
+  "endTime": 619.03064,
+  "matchedText": "اللهم صل على محمد وعلى آل محمد، كما صليت على إبراهيم وعلى آل إبراهيم إنك حميدٌ مجيد اللهم بارك على محمد وعلى آل محمد، كما باركت على إبراهيم وعلى آل إبراهيم إنك حميدٌ مجيد",
+  "canonicalText": "اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ كَمَا صَلَّيْتَ عَلَى إِبْرَاهِيمَ وَعَلَى آلِ إِبْرَاهِيمَ إِنَّكَ حَمِيدٌ مَجِيدٌ اللَّهُمَّ بَارِكْ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ كَمَا بَارَكْتَ عَلَى إِبْرَاهِيمَ وَعَلَى آلِ إِبْرَاهِيمَ إِنَّكَ حَمِيدٌ مَجِيدٌ",
+  "reference": "صحيح البخاري (3370)",
+  "confidence": 0.82,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "34:22",
+  "displayRef": "سبأ: 22",
+  "candidateRefs": [
+   "سبأ: 22",
+   "الشورى: 29",
+   "الرحمن: 52"
+  ],
+  "candidateUnitIds": [
+   "34:22",
+   "42:29",
+   "55:52"
+  ],
+  "candidateCount": 3,
+  "isAmbiguous": true,
+  "isOutsideCorpus": false,
+  "confidenceBand": "CANDIDATE",
+  "totalScore": 9.94,
+  "hasCitationCue": true,
+  "hasFuzzyHeal": false,
+  "tStart": 930,
+  "tEnd": 932,
+  "charStart": 5056,
+  "charEnd": 5064,
+  "segments": [
+   [
+    930,
+    932
+   ]
+  ],
+  "qSegments": [
+   [
+    18,
+    20
+   ]
+  ],
+  "canonicalSegments": [
+   "فِيهِمَا مِن"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 6.9,
+   "E": 6.9,
+   "matched": 2,
+   "content": 1,
+   "exactRun": 2,
+   "coverage": 0.08,
+   "margin": 0
+  },
+  "chainedAyah": false,
+  "id": "finding_75",
+  "type": "ayah",
+  "startIndex": 5056,
+  "endIndex": 5064,
+  "wordStartIdx": 930,
+  "wordEndIdx": 931,
+  "startTime": 633.41064,
+  "endTime": 634.61066,
+  "matchedText": "فيهما من",
+  "canonicalText": "فِيهِمَا مِن",
+  "reference": "سبأ: 22",
+  "confidence": 0.72,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "79:35",
+  "displayRef": "النازعات: 35",
+  "candidateRefs": [
+   "النازعات: 35"
+  ],
+  "candidateUnitIds": [
+   "79:35"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "CANDIDATE",
+  "totalScore": 14.63,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": true,
+  "tStart": 942,
+  "tEnd": 948,
+  "charStart": 5125,
+  "charEnd": 5155,
+  "segments": [
+   [
+    942,
+    948
+   ]
+  ],
+  "qSegments": [
+   [
+    1,
+    5
+   ]
+  ],
+  "canonicalSegments": [
+   "يَتَذَكَّرُ الْإِنسَانُ مَا سَعَىٰ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 14.6,
+   "E": 17.6,
+   "matched": 4,
+   "content": 2,
+   "exactRun": 3,
+   "coverage": 0.8,
+   "margin": 3.2
+  },
+  "chainedAyah": false,
+  "id": "finding_76",
+  "type": "ayah",
+  "startIndex": 5125,
+  "endIndex": 5155,
+  "wordStartIdx": 942,
+  "wordEndIdx": 947,
+  "startTime": 640.716,
+  "endTime": 644.696,
+  "matchedText": "يتذكر الإنسان ما يتذكر من سعيه",
+  "canonicalText": "يَتَذَكَّرُ الْإِنسَانُ مَا سَعَىٰ",
+  "reference": "النازعات: 35",
+  "confidence": 0.72,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "HADITH",
+  "unitId": "Tirmidhi:413",
+  "displayRef": "جامع الترمذي (413)",
+  "candidateRefs": [
+   "جامع الترمذي (413)",
+   "سنن النسائي (465)",
+   "الأربعون القدسية (9)",
+   "رياض الصالحين (402)"
+  ],
+  "candidateUnitIds": [
+   "Tirmidhi:413",
+   "Nasai:465",
+   "Qudsi40:9",
+   "RiyadSalihin:402"
+  ],
+  "candidateCount": 4,
+  "isAmbiguous": true,
+  "isOutsideCorpus": false,
+  "confidenceBand": "CANDIDATE",
+  "totalScore": 27.8,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": true,
+  "tStart": 951,
+  "tEnd": 958,
+  "charStart": 5171,
+  "charEnd": 5205,
+  "segments": [
+   [
+    951,
+    958
+   ]
+  ],
+  "qSegments": [
+   [
+    14,
+    21
+   ]
+  ],
+  "canonicalSegments": [
+   "أَفْلَحَ وَأَنْجَحَ وَإِنْ فَسَدَتْ فَقَدْ خَابَ وَخَسِرَ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "",
+  "qiraahDisplay": "",
+  "evidence": {
+   "S": 27.8,
+   "E": 33.1,
+   "matched": 4,
+   "content": 4,
+   "exactRun": 2,
+   "coverage": 0.08,
+   "margin": 0
+  },
+  "chainedAyah": false,
+  "id": "finding_77",
+  "type": "hadith",
+  "startIndex": 5171,
+  "endIndex": 5205,
+  "wordStartIdx": 951,
+  "wordEndIdx": 957,
+  "startTime": 646.336,
+  "endTime": 650.636,
+  "matchedText": "أفلح وأنجح سعد، ومن أساء خاب وخسر،",
+  "canonicalText": "أَفْلَحَ وَأَنْجَحَ وَإِنْ فَسَدَتْ فَقَدْ خَابَ وَخَسِرَ",
+  "reference": "جامع الترمذي (413)",
+  "confidence": 0.72,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "39:67",
+  "displayRef": "الزمر: 67",
+  "candidateRefs": [
+   "الزمر: 67",
+   "الروم: 40",
+   "الأنعام: 100",
+   "يونس: 18",
+   "النحل: 1",
+   "الإسراء: 43"
+  ],
+  "candidateUnitIds": [
+   "39:67",
+   "30:40",
+   "6:100",
+   "10:18",
+   "16:1",
+   "17:43"
+  ],
+  "candidateCount": 6,
+  "isAmbiguous": true,
+  "isOutsideCorpus": false,
+  "confidenceBand": "CANDIDATE",
+  "totalScore": 15.79,
+  "hasCitationCue": true,
+  "hasFuzzyHeal": false,
+  "tStart": 961,
+  "tEnd": 963,
+  "charStart": 5219,
+  "charEnd": 5232,
+  "segments": [
+   [
+    961,
+    963
+   ]
+  ],
+  "qSegments": [
+   [
+    13,
+    15
+   ]
+  ],
+  "canonicalSegments": [
+   "سُبْحَانَهُ وَتَعَالَىٰ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 12.8,
+   "E": 12.8,
+   "matched": 2,
+   "content": 2,
+   "exactRun": 2,
+   "coverage": 0.12,
+   "margin": 0
+  },
+  "chainedAyah": false,
+  "id": "finding_78",
+  "type": "ayah",
+  "startIndex": 5219,
+  "endIndex": 5232,
+  "wordStartIdx": 961,
+  "wordEndIdx": 962,
+  "startTime": 652.05597,
+  "endTime": 653.636,
+  "matchedText": "سبحانه وتعالى",
+  "canonicalText": "سُبْحَانَهُ وَتَعَالَىٰ",
+  "reference": "الزمر: 67",
+  "confidence": 0.72,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "89:21",
+  "displayRef": "الفجر: 21",
+  "candidateRefs": [
+   "الفجر: 21"
+  ],
+  "candidateUnitIds": [
+   "89:21"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 41.2,
+  "hasCitationCue": true,
+  "hasFuzzyHeal": false,
+  "tStart": 963,
+  "tEnd": 969,
+  "charStart": 5233,
+  "charEnd": 5264,
+  "segments": [
+   [
+    963,
+    969
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    6
+   ]
+  ],
+  "canonicalSegments": [
+   "كَلَّا إِذَا دُكَّتِ الْأَرْضُ دَكًّا دَكًّا"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 33.2,
+   "E": 33.2,
+   "matched": 6,
+   "content": 5,
+   "exactRun": 6,
+   "coverage": 1,
+   "margin": 25.4
+  },
+  "chainedAyah": true,
+  "id": "finding_79",
+  "type": "ayah",
+  "startIndex": 5233,
+  "endIndex": 5264,
+  "wordStartIdx": 963,
+  "wordEndIdx": 968,
+  "startTime": 653.716,
+  "endTime": 657.716,
+  "matchedText": "كلا إذا دُكَّت الأرض دكًا دكًا،",
+  "canonicalText": "كَلَّا إِذَا دُكَّتِ الْأَرْضُ دَكًّا دَكًّا",
+  "reference": "الفجر: 21",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "89:22",
+  "displayRef": "الفجر: 22",
+  "candidateRefs": [
+   "الفجر: 22"
+  ],
+  "candidateUnitIds": [
+   "89:22"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 41.36,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 969,
+  "tEnd": 974,
+  "charStart": 5265,
+  "charEnd": 5291,
+  "segments": [
+   [
+    969,
+    974
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    5
+   ]
+  ],
+  "canonicalSegments": [
+   "وَجَاءَ رَبُّكَ وَالْمَلَكُ صَفًّا صَفًّا"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 31.4,
+   "E": 31.4,
+   "matched": 5,
+   "content": 5,
+   "exactRun": 5,
+   "coverage": 1,
+   "margin": 23.4
+  },
+  "chainedAyah": true,
+  "id": "finding_80",
+  "type": "ayah",
+  "startIndex": 5265,
+  "endIndex": 5291,
+  "wordStartIdx": 969,
+  "wordEndIdx": 973,
+  "startTime": 657.716,
+  "endTime": 662.316,
+  "matchedText": "وجاء ربك والملك صفًا صفًا،",
+  "canonicalText": "وَجَاءَ رَبُّكَ وَالْمَلَكُ صَفًّا صَفًّا",
+  "reference": "الفجر: 22",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "89:23",
+  "displayRef": "الفجر: 23",
+  "candidateRefs": [
+   "الفجر: 23"
+  ],
+  "candidateUnitIds": [
+   "89:23"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 58,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 974,
+  "tEnd": 983,
+  "charStart": 5292,
+  "charEnd": 5346,
+  "segments": [
+   [
+    974,
+    983
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    9
+   ]
+  ],
+  "canonicalSegments": [
+   "وَجِيءَ يَوْمَئِذٍ بِجَهَنَّمَ يَوْمَئِذٍ يَتَذَكَّرُ الْإِنسَانُ وَأَنَّىٰ لَهُ الذِّكْرَىٰ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 48,
+   "E": 48,
+   "matched": 9,
+   "content": 8,
+   "exactRun": 9,
+   "coverage": 1,
+   "margin": 36.6
+  },
+  "chainedAyah": true,
+  "id": "finding_81",
+  "type": "ayah",
+  "startIndex": 5292,
+  "endIndex": 5346,
+  "wordStartIdx": 974,
+  "wordEndIdx": 982,
+  "startTime": 662.316,
+  "endTime": 670.756,
+  "matchedText": "وجيء يومئذٍ بجهنم، يومئذ يتذكر الإنسان وأنا له الذكرى،",
+  "canonicalText": "وَجِيءَ يَوْمَئِذٍ بِجَهَنَّمَ يَوْمَئِذٍ يَتَذَكَّرُ الْإِنسَانُ وَأَنَّىٰ لَهُ الذِّكْرَىٰ",
+  "reference": "الفجر: 23",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "89:24",
+  "displayRef": "الفجر: 24",
+  "candidateRefs": [
+   "الفجر: 24"
+  ],
+  "candidateUnitIds": [
+   "89:24"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 33.25,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 983,
+  "tEnd": 988,
+  "charStart": 5347,
+  "charEnd": 5375,
+  "segments": [
+   [
+    983,
+    988
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    5
+   ]
+  ],
+  "canonicalSegments": [
+   "يَقُولُ يَا لَيْتَنِي قَدَّمْتُ لِحَيَاتِي"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 23.2,
+   "E": 23.2,
+   "matched": 5,
+   "content": 3,
+   "exactRun": 5,
+   "coverage": 1,
+   "margin": 14.3
+  },
+  "chainedAyah": true,
+  "id": "finding_82",
+  "type": "ayah",
+  "startIndex": 5347,
+  "endIndex": 5375,
+  "wordStartIdx": 983,
+  "wordEndIdx": 987,
+  "startTime": 670.756,
+  "endTime": 674.876,
+  "matchedText": "يقول يا ليتني قدَّمت لحياتي،",
+  "canonicalText": "يَقُولُ يَا لَيْتَنِي قَدَّمْتُ لِحَيَاتِي",
+  "reference": "الفجر: 24",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "89:25",
+  "displayRef": "الفجر: 25",
+  "candidateRefs": [
+   "الفجر: 25"
+  ],
+  "candidateUnitIds": [
+   "89:25"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 38.2,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 988,
+  "tEnd": 993,
+  "charStart": 5376,
+  "charEnd": 5403,
+  "segments": [
+   [
+    988,
+    993
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    5
+   ]
+  ],
+  "canonicalSegments": [
+   "فَيَوْمَئِذٍ لَّا يُعَذِّبُ عَذَابَهُ أَحَدٌ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 28.2,
+   "E": 28.2,
+   "matched": 5,
+   "content": 4,
+   "exactRun": 5,
+   "coverage": 1,
+   "margin": 20.3
+  },
+  "chainedAyah": true,
+  "id": "finding_83",
+  "type": "ayah",
+  "startIndex": 5376,
+  "endIndex": 5403,
+  "wordStartIdx": 988,
+  "wordEndIdx": 992,
+  "startTime": 674.876,
+  "endTime": 678.156,
+  "matchedText": "فيومئذ لا يعذِّب عذابه أحد،",
+  "canonicalText": "فَيَوْمَئِذٍ لَّا يُعَذِّبُ عَذَابَهُ أَحَدٌ",
+  "reference": "الفجر: 25",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "89:26",
+  "displayRef": "الفجر: 26",
+  "candidateRefs": [
+   "الفجر: 26"
+  ],
+  "candidateUnitIds": [
+   "89:26"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 26.51,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 993,
+  "tEnd": 997,
+  "charStart": 5404,
+  "charEnd": 5425,
+  "segments": [
+   [
+    993,
+    997
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    4
+   ]
+  ],
+  "canonicalSegments": [
+   "وَلَا يُوثِقُ وَثَاقَهُ أَحَدٌ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 21.5,
+   "E": 21.5,
+   "matched": 4,
+   "content": 3,
+   "exactRun": 4,
+   "coverage": 1,
+   "margin": 13.9
+  },
+  "chainedAyah": true,
+  "id": "finding_84",
+  "type": "ayah",
+  "startIndex": 5404,
+  "endIndex": 5425,
+  "wordStartIdx": 993,
+  "wordEndIdx": 996,
+  "startTime": 678.156,
+  "endTime": 681.136,
+  "matchedText": "ولا يُوثِق وتاقه أحد،",
+  "canonicalText": "وَلَا يُوثِقُ وَثَاقَهُ أَحَدٌ",
+  "reference": "الفجر: 26",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "60:1",
+  "displayRef": "الممتحنة: 1",
+  "candidateRefs": [
+   "الممتحنة: 1"
+  ],
+  "candidateUnitIds": [
+   "60:1"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "CANDIDATE",
+  "totalScore": 13.97,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 1019,
+  "tEnd": 1021,
+  "charStart": 5564,
+  "charEnd": 5578,
+  "segments": [
+   [
+    1019,
+    1021
+   ]
+  ],
+  "qSegments": [
+   [
+    31,
+    33
+   ]
+  ],
+  "canonicalSegments": [
+   "وَابْتِغَاو مَرْضَاتِي"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "warsh",
+  "qiraahDisplay": "رواية ورش عن نافع",
+  "evidence": {
+   "S": 14,
+   "E": 14.6,
+   "matched": 2,
+   "content": 2,
+   "exactRun": 2,
+   "coverage": 0.04,
+   "margin": 6.5
+  },
+  "chainedAyah": false,
+  "id": "finding_85",
+  "type": "ayah",
+  "startIndex": 5564,
+  "endIndex": 5578,
+  "wordStartIdx": 1019,
+  "wordEndIdx": 1020,
+  "startTime": 697.436,
+  "endTime": 699.256,
+  "matchedText": "وابتغوا مرضاته",
+  "canonicalText": "وَابْتِغَاو مَرْضَاتِي",
+  "reference": "الممتحنة: 1",
+  "confidence": 0.72,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "2:203",
+  "displayRef": "البقرة: 203",
+  "candidateRefs": [
+   "البقرة: 203",
+   "البقرة: 223",
+   "التوبة: 2"
+  ],
+  "candidateUnitIds": [
+   "2:203",
+   "2:223",
+   "9:2"
+  ],
+  "candidateCount": 3,
+  "isAmbiguous": true,
+  "isOutsideCorpus": false,
+  "confidenceBand": "CANDIDATE",
+  "totalScore": 11.95,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 1028,
+  "tEnd": 1031,
+  "charStart": 5621,
+  "charEnd": 5639,
+  "segments": [
+   [
+    1028,
+    1031
+   ]
+  ],
+  "qSegments": [
+   [
+    21,
+    24
+   ]
+  ],
+  "canonicalSegments": [
+   "وَاعْلَمُوا أَنَّكُمْ إِلَيْهِ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 12,
+   "E": 12,
+   "matched": 3,
+   "content": 2,
+   "exactRun": 3,
+   "coverage": 0.12,
+   "margin": 0
+  },
+  "chainedAyah": false,
+  "id": "finding_86",
+  "type": "ayah",
+  "startIndex": 5621,
+  "endIndex": 5639,
+  "wordStartIdx": 1028,
+  "wordEndIdx": 1030,
+  "startTime": 703.916,
+  "endTime": 706.096,
+  "matchedText": "واعلموا أنكم إليهم",
+  "canonicalText": "وَاعْلَمُوا أَنَّكُمْ إِلَيْهِ",
+  "reference": "البقرة: 203",
+  "confidence": 0.72,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "2:254",
+  "displayRef": "البقرة: 254",
+  "candidateRefs": [
+   "البقرة: 254",
+   "إبراهيم: 31",
+   "الشورى: 47",
+   "الروم: 43"
+  ],
+  "candidateUnitIds": [
+   "2:254",
+   "14:31",
+   "42:47",
+   "30:43"
+  ],
+  "candidateCount": 4,
+  "isAmbiguous": true,
+  "isOutsideCorpus": false,
+  "confidenceBand": "CANDIDATE",
+  "totalScore": 15.73,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": true,
+  "tStart": 1072,
+  "tEnd": 1079,
+  "charStart": 5878,
+  "charEnd": 5905,
+  "segments": [
+   [
+    1072,
+    1079
+   ]
+  ],
+  "qSegments": [
+   [
+    8,
+    15
+   ]
+  ],
+  "canonicalSegments": [
+   "قَبْلِ أَن يَأْتِيَ يَوْمٌ لَّا بَيْعٌ فِيهِ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 12.7,
+   "E": 15.3,
+   "matched": 6,
+   "content": 3,
+   "exactRun": 5,
+   "coverage": 0.27,
+   "margin": 0
+  },
+  "chainedAyah": false,
+  "id": "finding_87",
+  "type": "ayah",
+  "startIndex": 5878,
+  "endIndex": 5905,
+  "wordStartIdx": 1072,
+  "wordEndIdx": 1078,
+  "startTime": 732.776,
+  "endTime": 736.136,
+  "matchedText": "قبل أن يأتي يوم لا يمكن فيه",
+  "canonicalText": "قَبْلِ أَن يَأْتِيَ يَوْمٌ لَّا بَيْعٌ فِيهِ",
+  "reference": "البقرة: 254",
+  "confidence": 0.72,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "HADITH",
+  "unitId": "Muslim:6906",
+  "displayRef": "صحيح مسلم (6906)",
+  "candidateRefs": [
+   "صحيح مسلم (6906)",
+   "سنن النسائي (5538)",
+   "سنن النسائي (5458)",
+   "رياض الصالحين (800)"
+  ],
+  "candidateUnitIds": [
+   "Muslim:6906",
+   "Nasai:5538",
+   "Nasai:5458",
+   "RiyadSalihin:800"
+  ],
+  "candidateCount": 4,
+  "isAmbiguous": true,
+  "isOutsideCorpus": false,
+  "confidenceBand": "AMBIGUOUS",
+  "totalScore": 69.39,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": true,
+  "tStart": 1082,
+  "tEnd": 1096,
+  "charStart": 5928,
+  "charEnd": 6007,
+  "segments": [
+   [
+    1082,
+    1096
+   ]
+  ],
+  "qSegments": [
+   [
+    12,
+    26
+   ]
+  ],
+  "canonicalSegments": [
+   "اللَّهُمَّ آتِ نَفْسِي تَقْوَاهَا وَزَكِّهَا أَنْتَ خَيْرُ مَنْ زَكَّاهَا أَنْتَ وَلِيُّهَا وَمَوْلاَهَا اللَّهُمَّ إِنِّي"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "",
+  "qiraahDisplay": "",
+  "evidence": {
+   "S": 69.4,
+   "E": 71.5,
+   "matched": 13,
+   "content": 12,
+   "exactRun": 11,
+   "coverage": 0.29,
+   "margin": 0
+  },
+  "chainedAyah": false,
+  "id": "finding_88",
+  "type": "hadith",
+  "startIndex": 5928,
+  "endIndex": 6007,
+  "wordStartIdx": 1082,
+  "wordEndIdx": 1095,
+  "startTime": 738.35596,
+  "endTime": 746.35596,
+  "matchedText": "اللهم أتِ نفوسنا تقواها، وزكِّها أنت خير من زكاها، أنت وليها ومولاها، اللهم إنا",
+  "canonicalText": "اللَّهُمَّ آتِ نَفْسِي تَقْوَاهَا وَزَكِّهَا أَنْتَ خَيْرُ مَنْ زَكَّاهَا أَنْتَ وَلِيُّهَا وَمَوْلاَهَا اللَّهُمَّ إِنِّي",
+  "reference": "صحيح مسلم (6906)",
+  "confidence": 0.82,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "HADITH",
+  "unitId": "Muslim:6904",
+  "displayRef": "صحيح مسلم (6904)",
+  "candidateRefs": [
+   "صحيح مسلم (6904)",
+   "جامع الترمذي (3489)",
+   "سنن ابن ماجه (3832)",
+   "رياض الصالحين (789)",
+   "رياض الصالحين (1288)"
+  ],
+  "candidateUnitIds": [
+   "Muslim:6904",
+   "Tirmidhi:3489",
+   "IbnMajah:3832",
+   "RiyadSalihin:789",
+   "RiyadSalihin:1288"
+  ],
+  "candidateCount": 5,
+  "isAmbiguous": true,
+  "isOutsideCorpus": false,
+  "confidenceBand": "AMBIGUOUS",
+  "totalScore": 42.17,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 1094,
+  "tEnd": 1101,
+  "charStart": 5998,
+  "charEnd": 6042,
+  "segments": [
+   [
+    1094,
+    1101
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    7
+   ]
+  ],
+  "canonicalSegments": [
+   "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْهُدَى وَالتُّقَى وَالْعَفَافَ وَالْغِنَى"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "",
+  "qiraahDisplay": "",
+  "evidence": {
+   "S": 42.2,
+   "E": 42.2,
+   "matched": 7,
+   "content": 6,
+   "exactRun": 4,
+   "coverage": 1,
+   "margin": 0
+  },
+  "chainedAyah": false,
+  "id": "finding_89",
+  "type": "hadith",
+  "startIndex": 5998,
+  "endIndex": 6042,
+  "wordStartIdx": 1094,
+  "wordEndIdx": 1100,
+  "startTime": 745.676,
+  "endTime": 750.156,
+  "matchedText": "اللهم إنا نسألك الهدى والتقى والعفاف والغنى،",
+  "canonicalText": "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْهُدَى وَالتُّقَى وَالْعَفَافَ وَالْغِنَى",
+  "reference": "صحيح مسلم (6904)",
+  "confidence": 0.82,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "49:7",
+  "displayRef": "الحجرات: 7",
+  "candidateRefs": [
+   "الحجرات: 7"
+  ],
+  "candidateUnitIds": [
+   "49:7"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 63.65,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 1101,
+  "tEnd": 1113,
+  "charStart": 6043,
+  "charEnd": 6124,
+  "segments": [
+   [
+    1101,
+    1113
+   ]
+  ],
+  "qSegments": [
+   [
+    13,
+    25
+   ]
+  ],
+  "canonicalSegments": [
+   "اللَّهَ حَبَّبَ إِلَيْكُمُ الْإِيمَانَ وَزَيَّنَهُ فِي قُلُوبِكُمْ وَكَرَّهَ إِلَيْكُمُ الْكُفْرَ وَالْفُسُوقَ وَالْعِصْيَانَ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 63.6,
+   "E": 63.6,
+   "matched": 12,
+   "content": 6,
+   "exactRun": 3,
+   "coverage": 0.43,
+   "margin": 54.4
+  },
+  "chainedAyah": false,
+  "id": "finding_90",
+  "type": "ayah",
+  "startIndex": 6043,
+  "endIndex": 6124,
+  "wordStartIdx": 1101,
+  "wordEndIdx": 1112,
+  "startTime": 750.156,
+  "endTime": 758.276,
+  "matchedText": "اللهم حبِّب إلينا الإيمان، وزيِّنه في قلوبنا، وكرِّ إلينا الكفر والحسوق والعصيان،",
+  "canonicalText": "اللَّهَ حَبَّبَ إِلَيْكُمُ الْإِيمَانَ وَزَيَّنَهُ فِي قُلُوبِكُمْ وَكَرَّهَ إِلَيْكُمُ الْكُفْرَ وَالْفُسُوقَ وَالْعِصْيَانَ",
+  "reference": "الحجرات: 7",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "27:19",
+  "displayRef": "النمل: 19",
+  "candidateRefs": [
+   "النمل: 19"
+  ],
+  "candidateUnitIds": [
+   "27:19"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "CANDIDATE",
+  "totalScore": 12.49,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 1115,
+  "tEnd": 1117,
+  "charStart": 6136,
+  "charEnd": 6151,
+  "segments": [
+   [
+    1115,
+    1117
+   ]
+  ],
+  "qSegments": [
+   [
+    22,
+    24
+   ]
+  ],
+  "canonicalSegments": [
+   "عِبَادِكَ الصَّالِحِينَ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 12.5,
+   "E": 12.5,
+   "matched": 2,
+   "content": 2,
+   "exactRun": 2,
+   "coverage": 0.08,
+   "margin": 5.4
+  },
+  "chainedAyah": false,
+  "id": "finding_91",
+  "type": "ayah",
+  "startIndex": 6136,
+  "endIndex": 6151,
+  "wordStartIdx": 1115,
+  "wordEndIdx": 1116,
+  "startTime": 759.416,
+  "endTime": 761.11597,
+  "matchedText": "عبادك الصالحين،",
+  "canonicalText": "عِبَادِكَ الصَّالِحِينَ",
+  "reference": "النمل: 19",
+  "confidence": 0.72,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "21:73",
+  "displayRef": "الأنبياء: 73",
+  "candidateRefs": [
+   "الأنبياء: 73"
+  ],
+  "candidateUnitIds": [
+   "21:73"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "CANDIDATE",
+  "totalScore": 13.09,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 1121,
+  "tEnd": 1123,
+  "charStart": 6171,
+  "charEnd": 6183,
+  "segments": [
+   [
+    1121,
+    1123
+   ]
+  ],
+  "qSegments": [
+   [
+    6,
+    8
+   ]
+  ],
+  "canonicalSegments": [
+   "فِعْلَ الْخَيْرَاتِ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 13.1,
+   "E": 13.1,
+   "matched": 2,
+   "content": 2,
+   "exactRun": 2,
+   "coverage": 0.13,
+   "margin": 13.1
+  },
+  "chainedAyah": false,
+  "id": "finding_92",
+  "type": "ayah",
+  "startIndex": 6171,
+  "endIndex": 6183,
+  "wordStartIdx": 1121,
+  "wordEndIdx": 1122,
+  "startTime": 762.716,
+  "endTime": 763.976,
+  "matchedText": "فعل الخيرات،",
+  "canonicalText": "فِعْلَ الْخَيْرَاتِ",
+  "reference": "الأنبياء: 73",
+  "confidence": 0.72,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "18:10",
+  "displayRef": "الكهف: 10",
+  "candidateRefs": [
+   "الكهف: 10"
+  ],
+  "candidateUnitIds": [
+   "18:10"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "CANDIDATE",
+  "totalScore": 9.67,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 1123,
+  "tEnd": 1125,
+  "charStart": 6184,
+  "charEnd": 6194,
+  "segments": [
+   [
+    1123,
+    1125
+   ]
+  ],
+  "qSegments": [
+   [
+    11,
+    13
+   ]
+  ],
+  "canonicalSegments": [
+   "وَهَيِّئْ لَنَا"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 9.7,
+   "E": 9.7,
+   "matched": 2,
+   "content": 1,
+   "exactRun": 2,
+   "coverage": 0.13,
+   "margin": 9.7
+  },
+  "chainedAyah": false,
+  "id": "finding_93",
+  "type": "ayah",
+  "startIndex": 6184,
+  "endIndex": 6194,
+  "wordStartIdx": 1123,
+  "wordEndIdx": 1124,
+  "startTime": 763.976,
+  "endTime": 764.73596,
+  "matchedText": "وهيِّئ لنا",
+  "canonicalText": "وَهَيِّئْ لَنَا",
+  "reference": "الكهف: 10",
+  "confidence": 0.72,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "HADITH",
+  "unitId": "Bukhari:1014",
+  "displayRef": "صحيح البخاري (1014)",
+  "candidateRefs": [
+   "صحيح البخاري (1014)",
+   "صحيح مسلم (2078)"
+  ],
+  "candidateUnitIds": [
+   "Bukhari:1014",
+   "Muslim:2078"
+  ],
+  "candidateCount": 2,
+  "isAmbiguous": true,
+  "isOutsideCorpus": false,
+  "confidenceBand": "AMBIGUOUS",
+  "totalScore": 37.18,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 1183,
+  "tEnd": 1189,
+  "charStart": 6583,
+  "charEnd": 6621,
+  "segments": [
+   [
+    1183,
+    1189
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    6
+   ]
+  ],
+  "canonicalSegments": [
+   "اللَّهُمَّ أَغِثْنَا اللَّهُمَّ أَغِثْنَا اللَّهُمَّ أَغِثْنَا"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "",
+  "qiraahDisplay": "",
+  "evidence": {
+   "S": 37.2,
+   "E": 37.2,
+   "matched": 6,
+   "content": 6,
+   "exactRun": 6,
+   "coverage": 0.05,
+   "margin": 0
+  },
+  "chainedAyah": false,
+  "id": "finding_94",
+  "type": "hadith",
+  "startIndex": 6583,
+  "endIndex": 6621,
+  "wordStartIdx": 1183,
+  "wordEndIdx": 1188,
+  "startTime": 803.476,
+  "endTime": 808.996,
+  "matchedText": "اللهم أغثنا، اللهم أغثنا، اللهم أغثنا،",
+  "canonicalText": "اللَّهُمَّ أَغِثْنَا اللَّهُمَّ أَغِثْنَا اللَّهُمَّ أَغِثْنَا",
+  "reference": "صحيح البخاري (1014)",
+  "confidence": 0.82,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "HADITH",
+  "unitId": "AbiDawud:1176",
+  "displayRef": "سنن أبي داود (1176)",
+  "candidateRefs": [
+   "سنن أبي داود (1176)",
+   "موطأ مالك (450)"
+  ],
+  "candidateUnitIds": [
+   "AbiDawud:1176",
+   "Muwatta:450"
+  ],
+  "candidateCount": 2,
+  "isAmbiguous": true,
+  "isOutsideCorpus": false,
+  "confidenceBand": "CANDIDATE",
+  "totalScore": 19,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": true,
+  "tStart": 1196,
+  "tEnd": 1203,
+  "charStart": 6663,
+  "charEnd": 6706,
+  "segments": [
+   [
+    1196,
+    1203
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    6
+   ]
+  ],
+  "canonicalSegments": [
+   "اللَّهُمَّ اسْقِ عِبَادَكَ وَبَهَائِمَكَ وَانْشُرْ رَحْمَتَكَ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "",
+  "qiraahDisplay": "",
+  "evidence": {
+   "S": 19,
+   "E": 26.5,
+   "matched": 4,
+   "content": 4,
+   "exactRun": 2,
+   "coverage": 0.31,
+   "margin": 0
+  },
+  "chainedAyah": false,
+  "id": "finding_95",
+  "type": "hadith",
+  "startIndex": 6663,
+  "endIndex": 6706,
+  "wordStartIdx": 1196,
+  "wordEndIdx": 1202,
+  "startTime": 821.716,
+  "endTime": 831.11597,
+  "matchedText": "اللهم اسق البلاد والعباد، اللهم انشر رحمتك،",
+  "canonicalText": "اللَّهُمَّ اسْقِ عِبَادَكَ وَبَهَائِمَكَ وَانْشُرْ رَحْمَتَكَ",
+  "reference": "سنن أبي داود (1176)",
+  "confidence": 0.72,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "60:5",
+  "displayRef": "الممتحنة: 5",
+  "candidateRefs": [
+   "الممتحنة: 5",
+   "المائدة: 116",
+   "آل عمران: 8",
+   "البقرة: 128",
+   "البقرة: 32",
+   "البقرة: 127",
+   "البقرة: 129",
+   "آل عمران: 35",
+   "المائدة: 109",
+   "طه: 68",
+   "ص: 35",
+   "غافر: 8"
+  ],
+  "candidateUnitIds": [
+   "60:5",
+   "5:116",
+   "3:8",
+   "2:128",
+   "2:32",
+   "2:127",
+   "2:129",
+   "3:35",
+   "5:109",
+   "20:68",
+   "38:35",
+   "40:8"
+  ],
+  "candidateCount": 13,
+  "isAmbiguous": true,
+  "isOutsideCorpus": false,
+  "confidenceBand": "CANDIDATE",
+  "totalScore": 9.5,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 1213,
+  "tEnd": 1215,
+  "charStart": 6760,
+  "charEnd": 6767,
+  "segments": [
+   [
+    1213,
+    1215
+   ]
+  ],
+  "qSegments": [
+   [
+    9,
+    11
+   ]
+  ],
+  "canonicalSegments": [
+   "إِنَّكَ أَنتَ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 9.5,
+   "E": 9.5,
+   "matched": 2,
+   "content": 2,
+   "exactRun": 2,
+   "coverage": 0.15,
+   "margin": 0
+  },
+  "chainedAyah": false,
+  "id": "finding_96",
+  "type": "ayah",
+  "startIndex": 6760,
+  "endIndex": 6767,
+  "wordStartIdx": 1213,
+  "wordEndIdx": 1214,
+  "startTime": 841.73596,
+  "endTime": 842.716,
+  "matchedText": "إنك أنت",
+  "canonicalText": "إِنَّكَ أَنتَ",
+  "reference": "الممتحنة: 5",
+  "confidence": 0.72,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "74:56",
+  "displayRef": "المدثر: 56",
+  "candidateRefs": [
+   "المدثر: 56"
+  ],
+  "candidateUnitIds": [
+   "74:56"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "CANDIDATE",
+  "totalScore": 13.03,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 1215,
+  "tEnd": 1218,
+  "charStart": 6768,
+  "charEnd": 6787,
+  "segments": [
+   [
+    1215,
+    1218
+   ]
+  ],
+  "qSegments": [
+   [
+    7,
+    11
+   ]
+  ],
+  "canonicalSegments": [
+   "أَهْلُ التَّقْوَىٰ وَأَهْلُ الْمَغْفِرَةِ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 13,
+   "E": 18.6,
+   "matched": 3,
+   "content": 3,
+   "exactRun": 2,
+   "coverage": 0.27,
+   "margin": 4.7
+  },
+  "chainedAyah": false,
+  "id": "finding_97",
+  "type": "ayah",
+  "startIndex": 6768,
+  "endIndex": 6787,
+  "wordStartIdx": 1215,
+  "wordEndIdx": 1217,
+  "startTime": 842.716,
+  "endTime": 844.516,
+  "matchedText": "أهل التقوى والمغفرة",
+  "canonicalText": "أَهْلُ التَّقْوَىٰ وَأَهْلُ الْمَغْفِرَةِ",
+  "reference": "المدثر: 56",
+  "confidence": 0.72,
+  "snappedToCanonical": false
+ }
+]

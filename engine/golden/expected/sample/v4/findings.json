@@ -1,0 +1,512 @@
+[
+ {
+  "sourceType": "QURAN",
+  "unitId": "10:10",
+  "displayRef": "يونس: 10",
+  "candidateRefs": [
+   "يونس: 10",
+   "الفاتحة: 2",
+   "الزمر: 75",
+   "غافر: 65"
+  ],
+  "candidateUnitIds": [
+   "10:10",
+   "1:2",
+   "39:75",
+   "40:65"
+  ],
+  "candidateCount": 4,
+  "isAmbiguous": true,
+  "isOutsideCorpus": false,
+  "confidenceBand": "CANDIDATE",
+  "totalScore": 15.49,
+  "hasCitationCue": true,
+  "hasFuzzyHeal": false,
+  "tStart": 16,
+  "tEnd": 20,
+  "charStart": 97,
+  "charEnd": 135,
+  "segments": [
+   [
+    16,
+    20
+   ]
+  ],
+  "qSegments": [
+   [
+    10,
+    14
+   ]
+  ],
+  "canonicalSegments": [
+   "الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 12.5,
+   "E": 12.5,
+   "matched": 4,
+   "content": 2,
+   "exactRun": 4,
+   "coverage": 0.29,
+   "margin": 0
+  },
+  "chainedAyah": false,
+  "id": "finding_1",
+  "type": "ayah",
+  "startIndex": 97,
+  "endIndex": 135,
+  "wordStartIdx": 16,
+  "wordEndIdx": 19,
+  "startTime": 6.96,
+  "endTime": 9.09,
+  "matchedText": "الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ،",
+  "canonicalText": "الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ",
+  "reference": "يونس: 10",
+  "confidence": 0.72,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "33:70",
+  "displayRef": "الأحزاب: 70",
+  "candidateRefs": [
+   "الأحزاب: 70"
+  ],
+  "candidateUnitIds": [
+   "33:70"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 37.85,
+  "hasCitationCue": true,
+  "hasFuzzyHeal": false,
+  "tStart": 51,
+  "tEnd": 60,
+  "charStart": 308,
+  "charEnd": 383,
+  "segments": [
+   [
+    51,
+    60
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    9
+   ]
+  ],
+  "canonicalSegments": [
+   "يَا أَيُّهَا الَّذِينَ آمَنُوا اتَّقُوا اللَّهَ وَقُولُوا قَوْلًا سَدِيدًا"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 31.8,
+   "E": 31.8,
+   "matched": 9,
+   "content": 5,
+   "exactRun": 9,
+   "coverage": 1,
+   "margin": 18.3
+  },
+  "chainedAyah": false,
+  "id": "finding_2",
+  "type": "ayah",
+  "startIndex": 308,
+  "endIndex": 383,
+  "wordStartIdx": 51,
+  "wordEndIdx": 59,
+  "startTime": 21.71,
+  "endTime": 26.41,
+  "matchedText": "يَا أَيُّهَا الَّذِينَ آمَنُوا اتَّقُوا اللَّهَ وَقُولُوا قَوْلًا سَدِيدًا،",
+  "canonicalText": "يَا أَيُّهَا الَّذِينَ آمَنُوا اتَّقُوا اللَّهَ وَقُولُوا قَوْلًا سَدِيدًا",
+  "reference": "الأحزاب: 70",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "HADITH",
+  "unitId": "Muslim:2149",
+  "displayRef": "صحيح مسلم (2149)",
+  "candidateRefs": [
+   "صحيح مسلم (2149)"
+  ],
+  "candidateUnitIds": [
+   "Muslim:2149"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "CANDIDATE",
+  "totalScore": 23.11,
+  "hasCitationCue": true,
+  "hasFuzzyHeal": false,
+  "tStart": 75,
+  "tEnd": 80,
+  "charStart": 464,
+  "charEnd": 491,
+  "segments": [
+   [
+    75,
+    80
+   ]
+  ],
+  "qSegments": [
+   [
+    15,
+    20
+   ]
+  ],
+  "canonicalSegments": [
+   "أَمِيرِ الْمُؤْمِنِينَ عُمَرَ بْنِ الْخَطَّابِ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "",
+  "qiraahDisplay": "",
+  "evidence": {
+   "S": 20.1,
+   "E": 20.1,
+   "matched": 5,
+   "content": 5,
+   "exactRun": 5,
+   "coverage": 0.03,
+   "margin": 20.1
+  },
+  "chainedAyah": false,
+  "id": "finding_3",
+  "type": "hadith",
+  "startIndex": 464,
+  "endIndex": 491,
+  "wordStartIdx": 75,
+  "wordEndIdx": 79,
+  "startTime": 32.72,
+  "endTime": 34.53,
+  "matchedText": "أمير المؤمنين عمر بن الخطاب",
+  "canonicalText": "أَمِيرِ الْمُؤْمِنِينَ عُمَرَ بْنِ الْخَطَّابِ",
+  "reference": "صحيح مسلم (2149)",
+  "confidence": 0.72,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "HADITH",
+  "unitId": "Nawawi40:1",
+  "displayRef": "الأربعون النووية (1)",
+  "candidateRefs": [
+   "الأربعون النووية (1)"
+  ],
+  "candidateUnitIds": [
+   "Nawawi40:1"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 297.96,
+  "hasCitationCue": true,
+  "hasFuzzyHeal": false,
+  "tStart": 90,
+  "tEnd": 159,
+  "charStart": 538,
+  "charEnd": 1166,
+  "segments": [
+   [
+    90,
+    159
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    69
+   ]
+  ],
+  "canonicalSegments": [
+   "إنَّمَا الْأَعْمَالُ بِالنِّيَّاتِ وَإِنَّمَا لِكُلِّ امْرِئٍ مَا نَوَى فَمَنْ كَانَتْ هِجْرَتُهُ إلَى اللَّهِ وَرَسُولِهِ فَهِجْرَتُهُ إلَى اللَّهِ وَرَسُولِهِ وَمَنْ كَانَتْ هِجْرَتُهُ لِدُنْيَا يُصِيبُهَا أَوْ امْرَأَةٍ يَنْكِحُهَا فَهِجْرَتُهُ إلَى مَا هَاجَرَ إلَيْهِ رَوَاهُ إِمَامَا الْمُحَدِّثِينَ أَبُو عَبْدِ اللهِ مُحَمَّدُ بنُ إِسْمَاعِيل بن إِبْرَاهِيم بن الْمُغِيرَة بن بَرْدِزبَه الْبُخَارِيُّ الْجُعْفِيُّ رقم وَأَبُو الْحُسَيْنِ مُسْلِمٌ بنُ الْحَجَّاج بن مُسْلِم الْقُشَيْرِيُّ النَّيْسَابُورِيُّ رقم رَضِيَ اللهُ عَنْهُمَا فِي صَحِيحَيْهِمَا اللذَينِ هُمَا أَصَحُّ الْكُتُبِ الْمُصَنَّفَةِ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "",
+  "qiraahDisplay": "",
+  "evidence": {
+   "S": 295,
+   "E": 295,
+   "matched": 69,
+   "content": 51,
+   "exactRun": 69,
+   "coverage": 1,
+   "margin": 41.6
+  },
+  "chainedAyah": false,
+  "id": "finding_4",
+  "type": "hadith",
+  "startIndex": 538,
+  "endIndex": 1166,
+  "wordStartIdx": 90,
+  "wordEndIdx": 158,
+  "startTime": 38,
+  "endTime": 76.8,
+  "matchedText": "إنَّمَا الْأَعْمَالُ بِالنِّيَّاتِ، وَإِنَّمَا لِكُلِّ امْرِئٍ مَا نَوَى، فَمَنْ كَانَتْ هِجْرَتُهُ إلَى اللَّهِ وَرَسُولِهِ فَهِجْرَتُهُ إلَى اللَّهِ وَرَسُولِهِ، وَمَنْ كَانَتْ هِجْرَتُهُ لِدُنْيَا يُصِيبُهَا أَوْ امْرَأَةٍ يَنْكِحُهَا فَهِجْرَتُهُ إلَى مَا هَاجَرَ إلَيْهِ\". رَوَاهُ إِمَامَا الْمُحَدِّثِينَ أَبُو عَبْدِ اللهِ مُحَمَّدُ بنُ إِسْمَاعِيل بن إِبْرَاهِيم بن الْمُغِيرَة بن بَرْدِزبَه الْبُخَارِيُّ الْجُعْفِيُّ [رقم:1]، وَأَبُو الْحُسَيْنِ مُسْلِمٌ بنُ الْحَجَّاج بن مُسْلِم الْقُشَيْرِيُّ النَّيْسَابُورِيُّ [رقم:1907] رَضِيَ اللهُ عَنْهُمَا فِي \"صَحِيحَيْهِمَا\" اللذَينِ هُمَا أَصَحُّ الْكُتُبِ الْمُصَنَّفَةِ،",
+  "canonicalText": "إنَّمَا الْأَعْمَالُ بِالنِّيَّاتِ وَإِنَّمَا لِكُلِّ امْرِئٍ مَا نَوَى فَمَنْ كَانَتْ هِجْرَتُهُ إلَى اللَّهِ وَرَسُولِهِ فَهِجْرَتُهُ إلَى اللَّهِ وَرَسُولِهِ وَمَنْ كَانَتْ هِجْرَتُهُ لِدُنْيَا يُصِيبُهَا أَوْ امْرَأَةٍ يَنْكِحُهَا فَهِجْرَتُهُ إلَى مَا هَاجَرَ إلَيْهِ رَوَاهُ إِمَامَا الْمُحَدِّثِينَ أَبُو عَبْدِ اللهِ مُحَمَّدُ بنُ إِسْمَاعِيل بن إِبْرَاهِيم بن الْمُغِيرَة بن بَرْدِزبَه الْبُخَارِيُّ الْجُعْفِيُّ رقم وَأَبُو الْحُسَيْنِ مُسْلِمٌ بنُ الْحَجَّاج بن مُسْلِم الْقُشَيْرِيُّ النَّيْسَابُورِيُّ رقم رَضِيَ اللهُ عَنْهُمَا فِي صَحِيحَيْهِمَا اللذَينِ هُمَا أَصَحُّ الْكُتُبِ الْمُصَنَّفَةِ",
+  "reference": "الأربعون النووية (1)",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "2:255",
+  "displayRef": "البقرة: 255",
+  "candidateRefs": [
+   "البقرة: 255"
+  ],
+  "candidateUnitIds": [
+   "2:255"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 194.24,
+  "hasCitationCue": true,
+  "hasFuzzyHeal": false,
+  "tStart": 185,
+  "tEnd": 235,
+  "charStart": 1300,
+  "charEnd": 1698,
+  "segments": [
+   [
+    185,
+    235
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    50
+   ]
+  ],
+  "canonicalSegments": [
+   "اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ لَا تَأْخُذُهُ سِنَةٌ وَلَا نَوْمٌ لَّهُ مَا فِي السَّمَاوَاتِ وَمَا فِي الْأَرْضِ مَن ذَا الَّذِي يَشْفَعُ عِندَهُ إِلَّا بِإِذْنِهِ يَعْلَمُ مَا بَيْنَ أَيْدِيهِمْ وَمَا خَلْفَهُمْ وَلَا يُحِيطُونَ بِشَيْءٍ مِّنْ عِلْمِهِ إِلَّا بِمَا شَاءَ وَسِعَ كُرْسِيُّهُ السَّمَاوَاتِ وَالْأَرْضَ وَلَا يَئُودُهُ حِفْظُهُمَا وَهُوَ الْعَلِيُّ الْعَظِيمُ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 188.2,
+   "E": 188.2,
+   "matched": 50,
+   "content": 30,
+   "exactRun": 50,
+   "coverage": 1,
+   "margin": 158.7
+  },
+  "chainedAyah": false,
+  "id": "finding_5",
+  "type": "ayah",
+  "startIndex": 1300,
+  "endIndex": 1698,
+  "wordStartIdx": 185,
+  "wordEndIdx": 234,
+  "startTime": 87.05,
+  "endTime": 111.33,
+  "matchedText": "اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ لَا تَأْخُذُهُ سِنَةٌ وَلَا نَوْمٌ لَّهُ مَا فِي السَّمَاوَاتِ وَمَا فِي الْأَرْضِ مَن ذَا الَّذِي يَشْفَعُ عِندَهُ إِلَّا بِإِذْنِهِ يَعْلَمُ مَا بَيْنَ أَيْدِيهِمْ وَمَا خَلْفَهُمْ وَلَا يُحِيطُونَ بِشَيْءٍ مِّنْ عِلْمِهِ إِلَّا بِمَا شَاءَ وَسِعَ كُرْسِيُّهُ السَّمَاوَاتِ وَالْأَرْضَ وَلَا يَئُودُهُ حِفْظُهُمَا وَهُوَ الْعَلِيُّ الْعَظِيمُ،",
+  "canonicalText": "اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ لَا تَأْخُذُهُ سِنَةٌ وَلَا نَوْمٌ لَّهُ مَا فِي السَّمَاوَاتِ وَمَا فِي الْأَرْضِ مَن ذَا الَّذِي يَشْفَعُ عِندَهُ إِلَّا بِإِذْنِهِ يَعْلَمُ مَا بَيْنَ أَيْدِيهِمْ وَمَا خَلْفَهُمْ وَلَا يُحِيطُونَ بِشَيْءٍ مِّنْ عِلْمِهِ إِلَّا بِمَا شَاءَ وَسِعَ كُرْسِيُّهُ السَّمَاوَاتِ وَالْأَرْضَ وَلَا يَئُودُهُ حِفْظُهُمَا وَهُوَ الْعَلِيُّ الْعَظِيمُ",
+  "reference": "البقرة: 255",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "103:1",
+  "displayRef": "العصر: 1",
+  "candidateRefs": [
+   "العصر: 1"
+  ],
+  "candidateUnitIds": [
+   "103:1"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 13.33,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 254,
+  "tEnd": 255,
+  "charStart": 1805,
+  "charEnd": 1816,
+  "segments": [
+   [
+    254,
+    255
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    1
+   ]
+  ],
+  "canonicalSegments": [
+   "وَالْعَصْرِ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 8.3,
+   "E": 8.3,
+   "matched": 1,
+   "content": 1,
+   "exactRun": 1,
+   "coverage": 1,
+   "margin": 8.3
+  },
+  "chainedAyah": true,
+  "id": "finding_6",
+  "type": "ayah",
+  "startIndex": 1805,
+  "endIndex": 1816,
+  "wordStartIdx": 254,
+  "wordEndIdx": 254,
+  "startTime": 119.5,
+  "endTime": 120.15,
+  "matchedText": "وَالْعَصْرِ",
+  "canonicalText": "وَالْعَصْرِ",
+  "reference": "العصر: 1",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "103:2",
+  "displayRef": "العصر: 2",
+  "candidateRefs": [
+   "العصر: 2"
+  ],
+  "candidateUnitIds": [
+   "103:2"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 28.38,
+  "hasCitationCue": true,
+  "hasFuzzyHeal": false,
+  "tStart": 255,
+  "tEnd": 259,
+  "charStart": 1817,
+  "charEnd": 1847,
+  "segments": [
+   [
+    255,
+    259
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    4
+   ]
+  ],
+  "canonicalSegments": [
+   "إِنَّ الْإِنسَانَ لَفِي خُسْرٍ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 17.4,
+   "E": 17.4,
+   "matched": 4,
+   "content": 3,
+   "exactRun": 4,
+   "coverage": 1,
+   "margin": 17.4
+  },
+  "chainedAyah": true,
+  "id": "finding_7",
+  "type": "ayah",
+  "startIndex": 1817,
+  "endIndex": 1847,
+  "wordStartIdx": 255,
+  "wordEndIdx": 258,
+  "startTime": 120.19,
+  "endTime": 122.01,
+  "matchedText": "إِنَّ الْإِنسَانَ لَفِي خُسْرٍ",
+  "canonicalText": "إِنَّ الْإِنسَانَ لَفِي خُسْرٍ",
+  "reference": "العصر: 2",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "103:3",
+  "displayRef": "العصر: 3",
+  "candidateRefs": [
+   "العصر: 3"
+  ],
+  "candidateUnitIds": [
+   "103:3"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 50.77,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 259,
+  "tEnd": 268,
+  "charStart": 1848,
+  "charEnd": 1947,
+  "segments": [
+   [
+    259,
+    268
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    9
+   ]
+  ],
+  "canonicalSegments": [
+   "إِلَّا الَّذِينَ آمَنُوا وَعَمِلُوا الصَّالِحَاتِ وَتَوَاصَوْا بِالْحَقِّ وَتَوَاصَوْا بِالصَّبْرِ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 42.8,
+   "E": 42.8,
+   "matched": 9,
+   "content": 8,
+   "exactRun": 9,
+   "coverage": 1,
+   "margin": 27.3
+  },
+  "chainedAyah": true,
+  "id": "finding_8",
+  "type": "ayah",
+  "startIndex": 1848,
+  "endIndex": 1947,
+  "wordStartIdx": 259,
+  "wordEndIdx": 267,
+  "startTime": 122.05,
+  "endTime": 127.7,
+  "matchedText": "إِلَّا الَّذِينَ آمَنُوا وَعَمِلُوا الصَّالِحَاتِ وَتَوَاصَوْا بِالْحَقِّ وَتَوَاصَوْا بِالصَّبْرِ،",
+  "canonicalText": "إِلَّا الَّذِينَ آمَنُوا وَعَمِلُوا الصَّالِحَاتِ وَتَوَاصَوْا بِالْحَقِّ وَتَوَاصَوْا بِالصَّبْرِ",
+  "reference": "العصر: 3",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ }
+]

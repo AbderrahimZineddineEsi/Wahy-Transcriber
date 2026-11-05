@@ -1,0 +1,1297 @@
+[
+ {
+  "state": {
+   "source_type": "ADHKAR",
+   "candidate_reference": "ذكر",
+   "canonical_corpus_text": "لَا إِلَٰهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ",
+   "context_before": "إن الحمد لله نحمده حمداً حمداً، ونشكره معبوداً واحداً فرداً، وأشهد أن",
+   "matched_span_in_lecture": "لا إله إلا الله وحده لا شريك له",
+   "context_after": "شهادةً تنجي صاحبها في الدنيا والآخرة، وأشهد أن محمدًا عبده ورسوله المخصوص بالمآتر الذاخرة الفاخرة صلى الله عليه وعلى آله وصحبه وسلم تسليماً مزيداً أما",
+   "unmatched_corpus_prefix_words": "",
+   "immediate_transcript_before": "حمداً حمداً، ونشكره معبوداً واحداً فرداً، وأشهد أن",
+   "unmatched_corpus_suffix_words": "لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَىٰ كُلِّ شَيْءٍ قَدِيرٌ",
+   "immediate_transcript_after": "شهادةً تنجي صاحبها في الدنيا والآخرة، وأشهد أن",
+   "quran_neighboring_context": null,
+   "engine_confidence_band": "VERIFIED",
+   "engine_score": 22.2,
+   "has_citation_cue": false
+  },
+  "questions": {
+   "verdict": {
+    "type": "choice",
+    "instructions": "In this Arabic Islamic lecture transcript, determine whether `matched_span_in_lecture` (surrounded by `context_before` and `context_after`) is an actual quotation/citation of `canonical_corpus_text` (`source_type`), or if it is merely ordinary speaker prose/explanation that happens to share words with the corpus text.",
+    "criteria": {
+     "CORRECT": "The speaker is genuinely quoting, reciting, or invoking this Quranic Ayah, Prophetic Hadith, or Dhikr (verbatim or as a direct religious citation in context).",
+     "FALSE": "False positive: the words are ordinary conversational speech, fiqh explanation, or narrator/person names that coincidentally overlap with corpus vocabulary without quoting the text.",
+     "NOT_SURE": "Ambiguous or partial paraphrase/meaning-only allusion where it is borderline whether the speaker intended a direct quotation."
+    }
+   },
+   "boundary_status": {
+    "type": "choice",
+    "instructions": "Compare `immediate_transcript_before` against `unmatched_corpus_prefix_words`, and `immediate_transcript_after` against `unmatched_corpus_suffix_words`. Determine whether the speaker actually uttered additional words of this quote at the beginning or end (even with minor ASR spelling errors) that were accidentally cut off from `matched_span_in_lecture`. If the speaker intentionally stopped quoting and resumed normal commentary, select COMPLETE_SPAN.",
+    "criteria": {
+     "COMPLETE_SPAN": "The detected span captures all words of the quote that the speaker actually uttered in this segment (no words of the quote were cut off in the adjacent transcript).",
+     "MISSING_START": "Words from `unmatched_corpus_prefix_words` appear inside `immediate_transcript_before` and were cut off from the beginning of the detection.",
+     "MISSING_END": "Words from `unmatched_corpus_suffix_words` appear inside `immediate_transcript_after` and were cut off from the end of the detection.",
+     "MISSING_BOTH": "Words of the quote were cut off from BOTH the beginning (`immediate_transcript_before`) and the end (`immediate_transcript_after`)."
+    }
+   }
+  },
+  "merge": {
+   "neighborIds": {
+    "previous": null,
+    "next": "finding_2"
+   },
+   "neighbors": {
+    "previous": null,
+    "next": {
+     "source_type": "HADITH",
+     "candidate_reference": "رياض الصالحين (353)",
+     "same_reference_as_current": false,
+     "gap_word_count": 6,
+     "gap_transcript_text": "شهادةً تنجي صاحبها في الدنيا والآخرة،",
+     "neighbor_span_in_lecture": "وأشهد أن محمدًا عبده ورسوله",
+     "neighbor_canonical_corpus_text": "وأشهد أن محمدًا عبده ورسوله"
+    }
+   },
+   "questions": {
+    "merge_suggestion": {
+     "type": "choice",
+     "instructions": "`neighbor_findings` lists the engine findings immediately before (`previous`) and/or after (`next`) this one, with the transcript words between them (`gap_transcript_text`). The engine often splits ONE quotation into separate findings when an ASR typo, a garbled or missing word, or a short repetition breaks the match; a neighbour may even be linked to a different reference. Decide, independently of `verdict`, whether this finding and a neighbour are consecutive parts of the same quoted text (compare the spans and the corpus texts) and should be one finding. Do not merge two different texts quoted one after the other.",
+     "criteria": {
+      "NO_MERGE": "This finding is a separate quotation (or the neighbour is a different text, or the gap is unrelated speech).",
+      "MERGE_WITH_NEXT": "This finding and the `next` neighbour are parts of the same quotation."
+     }
+    },
+    "merge_gap_type": {
+     "type": "choice",
+     "instructions": "Only meaningful when you suggest a merge: what are the words in `gap_transcript_text` between the parts?",
+     "criteria": {
+      "PART_OF_QUOTE": "The gap is empty, or it is mis-transcribed / garbled / repeated words of the quoted text itself.",
+      "COMMENTARY": "The gap is the speaker's own interjection or explanation between two parts of the same quotation."
+     }
+    }
+   }
+  }
+ },
+ {
+  "state": {
+   "source_type": "HADITH",
+   "candidate_reference": "رياض الصالحين (353)",
+   "canonical_corpus_text": "وأشهد أن محمدًا عبده ورسوله",
+   "context_before": "الحمد لله نحمده حمداً حمداً، ونشكره معبوداً واحداً فرداً، وأشهد أن لا إله إلا الله وحده لا شريك له شهادةً تنجي صاحبها في الدنيا والآخرة،",
+   "matched_span_in_lecture": "وأشهد أن محمدًا عبده ورسوله",
+   "context_after": "المخصوص بالمآتر الذاخرة الفاخرة صلى الله عليه وعلى آله وصحبه وسلم تسليماً مزيداً أما بعد، أيها المؤمنون اتقوا الله فقد فاز من اتقاه وسعد من",
+   "unmatched_corpus_prefix_words": "أشهد أن لا إله إلا الله وحده لا شريك له",
+   "immediate_transcript_before": "شريك له شهادةً تنجي صاحبها في الدنيا والآخرة،",
+   "unmatched_corpus_suffix_words": "إلا فتحت له أبواب الجنة الثمانية يدخل من أيها شاء",
+   "immediate_transcript_after": "المخصوص بالمآتر الذاخرة الفاخرة صلى الله عليه وعلى",
+   "quran_neighboring_context": null,
+   "engine_confidence_band": "CANDIDATE",
+   "engine_score": 24.27,
+   "has_citation_cue": false
+  },
+  "questions": {
+   "verdict": {
+    "type": "choice",
+    "instructions": "In this Arabic Islamic lecture transcript, determine whether `matched_span_in_lecture` (surrounded by `context_before` and `context_after`) is an actual quotation/citation of `canonical_corpus_text` (`source_type`), or if it is merely ordinary speaker prose/explanation that happens to share words with the corpus text.",
+    "criteria": {
+     "CORRECT": "The speaker is genuinely quoting, reciting, or invoking this Quranic Ayah, Prophetic Hadith, or Dhikr (verbatim or as a direct religious citation in context).",
+     "FALSE": "False positive: the words are ordinary conversational speech, fiqh explanation, or narrator/person names that coincidentally overlap with corpus vocabulary without quoting the text.",
+     "NOT_SURE": "Ambiguous or partial paraphrase/meaning-only allusion where it is borderline whether the speaker intended a direct quotation."
+    }
+   },
+   "boundary_status": {
+    "type": "choice",
+    "instructions": "Compare `immediate_transcript_before` against `unmatched_corpus_prefix_words`, and `immediate_transcript_after` against `unmatched_corpus_suffix_words`. Determine whether the speaker actually uttered additional words of this quote at the beginning or end (even with minor ASR spelling errors) that were accidentally cut off from `matched_span_in_lecture`. If the speaker intentionally stopped quoting and resumed normal commentary, select COMPLETE_SPAN.",
+    "criteria": {
+     "COMPLETE_SPAN": "The detected span captures all words of the quote that the speaker actually uttered in this segment (no words of the quote were cut off in the adjacent transcript).",
+     "MISSING_START": "Words from `unmatched_corpus_prefix_words` appear inside `immediate_transcript_before` and were cut off from the beginning of the detection.",
+     "MISSING_END": "Words from `unmatched_corpus_suffix_words` appear inside `immediate_transcript_after` and were cut off from the end of the detection.",
+     "MISSING_BOTH": "Words of the quote were cut off from BOTH the beginning (`immediate_transcript_before`) and the end (`immediate_transcript_after`)."
+    }
+   }
+  },
+  "merge": {
+   "neighborIds": {
+    "previous": "finding_1",
+    "next": null
+   },
+   "neighbors": {
+    "previous": {
+     "source_type": "ADHKAR",
+     "candidate_reference": "ذكر",
+     "same_reference_as_current": false,
+     "gap_word_count": 6,
+     "gap_transcript_text": "شهادةً تنجي صاحبها في الدنيا والآخرة،",
+     "neighbor_span_in_lecture": "لا إله إلا الله وحده لا شريك له",
+     "neighbor_canonical_corpus_text": "لَا إِلَٰهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ"
+    },
+    "next": null
+   },
+   "questions": {
+    "merge_suggestion": {
+     "type": "choice",
+     "instructions": "`neighbor_findings` lists the engine findings immediately before (`previous`) and/or after (`next`) this one, with the transcript words between them (`gap_transcript_text`). The engine often splits ONE quotation into separate findings when an ASR typo, a garbled or missing word, or a short repetition breaks the match; a neighbour may even be linked to a different reference. Decide, independently of `verdict`, whether this finding and a neighbour are consecutive parts of the same quoted text (compare the spans and the corpus texts) and should be one finding. Do not merge two different texts quoted one after the other.",
+     "criteria": {
+      "NO_MERGE": "This finding is a separate quotation (or the neighbour is a different text, or the gap is unrelated speech).",
+      "MERGE_WITH_PREVIOUS": "This finding and the `previous` neighbour are parts of the same quotation."
+     }
+    },
+    "merge_gap_type": {
+     "type": "choice",
+     "instructions": "Only meaningful when you suggest a merge: what are the words in `gap_transcript_text` between the parts?",
+     "criteria": {
+      "PART_OF_QUOTE": "The gap is empty, or it is mis-transcribed / garbled / repeated words of the quoted text itself.",
+      "COMMENTARY": "The gap is the speaker's own interjection or explanation between two parts of the same quotation."
+     }
+    }
+   }
+  }
+ },
+ {
+  "state": {
+   "source_type": "QURAN",
+   "candidate_reference": "آل عمران: 102",
+   "canonical_corpus_text": "يَا أَيُّهَا الَّذِينَ آمَنُوا اتَّقُوا اللَّهَ حَقَّ تُقَاتِهِ وَلَا تَمُوتُنَّ إِلَّا وَأَنتُم مُّسْلِمُونَ",
+   "context_before": "بالمآتر الذاخرة الفاخرة صلى الله عليه وعلى آله وصحبه وسلم تسليماً مزيداً أما بعد، أيها المؤمنون اتقوا الله فقد فاز من اتقاه وسعد من ابتغالضاه",
+   "matched_span_in_lecture": "يا أيها الذين آمنوا اتقوا الله حق تقاته ولا تموتن إلا وأنتم مسلمون",
+   "context_after": "يا أيها الذين آمنوا اتقوا الله وكونوا مع الصادقين، يا أيها الذين آمنوا اتقوا الله ولتنظر نفسهم ما قدمت لغدٍ واتقوا الله، إن الله خبيرٌ",
+   "unmatched_corpus_prefix_words": "",
+   "immediate_transcript_before": "الله فقد فاز من اتقاه وسعد من ابتغالضاه",
+   "unmatched_corpus_suffix_words": "",
+   "immediate_transcript_after": "يا أيها الذين آمنوا اتقوا الله وكونوا مع",
+   "quran_neighboring_context": {
+    "surah": 3,
+    "ayah": 102,
+    "previous_ayah_text": "وَأَنتُمْ تُتْلَىٰ عَلَيْكُمْ آيَاتُ اللَّهِ وَفِيكُمْ رَسُولُهُ وَمَن يَعْتَصِم بِاللَّهِ فَقَدْ هُدِيَ إِلَىٰ صِرَاطٍ مُّسْتَقِيمٍ",
+    "current_ayah_text": "يَا أَيُّهَا الَّذِينَ آمَنُوا اتَّقُوا اللَّهَ حَقَّ تُقَاتِهِ وَلَا تَمُوتُنَّ إِلَّا وَأَنتُم مُّسْلِمُونَ",
+    "next_ayah_text": "وَاعْتَصِمُوا بِحَبْلِ اللَّهِ جَمِيعًا وَلَا تَفَرَّقُوا وَاذْكُرُوا نِعْمَتَ اللَّهِ عَلَيْكُمْ إِذْ كُنتُمْ أَعْدَاءً فَأَلَّفَ بَيْنَ"
+   },
+   "engine_confidence_band": "VERIFIED",
+   "engine_score": 43.97,
+   "has_citation_cue": false
+  },
+  "questions": {
+   "verdict": {
+    "type": "choice",
+    "instructions": "In this Arabic Islamic lecture transcript, determine whether `matched_span_in_lecture` (surrounded by `context_before` and `context_after`) is an actual quotation/citation of `canonical_corpus_text` (`source_type`), or if it is merely ordinary speaker prose/explanation that happens to share words with the corpus text.",
+    "criteria": {
+     "CORRECT": "The speaker is genuinely quoting, reciting, or invoking this Quranic Ayah, Prophetic Hadith, or Dhikr (verbatim or as a direct religious citation in context).",
+     "FALSE": "False positive: the words are ordinary conversational speech, fiqh explanation, or narrator/person names that coincidentally overlap with corpus vocabulary without quoting the text.",
+     "NOT_SURE": "Ambiguous or partial paraphrase/meaning-only allusion where it is borderline whether the speaker intended a direct quotation."
+    }
+   },
+   "boundary_status": {
+    "type": "choice",
+    "instructions": "Compare `immediate_transcript_before` against `unmatched_corpus_prefix_words`, and `immediate_transcript_after` against `unmatched_corpus_suffix_words`. Determine whether the speaker actually uttered additional words of this quote at the beginning or end (even with minor ASR spelling errors) that were accidentally cut off from `matched_span_in_lecture`. If the speaker intentionally stopped quoting and resumed normal commentary, select COMPLETE_SPAN.",
+    "criteria": {
+     "COMPLETE_SPAN": "The detected span captures all words of the quote that the speaker actually uttered in this segment (no words of the quote were cut off in the adjacent transcript).",
+     "MISSING_START": "Words from `unmatched_corpus_prefix_words` appear inside `immediate_transcript_before` and were cut off from the beginning of the detection.",
+     "MISSING_END": "Words from `unmatched_corpus_suffix_words` appear inside `immediate_transcript_after` and were cut off from the end of the detection.",
+     "MISSING_BOTH": "Words of the quote were cut off from BOTH the beginning (`immediate_transcript_before`) and the end (`immediate_transcript_after`)."
+    }
+   }
+  },
+  "merge": {
+   "neighborIds": {
+    "previous": null,
+    "next": "finding_4"
+   },
+   "neighbors": {
+    "previous": null,
+    "next": {
+     "source_type": "QURAN",
+     "candidate_reference": "التوبة: 119",
+     "same_reference_as_current": false,
+     "gap_word_count": 0,
+     "gap_transcript_text": "",
+     "neighbor_span_in_lecture": "يا أيها الذين آمنوا اتقوا الله وكونوا مع الصادقين،",
+     "neighbor_canonical_corpus_text": "يَا أَيُّهَا الَّذِينَ آمَنُوا اتَّقُوا اللَّهَ وَكُونُوا مَعَ الصَّادِقِينَ"
+    }
+   },
+   "questions": {
+    "merge_suggestion": {
+     "type": "choice",
+     "instructions": "`neighbor_findings` lists the engine findings immediately before (`previous`) and/or after (`next`) this one, with the transcript words between them (`gap_transcript_text`). The engine often splits ONE quotation into separate findings when an ASR typo, a garbled or missing word, or a short repetition breaks the match; a neighbour may even be linked to a different reference. Decide, independently of `verdict`, whether this finding and a neighbour are consecutive parts of the same quoted text (compare the spans and the corpus texts) and should be one finding. Do not merge two different texts quoted one after the other.",
+     "criteria": {
+      "NO_MERGE": "This finding is a separate quotation (or the neighbour is a different text, or the gap is unrelated speech).",
+      "MERGE_WITH_NEXT": "This finding and the `next` neighbour are parts of the same quotation."
+     }
+    },
+    "merge_gap_type": {
+     "type": "choice",
+     "instructions": "Only meaningful when you suggest a merge: what are the words in `gap_transcript_text` between the parts?",
+     "criteria": {
+      "PART_OF_QUOTE": "The gap is empty, or it is mis-transcribed / garbled / repeated words of the quoted text itself.",
+      "COMMENTARY": "The gap is the speaker's own interjection or explanation between two parts of the same quotation."
+     }
+    }
+   }
+  }
+ },
+ {
+  "state": {
+   "source_type": "QURAN",
+   "candidate_reference": "التوبة: 119",
+   "canonical_corpus_text": "يَا أَيُّهَا الَّذِينَ آمَنُوا اتَّقُوا اللَّهَ وَكُونُوا مَعَ الصَّادِقِينَ",
+   "context_before": "بعد، أيها المؤمنون اتقوا الله فقد فاز من اتقاه وسعد من ابتغالضاه يا أيها الذين آمنوا اتقوا الله حق تقاته ولا تموتن إلا وأنتم مسلمون",
+   "matched_span_in_lecture": "يا أيها الذين آمنوا اتقوا الله وكونوا مع الصادقين،",
+   "context_after": "يا أيها الذين آمنوا اتقوا الله ولتنظر نفسهم ما قدمت لغدٍ واتقوا الله، إن الله خبيرٌ بما تعملون أيها المؤمنون، إن الله سبحانه وتعالى لما",
+   "unmatched_corpus_prefix_words": "",
+   "immediate_transcript_before": "الله حق تقاته ولا تموتن إلا وأنتم مسلمون",
+   "unmatched_corpus_suffix_words": "",
+   "immediate_transcript_after": "يا أيها الذين آمنوا اتقوا الله ولتنظر نفسهم",
+   "quran_neighboring_context": {
+    "surah": 9,
+    "ayah": 119,
+    "previous_ayah_text": "لَّا مَلْجَأَ مِنَ اللَّهِ إِلَّا إِلَيْهِ ثُمَّ تَابَ عَلَيْهِمْ لِيَتُوبُوا إِنَّ اللَّهَ هُوَ التَّوَّابُ الرَّحِيمُ",
+    "current_ayah_text": "يَا أَيُّهَا الَّذِينَ آمَنُوا اتَّقُوا اللَّهَ وَكُونُوا مَعَ الصَّادِقِينَ",
+    "next_ayah_text": "مَا كَانَ لِأَهْلِ الْمَدِينَةِ وَمَنْ حَوْلَهُم مِّنَ الْأَعْرَابِ أَن يَتَخَلَّفُوا عَن رَّسُولِ اللَّهِ وَلَا يَرْغَبُوا"
+   },
+   "engine_confidence_band": "VERIFIED",
+   "engine_score": 23.21,
+   "has_citation_cue": false
+  },
+  "questions": {
+   "verdict": {
+    "type": "choice",
+    "instructions": "In this Arabic Islamic lecture transcript, determine whether `matched_span_in_lecture` (surrounded by `context_before` and `context_after`) is an actual quotation/citation of `canonical_corpus_text` (`source_type`), or if it is merely ordinary speaker prose/explanation that happens to share words with the corpus text.",
+    "criteria": {
+     "CORRECT": "The speaker is genuinely quoting, reciting, or invoking this Quranic Ayah, Prophetic Hadith, or Dhikr (verbatim or as a direct religious citation in context).",
+     "FALSE": "False positive: the words are ordinary conversational speech, fiqh explanation, or narrator/person names that coincidentally overlap with corpus vocabulary without quoting the text.",
+     "NOT_SURE": "Ambiguous or partial paraphrase/meaning-only allusion where it is borderline whether the speaker intended a direct quotation."
+    }
+   },
+   "boundary_status": {
+    "type": "choice",
+    "instructions": "Compare `immediate_transcript_before` against `unmatched_corpus_prefix_words`, and `immediate_transcript_after` against `unmatched_corpus_suffix_words`. Determine whether the speaker actually uttered additional words of this quote at the beginning or end (even with minor ASR spelling errors) that were accidentally cut off from `matched_span_in_lecture`. If the speaker intentionally stopped quoting and resumed normal commentary, select COMPLETE_SPAN.",
+    "criteria": {
+     "COMPLETE_SPAN": "The detected span captures all words of the quote that the speaker actually uttered in this segment (no words of the quote were cut off in the adjacent transcript).",
+     "MISSING_START": "Words from `unmatched_corpus_prefix_words` appear inside `immediate_transcript_before` and were cut off from the beginning of the detection.",
+     "MISSING_END": "Words from `unmatched_corpus_suffix_words` appear inside `immediate_transcript_after` and were cut off from the end of the detection.",
+     "MISSING_BOTH": "Words of the quote were cut off from BOTH the beginning (`immediate_transcript_before`) and the end (`immediate_transcript_after`)."
+    }
+   }
+  },
+  "merge": {
+   "neighborIds": {
+    "previous": "finding_3",
+    "next": "finding_5"
+   },
+   "neighbors": {
+    "previous": {
+     "source_type": "QURAN",
+     "candidate_reference": "آل عمران: 102",
+     "same_reference_as_current": false,
+     "gap_word_count": 0,
+     "gap_transcript_text": "",
+     "neighbor_span_in_lecture": "يا أيها الذين آمنوا اتقوا الله حق تقاته ولا تموتن إلا وأنتم مسلمون",
+     "neighbor_canonical_corpus_text": "يَا أَيُّهَا الَّذِينَ آمَنُوا اتَّقُوا اللَّهَ حَقَّ تُقَاتِهِ وَلَا تَمُوتُنَّ إِلَّا وَأَنتُم مُّسْلِمُونَ"
+    },
+    "next": {
+     "source_type": "QURAN",
+     "candidate_reference": "الحشر: 18",
+     "same_reference_as_current": false,
+     "gap_word_count": 0,
+     "gap_transcript_text": "",
+     "neighbor_span_in_lecture": "يا أيها الذين آمنوا اتقوا الله ولتنظر نفسهم ما قدمت لغدٍ واتقوا الله، إن الله خبيرٌ بما تعملون",
+     "neighbor_canonical_corpus_text": "يَا أَيُّهَا الَّذِينَ آمَنُوا اتَّقُوا اللَّهَ وَلْتَنظُرْ نَفْسٌ مَّا قَدَّمَتْ لِغَدٍ وَاتَّقُوا اللَّهَ إِنَّ اللَّهَ خَبِيرٌ بِمَا تَعْمَلُونَ"
+    }
+   },
+   "questions": {
+    "merge_suggestion": {
+     "type": "choice",
+     "instructions": "`neighbor_findings` lists the engine findings immediately before (`previous`) and/or after (`next`) this one, with the transcript words between them (`gap_transcript_text`). The engine often splits ONE quotation into separate findings when an ASR typo, a garbled or missing word, or a short repetition breaks the match; a neighbour may even be linked to a different reference. Decide, independently of `verdict`, whether this finding and a neighbour are consecutive parts of the same quoted text (compare the spans and the corpus texts) and should be one finding. Do not merge two different texts quoted one after the other.",
+     "criteria": {
+      "NO_MERGE": "This finding is a separate quotation (or the neighbour is a different text, or the gap is unrelated speech).",
+      "MERGE_WITH_PREVIOUS": "This finding and the `previous` neighbour are parts of the same quotation.",
+      "MERGE_WITH_NEXT": "This finding and the `next` neighbour are parts of the same quotation.",
+      "MERGE_BOTH": "The `previous` neighbour, this finding and the `next` neighbour are all parts of the same quotation."
+     }
+    },
+    "merge_gap_type": {
+     "type": "choice",
+     "instructions": "Only meaningful when you suggest a merge: what are the words in `gap_transcript_text` between the parts?",
+     "criteria": {
+      "PART_OF_QUOTE": "The gap is empty, or it is mis-transcribed / garbled / repeated words of the quoted text itself.",
+      "COMMENTARY": "The gap is the speaker's own interjection or explanation between two parts of the same quotation."
+     }
+    }
+   }
+  }
+ },
+ {
+  "state": {
+   "source_type": "QURAN",
+   "candidate_reference": "الحشر: 18",
+   "canonical_corpus_text": "يَا أَيُّهَا الَّذِينَ آمَنُوا اتَّقُوا اللَّهَ وَلْتَنظُرْ نَفْسٌ مَّا قَدَّمَتْ لِغَدٍ وَاتَّقُوا اللَّهَ إِنَّ اللَّهَ خَبِيرٌ بِمَا تَعْمَلُونَ",
+   "context_before": "وسعد من ابتغالضاه يا أيها الذين آمنوا اتقوا الله حق تقاته ولا تموتن إلا وأنتم مسلمون يا أيها الذين آمنوا اتقوا الله وكونوا مع الصادقين،",
+   "matched_span_in_lecture": "يا أيها الذين آمنوا اتقوا الله ولتنظر نفسهم ما قدمت لغدٍ واتقوا الله، إن الله خبيرٌ بما تعملون",
+   "context_after": "أيها المؤمنون، إن الله سبحانه وتعالى لما أمرنا بعبادته، جعل لنا طريقاً موصلاً إليها، وبها أرسل رسله، وأنزل كتبه، واصطفى هذه الأمة بخير كتبه وأعظم",
+   "unmatched_corpus_prefix_words": "",
+   "immediate_transcript_before": "أيها الذين آمنوا اتقوا الله وكونوا مع الصادقين،",
+   "unmatched_corpus_suffix_words": "",
+   "immediate_transcript_after": "أيها المؤمنون، إن الله سبحانه وتعالى لما أمرنا",
+   "quran_neighboring_context": {
+    "surah": 59,
+    "ayah": 18,
+    "previous_ayah_text": "فَكَانَ عَاقِبَتَهُمَا أَنَّهُمَا فِي النَّارِ خَالِدَيْنِ فِيهَا وَذَٰلِكَ جَزَاءُ الظَّالِمِينَ",
+    "current_ayah_text": "يَا أَيُّهَا الَّذِينَ آمَنُوا اتَّقُوا اللَّهَ وَلْتَنظُرْ نَفْسٌ مَّا قَدَّمَتْ لِغَدٍ وَاتَّقُوا اللَّهَ إِنَّ اللَّهَ خَبِيرٌ بِمَا تَعْمَلُونَ",
+    "next_ayah_text": "وَلَا تَكُونُوا كَالَّذِينَ نَسُوا اللَّهَ فَأَنسَاهُمْ أَنفُسَهُمْ أُولَٰئِكَ هُمُ الْفَاسِقُونَ"
+   },
+   "engine_confidence_band": "VERIFIED",
+   "engine_score": 47.32,
+   "has_citation_cue": false
+  },
+  "questions": {
+   "verdict": {
+    "type": "choice",
+    "instructions": "In this Arabic Islamic lecture transcript, determine whether `matched_span_in_lecture` (surrounded by `context_before` and `context_after`) is an actual quotation/citation of `canonical_corpus_text` (`source_type`), or if it is merely ordinary speaker prose/explanation that happens to share words with the corpus text.",
+    "criteria": {
+     "CORRECT": "The speaker is genuinely quoting, reciting, or invoking this Quranic Ayah, Prophetic Hadith, or Dhikr (verbatim or as a direct religious citation in context).",
+     "FALSE": "False positive: the words are ordinary conversational speech, fiqh explanation, or narrator/person names that coincidentally overlap with corpus vocabulary without quoting the text.",
+     "NOT_SURE": "Ambiguous or partial paraphrase/meaning-only allusion where it is borderline whether the speaker intended a direct quotation."
+    }
+   },
+   "boundary_status": {
+    "type": "choice",
+    "instructions": "Compare `immediate_transcript_before` against `unmatched_corpus_prefix_words`, and `immediate_transcript_after` against `unmatched_corpus_suffix_words`. Determine whether the speaker actually uttered additional words of this quote at the beginning or end (even with minor ASR spelling errors) that were accidentally cut off from `matched_span_in_lecture`. If the speaker intentionally stopped quoting and resumed normal commentary, select COMPLETE_SPAN.",
+    "criteria": {
+     "COMPLETE_SPAN": "The detected span captures all words of the quote that the speaker actually uttered in this segment (no words of the quote were cut off in the adjacent transcript).",
+     "MISSING_START": "Words from `unmatched_corpus_prefix_words` appear inside `immediate_transcript_before` and were cut off from the beginning of the detection.",
+     "MISSING_END": "Words from `unmatched_corpus_suffix_words` appear inside `immediate_transcript_after` and were cut off from the end of the detection.",
+     "MISSING_BOTH": "Words of the quote were cut off from BOTH the beginning (`immediate_transcript_before`) and the end (`immediate_transcript_after`)."
+    }
+   }
+  },
+  "merge": {
+   "neighborIds": {
+    "previous": "finding_4",
+    "next": null
+   },
+   "neighbors": {
+    "previous": {
+     "source_type": "QURAN",
+     "candidate_reference": "التوبة: 119",
+     "same_reference_as_current": false,
+     "gap_word_count": 0,
+     "gap_transcript_text": "",
+     "neighbor_span_in_lecture": "يا أيها الذين آمنوا اتقوا الله وكونوا مع الصادقين،",
+     "neighbor_canonical_corpus_text": "يَا أَيُّهَا الَّذِينَ آمَنُوا اتَّقُوا اللَّهَ وَكُونُوا مَعَ الصَّادِقِينَ"
+    },
+    "next": null
+   },
+   "questions": {
+    "merge_suggestion": {
+     "type": "choice",
+     "instructions": "`neighbor_findings` lists the engine findings immediately before (`previous`) and/or after (`next`) this one, with the transcript words between them (`gap_transcript_text`). The engine often splits ONE quotation into separate findings when an ASR typo, a garbled or missing word, or a short repetition breaks the match; a neighbour may even be linked to a different reference. Decide, independently of `verdict`, whether this finding and a neighbour are consecutive parts of the same quoted text (compare the spans and the corpus texts) and should be one finding. Do not merge two different texts quoted one after the other.",
+     "criteria": {
+      "NO_MERGE": "This finding is a separate quotation (or the neighbour is a different text, or the gap is unrelated speech).",
+      "MERGE_WITH_PREVIOUS": "This finding and the `previous` neighbour are parts of the same quotation."
+     }
+    },
+    "merge_gap_type": {
+     "type": "choice",
+     "instructions": "Only meaningful when you suggest a merge: what are the words in `gap_transcript_text` between the parts?",
+     "criteria": {
+      "PART_OF_QUOTE": "The gap is empty, or it is mis-transcribed / garbled / repeated words of the quoted text itself.",
+      "COMMENTARY": "The gap is the speaker's own interjection or explanation between two parts of the same quotation."
+     }
+    }
+   }
+  }
+ },
+ {
+  "state": {
+   "source_type": "QURAN",
+   "candidate_reference": "فصلت: 6",
+   "canonical_corpus_text": "قُلْ إِنَّمَا أَنَا بَشَرٌ مِّثْلُكُمْ يُوحَىٰ إِلَيَّ أَنَّمَا إِلَٰهُكُمْ إِلَٰهٌ وَاحِدٌ فَاسْتَقِيمُوا إِلَيْهِ وَاسْتَغْفِرُوهُ وَوَيْلٌ لِّلْمُشْرِكِينَ",
+   "context_before": "أنفسنا عليه بالاستقامة فيه، فأمرنا بالاستقامة، والاستقامة التي أمرنا بها نوعان، أحدهما الاستقامة إلى الله، والآخر الاستقامة على دين الله، فأما الأول ففي قوله تعالى",
+   "matched_span_in_lecture": "قل إنما أنا بشر مثلكم يوحى إلي أنما إلهكم إله واحد فاستقيموا إليه واستغفروه، وغيل للمشركين،",
+   "context_after": "وأما الثاني ففي قوله تعالى وأن هذا صراطي مُستقيماً فاتبِعوه، ولا تتبِعوا السُّول فتفرَّق بكم عن سبيله، فأُمِرنا أن نستقيم إلى الله بتوحيده وإخلاص العبادة",
+   "unmatched_corpus_prefix_words": "",
+   "immediate_transcript_before": "على دين الله، فأما الأول ففي قوله تعالى",
+   "unmatched_corpus_suffix_words": "",
+   "immediate_transcript_after": "وأما الثاني ففي قوله تعالى وأن هذا صراطي",
+   "quran_neighboring_context": {
+    "surah": 41,
+    "ayah": 6,
+    "previous_ayah_text": "فِي أَكِنَّةٍ مِّمَّا تَدْعُونَا إِلَيْهِ وَفِي آذَانِنَا وَقْرٌ وَمِن بَيْنِنَا وَبَيْنِكَ حِجَابٌ فَاعْمَلْ إِنَّنَا عَامِلُونَ",
+    "current_ayah_text": "قُلْ إِنَّمَا أَنَا بَشَرٌ مِّثْلُكُمْ يُوحَىٰ إِلَيَّ أَنَّمَا إِلَٰهُكُمْ إِلَٰهٌ وَاحِدٌ فَاسْتَقِيمُوا إِلَيْهِ وَاسْتَغْفِرُوهُ وَوَيْلٌ لِّلْمُشْرِكِينَ",
+    "next_ayah_text": "الَّذِينَ لَا يُؤْتُونَ الزَّكَاةَ وَهُم بِالْآخِرَةِ هُمْ كَافِرُونَ"
+   },
+   "engine_confidence_band": "VERIFIED",
+   "engine_score": 74.24,
+   "has_citation_cue": true
+  },
+  "questions": {
+   "verdict": {
+    "type": "choice",
+    "instructions": "In this Arabic Islamic lecture transcript, determine whether `matched_span_in_lecture` (surrounded by `context_before` and `context_after`) is an actual quotation/citation of `canonical_corpus_text` (`source_type`), or if it is merely ordinary speaker prose/explanation that happens to share words with the corpus text.",
+    "criteria": {
+     "CORRECT": "The speaker is genuinely quoting, reciting, or invoking this Quranic Ayah, Prophetic Hadith, or Dhikr (verbatim or as a direct religious citation in context).",
+     "FALSE": "False positive: the words are ordinary conversational speech, fiqh explanation, or narrator/person names that coincidentally overlap with corpus vocabulary without quoting the text.",
+     "NOT_SURE": "Ambiguous or partial paraphrase/meaning-only allusion where it is borderline whether the speaker intended a direct quotation."
+    }
+   },
+   "boundary_status": {
+    "type": "choice",
+    "instructions": "Compare `immediate_transcript_before` against `unmatched_corpus_prefix_words`, and `immediate_transcript_after` against `unmatched_corpus_suffix_words`. Determine whether the speaker actually uttered additional words of this quote at the beginning or end (even with minor ASR spelling errors) that were accidentally cut off from `matched_span_in_lecture`. If the speaker intentionally stopped quoting and resumed normal commentary, select COMPLETE_SPAN.",
+    "criteria": {
+     "COMPLETE_SPAN": "The detected span captures all words of the quote that the speaker actually uttered in this segment (no words of the quote were cut off in the adjacent transcript).",
+     "MISSING_START": "Words from `unmatched_corpus_prefix_words` appear inside `immediate_transcript_before` and were cut off from the beginning of the detection.",
+     "MISSING_END": "Words from `unmatched_corpus_suffix_words` appear inside `immediate_transcript_after` and were cut off from the end of the detection.",
+     "MISSING_BOTH": "Words of the quote were cut off from BOTH the beginning (`immediate_transcript_before`) and the end (`immediate_transcript_after`)."
+    }
+   }
+  },
+  "merge": {
+   "neighborIds": {
+    "previous": null,
+    "next": "finding_7"
+   },
+   "neighbors": {
+    "previous": null,
+    "next": {
+     "source_type": "QURAN",
+     "candidate_reference": "الأنعام: 153",
+     "same_reference_as_current": false,
+     "gap_word_count": 5,
+     "gap_transcript_text": "وأما الثاني ففي قوله تعالى",
+     "neighbor_span_in_lecture": "وأن هذا صراطي مُستقيماً فاتبِعوه، ولا تتبِعوا السُّول فتفرَّق بكم عن سبيله،",
+     "neighbor_canonical_corpus_text": "وَأَنَّ هَٰذَا صِرَاطِي مُسْتَقِيمًا فَاتَّبِعُوهُ وَلَا تَتَّبِعُوا السُّبُلَ فَتَفَرَّقَ بِكُمْ عَن سَبِيلِهِ"
+    }
+   },
+   "questions": {
+    "merge_suggestion": {
+     "type": "choice",
+     "instructions": "`neighbor_findings` lists the engine findings immediately before (`previous`) and/or after (`next`) this one, with the transcript words between them (`gap_transcript_text`). The engine often splits ONE quotation into separate findings when an ASR typo, a garbled or missing word, or a short repetition breaks the match; a neighbour may even be linked to a different reference. Decide, independently of `verdict`, whether this finding and a neighbour are consecutive parts of the same quoted text (compare the spans and the corpus texts) and should be one finding. Do not merge two different texts quoted one after the other.",
+     "criteria": {
+      "NO_MERGE": "This finding is a separate quotation (or the neighbour is a different text, or the gap is unrelated speech).",
+      "MERGE_WITH_NEXT": "This finding and the `next` neighbour are parts of the same quotation."
+     }
+    },
+    "merge_gap_type": {
+     "type": "choice",
+     "instructions": "Only meaningful when you suggest a merge: what are the words in `gap_transcript_text` between the parts?",
+     "criteria": {
+      "PART_OF_QUOTE": "The gap is empty, or it is mis-transcribed / garbled / repeated words of the quoted text itself.",
+      "COMMENTARY": "The gap is the speaker's own interjection or explanation between two parts of the same quotation."
+     }
+    }
+   }
+  }
+ },
+ {
+  "state": {
+   "source_type": "QURAN",
+   "candidate_reference": "الأنعام: 153",
+   "canonical_corpus_text": "وَأَنَّ هَٰذَا صِرَاطِي مُسْتَقِيمًا فَاتَّبِعُوهُ وَلَا تَتَّبِعُوا السُّبُلَ فَتَفَرَّقَ بِكُمْ عَن سَبِيلِهِ",
+   "context_before": "الأول ففي قوله تعالى قل إنما أنا بشر مثلكم يوحى إلي أنما إلهكم إله واحد فاستقيموا إليه واستغفروه، وغيل للمشركين، وأما الثاني ففي قوله تعالى",
+   "matched_span_in_lecture": "وأن هذا صراطي مُستقيماً فاتبِعوه، ولا تتبِعوا السُّول فتفرَّق بكم عن سبيله،",
+   "context_after": "فأُمِرنا أن نستقيم إلى الله بتوحيده وإخلاص العبادة له، فالمُستقيمون إليه هم المُوحِّدون له سبحانه، وأُمِرنا بأن نستقيم على صراطه باتباع الدين الذي بعث به",
+   "unmatched_corpus_prefix_words": "",
+   "immediate_transcript_before": "واستغفروه، وغيل للمشركين، وأما الثاني ففي قوله تعالى",
+   "unmatched_corpus_suffix_words": "ذَٰلِكُمْ وَصَّاكُم بِهِ لَعَلَّكُمْ تَتَّقُونَ",
+   "immediate_transcript_after": "فأُمِرنا أن نستقيم إلى الله بتوحيده وإخلاص العبادة",
+   "quran_neighboring_context": {
+    "surah": 6,
+    "ayah": 153,
+    "previous_ayah_text": "وَإِذَا قُلْتُمْ فَاعْدِلُوا وَلَوْ كَانَ ذَا قُرْبَىٰ وَبِعَهْدِ اللَّهِ أَوْفُوا ذَٰلِكُمْ وَصَّاكُم بِهِ لَعَلَّكُمْ تَذَكَّرُونَ",
+    "current_ayah_text": "وَأَنَّ هَٰذَا صِرَاطِي مُسْتَقِيمًا فَاتَّبِعُوهُ وَلَا تَتَّبِعُوا السُّبُلَ فَتَفَرَّقَ بِكُمْ عَن سَبِيلِهِ",
+    "next_ayah_text": "ثُمَّ آتَيْنَا مُوسَى الْكِتَابَ تَمَامًا عَلَى الَّذِي أَحْسَنَ وَتَفْصِيلًا لِّكُلِّ شَيْءٍ وَهُدًى وَرَحْمَةً لَّعَلَّهُم بِلِقَاءِ"
+   },
+   "engine_confidence_band": "VERIFIED",
+   "engine_score": 55.35,
+   "has_citation_cue": true
+  },
+  "questions": {
+   "verdict": {
+    "type": "choice",
+    "instructions": "In this Arabic Islamic lecture transcript, determine whether `matched_span_in_lecture` (surrounded by `context_before` and `context_after`) is an actual quotation/citation of `canonical_corpus_text` (`source_type`), or if it is merely ordinary speaker prose/explanation that happens to share words with the corpus text.",
+    "criteria": {
+     "CORRECT": "The speaker is genuinely quoting, reciting, or invoking this Quranic Ayah, Prophetic Hadith, or Dhikr (verbatim or as a direct religious citation in context).",
+     "FALSE": "False positive: the words are ordinary conversational speech, fiqh explanation, or narrator/person names that coincidentally overlap with corpus vocabulary without quoting the text.",
+     "NOT_SURE": "Ambiguous or partial paraphrase/meaning-only allusion where it is borderline whether the speaker intended a direct quotation."
+    }
+   },
+   "boundary_status": {
+    "type": "choice",
+    "instructions": "Compare `immediate_transcript_before` against `unmatched_corpus_prefix_words`, and `immediate_transcript_after` against `unmatched_corpus_suffix_words`. Determine whether the speaker actually uttered additional words of this quote at the beginning or end (even with minor ASR spelling errors) that were accidentally cut off from `matched_span_in_lecture`. If the speaker intentionally stopped quoting and resumed normal commentary, select COMPLETE_SPAN.",
+    "criteria": {
+     "COMPLETE_SPAN": "The detected span captures all words of the quote that the speaker actually uttered in this segment (no words of the quote were cut off in the adjacent transcript).",
+     "MISSING_START": "Words from `unmatched_corpus_prefix_words` appear inside `immediate_transcript_before` and were cut off from the beginning of the detection.",
+     "MISSING_END": "Words from `unmatched_corpus_suffix_words` appear inside `immediate_transcript_after` and were cut off from the end of the detection.",
+     "MISSING_BOTH": "Words of the quote were cut off from BOTH the beginning (`immediate_transcript_before`) and the end (`immediate_transcript_after`)."
+    }
+   }
+  },
+  "merge": {
+   "neighborIds": {
+    "previous": "finding_6",
+    "next": null
+   },
+   "neighbors": {
+    "previous": {
+     "source_type": "QURAN",
+     "candidate_reference": "فصلت: 6",
+     "same_reference_as_current": false,
+     "gap_word_count": 5,
+     "gap_transcript_text": "وأما الثاني ففي قوله تعالى",
+     "neighbor_span_in_lecture": "قل إنما أنا بشر مثلكم يوحى إلي أنما إلهكم إله واحد فاستقيموا إليه واستغفروه، وغيل للمشركين،",
+     "neighbor_canonical_corpus_text": "قُلْ إِنَّمَا أَنَا بَشَرٌ مِّثْلُكُمْ يُوحَىٰ إِلَيَّ أَنَّمَا إِلَٰهُكُمْ إِلَٰهٌ وَاحِدٌ فَاسْتَقِيمُوا إِلَيْهِ وَاسْتَغْفِرُوهُ وَوَيْلٌ لِّلْمُشْرِكِينَ"
+    },
+    "next": null
+   },
+   "questions": {
+    "merge_suggestion": {
+     "type": "choice",
+     "instructions": "`neighbor_findings` lists the engine findings immediately before (`previous`) and/or after (`next`) this one, with the transcript words between them (`gap_transcript_text`). The engine often splits ONE quotation into separate findings when an ASR typo, a garbled or missing word, or a short repetition breaks the match; a neighbour may even be linked to a different reference. Decide, independently of `verdict`, whether this finding and a neighbour are consecutive parts of the same quoted text (compare the spans and the corpus texts) and should be one finding. Do not merge two different texts quoted one after the other.",
+     "criteria": {
+      "NO_MERGE": "This finding is a separate quotation (or the neighbour is a different text, or the gap is unrelated speech).",
+      "MERGE_WITH_PREVIOUS": "This finding and the `previous` neighbour are parts of the same quotation."
+     }
+    },
+    "merge_gap_type": {
+     "type": "choice",
+     "instructions": "Only meaningful when you suggest a merge: what are the words in `gap_transcript_text` between the parts?",
+     "criteria": {
+      "PART_OF_QUOTE": "The gap is empty, or it is mis-transcribed / garbled / repeated words of the quoted text itself.",
+      "COMMENTARY": "The gap is the speaker's own interjection or explanation between two parts of the same quotation."
+     }
+    }
+   }
+  }
+ },
+ {
+  "state": {
+   "source_type": "QURAN",
+   "candidate_reference": "هود: 112",
+   "canonical_corpus_text": "فَاسْتَقِمْ كَمَا أُمِرْتَ وَمَن تَابَ مَعَكَ وَلَا",
+   "context_before": "صلى الله عليه وسلم فلا يتم للعبد استقامة حتى يكون مستقيماً إلى الله مستقيماً على دين الله، وميزان هذه الاستقامة في آيتين أولاهما قوله تعالى",
+   "matched_span_in_lecture": "فاستقم كما أُمرت ومن تاب معك ولا",
+   "context_after": "تطقوه، والأخرى قوله تعالى واستقم كما أُمرت ولا تتبع أهوأهم، فميزان استقامة أحدنا يتحقق بالنظر إلى هذين الأمرين بأن لا يتجاوز العبد الحد المأدون به",
+   "unmatched_corpus_prefix_words": "",
+   "immediate_transcript_before": "وميزان هذه الاستقامة في آيتين أولاهما قوله تعالى",
+   "unmatched_corpus_suffix_words": "تَطْغَوْا إِنَّهُ بِمَا تَعْمَلُونَ بَصِيرٌ",
+   "immediate_transcript_after": "تطقوه، والأخرى قوله تعالى واستقم كما أُمرت ولا",
+   "quran_neighboring_context": {
+    "surah": 11,
+    "ayah": 112,
+    "previous_ayah_text": "وَإِنَّ كُلًّا لَّمَّا لَيُوَفِّيَنَّهُمْ رَبُّكَ أَعْمَالَهُمْ إِنَّهُ بِمَا يَعْمَلُونَ خَبِيرٌ",
+    "current_ayah_text": "فَاسْتَقِمْ كَمَا أُمِرْتَ وَمَن تَابَ مَعَكَ وَلَا",
+    "next_ayah_text": "وَلَا تَرْكَنُوا إِلَى الَّذِينَ ظَلَمُوا فَتَمَسَّكُمُ النَّارُ وَمَا لَكُم مِّن دُونِ اللَّهِ مِنْ أَوْلِيَاءَ ثُمَّ"
+   },
+   "engine_confidence_band": "VERIFIED",
+   "engine_score": 35.77,
+   "has_citation_cue": true
+  },
+  "questions": {
+   "verdict": {
+    "type": "choice",
+    "instructions": "In this Arabic Islamic lecture transcript, determine whether `matched_span_in_lecture` (surrounded by `context_before` and `context_after`) is an actual quotation/citation of `canonical_corpus_text` (`source_type`), or if it is merely ordinary speaker prose/explanation that happens to share words with the corpus text.",
+    "criteria": {
+     "CORRECT": "The speaker is genuinely quoting, reciting, or invoking this Quranic Ayah, Prophetic Hadith, or Dhikr (verbatim or as a direct religious citation in context).",
+     "FALSE": "False positive: the words are ordinary conversational speech, fiqh explanation, or narrator/person names that coincidentally overlap with corpus vocabulary without quoting the text.",
+     "NOT_SURE": "Ambiguous or partial paraphrase/meaning-only allusion where it is borderline whether the speaker intended a direct quotation."
+    }
+   },
+   "boundary_status": {
+    "type": "choice",
+    "instructions": "Compare `immediate_transcript_before` against `unmatched_corpus_prefix_words`, and `immediate_transcript_after` against `unmatched_corpus_suffix_words`. Determine whether the speaker actually uttered additional words of this quote at the beginning or end (even with minor ASR spelling errors) that were accidentally cut off from `matched_span_in_lecture`. If the speaker intentionally stopped quoting and resumed normal commentary, select COMPLETE_SPAN.",
+    "criteria": {
+     "COMPLETE_SPAN": "The detected span captures all words of the quote that the speaker actually uttered in this segment (no words of the quote were cut off in the adjacent transcript).",
+     "MISSING_START": "Words from `unmatched_corpus_prefix_words` appear inside `immediate_transcript_before` and were cut off from the beginning of the detection.",
+     "MISSING_END": "Words from `unmatched_corpus_suffix_words` appear inside `immediate_transcript_after` and were cut off from the end of the detection.",
+     "MISSING_BOTH": "Words of the quote were cut off from BOTH the beginning (`immediate_transcript_before`) and the end (`immediate_transcript_after`)."
+    }
+   }
+  },
+  "merge": {
+   "neighborIds": {
+    "previous": null,
+    "next": "finding_9"
+   },
+   "neighbors": {
+    "previous": null,
+    "next": {
+     "source_type": "QURAN",
+     "candidate_reference": "الشورى: 15",
+     "same_reference_as_current": false,
+     "gap_word_count": 4,
+     "gap_transcript_text": "تطقوه، والأخرى قوله تعالى",
+     "neighbor_span_in_lecture": "واستقم كما أُمرت ولا تتبع أهوأهم،",
+     "neighbor_canonical_corpus_text": "وَاسْتَقِمْ كَمَا أُمِرْتَ وَلَا تَتَّبِعْ أَهْوَاءَهُمْ"
+    }
+   },
+   "questions": {
+    "merge_suggestion": {
+     "type": "choice",
+     "instructions": "`neighbor_findings` lists the engine findings immediately before (`previous`) and/or after (`next`) this one, with the transcript words between them (`gap_transcript_text`). The engine often splits ONE quotation into separate findings when an ASR typo, a garbled or missing word, or a short repetition breaks the match; a neighbour may even be linked to a different reference. Decide, independently of `verdict`, whether this finding and a neighbour are consecutive parts of the same quoted text (compare the spans and the corpus texts) and should be one finding. Do not merge two different texts quoted one after the other.",
+     "criteria": {
+      "NO_MERGE": "This finding is a separate quotation (or the neighbour is a different text, or the gap is unrelated speech).",
+      "MERGE_WITH_NEXT": "This finding and the `next` neighbour are parts of the same quotation."
+     }
+    },
+    "merge_gap_type": {
+     "type": "choice",
+     "instructions": "Only meaningful when you suggest a merge: what are the words in `gap_transcript_text` between the parts?",
+     "criteria": {
+      "PART_OF_QUOTE": "The gap is empty, or it is mis-transcribed / garbled / repeated words of the quoted text itself.",
+      "COMMENTARY": "The gap is the speaker's own interjection or explanation between two parts of the same quotation."
+     }
+    }
+   }
+  }
+ },
+ {
+  "state": {
+   "source_type": "QURAN",
+   "candidate_reference": "الشورى: 15",
+   "canonical_corpus_text": "وَاسْتَقِمْ كَمَا أُمِرْتَ وَلَا تَتَّبِعْ أَهْوَاءَهُمْ",
+   "context_before": "إلى الله مستقيماً على دين الله، وميزان هذه الاستقامة في آيتين أولاهما قوله تعالى فاستقم كما أُمرت ومن تاب معك ولا تطقوه، والأخرى قوله تعالى",
+   "matched_span_in_lecture": "واستقم كما أُمرت ولا تتبع أهوأهم،",
+   "context_after": "فميزان استقامة أحدنا يتحقق بالنظر إلى هذين الأمرين بأن لا يتجاوز العبد الحد المأدون به في الاستقامة، فإنه يُفضي به إلى الطغيان، فهو مأمورٌ بأن",
+   "unmatched_corpus_prefix_words": "فَلِذَٰلِكَ فَادْعُ",
+   "immediate_transcript_before": "ومن تاب معك ولا تطقوه، والأخرى قوله تعالى",
+   "unmatched_corpus_suffix_words": "وَقُلْ آمَنتُ بِمَا أَنزَلَ اللَّهُ مِن كِتَابٍ وَأُمِرْتُ لِأَعْدِلَ بَيْنَكُمُ",
+   "immediate_transcript_after": "فميزان استقامة أحدنا يتحقق بالنظر إلى هذين الأمرين",
+   "quran_neighboring_context": {
+    "surah": 42,
+    "ayah": 15,
+    "previous_ayah_text": "إِلَىٰ أَجَلٍ مُّسَمًّى لَّقُضِيَ بَيْنَهُمْ وَإِنَّ الَّذِينَ أُورِثُوا الْكِتَابَ مِن بَعْدِهِمْ لَفِي شَكٍّ مِّنْهُ مُرِيبٍ",
+    "current_ayah_text": "وَاسْتَقِمْ كَمَا أُمِرْتَ وَلَا تَتَّبِعْ أَهْوَاءَهُمْ",
+    "next_ayah_text": "وَالَّذِينَ يُحَاجُّونَ فِي اللَّهِ مِن بَعْدِ مَا اسْتُجِيبَ لَهُ حُجَّتُهُمْ دَاحِضَةٌ عِندَ رَبِّهِمْ وَعَلَيْهِمْ غَضَبٌ"
+   },
+   "engine_confidence_band": "VERIFIED",
+   "engine_score": 34.52,
+   "has_citation_cue": true
+  },
+  "questions": {
+   "verdict": {
+    "type": "choice",
+    "instructions": "In this Arabic Islamic lecture transcript, determine whether `matched_span_in_lecture` (surrounded by `context_before` and `context_after`) is an actual quotation/citation of `canonical_corpus_text` (`source_type`), or if it is merely ordinary speaker prose/explanation that happens to share words with the corpus text.",
+    "criteria": {
+     "CORRECT": "The speaker is genuinely quoting, reciting, or invoking this Quranic Ayah, Prophetic Hadith, or Dhikr (verbatim or as a direct religious citation in context).",
+     "FALSE": "False positive: the words are ordinary conversational speech, fiqh explanation, or narrator/person names that coincidentally overlap with corpus vocabulary without quoting the text.",
+     "NOT_SURE": "Ambiguous or partial paraphrase/meaning-only allusion where it is borderline whether the speaker intended a direct quotation."
+    }
+   },
+   "boundary_status": {
+    "type": "choice",
+    "instructions": "Compare `immediate_transcript_before` against `unmatched_corpus_prefix_words`, and `immediate_transcript_after` against `unmatched_corpus_suffix_words`. Determine whether the speaker actually uttered additional words of this quote at the beginning or end (even with minor ASR spelling errors) that were accidentally cut off from `matched_span_in_lecture`. If the speaker intentionally stopped quoting and resumed normal commentary, select COMPLETE_SPAN.",
+    "criteria": {
+     "COMPLETE_SPAN": "The detected span captures all words of the quote that the speaker actually uttered in this segment (no words of the quote were cut off in the adjacent transcript).",
+     "MISSING_START": "Words from `unmatched_corpus_prefix_words` appear inside `immediate_transcript_before` and were cut off from the beginning of the detection.",
+     "MISSING_END": "Words from `unmatched_corpus_suffix_words` appear inside `immediate_transcript_after` and were cut off from the end of the detection.",
+     "MISSING_BOTH": "Words of the quote were cut off from BOTH the beginning (`immediate_transcript_before`) and the end (`immediate_transcript_after`)."
+    }
+   }
+  },
+  "merge": {
+   "neighborIds": {
+    "previous": "finding_8",
+    "next": null
+   },
+   "neighbors": {
+    "previous": {
+     "source_type": "QURAN",
+     "candidate_reference": "هود: 112",
+     "same_reference_as_current": false,
+     "gap_word_count": 4,
+     "gap_transcript_text": "تطقوه، والأخرى قوله تعالى",
+     "neighbor_span_in_lecture": "فاستقم كما أُمرت ومن تاب معك ولا",
+     "neighbor_canonical_corpus_text": "فَاسْتَقِمْ كَمَا أُمِرْتَ وَمَن تَابَ مَعَكَ وَلَا"
+    },
+    "next": null
+   },
+   "questions": {
+    "merge_suggestion": {
+     "type": "choice",
+     "instructions": "`neighbor_findings` lists the engine findings immediately before (`previous`) and/or after (`next`) this one, with the transcript words between them (`gap_transcript_text`). The engine often splits ONE quotation into separate findings when an ASR typo, a garbled or missing word, or a short repetition breaks the match; a neighbour may even be linked to a different reference. Decide, independently of `verdict`, whether this finding and a neighbour are consecutive parts of the same quoted text (compare the spans and the corpus texts) and should be one finding. Do not merge two different texts quoted one after the other.",
+     "criteria": {
+      "NO_MERGE": "This finding is a separate quotation (or the neighbour is a different text, or the gap is unrelated speech).",
+      "MERGE_WITH_PREVIOUS": "This finding and the `previous` neighbour are parts of the same quotation."
+     }
+    },
+    "merge_gap_type": {
+     "type": "choice",
+     "instructions": "Only meaningful when you suggest a merge: what are the words in `gap_transcript_text` between the parts?",
+     "criteria": {
+      "PART_OF_QUOTE": "The gap is empty, or it is mis-transcribed / garbled / repeated words of the quoted text itself.",
+      "COMMENTARY": "The gap is the speaker's own interjection or explanation between two parts of the same quotation."
+     }
+    }
+   }
+  }
+ },
+ {
+  "state": {
+   "source_type": "HADITH",
+   "candidate_reference": "صحيح مسلم (6889)",
+   "canonical_corpus_text": "رَبَّ السَّمَوَاتِ وَرَبَّ الأَرْضِ وَرَبَّ الْعَرْشِ الْعَظِيمِ",
+   "context_before": "عباد الله المُستقيمين، وحقيقٌ بأن يكون مُستقيماً، أقولوا ما تسمعون، وأستغفروا الله العلي العظيم لن ولكم استغفروه، إنه هو الغفور الرحيم الحمد لله رب العالمين،",
+   "matched_span_in_lecture": "رب السماوات ورب الأرض رب العرش العظيم،",
+   "context_after": "وأشهد أن لا إله إلا الله وحده لا شريك له هو الحق المبين، وأشهد أن محمدًا عبده ورسوله ورحمته المهدات للعالمين، اللهم صل على محمدٍ",
+   "unmatched_corpus_prefix_words": "أَنْ يَنَامَ أَنْ يَضْطَجِعَ عَلَى شِقِّهِ الأَيْمَنِ ثُمَّ يَقُولُ اللَّهُمَّ",
+   "immediate_transcript_before": "إنه هو الغفور الرحيم الحمد لله رب العالمين،",
+   "unmatched_corpus_suffix_words": "رَبَّنَا وَرَبَّ كُلِّ شَىْءٍ فَالِقَ الْحَبِّ وَالنَّوَى وَمُنْزِلَ التَّوْرَاةِ وَالإِنْجِيلِ",
+   "immediate_transcript_after": "وأشهد أن لا إله إلا الله وحده لا",
+   "quran_neighboring_context": null,
+   "engine_confidence_band": "CANDIDATE",
+   "engine_score": 33.02,
+   "has_citation_cue": false
+  },
+  "questions": {
+   "verdict": {
+    "type": "choice",
+    "instructions": "In this Arabic Islamic lecture transcript, determine whether `matched_span_in_lecture` (surrounded by `context_before` and `context_after`) is an actual quotation/citation of `canonical_corpus_text` (`source_type`), or if it is merely ordinary speaker prose/explanation that happens to share words with the corpus text.",
+    "criteria": {
+     "CORRECT": "The speaker is genuinely quoting, reciting, or invoking this Quranic Ayah, Prophetic Hadith, or Dhikr (verbatim or as a direct religious citation in context).",
+     "FALSE": "False positive: the words are ordinary conversational speech, fiqh explanation, or narrator/person names that coincidentally overlap with corpus vocabulary without quoting the text.",
+     "NOT_SURE": "Ambiguous or partial paraphrase/meaning-only allusion where it is borderline whether the speaker intended a direct quotation."
+    }
+   },
+   "boundary_status": {
+    "type": "choice",
+    "instructions": "Compare `immediate_transcript_before` against `unmatched_corpus_prefix_words`, and `immediate_transcript_after` against `unmatched_corpus_suffix_words`. Determine whether the speaker actually uttered additional words of this quote at the beginning or end (even with minor ASR spelling errors) that were accidentally cut off from `matched_span_in_lecture`. If the speaker intentionally stopped quoting and resumed normal commentary, select COMPLETE_SPAN.",
+    "criteria": {
+     "COMPLETE_SPAN": "The detected span captures all words of the quote that the speaker actually uttered in this segment (no words of the quote were cut off in the adjacent transcript).",
+     "MISSING_START": "Words from `unmatched_corpus_prefix_words` appear inside `immediate_transcript_before` and were cut off from the beginning of the detection.",
+     "MISSING_END": "Words from `unmatched_corpus_suffix_words` appear inside `immediate_transcript_after` and were cut off from the end of the detection.",
+     "MISSING_BOTH": "Words of the quote were cut off from BOTH the beginning (`immediate_transcript_before`) and the end (`immediate_transcript_after`)."
+    }
+   }
+  },
+  "merge": {
+   "neighborIds": {
+    "previous": null,
+    "next": "finding_11"
+   },
+   "neighbors": {
+    "previous": null,
+    "next": {
+     "source_type": "ADHKAR",
+     "candidate_reference": "ذكر",
+     "same_reference_as_current": false,
+     "gap_word_count": 2,
+     "gap_transcript_text": "وأشهد أن",
+     "neighbor_span_in_lecture": "لا إله إلا الله وحده لا شريك له",
+     "neighbor_canonical_corpus_text": "لَا إِلَٰهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ"
+    }
+   },
+   "questions": {
+    "merge_suggestion": {
+     "type": "choice",
+     "instructions": "`neighbor_findings` lists the engine findings immediately before (`previous`) and/or after (`next`) this one, with the transcript words between them (`gap_transcript_text`). The engine often splits ONE quotation into separate findings when an ASR typo, a garbled or missing word, or a short repetition breaks the match; a neighbour may even be linked to a different reference. Decide, independently of `verdict`, whether this finding and a neighbour are consecutive parts of the same quoted text (compare the spans and the corpus texts) and should be one finding. Do not merge two different texts quoted one after the other.",
+     "criteria": {
+      "NO_MERGE": "This finding is a separate quotation (or the neighbour is a different text, or the gap is unrelated speech).",
+      "MERGE_WITH_NEXT": "This finding and the `next` neighbour are parts of the same quotation."
+     }
+    },
+    "merge_gap_type": {
+     "type": "choice",
+     "instructions": "Only meaningful when you suggest a merge: what are the words in `gap_transcript_text` between the parts?",
+     "criteria": {
+      "PART_OF_QUOTE": "The gap is empty, or it is mis-transcribed / garbled / repeated words of the quoted text itself.",
+      "COMMENTARY": "The gap is the speaker's own interjection or explanation between two parts of the same quotation."
+     }
+    }
+   }
+  }
+ },
+ {
+  "state": {
+   "source_type": "ADHKAR",
+   "candidate_reference": "ذكر",
+   "canonical_corpus_text": "لَا إِلَٰهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ",
+   "context_before": "تسمعون، وأستغفروا الله العلي العظيم لن ولكم استغفروه، إنه هو الغفور الرحيم الحمد لله رب العالمين، رب السماوات ورب الأرض رب العرش العظيم، وأشهد أن",
+   "matched_span_in_lecture": "لا إله إلا الله وحده لا شريك له",
+   "context_after": "هو الحق المبين، وأشهد أن محمدًا عبده ورسوله ورحمته المهدات للعالمين، اللهم صل على محمدٍ وعلى آل محمدٍ كما صليت على إبراهيم وعلى آل إبراهيم",
+   "unmatched_corpus_prefix_words": "",
+   "immediate_transcript_before": "السماوات ورب الأرض رب العرش العظيم، وأشهد أن",
+   "unmatched_corpus_suffix_words": "لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَىٰ كُلِّ شَيْءٍ قَدِيرٌ",
+   "immediate_transcript_after": "هو الحق المبين، وأشهد أن محمدًا عبده ورسوله",
+   "quran_neighboring_context": null,
+   "engine_confidence_band": "VERIFIED",
+   "engine_score": 22.2,
+   "has_citation_cue": false
+  },
+  "questions": {
+   "verdict": {
+    "type": "choice",
+    "instructions": "In this Arabic Islamic lecture transcript, determine whether `matched_span_in_lecture` (surrounded by `context_before` and `context_after`) is an actual quotation/citation of `canonical_corpus_text` (`source_type`), or if it is merely ordinary speaker prose/explanation that happens to share words with the corpus text.",
+    "criteria": {
+     "CORRECT": "The speaker is genuinely quoting, reciting, or invoking this Quranic Ayah, Prophetic Hadith, or Dhikr (verbatim or as a direct religious citation in context).",
+     "FALSE": "False positive: the words are ordinary conversational speech, fiqh explanation, or narrator/person names that coincidentally overlap with corpus vocabulary without quoting the text.",
+     "NOT_SURE": "Ambiguous or partial paraphrase/meaning-only allusion where it is borderline whether the speaker intended a direct quotation."
+    }
+   },
+   "boundary_status": {
+    "type": "choice",
+    "instructions": "Compare `immediate_transcript_before` against `unmatched_corpus_prefix_words`, and `immediate_transcript_after` against `unmatched_corpus_suffix_words`. Determine whether the speaker actually uttered additional words of this quote at the beginning or end (even with minor ASR spelling errors) that were accidentally cut off from `matched_span_in_lecture`. If the speaker intentionally stopped quoting and resumed normal commentary, select COMPLETE_SPAN.",
+    "criteria": {
+     "COMPLETE_SPAN": "The detected span captures all words of the quote that the speaker actually uttered in this segment (no words of the quote were cut off in the adjacent transcript).",
+     "MISSING_START": "Words from `unmatched_corpus_prefix_words` appear inside `immediate_transcript_before` and were cut off from the beginning of the detection.",
+     "MISSING_END": "Words from `unmatched_corpus_suffix_words` appear inside `immediate_transcript_after` and were cut off from the end of the detection.",
+     "MISSING_BOTH": "Words of the quote were cut off from BOTH the beginning (`immediate_transcript_before`) and the end (`immediate_transcript_after`)."
+    }
+   }
+  },
+  "merge": {
+   "neighborIds": {
+    "previous": "finding_10",
+    "next": "finding_12"
+   },
+   "neighbors": {
+    "previous": {
+     "source_type": "HADITH",
+     "candidate_reference": "صحيح مسلم (6889)",
+     "same_reference_as_current": false,
+     "gap_word_count": 2,
+     "gap_transcript_text": "وأشهد أن",
+     "neighbor_span_in_lecture": "رب السماوات ورب الأرض رب العرش العظيم،",
+     "neighbor_canonical_corpus_text": "رَبَّ السَّمَوَاتِ وَرَبَّ الأَرْضِ وَرَبَّ الْعَرْشِ الْعَظِيمِ"
+    },
+    "next": {
+     "source_type": "HADITH",
+     "candidate_reference": "رياض الصالحين (353)",
+     "same_reference_as_current": false,
+     "gap_word_count": 3,
+     "gap_transcript_text": "هو الحق المبين،",
+     "neighbor_span_in_lecture": "وأشهد أن محمدًا عبده ورسوله",
+     "neighbor_canonical_corpus_text": "وأشهد أن محمدًا عبده ورسوله"
+    }
+   },
+   "questions": {
+    "merge_suggestion": {
+     "type": "choice",
+     "instructions": "`neighbor_findings` lists the engine findings immediately before (`previous`) and/or after (`next`) this one, with the transcript words between them (`gap_transcript_text`). The engine often splits ONE quotation into separate findings when an ASR typo, a garbled or missing word, or a short repetition breaks the match; a neighbour may even be linked to a different reference. Decide, independently of `verdict`, whether this finding and a neighbour are consecutive parts of the same quoted text (compare the spans and the corpus texts) and should be one finding. Do not merge two different texts quoted one after the other.",
+     "criteria": {
+      "NO_MERGE": "This finding is a separate quotation (or the neighbour is a different text, or the gap is unrelated speech).",
+      "MERGE_WITH_PREVIOUS": "This finding and the `previous` neighbour are parts of the same quotation.",
+      "MERGE_WITH_NEXT": "This finding and the `next` neighbour are parts of the same quotation.",
+      "MERGE_BOTH": "The `previous` neighbour, this finding and the `next` neighbour are all parts of the same quotation."
+     }
+    },
+    "merge_gap_type": {
+     "type": "choice",
+     "instructions": "Only meaningful when you suggest a merge: what are the words in `gap_transcript_text` between the parts?",
+     "criteria": {
+      "PART_OF_QUOTE": "The gap is empty, or it is mis-transcribed / garbled / repeated words of the quoted text itself.",
+      "COMMENTARY": "The gap is the speaker's own interjection or explanation between two parts of the same quotation."
+     }
+    }
+   }
+  }
+ },
+ {
+  "state": {
+   "source_type": "HADITH",
+   "candidate_reference": "رياض الصالحين (353)",
+   "canonical_corpus_text": "وأشهد أن محمدًا عبده ورسوله",
+   "context_before": "الرحيم الحمد لله رب العالمين، رب السماوات ورب الأرض رب العرش العظيم، وأشهد أن لا إله إلا الله وحده لا شريك له هو الحق المبين،",
+   "matched_span_in_lecture": "وأشهد أن محمدًا عبده ورسوله",
+   "context_after": "ورحمته المهدات للعالمين، اللهم صل على محمدٍ وعلى آل محمدٍ كما صليت على إبراهيم وعلى آل إبراهيم إنك حميدٌ مجيد، اللهم بارِك على محمدٍ وعلى",
+   "unmatched_corpus_prefix_words": "أشهد أن لا إله إلا الله وحده لا شريك له",
+   "immediate_transcript_before": "الله وحده لا شريك له هو الحق المبين،",
+   "unmatched_corpus_suffix_words": "إلا فتحت له أبواب الجنة الثمانية يدخل من أيها شاء",
+   "immediate_transcript_after": "ورحمته المهدات للعالمين، اللهم صل على محمدٍ وعلى",
+   "quran_neighboring_context": null,
+   "engine_confidence_band": "CANDIDATE",
+   "engine_score": 24.27,
+   "has_citation_cue": false
+  },
+  "questions": {
+   "verdict": {
+    "type": "choice",
+    "instructions": "In this Arabic Islamic lecture transcript, determine whether `matched_span_in_lecture` (surrounded by `context_before` and `context_after`) is an actual quotation/citation of `canonical_corpus_text` (`source_type`), or if it is merely ordinary speaker prose/explanation that happens to share words with the corpus text.",
+    "criteria": {
+     "CORRECT": "The speaker is genuinely quoting, reciting, or invoking this Quranic Ayah, Prophetic Hadith, or Dhikr (verbatim or as a direct religious citation in context).",
+     "FALSE": "False positive: the words are ordinary conversational speech, fiqh explanation, or narrator/person names that coincidentally overlap with corpus vocabulary without quoting the text.",
+     "NOT_SURE": "Ambiguous or partial paraphrase/meaning-only allusion where it is borderline whether the speaker intended a direct quotation."
+    }
+   },
+   "boundary_status": {
+    "type": "choice",
+    "instructions": "Compare `immediate_transcript_before` against `unmatched_corpus_prefix_words`, and `immediate_transcript_after` against `unmatched_corpus_suffix_words`. Determine whether the speaker actually uttered additional words of this quote at the beginning or end (even with minor ASR spelling errors) that were accidentally cut off from `matched_span_in_lecture`. If the speaker intentionally stopped quoting and resumed normal commentary, select COMPLETE_SPAN.",
+    "criteria": {
+     "COMPLETE_SPAN": "The detected span captures all words of the quote that the speaker actually uttered in this segment (no words of the quote were cut off in the adjacent transcript).",
+     "MISSING_START": "Words from `unmatched_corpus_prefix_words` appear inside `immediate_transcript_before` and were cut off from the beginning of the detection.",
+     "MISSING_END": "Words from `unmatched_corpus_suffix_words` appear inside `immediate_transcript_after` and were cut off from the end of the detection.",
+     "MISSING_BOTH": "Words of the quote were cut off from BOTH the beginning (`immediate_transcript_before`) and the end (`immediate_transcript_after`)."
+    }
+   }
+  },
+  "merge": {
+   "neighborIds": {
+    "previous": "finding_11",
+    "next": "finding_13"
+   },
+   "neighbors": {
+    "previous": {
+     "source_type": "ADHKAR",
+     "candidate_reference": "ذكر",
+     "same_reference_as_current": false,
+     "gap_word_count": 3,
+     "gap_transcript_text": "هو الحق المبين،",
+     "neighbor_span_in_lecture": "لا إله إلا الله وحده لا شريك له",
+     "neighbor_canonical_corpus_text": "لَا إِلَٰهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ"
+    },
+    "next": {
+     "source_type": "HADITH",
+     "candidate_reference": "صحيح البخاري (3370)",
+     "same_reference_as_current": false,
+     "gap_word_count": 3,
+     "gap_transcript_text": "ورحمته المهدات للعالمين،",
+     "neighbor_span_in_lecture": "اللهم صل على محمدٍ وعلى آل محمدٍ كما صليت على إبراهيم وعلى آل إبراهيم إنك حميدٌ مجيد، اللهم بارِك على محمدٍ وعلى آل محمدٍ، قال حمد كما باركت على إبراهيم …",
+     "neighbor_canonical_corpus_text": "اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ كَمَا صَلَّيْتَ عَلَى إِبْرَاهِيمَ وَعَلَى آلِ إِبْرَاهِيمَ إِنَّكَ حَمِيدٌ مَجِيدٌ اللَّهُمَّ بَارِكْ عَلَى مُحَمَّدٍ وَعَلَى آلِ كَمَا بَارَكْتَ عَلَى إِبْرَاهِيمَ وَعَلَى آلِ إِبْرَاهِيمَ إِنَّكَ حَمِيدٌ مَجِيدٌ"
+    }
+   },
+   "questions": {
+    "merge_suggestion": {
+     "type": "choice",
+     "instructions": "`neighbor_findings` lists the engine findings immediately before (`previous`) and/or after (`next`) this one, with the transcript words between them (`gap_transcript_text`). The engine often splits ONE quotation into separate findings when an ASR typo, a garbled or missing word, or a short repetition breaks the match; a neighbour may even be linked to a different reference. Decide, independently of `verdict`, whether this finding and a neighbour are consecutive parts of the same quoted text (compare the spans and the corpus texts) and should be one finding. Do not merge two different texts quoted one after the other.",
+     "criteria": {
+      "NO_MERGE": "This finding is a separate quotation (or the neighbour is a different text, or the gap is unrelated speech).",
+      "MERGE_WITH_PREVIOUS": "This finding and the `previous` neighbour are parts of the same quotation.",
+      "MERGE_WITH_NEXT": "This finding and the `next` neighbour are parts of the same quotation.",
+      "MERGE_BOTH": "The `previous` neighbour, this finding and the `next` neighbour are all parts of the same quotation."
+     }
+    },
+    "merge_gap_type": {
+     "type": "choice",
+     "instructions": "Only meaningful when you suggest a merge: what are the words in `gap_transcript_text` between the parts?",
+     "criteria": {
+      "PART_OF_QUOTE": "The gap is empty, or it is mis-transcribed / garbled / repeated words of the quoted text itself.",
+      "COMMENTARY": "The gap is the speaker's own interjection or explanation between two parts of the same quotation."
+     }
+    }
+   }
+  }
+ },
+ {
+  "state": {
+   "source_type": "HADITH",
+   "candidate_reference": "صحيح البخاري (3370)",
+   "canonical_corpus_text": "اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ كَمَا صَلَّيْتَ عَلَى إِبْرَاهِيمَ وَعَلَى آلِ إِبْرَاهِيمَ إِنَّكَ حَمِيدٌ مَجِيدٌ اللَّهُمَّ بَارِكْ عَلَى مُحَمَّدٍ وَعَلَى آلِ كَمَا بَارَكْتَ عَلَى إِبْرَاهِيمَ وَعَلَى آلِ إِبْرَاهِيمَ إِنَّكَ حَمِيدٌ مَجِيدٌ",
+   "context_before": "الأرض رب العرش العظيم، وأشهد أن لا إله إلا الله وحده لا شريك له هو الحق المبين، وأشهد أن محمدًا عبده ورسوله ورحمته المهدات للعالمين،",
+   "matched_span_in_lecture": "اللهم صل على محمدٍ وعلى آل محمدٍ كما صليت على إبراهيم وعلى آل إبراهيم إنك حميدٌ مجيد، اللهم بارِك على محمدٍ وعلى آل محمدٍ، قال حمد كما باركت على إبراهيم وعلى آل إبراهيم، إنك حميدٌ مجيدٌ",
+   "context_after": "أما بعد أيها المؤمنون، إن الله سبحانه وتعالى أمرنا بالاستقامة إليه والاستقامة على دينه، فقال سبحانه وتعالى فياستقيموا إليه واستغفروه وقال تعالى فاستقِم كما أُمرتَ",
+   "unmatched_corpus_prefix_words": "أَهْلَ الْبَيْتِ فَإِنَّ اللَّهَ قَدْ عَلَّمَنَا كَيْفَ نُسَلِّمُ قَالَ قُولُوا",
+   "immediate_transcript_before": "وأشهد أن محمدًا عبده ورسوله ورحمته المهدات للعالمين،",
+   "unmatched_corpus_suffix_words": "",
+   "immediate_transcript_after": "أما بعد أيها المؤمنون، إن الله سبحانه وتعالى",
+   "quran_neighboring_context": null,
+   "engine_confidence_band": "CANDIDATE",
+   "engine_score": 109.24,
+   "has_citation_cue": false
+  },
+  "questions": {
+   "verdict": {
+    "type": "choice",
+    "instructions": "In this Arabic Islamic lecture transcript, determine whether `matched_span_in_lecture` (surrounded by `context_before` and `context_after`) is an actual quotation/citation of `canonical_corpus_text` (`source_type`), or if it is merely ordinary speaker prose/explanation that happens to share words with the corpus text.",
+    "criteria": {
+     "CORRECT": "The speaker is genuinely quoting, reciting, or invoking this Quranic Ayah, Prophetic Hadith, or Dhikr (verbatim or as a direct religious citation in context).",
+     "FALSE": "False positive: the words are ordinary conversational speech, fiqh explanation, or narrator/person names that coincidentally overlap with corpus vocabulary without quoting the text.",
+     "NOT_SURE": "Ambiguous or partial paraphrase/meaning-only allusion where it is borderline whether the speaker intended a direct quotation."
+    }
+   },
+   "boundary_status": {
+    "type": "choice",
+    "instructions": "Compare `immediate_transcript_before` against `unmatched_corpus_prefix_words`, and `immediate_transcript_after` against `unmatched_corpus_suffix_words`. Determine whether the speaker actually uttered additional words of this quote at the beginning or end (even with minor ASR spelling errors) that were accidentally cut off from `matched_span_in_lecture`. If the speaker intentionally stopped quoting and resumed normal commentary, select COMPLETE_SPAN.",
+    "criteria": {
+     "COMPLETE_SPAN": "The detected span captures all words of the quote that the speaker actually uttered in this segment (no words of the quote were cut off in the adjacent transcript).",
+     "MISSING_START": "Words from `unmatched_corpus_prefix_words` appear inside `immediate_transcript_before` and were cut off from the beginning of the detection.",
+     "MISSING_END": "Words from `unmatched_corpus_suffix_words` appear inside `immediate_transcript_after` and were cut off from the end of the detection.",
+     "MISSING_BOTH": "Words of the quote were cut off from BOTH the beginning (`immediate_transcript_before`) and the end (`immediate_transcript_after`)."
+    }
+   }
+  },
+  "merge": {
+   "neighborIds": {
+    "previous": "finding_12",
+    "next": null
+   },
+   "neighbors": {
+    "previous": {
+     "source_type": "HADITH",
+     "candidate_reference": "رياض الصالحين (353)",
+     "same_reference_as_current": false,
+     "gap_word_count": 3,
+     "gap_transcript_text": "ورحمته المهدات للعالمين،",
+     "neighbor_span_in_lecture": "وأشهد أن محمدًا عبده ورسوله",
+     "neighbor_canonical_corpus_text": "وأشهد أن محمدًا عبده ورسوله"
+    },
+    "next": null
+   },
+   "questions": {
+    "merge_suggestion": {
+     "type": "choice",
+     "instructions": "`neighbor_findings` lists the engine findings immediately before (`previous`) and/or after (`next`) this one, with the transcript words between them (`gap_transcript_text`). The engine often splits ONE quotation into separate findings when an ASR typo, a garbled or missing word, or a short repetition breaks the match; a neighbour may even be linked to a different reference. Decide, independently of `verdict`, whether this finding and a neighbour are consecutive parts of the same quoted text (compare the spans and the corpus texts) and should be one finding. Do not merge two different texts quoted one after the other.",
+     "criteria": {
+      "NO_MERGE": "This finding is a separate quotation (or the neighbour is a different text, or the gap is unrelated speech).",
+      "MERGE_WITH_PREVIOUS": "This finding and the `previous` neighbour are parts of the same quotation."
+     }
+    },
+    "merge_gap_type": {
+     "type": "choice",
+     "instructions": "Only meaningful when you suggest a merge: what are the words in `gap_transcript_text` between the parts?",
+     "criteria": {
+      "PART_OF_QUOTE": "The gap is empty, or it is mis-transcribed / garbled / repeated words of the quoted text itself.",
+      "COMMENTARY": "The gap is the speaker's own interjection or explanation between two parts of the same quotation."
+     }
+    }
+   }
+  }
+ },
+ {
+  "state": {
+   "source_type": "QURAN",
+   "candidate_reference": "فصلت: 6",
+   "canonical_corpus_text": "فَاسْتَقِيمُوا إِلَيْهِ وَاسْتَغْفِرُوهُ",
+   "context_before": "على إبراهيم وعلى آل إبراهيم، إنك حميدٌ مجيدٌ أما بعد أيها المؤمنون، إن الله سبحانه وتعالى أمرنا بالاستقامة إليه والاستقامة على دينه، فقال سبحانه وتعالى",
+   "matched_span_in_lecture": "فياستقيموا إليه واستغفروه",
+   "context_after": "وقال تعالى فاستقِم كما أُمرتَ ومن تابَ معاك ولا تضغلى، وقال واستقيم كما أمرتَ ولا تتبعَهوًا ومن حصل هذه الاستقامة فقد فاز بوعد عظيم من",
+   "unmatched_corpus_prefix_words": "إِنَّمَا أَنَا بَشَرٌ مِّثْلُكُمْ يُوحَىٰ إِلَيَّ أَنَّمَا إِلَٰهُكُمْ إِلَٰهٌ وَاحِدٌ",
+   "immediate_transcript_before": "بالاستقامة إليه والاستقامة على دينه، فقال سبحانه وتعالى",
+   "unmatched_corpus_suffix_words": "وَوَيْلٌ لِّلْمُشْرِكِينَ",
+   "immediate_transcript_after": "وقال تعالى فاستقِم كما أُمرتَ ومن تابَ معاك",
+   "quran_neighboring_context": {
+    "surah": 41,
+    "ayah": 6,
+    "previous_ayah_text": "فِي أَكِنَّةٍ مِّمَّا تَدْعُونَا إِلَيْهِ وَفِي آذَانِنَا وَقْرٌ وَمِن بَيْنِنَا وَبَيْنِكَ حِجَابٌ فَاعْمَلْ إِنَّنَا عَامِلُونَ",
+    "current_ayah_text": "فَاسْتَقِيمُوا إِلَيْهِ وَاسْتَغْفِرُوهُ",
+    "next_ayah_text": "الَّذِينَ لَا يُؤْتُونَ الزَّكَاةَ وَهُم بِالْآخِرَةِ هُمْ كَافِرُونَ"
+   },
+   "engine_confidence_band": "VERIFIED",
+   "engine_score": 18.2,
+   "has_citation_cue": true
+  },
+  "questions": {
+   "verdict": {
+    "type": "choice",
+    "instructions": "In this Arabic Islamic lecture transcript, determine whether `matched_span_in_lecture` (surrounded by `context_before` and `context_after`) is an actual quotation/citation of `canonical_corpus_text` (`source_type`), or if it is merely ordinary speaker prose/explanation that happens to share words with the corpus text.",
+    "criteria": {
+     "CORRECT": "The speaker is genuinely quoting, reciting, or invoking this Quranic Ayah, Prophetic Hadith, or Dhikr (verbatim or as a direct religious citation in context).",
+     "FALSE": "False positive: the words are ordinary conversational speech, fiqh explanation, or narrator/person names that coincidentally overlap with corpus vocabulary without quoting the text.",
+     "NOT_SURE": "Ambiguous or partial paraphrase/meaning-only allusion where it is borderline whether the speaker intended a direct quotation."
+    }
+   },
+   "boundary_status": {
+    "type": "choice",
+    "instructions": "Compare `immediate_transcript_before` against `unmatched_corpus_prefix_words`, and `immediate_transcript_after` against `unmatched_corpus_suffix_words`. Determine whether the speaker actually uttered additional words of this quote at the beginning or end (even with minor ASR spelling errors) that were accidentally cut off from `matched_span_in_lecture`. If the speaker intentionally stopped quoting and resumed normal commentary, select COMPLETE_SPAN.",
+    "criteria": {
+     "COMPLETE_SPAN": "The detected span captures all words of the quote that the speaker actually uttered in this segment (no words of the quote were cut off in the adjacent transcript).",
+     "MISSING_START": "Words from `unmatched_corpus_prefix_words` appear inside `immediate_transcript_before` and were cut off from the beginning of the detection.",
+     "MISSING_END": "Words from `unmatched_corpus_suffix_words` appear inside `immediate_transcript_after` and were cut off from the end of the detection.",
+     "MISSING_BOTH": "Words of the quote were cut off from BOTH the beginning (`immediate_transcript_before`) and the end (`immediate_transcript_after`)."
+    }
+   }
+  },
+  "merge": {
+   "neighborIds": {
+    "previous": null,
+    "next": "finding_15"
+   },
+   "neighbors": {
+    "previous": null,
+    "next": {
+     "source_type": "QURAN",
+     "candidate_reference": "هود: 112",
+     "same_reference_as_current": false,
+     "gap_word_count": 2,
+     "gap_transcript_text": "وقال تعالى",
+     "neighbor_span_in_lecture": "فاستقِم كما أُمرتَ ومن تابَ معاك ولا",
+     "neighbor_canonical_corpus_text": "فَاسْتَقِمْ كَمَا أُمِرْتَ وَمَن تَابَ مَعَكَ وَلَا"
+    }
+   },
+   "questions": {
+    "merge_suggestion": {
+     "type": "choice",
+     "instructions": "`neighbor_findings` lists the engine findings immediately before (`previous`) and/or after (`next`) this one, with the transcript words between them (`gap_transcript_text`). The engine often splits ONE quotation into separate findings when an ASR typo, a garbled or missing word, or a short repetition breaks the match; a neighbour may even be linked to a different reference. Decide, independently of `verdict`, whether this finding and a neighbour are consecutive parts of the same quoted text (compare the spans and the corpus texts) and should be one finding. Do not merge two different texts quoted one after the other.",
+     "criteria": {
+      "NO_MERGE": "This finding is a separate quotation (or the neighbour is a different text, or the gap is unrelated speech).",
+      "MERGE_WITH_NEXT": "This finding and the `next` neighbour are parts of the same quotation."
+     }
+    },
+    "merge_gap_type": {
+     "type": "choice",
+     "instructions": "Only meaningful when you suggest a merge: what are the words in `gap_transcript_text` between the parts?",
+     "criteria": {
+      "PART_OF_QUOTE": "The gap is empty, or it is mis-transcribed / garbled / repeated words of the quoted text itself.",
+      "COMMENTARY": "The gap is the speaker's own interjection or explanation between two parts of the same quotation."
+     }
+    }
+   }
+  }
+ },
+ {
+  "state": {
+   "source_type": "QURAN",
+   "candidate_reference": "هود: 112",
+   "canonical_corpus_text": "فَاسْتَقِمْ كَمَا أُمِرْتَ وَمَن تَابَ مَعَكَ وَلَا",
+   "context_before": "إنك حميدٌ مجيدٌ أما بعد أيها المؤمنون، إن الله سبحانه وتعالى أمرنا بالاستقامة إليه والاستقامة على دينه، فقال سبحانه وتعالى فياستقيموا إليه واستغفروه وقال تعالى",
+   "matched_span_in_lecture": "فاستقِم كما أُمرتَ ومن تابَ معاك ولا",
+   "context_after": "تضغلى، وقال واستقيم كما أمرتَ ولا تتبعَهوًا ومن حصل هذه الاستقامة فقد فاز بوعد عظيم من الله العلي الكريم، فقال الله سبحانه وتعالى ان الذين",
+   "unmatched_corpus_prefix_words": "",
+   "immediate_transcript_before": "فقال سبحانه وتعالى فياستقيموا إليه واستغفروه وقال تعالى",
+   "unmatched_corpus_suffix_words": "تَطْغَوْا إِنَّهُ بِمَا تَعْمَلُونَ بَصِيرٌ",
+   "immediate_transcript_after": "تضغلى، وقال واستقيم كما أمرتَ ولا تتبعَهوًا ومن",
+   "quran_neighboring_context": {
+    "surah": 11,
+    "ayah": 112,
+    "previous_ayah_text": "وَإِنَّ كُلًّا لَّمَّا لَيُوَفِّيَنَّهُمْ رَبُّكَ أَعْمَالَهُمْ إِنَّهُ بِمَا يَعْمَلُونَ خَبِيرٌ",
+    "current_ayah_text": "فَاسْتَقِمْ كَمَا أُمِرْتَ وَمَن تَابَ مَعَكَ وَلَا",
+    "next_ayah_text": "وَلَا تَرْكَنُوا إِلَى الَّذِينَ ظَلَمُوا فَتَمَسَّكُمُ النَّارُ وَمَا لَكُم مِّن دُونِ اللَّهِ مِنْ أَوْلِيَاءَ ثُمَّ"
+   },
+   "engine_confidence_band": "VERIFIED",
+   "engine_score": 35.46,
+   "has_citation_cue": true
+  },
+  "questions": {
+   "verdict": {
+    "type": "choice",
+    "instructions": "In this Arabic Islamic lecture transcript, determine whether `matched_span_in_lecture` (surrounded by `context_before` and `context_after`) is an actual quotation/citation of `canonical_corpus_text` (`source_type`), or if it is merely ordinary speaker prose/explanation that happens to share words with the corpus text.",
+    "criteria": {
+     "CORRECT": "The speaker is genuinely quoting, reciting, or invoking this Quranic Ayah, Prophetic Hadith, or Dhikr (verbatim or as a direct religious citation in context).",
+     "FALSE": "False positive: the words are ordinary conversational speech, fiqh explanation, or narrator/person names that coincidentally overlap with corpus vocabulary without quoting the text.",
+     "NOT_SURE": "Ambiguous or partial paraphrase/meaning-only allusion where it is borderline whether the speaker intended a direct quotation."
+    }
+   },
+   "boundary_status": {
+    "type": "choice",
+    "instructions": "Compare `immediate_transcript_before` against `unmatched_corpus_prefix_words`, and `immediate_transcript_after` against `unmatched_corpus_suffix_words`. Determine whether the speaker actually uttered additional words of this quote at the beginning or end (even with minor ASR spelling errors) that were accidentally cut off from `matched_span_in_lecture`. If the speaker intentionally stopped quoting and resumed normal commentary, select COMPLETE_SPAN.",
+    "criteria": {
+     "COMPLETE_SPAN": "The detected span captures all words of the quote that the speaker actually uttered in this segment (no words of the quote were cut off in the adjacent transcript).",
+     "MISSING_START": "Words from `unmatched_corpus_prefix_words` appear inside `immediate_transcript_before` and were cut off from the beginning of the detection.",
+     "MISSING_END": "Words from `unmatched_corpus_suffix_words` appear inside `immediate_transcript_after` and were cut off from the end of the detection.",
+     "MISSING_BOTH": "Words of the quote were cut off from BOTH the beginning (`immediate_transcript_before`) and the end (`immediate_transcript_after`)."
+    }
+   }
+  },
+  "merge": {
+   "neighborIds": {
+    "previous": "finding_14",
+    "next": null
+   },
+   "neighbors": {
+    "previous": {
+     "source_type": "QURAN",
+     "candidate_reference": "فصلت: 6",
+     "same_reference_as_current": false,
+     "gap_word_count": 2,
+     "gap_transcript_text": "وقال تعالى",
+     "neighbor_span_in_lecture": "فياستقيموا إليه واستغفروه",
+     "neighbor_canonical_corpus_text": "فَاسْتَقِيمُوا إِلَيْهِ وَاسْتَغْفِرُوهُ"
+    },
+    "next": null
+   },
+   "questions": {
+    "merge_suggestion": {
+     "type": "choice",
+     "instructions": "`neighbor_findings` lists the engine findings immediately before (`previous`) and/or after (`next`) this one, with the transcript words between them (`gap_transcript_text`). The engine often splits ONE quotation into separate findings when an ASR typo, a garbled or missing word, or a short repetition breaks the match; a neighbour may even be linked to a different reference. Decide, independently of `verdict`, whether this finding and a neighbour are consecutive parts of the same quoted text (compare the spans and the corpus texts) and should be one finding. Do not merge two different texts quoted one after the other.",
+     "criteria": {
+      "NO_MERGE": "This finding is a separate quotation (or the neighbour is a different text, or the gap is unrelated speech).",
+      "MERGE_WITH_PREVIOUS": "This finding and the `previous` neighbour are parts of the same quotation."
+     }
+    },
+    "merge_gap_type": {
+     "type": "choice",
+     "instructions": "Only meaningful when you suggest a merge: what are the words in `gap_transcript_text` between the parts?",
+     "criteria": {
+      "PART_OF_QUOTE": "The gap is empty, or it is mis-transcribed / garbled / repeated words of the quoted text itself.",
+      "COMMENTARY": "The gap is the speaker's own interjection or explanation between two parts of the same quotation."
+     }
+    }
+   }
+  }
+ },
+ {
+  "state": {
+   "source_type": "QURAN",
+   "candidate_reference": "فصلت: 30",
+   "canonical_corpus_text": "إِنَّ الَّذِينَ قَالُوا رَبُّنَا اللَّهُ ثُمَّ اسْتَقَامُوا",
+   "context_before": "معاك ولا تضغلى، وقال واستقيم كما أمرتَ ولا تتبعَهوًا ومن حصل هذه الاستقامة فقد فاز بوعد عظيم من الله العلي الكريم، فقال الله سبحانه وتعالى",
+   "matched_span_in_lecture": "ان الذين قالوا ربنا الله ثم استقاموا",
+   "context_after": "ثار لهم إليات التحقيق في التفاقر، وَأُبْشِرُوا بِالْجَنَّةِ الَّذِي كُنْتُمْ تُوَعَدُونَ وَالْمُسْتَقِيمُونَ إِلَى اللَّهِّ وَعَلَى دِينِ اللَّهِ وَالْقَمُوا وَالَّذِينِ اللَّهِ الْمِنْ ويحزون بتلات جوائز عظيمة،",
+   "unmatched_corpus_prefix_words": "",
+   "immediate_transcript_before": "من الله العلي الكريم، فقال الله سبحانه وتعالى",
+   "unmatched_corpus_suffix_words": "تَتَنَزَّلُ عَلَيْهِمُ الْمَلَائِكَةُ أَلَّا تَخَافُوا وَلَا تَحْزَنُوا وَأَبْشِرُوا بِالْجَنَّةِ الَّتِي",
+   "immediate_transcript_after": "ثار لهم إليات التحقيق في التفاقر، وَأُبْشِرُوا بِالْجَنَّةِ",
+   "quran_neighboring_context": {
+    "surah": 41,
+    "ayah": 30,
+    "previous_ayah_text": "الَّذِينَ كَفَرُوا رَبَّنَا أَرِنَا اللَّذَيْنِ أَضَلَّانَا مِنَ الْجِنِّ وَالْإِنسِ نَجْعَلْهُمَا تَحْتَ أَقْدَامِنَا لِيَكُونَا مِنَ الْأَسْفَلِينَ",
+    "current_ayah_text": "إِنَّ الَّذِينَ قَالُوا رَبُّنَا اللَّهُ ثُمَّ اسْتَقَامُوا",
+    "next_ayah_text": "نَحْنُ أَوْلِيَاؤُكُمْ فِي الْحَيَاةِ الدُّنْيَا وَفِي الْآخِرَةِ وَلَكُمْ فِيهَا مَا تَشْتَهِي أَنفُسُكُمْ وَلَكُمْ فِيهَا مَا"
+   },
+   "engine_confidence_band": "AMBIGUOUS",
+   "engine_score": 16.02,
+   "has_citation_cue": true
+  },
+  "questions": {
+   "verdict": {
+    "type": "choice",
+    "instructions": "In this Arabic Islamic lecture transcript, determine whether `matched_span_in_lecture` (surrounded by `context_before` and `context_after`) is an actual quotation/citation of `canonical_corpus_text` (`source_type`), or if it is merely ordinary speaker prose/explanation that happens to share words with the corpus text.",
+    "criteria": {
+     "CORRECT": "The speaker is genuinely quoting, reciting, or invoking this Quranic Ayah, Prophetic Hadith, or Dhikr (verbatim or as a direct religious citation in context).",
+     "FALSE": "False positive: the words are ordinary conversational speech, fiqh explanation, or narrator/person names that coincidentally overlap with corpus vocabulary without quoting the text.",
+     "NOT_SURE": "Ambiguous or partial paraphrase/meaning-only allusion where it is borderline whether the speaker intended a direct quotation."
+    }
+   },
+   "boundary_status": {
+    "type": "choice",
+    "instructions": "Compare `immediate_transcript_before` against `unmatched_corpus_prefix_words`, and `immediate_transcript_after` against `unmatched_corpus_suffix_words`. Determine whether the speaker actually uttered additional words of this quote at the beginning or end (even with minor ASR spelling errors) that were accidentally cut off from `matched_span_in_lecture`. If the speaker intentionally stopped quoting and resumed normal commentary, select COMPLETE_SPAN.",
+    "criteria": {
+     "COMPLETE_SPAN": "The detected span captures all words of the quote that the speaker actually uttered in this segment (no words of the quote were cut off in the adjacent transcript).",
+     "MISSING_START": "Words from `unmatched_corpus_prefix_words` appear inside `immediate_transcript_before` and were cut off from the beginning of the detection.",
+     "MISSING_END": "Words from `unmatched_corpus_suffix_words` appear inside `immediate_transcript_after` and were cut off from the end of the detection.",
+     "MISSING_BOTH": "Words of the quote were cut off from BOTH the beginning (`immediate_transcript_before`) and the end (`immediate_transcript_after`)."
+    }
+   }
+  },
+  "merge": null
+ },
+ {
+  "state": {
+   "source_type": "HADITH",
+   "candidate_reference": "رياض الصالحين (789)",
+   "canonical_corpus_text": "الهدى والتقى والعفاف والغنى",
+   "context_before": "بِالْجَنَّةِ الَّتِي كُنْتُمْ تُوَعَدُونَ فَإِنَّهَا وَعْدٌ مِّنَ اللَّهِ الْكَرِيمِ الْعَظِيمِ اللَّهُمَّ أَتِي نَفُوسَنَا تَقْوَاها، وزكِّيها أنت خير من زكَّاها أنت وليُّها ومولاها، اللهم إنا نسألك",
+   "matched_span_in_lecture": "الهدى والتقى والعفاف والغنى،",
+   "context_after": "اللهم احفظنا بالإس وزقه البطانة الناصحة الصالحة، وجنبه بطانة السوء.",
+   "unmatched_corpus_prefix_words": "كان يقول اللهم إني أسألك",
+   "immediate_transcript_before": "من زكَّاها أنت وليُّها ومولاها، اللهم إنا نسألك",
+   "unmatched_corpus_suffix_words": "رواه مسلم",
+   "immediate_transcript_after": "اللهم احفظنا بالإس وزقه البطانة الناصحة الصالحة، وجنبه",
+   "quran_neighboring_context": null,
+   "engine_confidence_band": "CANDIDATE",
+   "engine_score": 27.03,
+   "has_citation_cue": false
+  },
+  "questions": {
+   "verdict": {
+    "type": "choice",
+    "instructions": "In this Arabic Islamic lecture transcript, determine whether `matched_span_in_lecture` (surrounded by `context_before` and `context_after`) is an actual quotation/citation of `canonical_corpus_text` (`source_type`), or if it is merely ordinary speaker prose/explanation that happens to share words with the corpus text.",
+    "criteria": {
+     "CORRECT": "The speaker is genuinely quoting, reciting, or invoking this Quranic Ayah, Prophetic Hadith, or Dhikr (verbatim or as a direct religious citation in context).",
+     "FALSE": "False positive: the words are ordinary conversational speech, fiqh explanation, or narrator/person names that coincidentally overlap with corpus vocabulary without quoting the text.",
+     "NOT_SURE": "Ambiguous or partial paraphrase/meaning-only allusion where it is borderline whether the speaker intended a direct quotation."
+    }
+   },
+   "boundary_status": {
+    "type": "choice",
+    "instructions": "Compare `immediate_transcript_before` against `unmatched_corpus_prefix_words`, and `immediate_transcript_after` against `unmatched_corpus_suffix_words`. Determine whether the speaker actually uttered additional words of this quote at the beginning or end (even with minor ASR spelling errors) that were accidentally cut off from `matched_span_in_lecture`. If the speaker intentionally stopped quoting and resumed normal commentary, select COMPLETE_SPAN.",
+    "criteria": {
+     "COMPLETE_SPAN": "The detected span captures all words of the quote that the speaker actually uttered in this segment (no words of the quote were cut off in the adjacent transcript).",
+     "MISSING_START": "Words from `unmatched_corpus_prefix_words` appear inside `immediate_transcript_before` and were cut off from the beginning of the detection.",
+     "MISSING_END": "Words from `unmatched_corpus_suffix_words` appear inside `immediate_transcript_after` and were cut off from the end of the detection.",
+     "MISSING_BOTH": "Words of the quote were cut off from BOTH the beginning (`immediate_transcript_before`) and the end (`immediate_transcript_after`)."
+    }
+   }
+  },
+  "merge": null
+ }
+]

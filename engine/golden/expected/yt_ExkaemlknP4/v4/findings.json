@@ -1,0 +1,2545 @@
+[
+ {
+  "sourceType": "HADITH",
+  "unitId": "AbiDawud:2438",
+  "displayRef": "سنن أبي داود (2438)",
+  "candidateRefs": [
+   "سنن أبي داود (2438)",
+   "جامع الترمذي (757)",
+   "سنن ابن ماجه (1727)",
+   "رياض الصالحين (570)"
+  ],
+  "candidateUnitIds": [
+   "AbiDawud:2438",
+   "Tirmidhi:757",
+   "IbnMajah:1727",
+   "RiyadSalihin:570"
+  ],
+  "candidateCount": 4,
+  "isAmbiguous": true,
+  "isOutsideCorpus": false,
+  "confidenceBand": "AMBIGUOUS",
+  "totalScore": 53.24,
+  "hasCitationCue": true,
+  "hasFuzzyHeal": true,
+  "tStart": 29,
+  "tEnd": 45,
+  "charStart": 160,
+  "charEnd": 236,
+  "segments": [
+   [
+    29,
+    45
+   ]
+  ],
+  "qSegments": [
+   [
+    25,
+    40
+   ]
+  ],
+  "canonicalSegments": [
+   "وَلاَ الْجِهَادُ فِي سَبِيلِ اللَّهِ إِلاَّ رَجُلٌ خَرَجَ بِنَفْسِهِ وَمَالِهِ فَلَمْ يَرْجِعْ مِنْ ذَلِكَ بِشَىْءٍ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "",
+  "qiraahDisplay": "",
+  "evidence": {
+   "S": 47.4,
+   "E": 49.7,
+   "matched": 15,
+   "content": 10,
+   "exactRun": 10,
+   "coverage": 0.38,
+   "margin": 0
+  },
+  "chainedAyah": false,
+  "id": "finding_1",
+  "type": "hadith",
+  "startIndex": 160,
+  "endIndex": 236,
+  "wordStartIdx": 29,
+  "wordEndIdx": 44,
+  "startTime": 41.02,
+  "endTime": 48.86,
+  "matchedText": "ولا الجهاد في سبيل الله تعالى، إلا رجل خرج بنفسه وماله فلم يرجع من ذلك بشيء،",
+  "canonicalText": "وَلاَ الْجِهَادُ فِي سَبِيلِ اللَّهِ إِلاَّ رَجُلٌ خَرَجَ بِنَفْسِهِ وَمَالِهِ فَلَمْ يَرْجِعْ مِنْ ذَلِكَ بِشَىْءٍ",
+  "reference": "سنن أبي داود (2438)",
+  "confidence": 0.82,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "HADITH",
+  "unitId": "Muslim:554",
+  "displayRef": "صحيح مسلم (554)",
+  "candidateRefs": [
+   "صحيح مسلم (554)",
+   "سنن أبي داود (525)",
+   "جامع الترمذي (55)",
+   "سنن النسائي (3278)",
+   "سنن النسائي (1168)",
+   "سنن النسائي (1173)",
+   "سنن ابن ماجه (1892)",
+   "سنن ابن ماجه (469)",
+   "سنن ابن ماجه (721)",
+   "رياض الصالحين (353)"
+  ],
+  "candidateUnitIds": [
+   "Muslim:554",
+   "AbiDawud:525",
+   "Tirmidhi:55",
+   "Nasai:3278",
+   "Nasai:1168",
+   "Nasai:1173",
+   "IbnMajah:1892",
+   "IbnMajah:469",
+   "IbnMajah:721",
+   "RiyadSalihin:353"
+  ],
+  "candidateCount": 10,
+  "isAmbiguous": true,
+  "isOutsideCorpus": false,
+  "confidenceBand": "AMBIGUOUS",
+  "totalScore": 39.68,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 55,
+  "tEnd": 70,
+  "charStart": 296,
+  "charEnd": 364,
+  "segments": [
+   [
+    55,
+    70
+   ]
+  ],
+  "qSegments": [
+   [
+    3,
+    18
+   ]
+  ],
+  "canonicalSegments": [
+   "أَشْهَدُ أَنْ لاَ إِلَهَ إِلاَّ اللَّهُ وَحْدَهُ لاَ شَرِيكَ لَهُ وَأَشْهَدُ أَنَّ مُحَمَّدًا عَبْدُهُ وَرَسُولُهُ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "",
+  "qiraahDisplay": "",
+  "evidence": {
+   "S": 38.2,
+   "E": 38.2,
+   "matched": 15,
+   "content": 9,
+   "exactRun": 14,
+   "coverage": 0.83,
+   "margin": 0
+  },
+  "chainedAyah": false,
+  "id": "finding_2",
+  "type": "hadith",
+  "startIndex": 296,
+  "endIndex": 364,
+  "wordStartIdx": 55,
+  "wordEndIdx": 69,
+  "startTime": 56.7,
+  "endTime": 64.1,
+  "matchedText": "وأشهد أن لا إله إلا الله وحده لا شريك له وأشهد أن محمدًا عبده ورسوله",
+  "canonicalText": "أَشْهَدُ أَنْ لاَ إِلَهَ إِلاَّ اللَّهُ وَحْدَهُ لاَ شَرِيكَ لَهُ وَأَشْهَدُ أَنَّ مُحَمَّدًا عَبْدُهُ وَرَسُولُهُ",
+  "reference": "صحيح مسلم (554)",
+  "confidence": 0.82,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "97:3",
+  "displayRef": "القدر: 3",
+  "candidateRefs": [
+   "القدر: 3"
+  ],
+  "candidateUnitIds": [
+   "97:3"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 26.72,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": true,
+  "tStart": 285,
+  "tEnd": 291,
+  "charStart": 1489,
+  "charEnd": 1517,
+  "segments": [
+   [
+    285,
+    291
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    6
+   ]
+  ],
+  "canonicalSegments": [
+   "لَيْلَةُ الْقَدْرِ خَيْرٌ مِّنْ أَلْفِ شَهْرٍ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 26.7,
+   "E": 28.6,
+   "matched": 5,
+   "content": 4,
+   "exactRun": 3,
+   "coverage": 0.83,
+   "margin": 26.7
+  },
+  "chainedAyah": false,
+  "id": "finding_3",
+  "type": "ayah",
+  "startIndex": 1489,
+  "endIndex": 1517,
+  "wordStartIdx": 285,
+  "wordEndIdx": 290,
+  "startTime": 231.82,
+  "endTime": 236.5,
+  "matchedText": "ليلة القدر ويخير من ألف شهر،",
+  "canonicalText": "لَيْلَةُ الْقَدْرِ خَيْرٌ مِّنْ أَلْفِ شَهْرٍ",
+  "reference": "القدر: 3",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "HADITH",
+  "unitId": "Tirmidhi:757",
+  "displayRef": "جامع الترمذي (757)",
+  "candidateRefs": [
+   "جامع الترمذي (757)"
+  ],
+  "candidateUnitIds": [
+   "Tirmidhi:757"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 95.33,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 357,
+  "tEnd": 408,
+  "charStart": 1875,
+  "charEnd": 2122,
+  "segments": [
+   [
+    357,
+    371
+   ],
+   [
+    377,
+    408
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    13
+   ],
+   [
+    13,
+    44
+   ]
+  ],
+  "canonicalSegments": [
+   "مَا مِنْ أَيَّامٍ الْعَمَلُ الصَّالِحُ فِيهِنَّ أَحَبُّ إِلَى اللَّهِ مِنْ هَذِهِ الأَيَّامِ الْعَشْرِ",
+   "فَقَالُوا يَا رَسُولَ اللَّهِ وَلاَ الْجِهَادُ فِي سَبِيلِ اللَّهِ فَقَالَ رَسُولُ اللَّهِ صلى الله عليه وسلم وَلاَ الْجِهَادُ فِي سَبِيلِ اللَّهِ إِلاَّ رَجُلٌ خَرَجَ بِنَفْسِهِ وَمَالِهِ فَلَمْ يَرْجِعْ مِنْ ذَلِكَ بِشَيْءٍ"
+  ],
+  "commentaryGaps": [
+   [
+    371,
+    377
+   ]
+  ],
+  "qiraah": "",
+  "qiraahDisplay": "",
+  "evidence": {
+   "S": 95.3,
+   "E": 103.4,
+   "matched": 44,
+   "content": 22,
+   "exactRun": 31,
+   "coverage": 1,
+   "margin": 9.9
+  },
+  "chainedAyah": false,
+  "id": "finding_4",
+  "type": "hadith",
+  "startIndex": 1875,
+  "endIndex": 2122,
+  "wordStartIdx": 357,
+  "wordEndIdx": 407,
+  "startTime": 283.56,
+  "endTime": 312.2,
+  "matchedText": "ما من أيام العمل الصالح فيهن أحب إلى الله تعالى من هذه الأيام العشر، أي العشر الأول من شرر الحجة، فقالوا يا رسول الله ولا الجهاد في سبيل الله، فقال رسول الله صلى الله عليه وسلم ولا الجهاد في سبيل الله، إلا رجل خرج بنفسه وماله فلم يرجع من ذلك بشيء،",
+  "canonicalText": "مَا مِنْ أَيَّامٍ الْعَمَلُ الصَّالِحُ فِيهِنَّ أَحَبُّ إِلَى اللَّهِ مِنْ هَذِهِ الأَيَّامِ الْعَشْرِ فَقَالُوا يَا رَسُولَ اللَّهِ وَلاَ الْجِهَادُ فِي سَبِيلِ اللَّهِ فَقَالَ رَسُولُ اللَّهِ صلى الله عليه وسلم وَلاَ الْجِهَادُ فِي سَبِيلِ اللَّهِ إِلاَّ رَجُلٌ خَرَجَ بِنَفْسِهِ وَمَالِهِ فَلَمْ يَرْجِعْ مِنْ ذَلِكَ بِشَيْءٍ",
+  "reference": "جامع الترمذي (757)",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "HADITH",
+  "unitId": "Bukhari:969",
+  "displayRef": "صحيح البخاري (969)",
+  "candidateRefs": [
+   "صحيح البخاري (969)"
+  ],
+  "candidateUnitIds": [
+   "Bukhari:969"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 64.4,
+  "hasCitationCue": true,
+  "hasFuzzyHeal": true,
+  "tStart": 436,
+  "tEnd": 462,
+  "charStart": 2269,
+  "charEnd": 2391,
+  "segments": [
+   [
+    436,
+    462
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    25
+   ]
+  ],
+  "canonicalSegments": [
+   "مَا الْعَمَلُ فِي أَيَّامِ الْعَشْرِ أَفْضَلَ مِنَ الْعَمَلِ فِي هَذِهِ قَالُوا وَلاَ الْجِهَادُ قَالَ وَلاَ الْجِهَادُ إِلاَّ رَجُلٌ خَرَجَ يُخَاطِرُ بِنَفْسِهِ وَمَالِهِ فَلَمْ يَرْجِعْ بِشَىْءٍ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "",
+  "qiraahDisplay": "",
+  "evidence": {
+   "S": 61.4,
+   "E": 72,
+   "matched": 21,
+   "content": 14,
+   "exactRun": 8,
+   "coverage": 0.84,
+   "margin": 33.8
+  },
+  "chainedAyah": false,
+  "id": "finding_5",
+  "type": "hadith",
+  "startIndex": 2269,
+  "endIndex": 2391,
+  "wordStartIdx": 436,
+  "wordEndIdx": 461,
+  "startTime": 328.7,
+  "endTime": 346.98,
+  "matchedText": "ما العمل في أيام أفضل من العمل في هذه العشر الأول منذ الحجة، قال ولا الجهاد إلا رجل خرج يخاطر بنفسه، وما له فلم يرجع بشيء،",
+  "canonicalText": "مَا الْعَمَلُ فِي أَيَّامِ الْعَشْرِ أَفْضَلَ مِنَ الْعَمَلِ فِي هَذِهِ قَالُوا وَلاَ الْجِهَادُ قَالَ وَلاَ الْجِهَادُ إِلاَّ رَجُلٌ خَرَجَ يُخَاطِرُ بِنَفْسِهِ وَمَالِهِ فَلَمْ يَرْجِعْ بِشَىْءٍ",
+  "reference": "صحيح البخاري (969)",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "HADITH",
+  "unitId": "AbiDawud:2437",
+  "displayRef": "سنن أبي داود (2437)",
+  "candidateRefs": [
+   "سنن أبي داود (2437)",
+   "سنن النسائي (2418)",
+   "سنن النسائي (2417)"
+  ],
+  "candidateUnitIds": [
+   "AbiDawud:2437",
+   "Nasai:2418",
+   "Nasai:2417"
+  ],
+  "candidateCount": 3,
+  "isAmbiguous": true,
+  "isOutsideCorpus": false,
+  "confidenceBand": "CANDIDATE",
+  "totalScore": 22.4,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": true,
+  "tStart": 524,
+  "tEnd": 531,
+  "charStart": 2727,
+  "charEnd": 2761,
+  "segments": [
+   [
+    524,
+    531
+   ]
+  ],
+  "qSegments": [
+   [
+    6,
+    13
+   ]
+  ],
+  "canonicalSegments": [
+   "وَثَلاَثَةَ أَيَّامٍ مِنْ كُلِّ شَهْرٍ أَوَّلَ اثْنَيْنِ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "",
+  "qiraahDisplay": "",
+  "evidence": {
+   "S": 21.7,
+   "E": 23.8,
+   "matched": 6,
+   "content": 4,
+   "exactRun": 5,
+   "coverage": 0.38,
+   "margin": 0
+  },
+  "chainedAyah": false,
+  "id": "finding_6",
+  "type": "hadith",
+  "startIndex": 2727,
+  "endIndex": 2761,
+  "wordStartIdx": 524,
+  "wordEndIdx": 530,
+  "startTime": 395.6,
+  "endTime": 398.88,
+  "matchedText": "وثلاثة أيام من كل شهر ويوم الاثنين",
+  "canonicalText": "وَثَلاَثَةَ أَيَّامٍ مِنْ كُلِّ شَهْرٍ أَوَّلَ اثْنَيْنِ",
+  "reference": "سنن أبي داود (2437)",
+  "confidence": 0.72,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "HADITH",
+  "unitId": "Muslim:2747",
+  "displayRef": "صحيح مسلم (2747)",
+  "candidateRefs": [
+   "صحيح مسلم (2747)"
+  ],
+  "candidateUnitIds": [
+   "Muslim:2747"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 155.81,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 567,
+  "tEnd": 650,
+  "charStart": 2945,
+  "charEnd": 3335,
+  "segments": [
+   [
+    567,
+    577
+   ],
+   [
+    585,
+    586
+   ],
+   [
+    594,
+    595
+   ],
+   [
+    603,
+    650
+   ]
+  ],
+  "qSegments": [
+   [
+    9,
+    19
+   ],
+   [
+    19,
+    20
+   ],
+   [
+    20,
+    21
+   ],
+   [
+    21,
+    68
+   ]
+  ],
+  "canonicalSegments": [
+   "قَالَ فَسُئِلَ عَنْ صَوْمِ يَوْمَيْنِ وَإِفْطَارِ يَوْمٍ قَالَ وَمَنْ يُطِيقُ",
+   "ذَلِكَ",
+   "قَالَ",
+   "وَسُئِلَ عَنْ صَوْمِ يَوْمٍ وَإِفْطَارِ يَوْمَيْنِ قَالَ لَيْتَ أَنَّ اللَّهَ قَوَّانَا لِذَلِكَ قَالَ وَسُئِلَ عَنْ صَوْمِ يَوْمٍ وَإِفْطَارِ يَوْمٍ قَالَ ذَاكَ صَوْمُ أَخِي دَاوُدَ عَلَيْهِ السَّلاَمُ قَالَ وَسُئِلَ عَنْ صَوْمِ يَوْمِ الاِثْنَيْنِ قَالَ ذَاكَ يَوْمٌ وُلِدْتُ فِيهِ وَيَوْمٌ بُعِثْتُ أَوْ أُنْزِلَ عَلَىَّ فِيهِ قَالَ فَقَالَ صَوْمُ ثَلاَثَةٍ"
+  ],
+  "commentaryGaps": [
+   [
+    577,
+    585
+   ],
+   [
+    586,
+    594
+   ],
+   [
+    595,
+    603
+   ]
+  ],
+  "qiraah": "",
+  "qiraahDisplay": "",
+  "evidence": {
+   "S": 155.8,
+   "E": 193.9,
+   "matched": 51,
+   "content": 33,
+   "exactRun": 7,
+   "coverage": 0.44,
+   "margin": 121.7
+  },
+  "chainedAyah": false,
+  "id": "finding_7",
+  "type": "hadith",
+  "startIndex": 2945,
+  "endIndex": 3335,
+  "wordStartIdx": 567,
+  "wordEndIdx": 649,
+  "startTime": 446.265,
+  "endTime": 502.445,
+  "matchedText": "قال فسئل عن صيام يومين وإفطار يوم قال ومن يطيق ذلك؟ قال وسئل عن صوم يوم وإفطار يوم قال ذاك صوم أخي داود داود قبله، يبدو عندك سقط عندك، في سقط عندك، حتى النسقطة، نعم، قال وسئل عن صوم يوم وإشطار يومين، قال ليت أن الله عز وجل قوان لذلك، قال وسئل عن صوم يوم وإشطار يوم، قال ذلك صوم أخي داود، نعم، قال وسئل عن صيام يوم الاثنين، فقال ذاك يوم ولدت فيه، ويوم بعثت وأنزل علي فيه، قال فقال فصوم ثلاثة",
+  "canonicalText": "قَالَ فَسُئِلَ عَنْ صَوْمِ يَوْمَيْنِ وَإِفْطَارِ يَوْمٍ قَالَ وَمَنْ يُطِيقُ ذَلِكَ قَالَ وَسُئِلَ عَنْ صَوْمِ يَوْمٍ وَإِفْطَارِ يَوْمَيْنِ قَالَ لَيْتَ أَنَّ اللَّهَ قَوَّانَا لِذَلِكَ قَالَ وَسُئِلَ عَنْ صَوْمِ يَوْمٍ وَإِفْطَارِ يَوْمٍ قَالَ ذَاكَ صَوْمُ أَخِي دَاوُدَ عَلَيْهِ السَّلاَمُ قَالَ وَسُئِلَ عَنْ صَوْمِ يَوْمِ الاِثْنَيْنِ قَالَ ذَاكَ يَوْمٌ وُلِدْتُ فِيهِ وَيَوْمٌ بُعِثْتُ أَوْ أُنْزِلَ عَلَىَّ فِيهِ قَالَ فَقَالَ صَوْمُ ثَلاَثَةٍ",
+  "reference": "صحيح مسلم (2747)",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "HADITH",
+  "unitId": "Muslim:2746",
+  "displayRef": "صحيح مسلم (2746)",
+  "candidateRefs": [
+   "صحيح مسلم (2746)"
+  ],
+  "candidateUnitIds": [
+   "Muslim:2746"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "CANDIDATE",
+  "totalScore": 23.89,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": true,
+  "tStart": 582,
+  "tEnd": 590,
+  "charStart": 3013,
+  "charEnd": 3048,
+  "segments": [
+   [
+    582,
+    590
+   ]
+  ],
+  "qSegments": [
+   [
+    25,
+    32
+   ]
+  ],
+  "canonicalSegments": [
+   "يَوْمًا وَيُفْطِرُ يَوْمًا قَالَ ذَاكَ صَوْمُ دَاوُدَ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "",
+  "qiraahDisplay": "",
+  "evidence": {
+   "S": 23.9,
+   "E": 26.2,
+   "matched": 7,
+   "content": 6,
+   "exactRun": 4,
+   "coverage": 0.08,
+   "margin": 3.7
+  },
+  "chainedAyah": false,
+  "id": "finding_8",
+  "type": "hadith",
+  "startIndex": 3013,
+  "endIndex": 3048,
+  "wordStartIdx": 582,
+  "wordEndIdx": 589,
+  "startTime": 458.02502,
+  "endTime": 461.48502,
+  "matchedText": "يوم وإفطار يوم قال ذاك صوم أخي داود",
+  "canonicalText": "يَوْمًا وَيُفْطِرُ يَوْمًا قَالَ ذَاكَ صَوْمُ دَاوُدَ",
+  "reference": "صحيح مسلم (2746)",
+  "confidence": 0.72,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "HADITH",
+  "unitId": "Muslim:2747",
+  "displayRef": "صحيح مسلم (2747)",
+  "candidateRefs": [
+   "صحيح مسلم (2747)"
+  ],
+  "candidateUnitIds": [
+   "Muslim:2747"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 51.21,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": true,
+  "tStart": 648,
+  "tEnd": 667,
+  "charStart": 3325,
+  "charEnd": 3422,
+  "segments": [
+   [
+    648,
+    667
+   ]
+  ],
+  "qSegments": [
+   [
+    66,
+    85
+   ]
+  ],
+  "canonicalSegments": [
+   "صَوْمُ ثَلاَثَةٍ مِنْ كُلِّ شَهْرٍ وَرَمَضَانَ إِلَى رَمَضَانَ صَوْمُ الدَّهْرِ قَالَ وَسُئِلَ عَنْ صَوْمِ يَوْمِ عَرَفَةَ فَقَالَ يُكَفِّرُ السَّنَةَ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "",
+  "qiraahDisplay": "",
+  "evidence": {
+   "S": 51.2,
+   "E": 61.2,
+   "matched": 16,
+   "content": 10,
+   "exactRun": 9,
+   "coverage": 0.14,
+   "margin": 22.2
+  },
+  "chainedAyah": false,
+  "id": "finding_9",
+  "type": "hadith",
+  "startIndex": 3325,
+  "endIndex": 3422,
+  "wordStartIdx": 648,
+  "wordEndIdx": 666,
+  "startTime": 501.385,
+  "endTime": 511.265,
+  "matchedText": "فصوم ثلاثة أيام من كل شهر، ورمضان إلى رمضان صوم الدهر، قال فالسئل عن صوم عاشراء، فقال يكفر السنة،",
+  "canonicalText": "صَوْمُ ثَلاَثَةٍ مِنْ كُلِّ شَهْرٍ وَرَمَضَانَ إِلَى رَمَضَانَ صَوْمُ الدَّهْرِ قَالَ وَسُئِلَ عَنْ صَوْمِ يَوْمِ عَرَفَةَ فَقَالَ يُكَفِّرُ السَّنَةَ",
+  "reference": "صحيح مسلم (2747)",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "HADITH",
+  "unitId": "Nasai:2420",
+  "displayRef": "سنن النسائي (2420)",
+  "candidateRefs": [
+   "سنن النسائي (2420)"
+  ],
+  "candidateUnitIds": [
+   "Nasai:2420"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "CANDIDATE",
+  "totalScore": 24.4,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": true,
+  "tStart": 696,
+  "tEnd": 704,
+  "charStart": 3562,
+  "charEnd": 3597,
+  "segments": [
+   [
+    696,
+    704
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    7
+   ]
+  ],
+  "canonicalSegments": [
+   "صِيَامُ ثَلاَثَةِ أَيَّامٍ مِنْ كُلِّ شَهْرٍ صِيَامُ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "",
+  "qiraahDisplay": "",
+  "evidence": {
+   "S": 24.4,
+   "E": 26.7,
+   "matched": 7,
+   "content": 5,
+   "exactRun": 6,
+   "coverage": 0.41,
+   "margin": 3.4
+  },
+  "chainedAyah": false,
+  "id": "finding_10",
+  "type": "hadith",
+  "startIndex": 3562,
+  "endIndex": 3597,
+  "wordStartIdx": 696,
+  "wordEndIdx": 703,
+  "startTime": 531.265,
+  "endTime": 534.685,
+  "matchedText": "صيام ثلاثة أيام من كل شهر وفضل صيام",
+  "canonicalText": "صِيَامُ ثَلاَثَةِ أَيَّامٍ مِنْ كُلِّ شَهْرٍ صِيَامُ",
+  "reference": "سنن النسائي (2420)",
+  "confidence": 0.72,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "HADITH",
+  "unitId": "Bukhari:6362",
+  "displayRef": "صحيح البخاري (6362)",
+  "candidateRefs": [
+   "صحيح البخاري (6362)",
+   "صحيح البخاري (7294)"
+  ],
+  "candidateUnitIds": [
+   "Bukhari:6362",
+   "Bukhari:7294"
+  ],
+  "candidateCount": 2,
+  "isAmbiguous": true,
+  "isOutsideCorpus": false,
+  "confidenceBand": "AMBIGUOUS",
+  "totalScore": 41.78,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 855,
+  "tEnd": 866,
+  "charStart": 4413,
+  "charEnd": 4474,
+  "segments": [
+   [
+    855,
+    866
+   ]
+  ],
+  "qSegments": [
+   [
+    41,
+    52
+   ]
+  ],
+  "canonicalSegments": [
+   "رَضِينَا بِاللَّهِ رَبًّا وَبِالإِسْلاَمِ دِينًا وَبِمُحَمَّدٍ صلى الله عليه وسلم رَسُولاً"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "",
+  "qiraahDisplay": "",
+  "evidence": {
+   "S": 41.8,
+   "E": 41.8,
+   "matched": 11,
+   "content": 8,
+   "exactRun": 5,
+   "coverage": 0.11,
+   "margin": 0
+  },
+  "chainedAyah": false,
+  "id": "finding_11",
+  "type": "hadith",
+  "startIndex": 4413,
+  "endIndex": 4474,
+  "wordStartIdx": 855,
+  "wordEndIdx": 865,
+  "startTime": 648.245,
+  "endTime": 654.705,
+  "matchedText": "رضينا بالله ربا وبالإسلام دينا ومحمد صلى الله عليه وسلم رسولا",
+  "canonicalText": "رَضِينَا بِاللَّهِ رَبًّا وَبِالإِسْلاَمِ دِينًا وَبِمُحَمَّدٍ صلى الله عليه وسلم رَسُولاً",
+  "reference": "صحيح البخاري (6362)",
+  "confidence": 0.82,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "HADITH",
+  "unitId": "Bukhari:6362",
+  "displayRef": "صحيح البخاري (6362)",
+  "candidateRefs": [
+   "صحيح البخاري (6362)",
+   "صحيح البخاري (7294)"
+  ],
+  "candidateUnitIds": [
+   "Bukhari:6362",
+   "Bukhari:7294"
+  ],
+  "candidateCount": 2,
+  "isAmbiguous": true,
+  "isOutsideCorpus": false,
+  "confidenceBand": "AMBIGUOUS",
+  "totalScore": 44.52,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 895,
+  "tEnd": 907,
+  "charStart": 4640,
+  "charEnd": 4706,
+  "segments": [
+   [
+    895,
+    907
+   ]
+  ],
+  "qSegments": [
+   [
+    40,
+    52
+   ]
+  ],
+  "canonicalSegments": [
+   "فَقَالَ رَضِينَا بِاللَّهِ رَبًّا وَبِالإِسْلاَمِ دِينًا وَبِمُحَمَّدٍ صلى الله عليه وسلم رَسُولاً"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "",
+  "qiraahDisplay": "",
+  "evidence": {
+   "S": 44.5,
+   "E": 44.5,
+   "matched": 12,
+   "content": 8,
+   "exactRun": 11,
+   "coverage": 0.12,
+   "margin": 0
+  },
+  "chainedAyah": false,
+  "id": "finding_12",
+  "type": "hadith",
+  "startIndex": 4640,
+  "endIndex": 4706,
+  "wordStartIdx": 895,
+  "wordEndIdx": 906,
+  "startTime": 675.84503,
+  "endTime": 682.525,
+  "matchedText": "قال رضينا بالله ربا وبالإسلام دينا وبمحمد صلى الله عليه وسلم رسولا",
+  "canonicalText": "فَقَالَ رَضِينَا بِاللَّهِ رَبًّا وَبِالإِسْلاَمِ دِينًا وَبِمُحَمَّدٍ صلى الله عليه وسلم رَسُولاً",
+  "reference": "صحيح البخاري (6362)",
+  "confidence": 0.82,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "HADITH",
+  "unitId": "AbiDawud:4753",
+  "displayRef": "سنن أبي داود (4753)",
+  "candidateRefs": [
+   "سنن أبي داود (4753)",
+   "جامع الترمذي (3120)"
+  ],
+  "candidateUnitIds": [
+   "AbiDawud:4753",
+   "Tirmidhi:3120"
+  ],
+  "candidateCount": 2,
+  "isAmbiguous": true,
+  "isOutsideCorpus": false,
+  "confidenceBand": "CANDIDATE",
+  "totalScore": 22.43,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 922,
+  "tEnd": 928,
+  "charStart": 4789,
+  "charEnd": 4813,
+  "segments": [
+   [
+    922,
+    928
+   ]
+  ],
+  "qSegments": [
+   [
+    27,
+    33
+   ]
+  ],
+  "canonicalSegments": [
+   "مَنْ رَبُّكَ وَمَا دِينُكَ وَمَنْ نَبِيُّكَ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "",
+  "qiraahDisplay": "",
+  "evidence": {
+   "S": 22.4,
+   "E": 22.4,
+   "matched": 6,
+   "content": 3,
+   "exactRun": 6,
+   "coverage": 0.03,
+   "margin": 0
+  },
+  "chainedAyah": false,
+  "id": "finding_13",
+  "type": "hadith",
+  "startIndex": 4789,
+  "endIndex": 4813,
+  "wordStartIdx": 922,
+  "wordEndIdx": 927,
+  "startTime": 695.225,
+  "endTime": 699.18506,
+  "matchedText": "من ربك وما دينك ومن نبيك",
+  "canonicalText": "مَنْ رَبُّكَ وَمَا دِينُكَ وَمَنْ نَبِيُّكَ",
+  "reference": "سنن أبي داود (4753)",
+  "confidence": 0.72,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "HADITH",
+  "unitId": "Bukhari:6362",
+  "displayRef": "صحيح البخاري (6362)",
+  "candidateRefs": [
+   "صحيح البخاري (6362)",
+   "صحيح البخاري (7294)"
+  ],
+  "candidateUnitIds": [
+   "Bukhari:6362",
+   "Bukhari:7294"
+  ],
+  "candidateCount": 2,
+  "isAmbiguous": true,
+  "isOutsideCorpus": false,
+  "confidenceBand": "AMBIGUOUS",
+  "totalScore": 34.32,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 944,
+  "tEnd": 954,
+  "charStart": 4897,
+  "charEnd": 4955,
+  "segments": [
+   [
+    944,
+    954
+   ]
+  ],
+  "qSegments": [
+   [
+    42,
+    52
+   ]
+  ],
+  "canonicalSegments": [
+   "بِاللَّهِ رَبًّا وَبِالإِسْلاَمِ دِينًا وَبِمُحَمَّدٍ صلى الله عليه وسلم رَسُولاً"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "",
+  "qiraahDisplay": "",
+  "evidence": {
+   "S": 34.3,
+   "E": 34.3,
+   "matched": 10,
+   "content": 7,
+   "exactRun": 9,
+   "coverage": 0.1,
+   "margin": 0
+  },
+  "chainedAyah": false,
+  "id": "finding_14",
+  "type": "hadith",
+  "startIndex": 4897,
+  "endIndex": 4955,
+  "wordStartIdx": 944,
+  "wordEndIdx": 953,
+  "startTime": 711.80505,
+  "endTime": 717.92505,
+  "matchedText": "بالله رباً وبالإسلام ديناً وبمحمد صلى الله عليه وسلم رسوله",
+  "canonicalText": "بِاللَّهِ رَبًّا وَبِالإِسْلاَمِ دِينًا وَبِمُحَمَّدٍ صلى الله عليه وسلم رَسُولاً",
+  "reference": "صحيح البخاري (6362)",
+  "confidence": 0.82,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "HADITH",
+  "unitId": "Bukhari:7294",
+  "displayRef": "صحيح البخاري (7294)",
+  "candidateRefs": [
+   "صحيح البخاري (7294)",
+   "صحيح البخاري (6362)"
+  ],
+  "candidateUnitIds": [
+   "Bukhari:7294",
+   "Bukhari:6362"
+  ],
+  "candidateCount": 2,
+  "isAmbiguous": true,
+  "isOutsideCorpus": false,
+  "confidenceBand": "AMBIGUOUS",
+  "totalScore": 40.24,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 990,
+  "tEnd": 1001,
+  "charStart": 5137,
+  "charEnd": 5200,
+  "segments": [
+   [
+    990,
+    1001
+   ]
+  ],
+  "qSegments": [
+   [
+    75,
+    86
+   ]
+  ],
+  "canonicalSegments": [
+   "رَضِينَا بِاللَّهِ رَبًّا وَبِالإِسْلاَمِ دِينًا وَبِمُحَمَّدٍ صلى الله عليه وسلم رَسُولاً"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "",
+  "qiraahDisplay": "",
+  "evidence": {
+   "S": 40.2,
+   "E": 40.2,
+   "matched": 11,
+   "content": 8,
+   "exactRun": 5,
+   "coverage": 0.09,
+   "margin": 0
+  },
+  "chainedAyah": false,
+  "id": "finding_15",
+  "type": "hadith",
+  "startIndex": 5137,
+  "endIndex": 5200,
+  "wordStartIdx": 990,
+  "wordEndIdx": 1000,
+  "startTime": 740.085,
+  "endTime": 746.905,
+  "matchedText": "رضيت بالله رباً وبالإسلام ديناً ومحمد صلى الله عليه وسلم رسولاً",
+  "canonicalText": "رَضِينَا بِاللَّهِ رَبًّا وَبِالإِسْلاَمِ دِينًا وَبِمُحَمَّدٍ صلى الله عليه وسلم رَسُولاً",
+  "reference": "صحيح البخاري (7294)",
+  "confidence": 0.82,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "HADITH",
+  "unitId": "Muslim:2747",
+  "displayRef": "صحيح مسلم (2747)",
+  "candidateRefs": [
+   "صحيح مسلم (2747)",
+   "سنن النسائي (2383)"
+  ],
+  "candidateUnitIds": [
+   "Muslim:2747",
+   "Nasai:2383"
+  ],
+  "candidateCount": 2,
+  "isAmbiguous": true,
+  "isOutsideCorpus": false,
+  "confidenceBand": "CANDIDATE",
+  "totalScore": 26.76,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 1043,
+  "tEnd": 1052,
+  "charStart": 5422,
+  "charEnd": 5458,
+  "segments": [
+   [
+    1043,
+    1052
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    9
+   ]
+  ],
+  "canonicalSegments": [
+   "لاَ صَامَ وَلاَ أَفْطَرَ أَوْ مَا صَامَ وَمَا أَفْطَرَ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "",
+  "qiraahDisplay": "",
+  "evidence": {
+   "S": 26.8,
+   "E": 26.8,
+   "matched": 9,
+   "content": 4,
+   "exactRun": 9,
+   "coverage": 0.08,
+   "margin": 0
+  },
+  "chainedAyah": false,
+  "id": "finding_16",
+  "type": "hadith",
+  "startIndex": 5422,
+  "endIndex": 5458,
+  "wordStartIdx": 1043,
+  "wordEndIdx": 1051,
+  "startTime": 777.645,
+  "endTime": 783.725,
+  "matchedText": "لا صام ولا أفطر، أو ما صام وما أفطر،",
+  "canonicalText": "لاَ صَامَ وَلاَ أَفْطَرَ أَوْ مَا صَامَ وَمَا أَفْطَرَ",
+  "reference": "صحيح مسلم (2747)",
+  "confidence": 0.72,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "HADITH",
+  "unitId": "Bukhari:5063",
+  "displayRef": "صحيح البخاري (5063)",
+  "candidateRefs": [
+   "صحيح البخاري (5063)",
+   "صحيح مسلم (3403)",
+   "سنن النسائي (3217)",
+   "رياض الصالحين (1360)",
+   "بلوغ المرام (1124)"
+  ],
+  "candidateUnitIds": [
+   "Bukhari:5063",
+   "Muslim:3403",
+   "Nasai:3217",
+   "RiyadSalihin:1360",
+   "BulughMaram:1124"
+  ],
+  "candidateCount": 5,
+  "isAmbiguous": true,
+  "isOutsideCorpus": false,
+  "confidenceBand": "CANDIDATE",
+  "totalScore": 29.26,
+  "hasCitationCue": true,
+  "hasFuzzyHeal": false,
+  "tStart": 1103,
+  "tEnd": 1108,
+  "charStart": 5715,
+  "charEnd": 5736,
+  "segments": [
+   [
+    1103,
+    1108
+   ]
+  ],
+  "qSegments": [
+   [
+    20,
+    25
+   ]
+  ],
+  "canonicalSegments": [
+   "رَغِبَ عَنْ سُنَّتِي فَلَيْسَ مِنِّي"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "",
+  "qiraahDisplay": "",
+  "evidence": {
+   "S": 26.3,
+   "E": 26.3,
+   "matched": 5,
+   "content": 4,
+   "exactRun": 5,
+   "coverage": 0.2,
+   "margin": 0
+  },
+  "chainedAyah": false,
+  "id": "finding_17",
+  "type": "hadith",
+  "startIndex": 5715,
+  "endIndex": 5736,
+  "wordStartIdx": 1103,
+  "wordEndIdx": 1107,
+  "startTime": 812.17004,
+  "endTime": 815.15,
+  "matchedText": "رغب عن سنتي فليس مني،",
+  "canonicalText": "رَغِبَ عَنْ سُنَّتِي فَلَيْسَ مِنِّي",
+  "reference": "صحيح البخاري (5063)",
+  "confidence": 0.72,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "HADITH",
+  "unitId": "Muslim:2747",
+  "displayRef": "صحيح مسلم (2747)",
+  "candidateRefs": [
+   "صحيح مسلم (2747)"
+  ],
+  "candidateUnitIds": [
+   "Muslim:2747"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 171.06,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 1146,
+  "tEnd": 1218,
+  "charStart": 5939,
+  "charEnd": 6285,
+  "segments": [
+   [
+    1146,
+    1156
+   ],
+   [
+    1165,
+    1167
+   ],
+   [
+    1170,
+    1218
+   ]
+  ],
+  "qSegments": [
+   [
+    5,
+    15
+   ],
+   [
+    15,
+    17
+   ],
+   [
+    17,
+    64
+   ]
+  ],
+  "canonicalSegments": [
+   "مَا صَامَ وَمَا أَفْطَرَ قَالَ فَسُئِلَ عَنْ صَوْمِ يَوْمَيْنِ وَإِفْطَارِ",
+   "يَوْمٍ قَالَ",
+   "وَمَنْ يُطِيقُ ذَلِكَ قَالَ وَسُئِلَ عَنْ صَوْمِ يَوْمٍ وَإِفْطَارِ يَوْمَيْنِ قَالَ لَيْتَ أَنَّ اللَّهَ قَوَّانَا لِذَلِكَ قَالَ وَسُئِلَ عَنْ صَوْمِ يَوْمٍ وَإِفْطَارِ يَوْمٍ قَالَ ذَاكَ صَوْمُ أَخِي دَاوُدَ عَلَيْهِ السَّلاَمُ قَالَ وَسُئِلَ عَنْ صَوْمِ يَوْمِ الاِثْنَيْنِ قَالَ ذَاكَ يَوْمٌ وُلِدْتُ فِيهِ وَيَوْمٌ بُعِثْتُ أَوْ أُنْزِلَ عَلَىَّ فِيهِ"
+  ],
+  "commentaryGaps": [
+   [
+    1156,
+    1165
+   ],
+   [
+    1167,
+    1170
+   ]
+  ],
+  "qiraah": "",
+  "qiraahDisplay": "",
+  "evidence": {
+   "S": 171.1,
+   "E": 197.4,
+   "matched": 54,
+   "content": 33,
+   "exactRun": 14,
+   "coverage": 0.46,
+   "margin": 135.9
+  },
+  "chainedAyah": false,
+  "id": "finding_18",
+  "type": "hadith",
+  "startIndex": 5939,
+  "endIndex": 6285,
+  "wordStartIdx": 1146,
+  "wordEndIdx": 1217,
+  "startTime": 838.35004,
+  "endTime": 885.49005,
+  "matchedText": "ما صام وما أبضر، قال فسئل عن صيام يومين وإفطار يوم، يعني أن يداوم على ذلك يصوم يومين ويفطر يوم، قال عليه الصلاة والسلام ومن يطيق ذلك، قال وسئل عن صوم يوم وإفطار يومين، قال ليت أن الله عز وجل قوان لذلك، قال وسئل عن صيام يوم وإفطار يوم، قال ذاك صوم أخي داود عليه السلام، قال وسئل عن صيام يوم الأثنين، فقال ذاك يوم ولدت فيه، ويوم بعدت وأنزل علي فيه،",
+  "canonicalText": "مَا صَامَ وَمَا أَفْطَرَ قَالَ فَسُئِلَ عَنْ صَوْمِ يَوْمَيْنِ وَإِفْطَارِ يَوْمٍ قَالَ وَمَنْ يُطِيقُ ذَلِكَ قَالَ وَسُئِلَ عَنْ صَوْمِ يَوْمٍ وَإِفْطَارِ يَوْمَيْنِ قَالَ لَيْتَ أَنَّ اللَّهَ قَوَّانَا لِذَلِكَ قَالَ وَسُئِلَ عَنْ صَوْمِ يَوْمٍ وَإِفْطَارِ يَوْمٍ قَالَ ذَاكَ صَوْمُ أَخِي دَاوُدَ عَلَيْهِ السَّلاَمُ قَالَ وَسُئِلَ عَنْ صَوْمِ يَوْمِ الاِثْنَيْنِ قَالَ ذَاكَ يَوْمٌ وُلِدْتُ فِيهِ وَيَوْمٌ بُعِثْتُ أَوْ أُنْزِلَ عَلَىَّ فِيهِ",
+  "reference": "صحيح مسلم (2747)",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "HADITH",
+  "unitId": "Muslim:2747",
+  "displayRef": "صحيح مسلم (2747)",
+  "candidateRefs": [
+   "صحيح مسلم (2747)"
+  ],
+  "candidateUnitIds": [
+   "Muslim:2747"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "CANDIDATE",
+  "totalScore": 43.14,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": true,
+  "tStart": 1252,
+  "tEnd": 1269,
+  "charStart": 6454,
+  "charEnd": 6537,
+  "segments": [
+   [
+    1252,
+    1269
+   ]
+  ],
+  "qSegments": [
+   [
+    59,
+    76
+   ]
+  ],
+  "canonicalSegments": [
+   "بُعِثْتُ أَوْ أُنْزِلَ عَلَىَّ فِيهِ قَالَ فَقَالَ صَوْمُ ثَلاَثَةٍ مِنْ كُلِّ شَهْرٍ وَرَمَضَانَ إِلَى رَمَضَانَ صَوْمُ الدَّهْرِ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "",
+  "qiraahDisplay": "",
+  "evidence": {
+   "S": 43.1,
+   "E": 50.3,
+   "matched": 13,
+   "content": 9,
+   "exactRun": 8,
+   "coverage": 0.11,
+   "margin": 14.2
+  },
+  "chainedAyah": false,
+  "id": "finding_19",
+  "type": "hadith",
+  "startIndex": 6454,
+  "endIndex": 6537,
+  "wordStartIdx": 1252,
+  "wordEndIdx": 1268,
+  "startTime": 909.11005,
+  "endTime": 919.55005,
+  "matchedText": "بعثه الله تبارك وتعالى فيه قال فصوم ثلاثة أيام من كل شهر ورمضان إلى رمضان صوم الدهر",
+  "canonicalText": "بُعِثْتُ أَوْ أُنْزِلَ عَلَىَّ فِيهِ قَالَ فَقَالَ صَوْمُ ثَلاَثَةٍ مِنْ كُلِّ شَهْرٍ وَرَمَضَانَ إِلَى رَمَضَانَ صَوْمُ الدَّهْرِ",
+  "reference": "صحيح مسلم (2747)",
+  "confidence": 0.72,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "2:196",
+  "displayRef": "البقرة: 196",
+  "candidateRefs": [
+   "البقرة: 196",
+   "المائدة: 89"
+  ],
+  "candidateUnitIds": [
+   "2:196",
+   "5:89"
+  ],
+  "candidateCount": 2,
+  "isAmbiguous": true,
+  "isOutsideCorpus": false,
+  "confidenceBand": "CANDIDATE",
+  "totalScore": 18.52,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 1274,
+  "tEnd": 1277,
+  "charStart": 6566,
+  "charEnd": 6581,
+  "segments": [
+   [
+    1274,
+    1277
+   ]
+  ],
+  "qSegments": [
+   [
+    47,
+    50
+   ]
+  ],
+  "canonicalSegments": [
+   "فَصِيَامُ ثَلَاثَةِ أَيَّامٍ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 18.5,
+   "E": 18.5,
+   "matched": 3,
+   "content": 3,
+   "exactRun": 2,
+   "coverage": 0.04,
+   "margin": 0
+  },
+  "chainedAyah": false,
+  "id": "finding_20",
+  "type": "ayah",
+  "startIndex": 6566,
+  "endIndex": 6581,
+  "wordStartIdx": 1274,
+  "wordEndIdx": 1276,
+  "startTime": 922.77,
+  "endTime": 924.39,
+  "matchedText": "صيام ثلاثة أيام",
+  "canonicalText": "فَصِيَامُ ثَلَاثَةِ أَيَّامٍ",
+  "reference": "البقرة: 196",
+  "confidence": 0.72,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "2:196",
+  "displayRef": "البقرة: 196",
+  "candidateRefs": [
+   "البقرة: 196",
+   "المائدة: 89"
+  ],
+  "candidateUnitIds": [
+   "2:196",
+   "5:89"
+  ],
+  "candidateCount": 2,
+  "isAmbiguous": true,
+  "isOutsideCorpus": false,
+  "confidenceBand": "CANDIDATE",
+  "totalScore": 18.52,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 1334,
+  "tEnd": 1337,
+  "charStart": 6847,
+  "charEnd": 6862,
+  "segments": [
+   [
+    1334,
+    1337
+   ]
+  ],
+  "qSegments": [
+   [
+    47,
+    50
+   ]
+  ],
+  "canonicalSegments": [
+   "فَصِيَامُ ثَلَاثَةِ أَيَّامٍ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 18.5,
+   "E": 18.5,
+   "matched": 3,
+   "content": 3,
+   "exactRun": 2,
+   "coverage": 0.04,
+   "margin": 0
+  },
+  "chainedAyah": false,
+  "id": "finding_21",
+  "type": "ayah",
+  "startIndex": 6847,
+  "endIndex": 6862,
+  "wordStartIdx": 1334,
+  "wordEndIdx": 1336,
+  "startTime": 954.4501,
+  "endTime": 956.59,
+  "matchedText": "صيام ثلاثة أيام",
+  "canonicalText": "فَصِيَامُ ثَلَاثَةِ أَيَّامٍ",
+  "reference": "البقرة: 196",
+  "confidence": 0.72,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "HADITH",
+  "unitId": "Muslim:2747",
+  "displayRef": "صحيح مسلم (2747)",
+  "candidateRefs": [
+   "صحيح مسلم (2747)"
+  ],
+  "candidateUnitIds": [
+   "Muslim:2747"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "CANDIDATE",
+  "totalScore": 39.4,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": true,
+  "tStart": 1352,
+  "tEnd": 1364,
+  "charStart": 6934,
+  "charEnd": 6991,
+  "segments": [
+   [
+    1352,
+    1364
+   ]
+  ],
+  "qSegments": [
+   [
+    65,
+    76
+   ]
+  ],
+  "canonicalSegments": [
+   "فَقَالَ صَوْمُ ثَلاَثَةٍ مِنْ كُلِّ شَهْرٍ وَرَمَضَانَ إِلَى رَمَضَانَ صَوْمُ الدَّهْرِ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "",
+  "qiraahDisplay": "",
+  "evidence": {
+   "S": 39.4,
+   "E": 41.7,
+   "matched": 11,
+   "content": 7,
+   "exactRun": 8,
+   "coverage": 0.09,
+   "margin": 10.4
+  },
+  "chainedAyah": false,
+  "id": "finding_22",
+  "type": "hadith",
+  "startIndex": 6934,
+  "endIndex": 6991,
+  "wordStartIdx": 1352,
+  "wordEndIdx": 1363,
+  "startTime": 963.19006,
+  "endTime": 973.55005,
+  "matchedText": "قال فصوم ثلاثة أيام من كل شهر ورمضان إلى رمضان صوم الدهر،",
+  "canonicalText": "فَقَالَ صَوْمُ ثَلاَثَةٍ مِنْ كُلِّ شَهْرٍ وَرَمَضَانَ إِلَى رَمَضَانَ صَوْمُ الدَّهْرِ",
+  "reference": "صحيح مسلم (2747)",
+  "confidence": 0.72,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "HADITH",
+  "unitId": "Bukhari:1976",
+  "displayRef": "صحيح البخاري (1976)",
+  "candidateRefs": [
+   "صحيح البخاري (1976)",
+   "صحيح البخاري (3418)",
+   "صحيح مسلم (2729)",
+   "سنن النسائي (2392)",
+   "رياض الصالحين (1367)"
+  ],
+  "candidateUnitIds": [
+   "Bukhari:1976",
+   "Bukhari:3418",
+   "Muslim:2729",
+   "Nasai:2392",
+   "RiyadSalihin:1367"
+  ],
+  "candidateCount": 5,
+  "isAmbiguous": true,
+  "isOutsideCorpus": false,
+  "confidenceBand": "CANDIDATE",
+  "totalScore": 28.32,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 1363,
+  "tEnd": 1376,
+  "charStart": 6985,
+  "charEnd": 7049,
+  "segments": [
+   [
+    1363,
+    1364
+   ],
+   [
+    1367,
+    1369
+   ],
+   [
+    1372,
+    1376
+   ]
+  ],
+  "qSegments": [
+   [
+    10,
+    11
+   ],
+   [
+    11,
+    13
+   ],
+   [
+    13,
+    17
+   ]
+  ],
+  "canonicalSegments": [
+   "الشَّهْرِ",
+   "ثَلاَثَةَ أَيَّامٍ",
+   "فَإِنَّ الْحَسَنَةَ بِعَشْرِ أَمْثَالِهَا"
+  ],
+  "commentaryGaps": [
+   [
+    1364,
+    1367
+   ],
+   [
+    1369,
+    1372
+   ]
+  ],
+  "qiraah": "",
+  "qiraahDisplay": "",
+  "evidence": {
+   "S": 28.3,
+   "E": 35.7,
+   "matched": 7,
+   "content": 6,
+   "exactRun": 4,
+   "coverage": 0.1,
+   "margin": 0
+  },
+  "chainedAyah": false,
+  "id": "finding_23",
+  "type": "hadith",
+  "startIndex": 6985,
+  "endIndex": 7049,
+  "wordStartIdx": 1363,
+  "wordEndIdx": 1375,
+  "startTime": 972.01,
+  "endTime": 980.43005,
+  "matchedText": "الدهر، لأن من يصوم ثلاثة أيام من كل شهر فإن الحسنة بعشر أمثالها،",
+  "canonicalText": "الشَّهْرِ ثَلاَثَةَ أَيَّامٍ فَإِنَّ الْحَسَنَةَ بِعَشْرِ أَمْثَالِهَا",
+  "reference": "صحيح البخاري (1976)",
+  "confidence": 0.72,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "HADITH",
+  "unitId": "Bukhari:1981",
+  "displayRef": "صحيح البخاري (1981)",
+  "candidateRefs": [
+   "صحيح البخاري (1981)",
+   "صحيح مسلم (1672)",
+   "رياض الصالحين (579)"
+  ],
+  "candidateUnitIds": [
+   "Bukhari:1981",
+   "Muslim:1672",
+   "RiyadSalihin:579"
+  ],
+  "candidateCount": 3,
+  "isAmbiguous": true,
+  "isOutsideCorpus": false,
+  "confidenceBand": "CANDIDATE",
+  "totalScore": 27.42,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 1486,
+  "tEnd": 1493,
+  "charStart": 7599,
+  "charEnd": 7631,
+  "segments": [
+   [
+    1486,
+    1493
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    7
+   ]
+  ],
+  "canonicalSegments": [
+   "بِثَلاَثٍ صِيَامِ ثَلاَثَةِ أَيَّامٍ مِنْ كُلِّ شَهْرٍ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "",
+  "qiraahDisplay": "",
+  "evidence": {
+   "S": 27.4,
+   "E": 27.4,
+   "matched": 7,
+   "content": 5,
+   "exactRun": 7,
+   "coverage": 0.5,
+   "margin": 0
+  },
+  "chainedAyah": false,
+  "id": "finding_24",
+  "type": "hadith",
+  "startIndex": 7599,
+  "endIndex": 7631,
+  "wordStartIdx": 1486,
+  "wordEndIdx": 1492,
+  "startTime": 1066.5701,
+  "endTime": 1070.01,
+  "matchedText": "بثلاث صيام ثلاثة أيام من كل شهر،",
+  "canonicalText": "بِثَلاَثٍ صِيَامِ ثَلاَثَةِ أَيَّامٍ مِنْ كُلِّ شَهْرٍ",
+  "reference": "صحيح البخاري (1981)",
+  "confidence": 0.72,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "HADITH",
+  "unitId": "AbiDawud:2453",
+  "displayRef": "سنن أبي داود (2453)",
+  "candidateRefs": [
+   "سنن أبي داود (2453)"
+  ],
+  "candidateUnitIds": [
+   "AbiDawud:2453"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "CANDIDATE",
+  "totalScore": 37.36,
+  "hasCitationCue": true,
+  "hasFuzzyHeal": true,
+  "tStart": 1539,
+  "tEnd": 1554,
+  "charStart": 7856,
+  "charEnd": 7922,
+  "segments": [
+   [
+    1539,
+    1554
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    14
+   ]
+  ],
+  "canonicalSegments": [
+   "يَصُومُ مِنْ كُلِّ شَهْرٍ ثَلاَثَةَ أَيَّامٍ قَالَتْ نَعَمْ قُلْتُ مِنْ أَىِّ شَهْرٍ كَانَ يَصُومُ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "",
+  "qiraahDisplay": "",
+  "evidence": {
+   "S": 34.4,
+   "E": 38.3,
+   "matched": 13,
+   "content": 7,
+   "exactRun": 8,
+   "coverage": 0.54,
+   "margin": 2.2
+  },
+  "chainedAyah": false,
+  "id": "finding_25",
+  "type": "hadith",
+  "startIndex": 7856,
+  "endIndex": 7922,
+  "wordStartIdx": 1539,
+  "wordEndIdx": 1553,
+  "startTime": 1091.5701,
+  "endTime": 1099.17,
+  "matchedText": "يصوم من كل شهر ثلاثة أيام؟ قالت نعم، فقالت لها من أي شهر كان يصوم؟",
+  "canonicalText": "يَصُومُ مِنْ كُلِّ شَهْرٍ ثَلاَثَةَ أَيَّامٍ قَالَتْ نَعَمْ قُلْتُ مِنْ أَىِّ شَهْرٍ كَانَ يَصُومُ",
+  "reference": "سنن أبي داود (2453)",
+  "confidence": 0.72,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "33:21",
+  "displayRef": "الأحزاب: 21",
+  "candidateRefs": [
+   "الأحزاب: 21"
+  ],
+  "candidateUnitIds": [
+   "33:21"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "VERIFIED",
+  "totalScore": 54.14,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 1582,
+  "tEnd": 1599,
+  "charStart": 8095,
+  "charEnd": 8177,
+  "segments": [
+   [
+    1582,
+    1599
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    17
+   ]
+  ],
+  "canonicalSegments": [
+   "لَّقَدْ كَانَ لَكُمْ فِي رَسُولِ اللَّهِ أُسْوَةٌ حَسَنَةٌ لِّمَن كَانَ يَرْجُو اللَّهَ وَالْيَوْمَ الْآخِرَ وَذَكَرَ اللَّهَ كَثِيرًا"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 54.1,
+   "E": 54.1,
+   "matched": 17,
+   "content": 9,
+   "exactRun": 17,
+   "coverage": 1,
+   "margin": 17
+  },
+  "chainedAyah": false,
+  "id": "finding_26",
+  "type": "ayah",
+  "startIndex": 8095,
+  "endIndex": 8177,
+  "wordStartIdx": 1582,
+  "wordEndIdx": 1598,
+  "startTime": 1119.41,
+  "endTime": 1126.75,
+  "matchedText": "لقد كان لكم في رسول الله أسوة حسنة لمن كان يرجو الله واليوم الآخر وذكر الله كثيراً",
+  "canonicalText": "لَّقَدْ كَانَ لَكُمْ فِي رَسُولِ اللَّهِ أُسْوَةٌ حَسَنَةٌ لِّمَن كَانَ يَرْجُو اللَّهَ وَالْيَوْمَ الْآخِرَ وَذَكَرَ اللَّهَ كَثِيرًا",
+  "reference": "الأحزاب: 21",
+  "confidence": 0.98,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "2:196",
+  "displayRef": "البقرة: 196",
+  "candidateRefs": [
+   "البقرة: 196",
+   "المائدة: 89"
+  ],
+  "candidateUnitIds": [
+   "2:196",
+   "5:89"
+  ],
+  "candidateCount": 2,
+  "isAmbiguous": true,
+  "isOutsideCorpus": false,
+  "confidenceBand": "CANDIDATE",
+  "totalScore": 18.52,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 1750,
+  "tEnd": 1753,
+  "charStart": 8936,
+  "charEnd": 8952,
+  "segments": [
+   [
+    1750,
+    1753
+   ]
+  ],
+  "qSegments": [
+   [
+    47,
+    50
+   ]
+  ],
+  "canonicalSegments": [
+   "فَصِيَامُ ثَلَاثَةِ أَيَّامٍ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 18.5,
+   "E": 18.5,
+   "matched": 3,
+   "content": 3,
+   "exactRun": 2,
+   "coverage": 0.04,
+   "margin": 0
+  },
+  "chainedAyah": false,
+  "id": "finding_27",
+  "type": "ayah",
+  "startIndex": 8936,
+  "endIndex": 8952,
+  "wordStartIdx": 1750,
+  "wordEndIdx": 1752,
+  "startTime": 1259.6151,
+  "endTime": 1261.2551,
+  "matchedText": "وصيام ثلاثة أيام",
+  "canonicalText": "فَصِيَامُ ثَلَاثَةِ أَيَّامٍ",
+  "reference": "البقرة: 196",
+  "confidence": 0.72,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "HADITH",
+  "unitId": "Muslim:2744",
+  "displayRef": "صحيح مسلم (2744)",
+  "candidateRefs": [
+   "صحيح مسلم (2744)"
+  ],
+  "candidateUnitIds": [
+   "Muslim:2744"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "CANDIDATE",
+  "totalScore": 28.87,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 1802,
+  "tEnd": 1810,
+  "charStart": 9185,
+  "charEnd": 9220,
+  "segments": [
+   [
+    1802,
+    1810
+   ]
+  ],
+  "qSegments": [
+   [
+    17,
+    25
+   ]
+  ],
+  "canonicalSegments": [
+   "لَمْ يَكُنْ يُبَالِي مِنْ أَىِّ أَيَّامِ الشَّهْرِ يَصُومُ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "",
+  "qiraahDisplay": "",
+  "evidence": {
+   "S": 28.9,
+   "E": 28.9,
+   "matched": 8,
+   "content": 5,
+   "exactRun": 5,
+   "coverage": 0.32,
+   "margin": 6.5
+  },
+  "chainedAyah": false,
+  "id": "finding_28",
+  "type": "hadith",
+  "startIndex": 9185,
+  "endIndex": 9220,
+  "wordStartIdx": 1802,
+  "wordEndIdx": 1809,
+  "startTime": 1280.9951,
+  "endTime": 1286.3751,
+  "matchedText": "لم يكن يغالي من أي أيام الشهر يصوم.",
+  "canonicalText": "لَمْ يَكُنْ يُبَالِي مِنْ أَىِّ أَيَّامِ الشَّهْرِ يَصُومُ",
+  "reference": "صحيح مسلم (2744)",
+  "confidence": 0.72,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "HADITH",
+  "unitId": "Bukhari:1178",
+  "displayRef": "صحيح البخاري (1178)",
+  "candidateRefs": [
+   "صحيح البخاري (1178)"
+  ],
+  "candidateUnitIds": [
+   "Bukhari:1178"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "CANDIDATE",
+  "totalScore": 26.08,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": true,
+  "tStart": 1821,
+  "tEnd": 1831,
+  "charStart": 9276,
+  "charEnd": 9328,
+  "segments": [
+   [
+    1821,
+    1831
+   ]
+  ],
+  "qSegments": [
+   [
+    0,
+    13
+   ]
+  ],
+  "canonicalSegments": [
+   "أَوْصَانِي خَلِيلِي بِثَلاَثٍ لاَ أَدَعُهُنَّ حَتَّى أَمُوتَ صَوْمِ ثَلاَثَةِ أَيَّامٍ مِنْ كُلِّ شَهْرٍ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "",
+  "qiraahDisplay": "",
+  "evidence": {
+   "S": 26.1,
+   "E": 37.9,
+   "matched": 8,
+   "content": 6,
+   "exactRun": 5,
+   "coverage": 0.44,
+   "margin": 8.6
+  },
+  "chainedAyah": false,
+  "id": "finding_29",
+  "type": "hadith",
+  "startIndex": 9276,
+  "endIndex": 9328,
+  "wordStartIdx": 1821,
+  "wordEndIdx": 1830,
+  "startTime": 1295.4552,
+  "endTime": 1299.8551,
+  "matchedText": "أوصاني خليلي بثلاثة أيام، سيام ثلاثة أيام من كل شهر،",
+  "canonicalText": "أَوْصَانِي خَلِيلِي بِثَلاَثٍ لاَ أَدَعُهُنَّ حَتَّى أَمُوتَ صَوْمِ ثَلاَثَةِ أَيَّامٍ مِنْ كُلِّ شَهْرٍ",
+  "reference": "صحيح البخاري (1178)",
+  "confidence": 0.72,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "HADITH",
+  "unitId": "BulughMaram:209",
+  "displayRef": "بلوغ المرام (209)",
+  "candidateRefs": [
+   "بلوغ المرام (209)"
+  ],
+  "candidateUnitIds": [
+   "BulughMaram:209"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "CANDIDATE",
+  "totalScore": 25.29,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 1977,
+  "tEnd": 1982,
+  "charStart": 10030,
+  "charEnd": 10053,
+  "segments": [
+   [
+    1977,
+    1982
+   ]
+  ],
+  "qSegments": [
+   [
+    27,
+    32
+   ]
+  ],
+  "canonicalSegments": [
+   "الشيخ عبد العزيز بن باز"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "",
+  "qiraahDisplay": "",
+  "evidence": {
+   "S": 25.3,
+   "E": 25.3,
+   "matched": 5,
+   "content": 5,
+   "exactRun": 5,
+   "coverage": 0.13,
+   "margin": 25.3
+  },
+  "chainedAyah": false,
+  "id": "finding_30",
+  "type": "hadith",
+  "startIndex": 10030,
+  "endIndex": 10053,
+  "wordStartIdx": 1977,
+  "wordEndIdx": 1981,
+  "startTime": 1386.1752,
+  "endTime": 1388.3551,
+  "matchedText": "الشيخ عبد العزيز بن باز",
+  "canonicalText": "الشيخ عبد العزيز بن باز",
+  "reference": "بلوغ المرام (209)",
+  "confidence": 0.72,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "2:196",
+  "displayRef": "البقرة: 196",
+  "candidateRefs": [
+   "البقرة: 196",
+   "المائدة: 89"
+  ],
+  "candidateUnitIds": [
+   "2:196",
+   "5:89"
+  ],
+  "candidateCount": 2,
+  "isAmbiguous": true,
+  "isOutsideCorpus": false,
+  "confidenceBand": "CANDIDATE",
+  "totalScore": 18.52,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 2103,
+  "tEnd": 2106,
+  "charStart": 10678,
+  "charEnd": 10694,
+  "segments": [
+   [
+    2103,
+    2106
+   ]
+  ],
+  "qSegments": [
+   [
+    47,
+    50
+   ]
+  ],
+  "canonicalSegments": [
+   "فَصِيَامُ ثَلَاثَةِ أَيَّامٍ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 18.5,
+   "E": 18.5,
+   "matched": 3,
+   "content": 3,
+   "exactRun": 2,
+   "coverage": 0.04,
+   "margin": 0
+  },
+  "chainedAyah": false,
+  "id": "finding_31",
+  "type": "ayah",
+  "startIndex": 10678,
+  "endIndex": 10694,
+  "wordStartIdx": 2103,
+  "wordEndIdx": 2105,
+  "startTime": 1482.8551,
+  "endTime": 1485.2351,
+  "matchedText": "صيام ثلاثة أيام،",
+  "canonicalText": "فَصِيَامُ ثَلَاثَةِ أَيَّامٍ",
+  "reference": "البقرة: 196",
+  "confidence": 0.72,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "4:175",
+  "displayRef": "النساء: 175",
+  "candidateRefs": [
+   "النساء: 175",
+   "الفتح: 2",
+   "النساء: 68",
+   "الفتح: 20"
+  ],
+  "candidateUnitIds": [
+   "4:175",
+   "48:2",
+   "4:68",
+   "48:20"
+  ],
+  "candidateCount": 4,
+  "isAmbiguous": true,
+  "isOutsideCorpus": false,
+  "confidenceBand": "CANDIDATE",
+  "totalScore": 14.2,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 2150,
+  "tEnd": 2153,
+  "charStart": 10923,
+  "charEnd": 10942,
+  "segments": [
+   [
+    2150,
+    2153
+   ]
+  ],
+  "qSegments": [
+   [
+    12,
+    15
+   ]
+  ],
+  "canonicalSegments": [
+   "إِلَيْهِ صِرَاطًا مُّسْتَقِيمًا"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 14.2,
+   "E": 14.2,
+   "matched": 3,
+   "content": 2,
+   "exactRun": 2,
+   "coverage": 0.2,
+   "margin": 0
+  },
+  "chainedAyah": false,
+  "id": "finding_32",
+  "type": "ayah",
+  "startIndex": 10923,
+  "endIndex": 10942,
+  "wordStartIdx": 2150,
+  "wordEndIdx": 2152,
+  "startTime": 1513.2151,
+  "endTime": 1515.3551,
+  "matchedText": "إليه صراطا مستقيمة،",
+  "canonicalText": "إِلَيْهِ صِرَاطًا مُّسْتَقِيمًا",
+  "reference": "النساء: 175",
+  "confidence": 0.72,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "QURAN",
+  "unitId": "33:35",
+  "displayRef": "الأحزاب: 35",
+  "candidateRefs": [
+   "الأحزاب: 35"
+  ],
+  "candidateUnitIds": [
+   "33:35"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "CANDIDATE",
+  "totalScore": 22.96,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 2173,
+  "tEnd": 2176,
+  "charStart": 11058,
+  "charEnd": 11089,
+  "segments": [
+   [
+    2173,
+    2176
+   ]
+  ],
+  "qSegments": [
+   [
+    2,
+    5
+   ]
+  ],
+  "canonicalSegments": [
+   "وَالْمُسْلِمَاتِ وَالْمُؤْمِنِينَ وَالْمُؤْمِنَاتِ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "hafs",
+  "qiraahDisplay": "رواية حفص عن عاصم",
+  "evidence": {
+   "S": 23,
+   "E": 23,
+   "matched": 3,
+   "content": 3,
+   "exactRun": 3,
+   "coverage": 0.1,
+   "margin": 10.5
+  },
+  "chainedAyah": false,
+  "id": "finding_33",
+  "type": "ayah",
+  "startIndex": 11058,
+  "endIndex": 11089,
+  "wordStartIdx": 2173,
+  "wordEndIdx": 2175,
+  "startTime": 1527.2952,
+  "endTime": 1530.0952,
+  "matchedText": "والمسلمات، والمؤمنين والمؤمنات،",
+  "canonicalText": "وَالْمُسْلِمَاتِ وَالْمُؤْمِنِينَ وَالْمُؤْمِنَاتِ",
+  "reference": "الأحزاب: 35",
+  "confidence": 0.72,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "HADITH",
+  "unitId": "Muslim:6906",
+  "displayRef": "صحيح مسلم (6906)",
+  "candidateRefs": [
+   "صحيح مسلم (6906)",
+   "سنن النسائي (5458)",
+   "سنن النسائي (5538)",
+   "رياض الصالحين (800)"
+  ],
+  "candidateUnitIds": [
+   "Muslim:6906",
+   "Nasai:5458",
+   "Nasai:5538",
+   "RiyadSalihin:800"
+  ],
+  "candidateCount": 4,
+  "isAmbiguous": true,
+  "isOutsideCorpus": false,
+  "confidenceBand": "AMBIGUOUS",
+  "totalScore": 40.93,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 2182,
+  "tEnd": 2201,
+  "charStart": 11129,
+  "charEnd": 11256,
+  "segments": [
+   [
+    2182,
+    2190
+   ],
+   [
+    2199,
+    2201
+   ]
+  ],
+  "qSegments": [
+   [
+    15,
+    23
+   ],
+   [
+    23,
+    25
+   ]
+  ],
+  "canonicalSegments": [
+   "تَقْوَاهَا وَزَكِّهَا أَنْتَ خَيْرُ مَنْ زَكَّاهَا أَنْتَ وَلِيُّهَا",
+   "وَمَوْلاَهَا اللَّهُمَّ"
+  ],
+  "commentaryGaps": [
+   [
+    2190,
+    2199
+   ]
+  ],
+  "qiraah": "",
+  "qiraahDisplay": "",
+  "evidence": {
+   "S": 40.9,
+   "E": 51.4,
+   "matched": 9,
+   "content": 8,
+   "exactRun": 7,
+   "coverage": 0.2,
+   "margin": 0
+  },
+  "chainedAyah": false,
+  "id": "finding_34",
+  "type": "hadith",
+  "startIndex": 11129,
+  "endIndex": 11256,
+  "wordStartIdx": 2182,
+  "wordEndIdx": 2200,
+  "startTime": 1533.6552,
+  "endTime": 1539.4152,
+  "matchedText": "تقواها، وزكها، أنت خير من زكاها، أنت ولي، سمع الله تليمًا ولا تليمًا لِم الشَّبِ وَمَالْهَا وَمَولَاهَا وَمَوْلَاهَا اللَّهُمَّ",
+  "canonicalText": "تَقْوَاهَا وَزَكِّهَا أَنْتَ خَيْرُ مَنْ زَكَّاهَا أَنْتَ وَلِيُّهَا وَمَوْلاَهَا اللَّهُمَّ",
+  "reference": "صحيح مسلم (6906)",
+  "confidence": 0.82,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "HADITH",
+  "unitId": "Nasai:1304",
+  "displayRef": "سنن النسائي (1304)",
+  "candidateRefs": [
+   "سنن النسائي (1304)"
+  ],
+  "candidateUnitIds": [
+   "Nasai:1304"
+  ],
+  "candidateCount": 1,
+  "isAmbiguous": false,
+  "isOutsideCorpus": false,
+  "confidenceBand": "CANDIDATE",
+  "totalScore": 32.19,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 2210,
+  "tEnd": 2216,
+  "charStart": 11350,
+  "charEnd": 11405,
+  "segments": [
+   [
+    2210,
+    2216
+   ]
+  ],
+  "qSegments": [
+   [
+    3,
+    9
+   ]
+  ],
+  "canonicalSegments": [
+   "الثَّبَاتَ فِي الأَمْرِ وَالْعَزِيمَةِ عَلَى الرُّشْدِ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "",
+  "qiraahDisplay": "",
+  "evidence": {
+   "S": 32.2,
+   "E": 32.2,
+   "matched": 6,
+   "content": 4,
+   "exactRun": 6,
+   "coverage": 0.18,
+   "margin": 32.2
+  },
+  "chainedAyah": false,
+  "id": "finding_35",
+  "type": "hadith",
+  "startIndex": 11350,
+  "endIndex": 11405,
+  "wordStartIdx": 2210,
+  "wordEndIdx": 2215,
+  "startTime": 1545.0151,
+  "endTime": 1547.5352,
+  "matchedText": "الثَّبَاتَ فِي الْأَمْرَ وَالْعَزِيمَةَ عَلَى الْرُشْدِ",
+  "canonicalText": "الثَّبَاتَ فِي الأَمْرِ وَالْعَزِيمَةِ عَلَى الرُّشْدِ",
+  "reference": "سنن النسائي (1304)",
+  "confidence": 0.72,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "HADITH",
+  "unitId": "Tirmidhi:479",
+  "displayRef": "جامع الترمذي (479)",
+  "candidateRefs": [
+   "جامع الترمذي (479)",
+   "سنن ابن ماجه (1384)",
+   "رياض الصالحين (814)"
+  ],
+  "candidateUnitIds": [
+   "Tirmidhi:479",
+   "IbnMajah:1384",
+   "RiyadSalihin:814"
+  ],
+  "candidateCount": 3,
+  "isAmbiguous": true,
+  "isOutsideCorpus": false,
+  "confidenceBand": "AMBIGUOUS",
+  "totalScore": 34.73,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 2217,
+  "tEnd": 2221,
+  "charStart": 11419,
+  "charEnd": 11464,
+  "segments": [
+   [
+    2217,
+    2221
+   ]
+  ],
+  "qSegments": [
+   [
+    47,
+    51
+   ]
+  ],
+  "canonicalSegments": [
+   "مُوجِبَاتِ رَحْمَتِكَ وَعَزَائِمَ مَغْفِرَتِكَ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "",
+  "qiraahDisplay": "",
+  "evidence": {
+   "S": 34.7,
+   "E": 34.7,
+   "matched": 4,
+   "content": 4,
+   "exactRun": 4,
+   "coverage": 0.05,
+   "margin": 0
+  },
+  "chainedAyah": false,
+  "id": "finding_36",
+  "type": "hadith",
+  "startIndex": 11419,
+  "endIndex": 11464,
+  "wordStartIdx": 2217,
+  "wordEndIdx": 2220,
+  "startTime": 1548.4951,
+  "endTime": 1567.5352,
+  "matchedText": "مُوجِبَاتِ رَحْمَتِكُ وَعَزَائِمَ مَغْفِرَتِك",
+  "canonicalText": "مُوجِبَاتِ رَحْمَتِكَ وَعَزَائِمَ مَغْفِرَتِكَ",
+  "reference": "جامع الترمذي (479)",
+  "confidence": 0.82,
+  "snappedToCanonical": false
+ },
+ {
+  "sourceType": "HADITH",
+  "unitId": "AbiDawud:4859",
+  "displayRef": "سنن أبي داود (4859)",
+  "candidateRefs": [
+   "سنن أبي داود (4859)",
+   "جامع الترمذي (3433)",
+   "رياض الصالحين (152)",
+   "رياض الصالحين (153)"
+  ],
+  "candidateUnitIds": [
+   "AbiDawud:4859",
+   "Tirmidhi:3433",
+   "RiyadSalihin:152",
+   "RiyadSalihin:153"
+  ],
+  "candidateCount": 4,
+  "isAmbiguous": true,
+  "isOutsideCorpus": false,
+  "confidenceBand": "AMBIGUOUS",
+  "totalScore": 36.39,
+  "hasCitationCue": false,
+  "hasFuzzyHeal": false,
+  "tStart": 2223,
+  "tEnd": 2232,
+  "charStart": 11477,
+  "charEnd": 11520,
+  "segments": [
+   [
+    2223,
+    2232
+   ]
+  ],
+  "qSegments": [
+   [
+    3,
+    12
+   ]
+  ],
+  "canonicalSegments": [
+   "أَشْهَدُ أَنْ لاَ إِلَهَ إِلاَّ أَنْتَ أَسْتَغْفِرُكَ وَأَتُوبُ إِلَيْكَ"
+  ],
+  "commentaryGaps": [],
+  "qiraah": "",
+  "qiraahDisplay": "",
+  "evidence": {
+   "S": 36.4,
+   "E": 36.4,
+   "matched": 9,
+   "content": 7,
+   "exactRun": 9,
+   "coverage": 0.29,
+   "margin": 0
+  },
+  "chainedAyah": false,
+  "id": "finding_37",
+  "type": "hadith",
+  "startIndex": 11477,
+  "endIndex": 11520,
+  "wordStartIdx": 2223,
+  "wordEndIdx": 2231,
+  "startTime": 1597.8751,
+  "endTime": 1601.7751,
+  "matchedText": "أشهد أن لا إله إلا أنت، أستغفرك وأتوب إليك،",
+  "canonicalText": "أَشْهَدُ أَنْ لاَ إِلَهَ إِلاَّ أَنْتَ أَسْتَغْفِرُكَ وَأَتُوبُ إِلَيْكَ",
+  "reference": "سنن أبي داود (4859)",
+  "confidence": 0.82,
+  "snappedToCanonical": false
+ }
+]

@@ -1,0 +1,463 @@
+{
+ "about": "Old app v3 findings on a window of a real lecture where a hadith finding becomes the verse inside it. Made by engine/golden/make_nested_verse.mjs; never edit by hand.",
+ "lecture": "binbaz_audio_189",
+ "words_from": 312,
+ "words_to": 377,
+ "old_app": {
+  "files": {
+   "js/state.js": "152c8c69cb905a0e737417b6c4653055e1cdc5ba3e98e81002057f5ddf379eaa",
+   "js/engine.js": "148f9fd0e869a57b9efd0a23fa290ad2da72c7f0bcdcb7659ad58f77731fbce2",
+   "js/engine_v4.js": "f683a767ba70f0f65dd25ca4df06ebb4e74cc579fbb1415ad71838cb31b1ba4f",
+   "js/engine_v5.js": "495554c8a379d2e3072001bcb1181a6e771f5cbf385696f0fc1b6eba6e7775c0",
+   "js/caption-builder.js": "0be25306d5b5b1cad3c98d966f373b73d280b4b337c365f8a8663c0f784a5097",
+   "js/ai-verifier.js": "0739db526ecbde44f7096487bdfd0183f32e95a66bd212a2a6e34ba731ac60dd",
+   "js/editor.js": "b8c44b3e26c0d794dc1ba257d263e9ffa767c01d8356debf5a613f34ef62b147",
+   "js/render.js": "456876add3baefee54b4604612fc6a0a8d5994f16684ee1c1ba35b6408043871"
+  },
+  "corpus": "ffe22b8035e0285bb2f44e1824f909ce485ba25fdbcdc07bbf844f7dfdb69f67"
+ },
+ "words": [
+  {
+   "word": "الغضبان",
+   "start": 164.2502,
+   "end": 165.3502
+  },
+  {
+   "word": "أن",
+   "start": 165.3502,
+   "end": 165.9102
+  },
+  {
+   "word": "يتعوذ",
+   "start": 165.9102,
+   "end": 166.3702
+  },
+  {
+   "word": "بالله",
+   "start": 166.3702,
+   "end": 166.7102
+  },
+  {
+   "word": "من",
+   "start": 166.7102,
+   "end": 166.8302
+  },
+  {
+   "word": "الشيطان",
+   "start": 166.8302,
+   "end": 167.1902
+  },
+  {
+   "word": "الرجيم،",
+   "start": 167.1902,
+   "end": 168.3702
+  },
+  {
+   "word": "فأنت",
+   "start": 168.3702,
+   "end": 169.0902
+  },
+  {
+   "word": "يا",
+   "start": 169.0902,
+   "end": 169.2502
+  },
+  {
+   "word": "عبد",
+   "start": 169.2502,
+   "end": 169.43019
+  },
+  {
+   "word": "الله",
+   "start": 169.43019,
+   "end": 169.5502
+  },
+  {
+   "word": "إذا",
+   "start": 169.5502,
+   "end": 169.7302
+  },
+  {
+   "word": "غضبت",
+   "start": 169.7302,
+   "end": 170.1702
+  },
+  {
+   "word": "بسبب",
+   "start": 170.1702,
+   "end": 170.7502
+  },
+  {
+   "word": "النزاع",
+   "start": 170.7502,
+   "end": 171.1302
+  },
+  {
+   "word": "بينك",
+   "start": 171.1302,
+   "end": 171.4702
+  },
+  {
+   "word": "وبين",
+   "start": 171.4702,
+   "end": 171.7702
+  },
+  {
+   "word": "أهلك",
+   "start": 171.7702,
+   "end": 172.1102
+  },
+  {
+   "word": "أو",
+   "start": 172.1102,
+   "end": 172.7702
+  },
+  {
+   "word": "غيرهم",
+   "start": 172.7702,
+   "end": 173.2102
+  },
+  {
+   "word": "فإياك",
+   "start": 173.2102,
+   "end": 174.1302
+  },
+  {
+   "word": "والعجلة،",
+   "start": 174.1302,
+   "end": 174.8902
+  },
+  {
+   "word": "لا",
+   "start": 174.8902,
+   "end": 175.3902
+  },
+  {
+   "word": "تعجل",
+   "start": 175.3902,
+   "end": 175.7302
+  },
+  {
+   "word": "في",
+   "start": 175.7302,
+   "end": 175.85019
+  },
+  {
+   "word": "الطلاق",
+   "start": 175.85019,
+   "end": 176.2102
+  },
+  {
+   "word": "وعاجل",
+   "start": 176.2102,
+   "end": 176.8902
+  },
+  {
+   "word": "الأمور",
+   "start": 176.8902,
+   "end": 177.2102
+  },
+  {
+   "word": "بغير",
+   "start": 177.2102,
+   "end": 177.4502
+  },
+  {
+   "word": "الطلاق،",
+   "start": 177.4502,
+   "end": 178.5102
+  },
+  {
+   "word": "تعوذ",
+   "start": 178.5102,
+   "end": 180.1102
+  },
+  {
+   "word": "بالله",
+   "start": 180.1102,
+   "end": 180.4102
+  },
+  {
+   "word": "من",
+   "start": 180.4102,
+   "end": 180.5302
+  },
+  {
+   "word": "الشيطان",
+   "start": 180.5302,
+   "end": 180.8302
+  },
+  {
+   "word": "الرجيم،",
+   "start": 180.8302,
+   "end": 182.1702
+  },
+  {
+   "word": "توضأ",
+   "start": 182.1702,
+   "end": 182.6902
+  },
+  {
+   "word": "وصلي،",
+   "start": 182.6902,
+   "end": 184.0102
+  },
+  {
+   "word": "اخرج",
+   "start": 184.0102,
+   "end": 184.4902
+  },
+  {
+   "word": "من",
+   "start": 184.4902,
+   "end": 184.6302
+  },
+  {
+   "word": "البيت،",
+   "start": 184.6302,
+   "end": 185.4102
+  },
+  {
+   "word": "اشتغل",
+   "start": 185.4102,
+   "end": 185.7502
+  },
+  {
+   "word": "بشيء",
+   "start": 185.7502,
+   "end": 186.0102
+  },
+  {
+   "word": "آخر،",
+   "start": 186.0102,
+   "end": 186.5902
+  },
+  {
+   "word": "حتى",
+   "start": 186.5902,
+   "end": 187.1702
+  },
+  {
+   "word": "تهدأ،",
+   "start": 187.1702,
+   "end": 187.9702
+  },
+  {
+   "word": "وحتى",
+   "start": 188.0302,
+   "end": 188.4902
+  },
+  {
+   "word": "يزو",
+   "start": 188.4902,
+   "end": 188.65019
+  },
+  {
+   "word": "الغضب،",
+   "start": 188.65019,
+   "end": 189.29019
+  },
+  {
+   "word": "أما",
+   "start": 189.29019,
+   "end": 189.9702
+  },
+  {
+   "word": "البدار",
+   "start": 189.9702,
+   "end": 190.3302
+  },
+  {
+   "word": "بالطلاق",
+   "start": 190.3302,
+   "end": 190.9302
+  },
+  {
+   "word": "في",
+   "start": 190.9302,
+   "end": 191.3702
+  },
+  {
+   "word": "حال",
+   "start": 191.3702,
+   "end": 191.5102
+  },
+  {
+   "word": "الغضب",
+   "start": 191.5102,
+   "end": 191.8902
+  },
+  {
+   "word": "فذلك",
+   "start": 191.8902,
+   "end": 192.65019
+  },
+  {
+   "word": "مما",
+   "start": 192.65019,
+   "end": 192.9502
+  },
+  {
+   "word": "تسوق",
+   "start": 192.9502,
+   "end": 194.29019
+  },
+  {
+   "word": "عقبته،",
+   "start": 194.29019,
+   "end": 195.2702
+  },
+  {
+   "word": "وإما",
+   "start": 195.2702,
+   "end": 195.7102
+  },
+  {
+   "word": "يسبب",
+   "start": 195.7102,
+   "end": 196.13019
+  },
+  {
+   "word": "الندم،",
+   "start": 196.13019,
+   "end": 196.8102
+  },
+  {
+   "word": "وإما",
+   "start": 196.8102,
+   "end": 197.3302
+  },
+  {
+   "word": "يسبب",
+   "start": 197.3302,
+   "end": 197.8902
+  },
+  {
+   "word": "المشاكل",
+   "start": 197.8902,
+   "end": 199.0102
+  },
+  {
+   "word": "التي",
+   "start": 199.0102,
+   "end": 199.8302
+  }
+ ],
+ "findings": [
+  {
+   "sourceType": "ADHKAR",
+   "unitId": "Adhkar:istiadha",
+   "displayRef": "ذكر",
+   "candidateRefs": [
+    "ذكر"
+   ],
+   "candidateUnitIds": [
+    "Adhkar:istiadha"
+   ],
+   "isAmbiguous": false,
+   "isOutsideCorpus": false,
+   "confidenceBand": "VERIFIED",
+   "totalScore": 12.71,
+   "hasCitationCue": false,
+   "hasFuzzyHeal": false,
+   "tStart": 3,
+   "tEnd": 7,
+   "charStart": 17,
+   "charEnd": 41,
+   "segments": [
+    [
+     3,
+     7
+    ]
+   ],
+   "qSegments": [
+    [
+     1,
+     5
+    ]
+   ],
+   "canonicalSegments": [
+    "بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ"
+   ],
+   "commentaryGaps": [],
+   "qiraah": "hafs",
+   "qiraahDisplay": "رواية حفص عن عاصم",
+   "id": "finding_1",
+   "type": "dhikr",
+   "startIndex": 17,
+   "endIndex": 41,
+   "wordStartIdx": 3,
+   "wordEndIdx": 6,
+   "startTime": 166.3702,
+   "endTime": 168.3702,
+   "matchedText": "بالله من الشيطان الرجيم،",
+   "canonicalText": "بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ",
+   "reference": "ذكر",
+   "confidence": 0.98,
+   "snappedToCanonical": false
+  },
+  {
+   "sourceType": "QURAN",
+   "unitId": "16:98",
+   "displayRef": "النحل: 98",
+   "candidateRefs": [
+    "رياض الصالحين (1263)"
+   ],
+   "candidateUnitIds": [
+    "RiyadSalihin:1263"
+   ],
+   "isAmbiguous": false,
+   "isOutsideCorpus": false,
+   "confidenceBand": "CANDIDATE",
+   "totalScore": 20.15,
+   "hasCitationCue": false,
+   "hasFuzzyHeal": false,
+   "tStart": 30,
+   "tEnd": 35,
+   "charStart": 163,
+   "charEnd": 192,
+   "segments": [
+    [
+     30,
+     35
+    ]
+   ],
+   "qSegments": [
+    [
+     4,
+     8
+    ]
+   ],
+   "canonicalSegments": [
+    "بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ"
+   ],
+   "commentaryGaps": [],
+   "qiraah": "",
+   "qiraahDisplay": "",
+   "embeddedQuran": [
+    {
+     "tStart": 31,
+     "tEnd": 35,
+     "qStart": 4,
+     "qEnd": 8,
+     "unitId": "16:98",
+     "displayRef": "النحل: 98",
+     "canonical": "بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ"
+    }
+   ],
+   "canonicalText": "بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ",
+   "id": "finding_2",
+   "type": "ayah",
+   "startIndex": 163,
+   "endIndex": 192,
+   "wordStartIdx": 30,
+   "wordEndIdx": 34,
+   "startTime": 178.5102,
+   "endTime": 182.1702,
+   "matchedText": "تعوذ بالله من الشيطان الرجيم،",
+   "reference": "النحل: 98",
+   "confidence": 0.72,
+   "snappedToCanonical": false
+  }
+ ]
+}

@@ -6,6 +6,8 @@ backend/data_cache/
 backend/temp_media/
 backend/models/
 *.jsonl
+# golden files are kept on purpose (engine/golden/make_golden.mjs)
+!engine/golden/**/*.jsonl
 .DS_Store
 
 # 90 MB corpus, fetched by run.sh from the Wahy-Finder repo
@@ -20,3 +22,10 @@ data/media_cache/
 # secrets and generated datasets
 .env
 data/laya_datagen/
+
+# rewrite: node and python tooling, experiment output (moved to data/tafrigh_runs/)
+node_modules/
+web/dist/
+/backend/runs/
+/data/*
+!/data/.gitkeep

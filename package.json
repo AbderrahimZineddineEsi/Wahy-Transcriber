@@ -1,0 +1,5 @@
+{
+  "name": "wahy-finder",
+  "private": true,
+  "workspaces": ["engine", "web"]
+}

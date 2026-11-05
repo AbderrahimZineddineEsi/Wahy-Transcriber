@@ -1,0 +1,1789 @@
+[
+ {
+  "members": [
+   0
+  ],
+  "state": {
+   "source_type": "HADITH",
+   "candidate_reference": "سنن أبي داود (2438)",
+   "has_citation_cue": true,
+   "context_before": "وبركاته وبركاته وقال الله تعالى، إن أردسل الله وقته ومركاته، قال الله تعالى بشكل كله، قال الله تعالى، فقال رسول الله صلى الله عليه وسلم،",
+   "matched_span_in_lecture": "ولا الجهاد في سبيل الله تعالى، إلا رجل خرج بنفسه وماله فلم يرجع من ذلك بشيء،",
+   "context_after": "أخرجه البخاري بسم الله الرحمن الرحيم الحمد لله رب العالمين وأشهد أن لا إله إلا الله وحده لا شريك له وأشهد أن محمدًا عبده ورسوله",
+   "immediate_transcript_before": "تعالى، فقال رسول الله صلى الله عليه وسلم،",
+   "unmatched_corpus_prefix_words": "قَالُوا يَا رَسُولَ اللَّهِ وَلاَ الْجِهَادُ فِي سَبِيلِ اللَّهِ قَالَ",
+   "prefix_words_heard": "1 of 2",
+   "immediate_transcript_after": "أخرجه البخاري بسم الله الرحمن الرحيم الحمد لله",
+   "unmatched_corpus_suffix_words": "",
+   "suffix_words_heard": null,
+   "canonical_corpus_text": "وَلاَ الْجِهَادُ فِي سَبِيلِ اللَّهِ إِلاَّ رَجُلٌ خَرَجَ بِنَفْسِهِ وَمَالِهِ فَلَمْ يَرْجِعْ مِنْ ذَلِكَ بِشَىْءٍ"
+  },
+  "questions": {
+   "verdict": {
+    "type": "choice",
+    "instructions": "In this Arabic Islamic lecture transcript, determine whether `matched_span_in_lecture` (surrounded by `context_before` and `context_after`) is an actual quotation/citation of `canonical_corpus_text` (`source_type`), or if it is merely ordinary speaker prose/explanation that happens to share words with the corpus text. When `verses_in_passage` is present, the span is that many consecutive verses the engine found back to back: judge them together. When `neighbor_findings` is present, it lists the engine's nearest other findings before and after this one (unverified: they can be false too), with the words between them.",
+    "criteria": {
+     "CORRECT": "The speaker is genuinely quoting, reciting, or invoking this Quranic Ayah, Prophetic Hadith, or Dhikr (verbatim or as a direct religious citation in context).",
+     "FALSE": "False positive: the words are ordinary conversational speech, fiqh explanation, or narrator/person names that coincidentally overlap with corpus vocabulary without quoting the text.",
+     "NOT_SURE": "Ambiguous or partial paraphrase/meaning-only allusion where it is borderline whether the speaker intended a direct quotation."
+    }
+   },
+   "start_missing": {
+    "type": "noul",
+    "instructions": "Was the START of this quote cut off from the detected span? `unmatched_corpus_prefix_words` are the words of the corpus text just before the part that was matched; `immediate_transcript_before` is what the speaker said just before the span; `prefix_words_heard` counts how many of the last corpus words before the span appear there (allowing ASR spelling errors). Answer true only if the speaker actually said words of the quote right before `matched_span_in_lecture`.",
+    "criteria": {
+     "false": "The span starts where the speaker started quoting: no words of the quote are missing at the start.",
+     "true": "Words of `unmatched_corpus_prefix_words` were said right before the span and are missing from its start."
+    }
+   },
+   "end_missing": {
+    "type": "noul",
+    "instructions": "Was the END of this quote cut off from the detected span? `unmatched_corpus_suffix_words` are the words of the corpus text just after the part that was matched; `immediate_transcript_after` is what the speaker said just after the span; `suffix_words_heard` counts how many of the first corpus words after the span appear there (allowing ASR spelling errors). Answer true only if the speaker actually said words of the quote right after `matched_span_in_lecture`.",
+    "criteria": {
+     "false": "The span ends where the speaker stopped quoting: no words of the quote are missing at the end.",
+     "true": "Words of `unmatched_corpus_suffix_words` were said right after the span and are missing from its end."
+    }
+   }
+  }
+ },
+ {
+  "members": [
+   1
+  ],
+  "state": {
+   "source_type": "HADITH",
+   "candidate_reference": "صحيح مسلم (554)",
+   "has_citation_cue": false,
+   "context_before": "الجهاد في سبيل الله تعالى، إلا رجل خرج بنفسه وماله فلم يرجع من ذلك بشيء، أخرجه البخاري بسم الله الرحمن الرحيم الحمد لله رب العالمين",
+   "matched_span_in_lecture": "وأشهد أن لا إله إلا الله وحده لا شريك له وأشهد أن محمدًا عبده ورسوله",
+   "context_after": "صلى الله وسلم عليه وعلى آله وأصحابه أجمعين اللهم علمنا ما ينفعنا وانفعنا بما علمتنا وزدنا علماً وأصلح لنا شأننا كله ولا تكلنا إلى أهوسنا",
+   "immediate_transcript_before": "بسم الله الرحمن الرحيم الحمد لله رب العالمين",
+   "unmatched_corpus_prefix_words": "مَنْ تَوَضَّأَ فَقَالَ",
+   "prefix_words_heard": "0 of 2",
+   "immediate_transcript_after": "صلى الله وسلم عليه وعلى آله وأصحابه أجمعين",
+   "unmatched_corpus_suffix_words": "",
+   "suffix_words_heard": null,
+   "canonical_corpus_text": "أَشْهَدُ أَنْ لاَ إِلَهَ إِلاَّ اللَّهُ وَحْدَهُ لاَ شَرِيكَ لَهُ وَأَشْهَدُ أَنَّ مُحَمَّدًا عَبْدُهُ وَرَسُولُهُ"
+  },
+  "questions": {
+   "verdict": {
+    "type": "choice",
+    "instructions": "In this Arabic Islamic lecture transcript, determine whether `matched_span_in_lecture` (surrounded by `context_before` and `context_after`) is an actual quotation/citation of `canonical_corpus_text` (`source_type`), or if it is merely ordinary speaker prose/explanation that happens to share words with the corpus text. When `verses_in_passage` is present, the span is that many consecutive verses the engine found back to back: judge them together. When `neighbor_findings` is present, it lists the engine's nearest other findings before and after this one (unverified: they can be false too), with the words between them.",
+    "criteria": {
+     "CORRECT": "The speaker is genuinely quoting, reciting, or invoking this Quranic Ayah, Prophetic Hadith, or Dhikr (verbatim or as a direct religious citation in context).",
+     "FALSE": "False positive: the words are ordinary conversational speech, fiqh explanation, or narrator/person names that coincidentally overlap with corpus vocabulary without quoting the text.",
+     "NOT_SURE": "Ambiguous or partial paraphrase/meaning-only allusion where it is borderline whether the speaker intended a direct quotation."
+    }
+   },
+   "start_missing": {
+    "type": "noul",
+    "instructions": "Was the START of this quote cut off from the detected span? `unmatched_corpus_prefix_words` are the words of the corpus text just before the part that was matched; `immediate_transcript_before` is what the speaker said just before the span; `prefix_words_heard` counts how many of the last corpus words before the span appear there (allowing ASR spelling errors). Answer true only if the speaker actually said words of the quote right before `matched_span_in_lecture`.",
+    "criteria": {
+     "false": "The span starts where the speaker started quoting: no words of the quote are missing at the start.",
+     "true": "Words of `unmatched_corpus_prefix_words` were said right before the span and are missing from its start."
+    }
+   },
+   "end_missing": {
+    "type": "noul",
+    "instructions": "Was the END of this quote cut off from the detected span? `unmatched_corpus_suffix_words` are the words of the corpus text just after the part that was matched; `immediate_transcript_after` is what the speaker said just after the span; `suffix_words_heard` counts how many of the first corpus words after the span appear there (allowing ASR spelling errors). Answer true only if the speaker actually said words of the quote right after `matched_span_in_lecture`.",
+    "criteria": {
+     "false": "The span ends where the speaker stopped quoting: no words of the quote are missing at the end.",
+     "true": "Words of `unmatched_corpus_suffix_words` were said right after the span and are missing from its end."
+    }
+   }
+  }
+ },
+ {
+  "members": [
+   2
+  ],
+  "state": {
+   "source_type": "QURAN",
+   "candidate_reference": "القدر: 3",
+   "has_citation_cue": false,
+   "context_before": "من رمضان هي خير الليالي فخير أيام السنة العشر الأول من ذي الحجة وخير ليالي السنة العشر الأواخر من رمضان وفي العشر الأواقر من رمضان",
+   "matched_span_in_lecture": "ليلة القدر ويخير من ألف شهر،",
+   "context_after": "وفي العشر الأوائل من ذي الحجة يوم عرفة ووسيد الأيام وخيرها وأفضلها، فالحاصل أن العشر الأول من ذي الحجة أيام فاضلة وعظيمة ومباركة، وهي خير",
+   "immediate_transcript_before": "الأواخر من رمضان وفي العشر الأواقر من رمضان",
+   "unmatched_corpus_prefix_words": "",
+   "prefix_words_heard": null,
+   "immediate_transcript_after": "وفي العشر الأوائل من ذي الحجة يوم عرفة",
+   "unmatched_corpus_suffix_words": "",
+   "suffix_words_heard": null,
+   "canonical_corpus_text": "لَيْلَةُ الْقَدْرِ خَيْرٌ مِّنْ أَلْفِ شَهْرٍ",
+   "quran_neighboring_context": {
+    "surah": 97,
+    "ayah": 3,
+    "previous_ayah_text": "وَمَا أَدْرَاكَ مَا لَيْلَةُ الْقَدْرِ",
+    "next_ayah_text": "تَنَزَّلُ الْمَلَائِكَةُ وَالرُّوحُ فِيهَا بِإِذْنِ رَبِّهِم مِّن كُلِّ أَمْرٍ"
+   }
+  },
+  "questions": {
+   "verdict": {
+    "type": "choice",
+    "instructions": "In this Arabic Islamic lecture transcript, determine whether `matched_span_in_lecture` (surrounded by `context_before` and `context_after`) is an actual quotation/citation of `canonical_corpus_text` (`source_type`), or if it is merely ordinary speaker prose/explanation that happens to share words with the corpus text. When `verses_in_passage` is present, the span is that many consecutive verses the engine found back to back: judge them together. When `neighbor_findings` is present, it lists the engine's nearest other findings before and after this one (unverified: they can be false too), with the words between them.",
+    "criteria": {
+     "CORRECT": "The speaker is genuinely quoting, reciting, or invoking this Quranic Ayah, Prophetic Hadith, or Dhikr (verbatim or as a direct religious citation in context).",
+     "FALSE": "False positive: the words are ordinary conversational speech, fiqh explanation, or narrator/person names that coincidentally overlap with corpus vocabulary without quoting the text.",
+     "NOT_SURE": "Ambiguous or partial paraphrase/meaning-only allusion where it is borderline whether the speaker intended a direct quotation."
+    }
+   },
+   "start_missing": {
+    "type": "noul",
+    "instructions": "Was the START of this quote cut off from the detected span? `unmatched_corpus_prefix_words` are the words of the corpus text just before the part that was matched; `immediate_transcript_before` is what the speaker said just before the span; `prefix_words_heard` counts how many of the last corpus words before the span appear there (allowing ASR spelling errors). Answer true only if the speaker actually said words of the quote right before `matched_span_in_lecture`.",
+    "criteria": {
+     "false": "The span starts where the speaker started quoting: no words of the quote are missing at the start.",
+     "true": "Words of `unmatched_corpus_prefix_words` were said right before the span and are missing from its start."
+    }
+   },
+   "end_missing": {
+    "type": "noul",
+    "instructions": "Was the END of this quote cut off from the detected span? `unmatched_corpus_suffix_words` are the words of the corpus text just after the part that was matched; `immediate_transcript_after` is what the speaker said just after the span; `suffix_words_heard` counts how many of the first corpus words after the span appear there (allowing ASR spelling errors). Answer true only if the speaker actually said words of the quote right after `matched_span_in_lecture`.",
+    "criteria": {
+     "false": "The span ends where the speaker stopped quoting: no words of the quote are missing at the end.",
+     "true": "Words of `unmatched_corpus_suffix_words` were said right after the span and are missing from its end."
+    }
+   }
+  }
+ },
+ {
+  "members": [
+   3
+  ],
+  "state": {
+   "source_type": "HADITH",
+   "candidate_reference": "جامع الترمذي (757)",
+   "has_citation_cue": false,
+   "context_before": "صلاة وصيام وصدقة وغير ذلك من الطاعات والعبادات، وأورد رحمه الله تعالى حديث ابن عباس رضي الله عنهما أن نبي صلى الله عليه وسلم قال",
+   "matched_span_in_lecture": "ما من أيام العمل الصالح فيهن أحب إلى الله تعالى من هذه الأيام العشر، أي العشر الأول من شرر الحجة، فقالوا يا رسول الله ولا الجهاد في سبيل الله، فقال رسول الله صلى الله عليه وسلم ولا الجهاد في سبيل الله، إلا رجل خرج بنفسه وماله فلم يرجع من ذلك بشيء،",
+   "context_after": "قال أخرجه البخاري وهذا اللفظ الذي ساقه رحمه الله تعالى هو لفظ الترمذي في جامعه، أما لفظ الإمام البخاري قال ما العمل، قال النبي صلى",
+   "immediate_transcript_before": "عنهما أن نبي صلى الله عليه وسلم قال",
+   "unmatched_corpus_prefix_words": "",
+   "prefix_words_heard": null,
+   "immediate_transcript_after": "قال أخرجه البخاري وهذا اللفظ الذي ساقه رحمه",
+   "unmatched_corpus_suffix_words": "",
+   "suffix_words_heard": null,
+   "canonical_corpus_text": "مَا مِنْ أَيَّامٍ الْعَمَلُ الصَّالِحُ فِيهِنَّ أَحَبُّ إِلَى اللَّهِ مِنْ هَذِهِ الأَيَّامِ الْعَشْرِ فَقَالُوا يَا رَسُولَ اللَّهِ وَلاَ الْجِهَادُ فِي سَبِيلِ اللَّهِ فَقَالَ رَسُولُ اللَّهِ صلى الله عليه وسلم وَلاَ الْجِهَادُ فِي سَبِيلِ اللَّهِ إِلاَّ رَجُلٌ خَرَجَ بِنَفْسِهِ وَمَالِهِ فَلَمْ يَرْجِعْ مِنْ ذَلِكَ بِشَيْءٍ"
+  },
+  "questions": {
+   "verdict": {
+    "type": "choice",
+    "instructions": "In this Arabic Islamic lecture transcript, determine whether `matched_span_in_lecture` (surrounded by `context_before` and `context_after`) is an actual quotation/citation of `canonical_corpus_text` (`source_type`), or if it is merely ordinary speaker prose/explanation that happens to share words with the corpus text. When `verses_in_passage` is present, the span is that many consecutive verses the engine found back to back: judge them together. When `neighbor_findings` is present, it lists the engine's nearest other findings before and after this one (unverified: they can be false too), with the words between them.",
+    "criteria": {
+     "CORRECT": "The speaker is genuinely quoting, reciting, or invoking this Quranic Ayah, Prophetic Hadith, or Dhikr (verbatim or as a direct religious citation in context).",
+     "FALSE": "False positive: the words are ordinary conversational speech, fiqh explanation, or narrator/person names that coincidentally overlap with corpus vocabulary without quoting the text.",
+     "NOT_SURE": "Ambiguous or partial paraphrase/meaning-only allusion where it is borderline whether the speaker intended a direct quotation."
+    }
+   },
+   "start_missing": {
+    "type": "noul",
+    "instructions": "Was the START of this quote cut off from the detected span? `unmatched_corpus_prefix_words` are the words of the corpus text just before the part that was matched; `immediate_transcript_before` is what the speaker said just before the span; `prefix_words_heard` counts how many of the last corpus words before the span appear there (allowing ASR spelling errors). Answer true only if the speaker actually said words of the quote right before `matched_span_in_lecture`.",
+    "criteria": {
+     "false": "The span starts where the speaker started quoting: no words of the quote are missing at the start.",
+     "true": "Words of `unmatched_corpus_prefix_words` were said right before the span and are missing from its start."
+    }
+   },
+   "end_missing": {
+    "type": "noul",
+    "instructions": "Was the END of this quote cut off from the detected span? `unmatched_corpus_suffix_words` are the words of the corpus text just after the part that was matched; `immediate_transcript_after` is what the speaker said just after the span; `suffix_words_heard` counts how many of the first corpus words after the span appear there (allowing ASR spelling errors). Answer true only if the speaker actually said words of the quote right after `matched_span_in_lecture`.",
+    "criteria": {
+     "false": "The span ends where the speaker stopped quoting: no words of the quote are missing at the end.",
+     "true": "Words of `unmatched_corpus_suffix_words` were said right after the span and are missing from its end."
+    }
+   }
+  }
+ },
+ {
+  "members": [
+   4
+  ],
+  "state": {
+   "source_type": "HADITH",
+   "candidate_reference": "صحيح البخاري (969)",
+   "has_citation_cue": true,
+   "context_before": "وهذا اللفظ الذي ساقه رحمه الله تعالى هو لفظ الترمذي في جامعه، أما لفظ الإمام البخاري قال ما العمل، قال النبي صلى الله عليه وسلم",
+   "matched_span_in_lecture": "ما العمل في أيام أفضل من العمل في هذه العشر الأول منذ الحجة، قال ولا الجهاد إلا رجل خرج يخاطر بنفسه، وما له فلم يرجع بشيء،",
+   "context_after": "والحديث دلّا دلالة ظاهرة على فضل هذه العشر وعظم ميشانها، وأن خير أيام العمل الصالح، وأن المسلم ينبغي أن يغنم تلك الأيام، وأن يحرص فيها",
+   "immediate_transcript_before": "ما العمل، قال النبي صلى الله عليه وسلم",
+   "unmatched_corpus_prefix_words": "",
+   "prefix_words_heard": null,
+   "immediate_transcript_after": "والحديث دلّا دلالة ظاهرة على فضل هذه العشر",
+   "unmatched_corpus_suffix_words": "",
+   "suffix_words_heard": null,
+   "canonical_corpus_text": "مَا الْعَمَلُ فِي أَيَّامِ الْعَشْرِ أَفْضَلَ مِنَ الْعَمَلِ فِي هَذِهِ قَالُوا وَلاَ الْجِهَادُ قَالَ وَلاَ الْجِهَادُ إِلاَّ رَجُلٌ خَرَجَ يُخَاطِرُ بِنَفْسِهِ وَمَالِهِ فَلَمْ يَرْجِعْ بِشَىْءٍ"
+  },
+  "questions": {
+   "verdict": {
+    "type": "choice",
+    "instructions": "In this Arabic Islamic lecture transcript, determine whether `matched_span_in_lecture` (surrounded by `context_before` and `context_after`) is an actual quotation/citation of `canonical_corpus_text` (`source_type`), or if it is merely ordinary speaker prose/explanation that happens to share words with the corpus text. When `verses_in_passage` is present, the span is that many consecutive verses the engine found back to back: judge them together. When `neighbor_findings` is present, it lists the engine's nearest other findings before and after this one (unverified: they can be false too), with the words between them.",
+    "criteria": {
+     "CORRECT": "The speaker is genuinely quoting, reciting, or invoking this Quranic Ayah, Prophetic Hadith, or Dhikr (verbatim or as a direct religious citation in context).",
+     "FALSE": "False positive: the words are ordinary conversational speech, fiqh explanation, or narrator/person names that coincidentally overlap with corpus vocabulary without quoting the text.",
+     "NOT_SURE": "Ambiguous or partial paraphrase/meaning-only allusion where it is borderline whether the speaker intended a direct quotation."
+    }
+   },
+   "start_missing": {
+    "type": "noul",
+    "instructions": "Was the START of this quote cut off from the detected span? `unmatched_corpus_prefix_words` are the words of the corpus text just before the part that was matched; `immediate_transcript_before` is what the speaker said just before the span; `prefix_words_heard` counts how many of the last corpus words before the span appear there (allowing ASR spelling errors). Answer true only if the speaker actually said words of the quote right before `matched_span_in_lecture`.",
+    "criteria": {
+     "false": "The span starts where the speaker started quoting: no words of the quote are missing at the start.",
+     "true": "Words of `unmatched_corpus_prefix_words` were said right before the span and are missing from its start."
+    }
+   },
+   "end_missing": {
+    "type": "noul",
+    "instructions": "Was the END of this quote cut off from the detected span? `unmatched_corpus_suffix_words` are the words of the corpus text just after the part that was matched; `immediate_transcript_after` is what the speaker said just after the span; `suffix_words_heard` counts how many of the first corpus words after the span appear there (allowing ASR spelling errors). Answer true only if the speaker actually said words of the quote right after `matched_span_in_lecture`.",
+    "criteria": {
+     "false": "The span ends where the speaker stopped quoting: no words of the quote are missing at the end.",
+     "true": "Words of `unmatched_corpus_suffix_words` were said right after the span and are missing from its end."
+    }
+   }
+  }
+ },
+ {
+  "members": [
+   5
+  ],
+  "state": {
+   "source_type": "HADITH",
+   "candidate_reference": "سنن أبي داود (2437)",
+   "has_citation_cue": false,
+   "context_before": "العشر الصيام، ولأجل هذا أورده المنذر رحمه الله تعالى في الأبواب المتعلقة بفضائل الصيام نام قال رحمه الله تعالى ما جاء في صيام يوم عرفة",
+   "matched_span_in_lecture": "وثلاثة أيام من كل شهر ويوم الاثنين",
+   "context_after": "روى أبو قتادة رضي الله عنه أن رسول الله صلى الثمن والبغوات أن يوم أنفسه. قال عمرا، علي الضقيف وتباني محمد بالظميل على سيدنا حدا",
+   "immediate_transcript_before": "الله تعالى ما جاء في صيام يوم عرفة",
+   "unmatched_corpus_prefix_words": "يَصُومُ تِسْعَ ذِي الْحِجَّةِ وَيَوْمَ عَاشُورَاءَ",
+   "prefix_words_heard": "1 of 2",
+   "immediate_transcript_after": "روى أبو قتادة رضي الله عنه أن رسول",
+   "unmatched_corpus_suffix_words": "مِنَ الشَّهْرِ وَالْخَمِيسَ",
+   "suffix_words_heard": "0 of 2",
+   "canonical_corpus_text": "وَثَلاَثَةَ أَيَّامٍ مِنْ كُلِّ شَهْرٍ أَوَّلَ اثْنَيْنِ"
+  },
+  "questions": {
+   "verdict": {
+    "type": "choice",
+    "instructions": "In this Arabic Islamic lecture transcript, determine whether `matched_span_in_lecture` (surrounded by `context_before` and `context_after`) is an actual quotation/citation of `canonical_corpus_text` (`source_type`), or if it is merely ordinary speaker prose/explanation that happens to share words with the corpus text. When `verses_in_passage` is present, the span is that many consecutive verses the engine found back to back: judge them together. When `neighbor_findings` is present, it lists the engine's nearest other findings before and after this one (unverified: they can be false too), with the words between them.",
+    "criteria": {
+     "CORRECT": "The speaker is genuinely quoting, reciting, or invoking this Quranic Ayah, Prophetic Hadith, or Dhikr (verbatim or as a direct religious citation in context).",
+     "FALSE": "False positive: the words are ordinary conversational speech, fiqh explanation, or narrator/person names that coincidentally overlap with corpus vocabulary without quoting the text.",
+     "NOT_SURE": "Ambiguous or partial paraphrase/meaning-only allusion where it is borderline whether the speaker intended a direct quotation."
+    }
+   },
+   "start_missing": {
+    "type": "noul",
+    "instructions": "Was the START of this quote cut off from the detected span? `unmatched_corpus_prefix_words` are the words of the corpus text just before the part that was matched; `immediate_transcript_before` is what the speaker said just before the span; `prefix_words_heard` counts how many of the last corpus words before the span appear there (allowing ASR spelling errors). Answer true only if the speaker actually said words of the quote right before `matched_span_in_lecture`.",
+    "criteria": {
+     "false": "The span starts where the speaker started quoting: no words of the quote are missing at the start.",
+     "true": "Words of `unmatched_corpus_prefix_words` were said right before the span and are missing from its start."
+    }
+   },
+   "end_missing": {
+    "type": "noul",
+    "instructions": "Was the END of this quote cut off from the detected span? `unmatched_corpus_suffix_words` are the words of the corpus text just after the part that was matched; `immediate_transcript_after` is what the speaker said just after the span; `suffix_words_heard` counts how many of the first corpus words after the span appear there (allowing ASR spelling errors). Answer true only if the speaker actually said words of the quote right after `matched_span_in_lecture`.",
+    "criteria": {
+     "false": "The span ends where the speaker stopped quoting: no words of the quote are missing at the end.",
+     "true": "Words of `unmatched_corpus_suffix_words` were said right after the span and are missing from its end."
+    }
+   }
+  }
+ },
+ {
+  "members": [
+   6
+  ],
+  "state": {
+   "source_type": "HADITH",
+   "candidate_reference": "صحيح مسلم (2747)",
+   "has_citation_cue": false,
+   "context_before": "والبغوات أن يوم أنفسه. قال عمرا، علي الضقيف وتباني محمد بالظميل على سيدنا حدا فرعا ومستخدم جميع متعا من حيثتنا. نعم. فأعد من قوله هو",
+   "matched_span_in_lecture": "قال فسئل عن صيام يومين وإفطار يوم قال ومن يطيق ذلك؟ قال وسئل عن صوم يوم وإفطار يوم قال ذاك صوم أخي داود داود قبله، يبدو عندك سقط عندك، في سقط عندك، حتى النسقطة، نعم، قال وسئل عن صوم يوم وإشطار يومين، قال ليت أن الله عز وجل قوان لذلك، قال وسئل عن صوم يوم وإشطار يوم، قال ذلك صوم أخي داود، نعم، قال وسئل عن صيام يوم الاثنين، فقال ذاك يوم ولدت فيه، ويوم بعثت وأنزل علي فيه، قال فقال فصوم ثلاثة",
+   "context_after": "أيام من كل شهر، ورمضان إلى رمضان صوم الدهر، قال فالسئل عن صوم عاشراء، فقال يكفر السنة، انفرد به مسلم ثم عقد رحمه الله تعالى",
+   "immediate_transcript_before": "متعا من حيثتنا. نعم. فأعد من قوله هو",
+   "unmatched_corpus_prefix_words": "لاَ صَامَ وَلاَ أَفْطَرَ أَوْ مَا صَامَ وَمَا أَفْطَرَ",
+   "prefix_words_heard": "0 of 2",
+   "immediate_transcript_after": "أيام من كل شهر، ورمضان إلى رمضان صوم",
+   "unmatched_corpus_suffix_words": "مِنْ كُلِّ شَهْرٍ وَرَمَضَانَ إِلَى رَمَضَانَ صَوْمُ الدَّهْرِ قَالَ وَسُئِلَ",
+   "suffix_words_heard": "2 of 2",
+   "canonical_corpus_text": "قَالَ فَسُئِلَ عَنْ صَوْمِ يَوْمَيْنِ وَإِفْطَارِ يَوْمٍ قَالَ وَمَنْ يُطِيقُ ذَلِكَ قَالَ وَسُئِلَ عَنْ صَوْمِ يَوْمٍ وَإِفْطَارِ يَوْمَيْنِ قَالَ لَيْتَ أَنَّ اللَّهَ قَوَّانَا لِذَلِكَ قَالَ وَسُئِلَ عَنْ صَوْمِ يَوْمٍ وَإِفْطَارِ يَوْمٍ قَالَ ذَاكَ صَوْمُ أَخِي دَاوُدَ عَلَيْهِ السَّلاَمُ قَالَ وَسُئِلَ عَنْ صَوْمِ يَوْمِ الاِثْنَيْنِ قَالَ ذَاكَ يَوْمٌ وُلِدْتُ فِيهِ وَيَوْمٌ بُعِثْتُ أَوْ أُنْزِلَ عَلَىَّ فِيهِ قَالَ فَقَالَ صَوْمُ ثَلاَثَةٍ"
+  },
+  "questions": {
+   "verdict": {
+    "type": "choice",
+    "instructions": "In this Arabic Islamic lecture transcript, determine whether `matched_span_in_lecture` (surrounded by `context_before` and `context_after`) is an actual quotation/citation of `canonical_corpus_text` (`source_type`), or if it is merely ordinary speaker prose/explanation that happens to share words with the corpus text. When `verses_in_passage` is present, the span is that many consecutive verses the engine found back to back: judge them together. When `neighbor_findings` is present, it lists the engine's nearest other findings before and after this one (unverified: they can be false too), with the words between them.",
+    "criteria": {
+     "CORRECT": "The speaker is genuinely quoting, reciting, or invoking this Quranic Ayah, Prophetic Hadith, or Dhikr (verbatim or as a direct religious citation in context).",
+     "FALSE": "False positive: the words are ordinary conversational speech, fiqh explanation, or narrator/person names that coincidentally overlap with corpus vocabulary without quoting the text.",
+     "NOT_SURE": "Ambiguous or partial paraphrase/meaning-only allusion where it is borderline whether the speaker intended a direct quotation."
+    }
+   },
+   "start_missing": {
+    "type": "noul",
+    "instructions": "Was the START of this quote cut off from the detected span? `unmatched_corpus_prefix_words` are the words of the corpus text just before the part that was matched; `immediate_transcript_before` is what the speaker said just before the span; `prefix_words_heard` counts how many of the last corpus words before the span appear there (allowing ASR spelling errors). Answer true only if the speaker actually said words of the quote right before `matched_span_in_lecture`.",
+    "criteria": {
+     "false": "The span starts where the speaker started quoting: no words of the quote are missing at the start.",
+     "true": "Words of `unmatched_corpus_prefix_words` were said right before the span and are missing from its start."
+    }
+   },
+   "end_missing": {
+    "type": "noul",
+    "instructions": "Was the END of this quote cut off from the detected span? `unmatched_corpus_suffix_words` are the words of the corpus text just after the part that was matched; `immediate_transcript_after` is what the speaker said just after the span; `suffix_words_heard` counts how many of the first corpus words after the span appear there (allowing ASR spelling errors). Answer true only if the speaker actually said words of the quote right after `matched_span_in_lecture`.",
+    "criteria": {
+     "false": "The span ends where the speaker stopped quoting: no words of the quote are missing at the end.",
+     "true": "Words of `unmatched_corpus_suffix_words` were said right after the span and are missing from its end."
+    }
+   }
+  }
+ },
+ {
+  "members": [
+   7
+  ],
+  "state": {
+   "source_type": "HADITH",
+   "candidate_reference": "صحيح مسلم (2746)",
+   "has_citation_cue": false,
+   "context_before": "ومستخدم جميع متعا من حيثتنا. نعم. فأعد من قوله هو قال فسئل عن صيام يومين وإفطار يوم قال ومن يطيق ذلك؟ قال وسئل عن صوم",
+   "matched_span_in_lecture": "يوم وإفطار يوم قال ذاك صوم أخي داود",
+   "context_after": "داود قبله، يبدو عندك سقط عندك، في سقط عندك، حتى النسقطة، نعم، قال وسئل عن صوم يوم وإشطار يومين، قال ليت أن الله عز وجل",
+   "immediate_transcript_before": "قال ومن يطيق ذلك؟ قال وسئل عن صوم",
+   "unmatched_corpus_prefix_words": "وَيُفْطِرُ يَوْمًا قَالَ وَيُطِيقُ ذَلِكَ أَحَدٌ قَالَ كَيْفَ مَنْ يَصُومُ",
+   "prefix_words_heard": "1 of 2",
+   "immediate_transcript_after": "داود قبله، يبدو عندك سقط عندك، في سقط",
+   "unmatched_corpus_suffix_words": "عَلَيْهِ السَّلاَمُ قَالَ كَيْفَ مَنْ يَصُومُ يَوْمًا وَيُفْطِرُ يَوْمَيْنِ قَالَ",
+   "suffix_words_heard": "0 of 2",
+   "canonical_corpus_text": "يَوْمًا وَيُفْطِرُ يَوْمًا قَالَ ذَاكَ صَوْمُ دَاوُدَ"
+  },
+  "questions": {
+   "verdict": {
+    "type": "choice",
+    "instructions": "In this Arabic Islamic lecture transcript, determine whether `matched_span_in_lecture` (surrounded by `context_before` and `context_after`) is an actual quotation/citation of `canonical_corpus_text` (`source_type`), or if it is merely ordinary speaker prose/explanation that happens to share words with the corpus text. When `verses_in_passage` is present, the span is that many consecutive verses the engine found back to back: judge them together. When `neighbor_findings` is present, it lists the engine's nearest other findings before and after this one (unverified: they can be false too), with the words between them.",
+    "criteria": {
+     "CORRECT": "The speaker is genuinely quoting, reciting, or invoking this Quranic Ayah, Prophetic Hadith, or Dhikr (verbatim or as a direct religious citation in context).",
+     "FALSE": "False positive: the words are ordinary conversational speech, fiqh explanation, or narrator/person names that coincidentally overlap with corpus vocabulary without quoting the text.",
+     "NOT_SURE": "Ambiguous or partial paraphrase/meaning-only allusion where it is borderline whether the speaker intended a direct quotation."
+    }
+   },
+   "start_missing": {
+    "type": "noul",
+    "instructions": "Was the START of this quote cut off from the detected span? `unmatched_corpus_prefix_words` are the words of the corpus text just before the part that was matched; `immediate_transcript_before` is what the speaker said just before the span; `prefix_words_heard` counts how many of the last corpus words before the span appear there (allowing ASR spelling errors). Answer true only if the speaker actually said words of the quote right before `matched_span_in_lecture`.",
+    "criteria": {
+     "false": "The span starts where the speaker started quoting: no words of the quote are missing at the start.",
+     "true": "Words of `unmatched_corpus_prefix_words` were said right before the span and are missing from its start."
+    }
+   },
+   "end_missing": {
+    "type": "noul",
+    "instructions": "Was the END of this quote cut off from the detected span? `unmatched_corpus_suffix_words` are the words of the corpus text just after the part that was matched; `immediate_transcript_after` is what the speaker said just after the span; `suffix_words_heard` counts how many of the first corpus words after the span appear there (allowing ASR spelling errors). Answer true only if the speaker actually said words of the quote right after `matched_span_in_lecture`.",
+    "criteria": {
+     "false": "The span ends where the speaker stopped quoting: no words of the quote are missing at the end.",
+     "true": "Words of `unmatched_corpus_suffix_words` were said right after the span and are missing from its end."
+    }
+   }
+  }
+ },
+ {
+  "members": [
+   8
+  ],
+  "state": {
+   "source_type": "HADITH",
+   "candidate_reference": "صحيح مسلم (2747)",
+   "has_citation_cue": false,
+   "context_before": "يوم، قال ذلك صوم أخي داود، نعم، قال وسئل عن صيام يوم الاثنين، فقال ذاك يوم ولدت فيه، ويوم بعثت وأنزل علي فيه، قال فقال",
+   "matched_span_in_lecture": "فصوم ثلاثة أيام من كل شهر، ورمضان إلى رمضان صوم الدهر، قال فالسئل عن صوم عاشراء، فقال يكفر السنة،",
+   "context_after": "انفرد به مسلم ثم عقد رحمه الله تعالى هذه الترجمة في جملة من الفضائل جمعها حديث واحد وحديث أبي قتادة رضي الله عنه في فضل",
+   "immediate_transcript_before": "فيه، ويوم بعثت وأنزل علي فيه، قال فقال",
+   "unmatched_corpus_prefix_words": "وُلِدْتُ فِيهِ وَيَوْمٌ بُعِثْتُ أَوْ أُنْزِلَ عَلَىَّ فِيهِ قَالَ فَقَالَ",
+   "prefix_words_heard": "2 of 2",
+   "immediate_transcript_after": "انفرد به مسلم ثم عقد رحمه الله تعالى",
+   "unmatched_corpus_suffix_words": "الْمَاضِيَةَ وَالْبَاقِيَةَ قَالَ وَسُئِلَ عَنْ صَوْمِ يَوْمِ عَاشُورَاءَ فَقَالَ يُكَفِّرُ",
+   "suffix_words_heard": "0 of 2",
+   "canonical_corpus_text": "صَوْمُ ثَلاَثَةٍ مِنْ كُلِّ شَهْرٍ وَرَمَضَانَ إِلَى رَمَضَانَ صَوْمُ الدَّهْرِ قَالَ وَسُئِلَ عَنْ صَوْمِ يَوْمِ عَرَفَةَ فَقَالَ يُكَفِّرُ السَّنَةَ"
+  },
+  "questions": {
+   "verdict": {
+    "type": "choice",
+    "instructions": "In this Arabic Islamic lecture transcript, determine whether `matched_span_in_lecture` (surrounded by `context_before` and `context_after`) is an actual quotation/citation of `canonical_corpus_text` (`source_type`), or if it is merely ordinary speaker prose/explanation that happens to share words with the corpus text. When `verses_in_passage` is present, the span is that many consecutive verses the engine found back to back: judge them together. When `neighbor_findings` is present, it lists the engine's nearest other findings before and after this one (unverified: they can be false too), with the words between them.",
+    "criteria": {
+     "CORRECT": "The speaker is genuinely quoting, reciting, or invoking this Quranic Ayah, Prophetic Hadith, or Dhikr (verbatim or as a direct religious citation in context).",
+     "FALSE": "False positive: the words are ordinary conversational speech, fiqh explanation, or narrator/person names that coincidentally overlap with corpus vocabulary without quoting the text.",
+     "NOT_SURE": "Ambiguous or partial paraphrase/meaning-only allusion where it is borderline whether the speaker intended a direct quotation."
+    }
+   },
+   "start_missing": {
+    "type": "noul",
+    "instructions": "Was the START of this quote cut off from the detected span? `unmatched_corpus_prefix_words` are the words of the corpus text just before the part that was matched; `immediate_transcript_before` is what the speaker said just before the span; `prefix_words_heard` counts how many of the last corpus words before the span appear there (allowing ASR spelling errors). Answer true only if the speaker actually said words of the quote right before `matched_span_in_lecture`.",
+    "criteria": {
+     "false": "The span starts where the speaker started quoting: no words of the quote are missing at the start.",
+     "true": "Words of `unmatched_corpus_prefix_words` were said right before the span and are missing from its start."
+    }
+   },
+   "end_missing": {
+    "type": "noul",
+    "instructions": "Was the END of this quote cut off from the detected span? `unmatched_corpus_suffix_words` are the words of the corpus text just after the part that was matched; `immediate_transcript_after` is what the speaker said just after the span; `suffix_words_heard` counts how many of the first corpus words after the span appear there (allowing ASR spelling errors). Answer true only if the speaker actually said words of the quote right after `matched_span_in_lecture`.",
+    "criteria": {
+     "false": "The span ends where the speaker stopped quoting: no words of the quote are missing at the end.",
+     "true": "Words of `unmatched_corpus_suffix_words` were said right after the span and are missing from its end."
+    }
+   }
+  }
+ },
+ {
+  "members": [
+   9
+  ],
+  "state": {
+   "source_type": "HADITH",
+   "candidate_reference": "سنن النسائي (2420)",
+   "has_citation_cue": false,
+   "context_before": "عقد رحمه الله تعالى هذه الترجمة في جملة من الفضائل جمعها حديث واحد وحديث أبي قتادة رضي الله عنه في فضل صيام يوم عرفة وفضل",
+   "matched_span_in_lecture": "صيام ثلاثة أيام من كل شهر وفضل صيام",
+   "context_after": "الاثنين إلى أيضا جملة من الفضائل الأخرى المتعلقة بالصيام وقال رسول الله صلى الله عليه وسلم سئل عن صومه، أي سأله رجل عن صومه، أي",
+   "immediate_transcript_before": "الله عنه في فضل صيام يوم عرفة وفضل",
+   "unmatched_corpus_prefix_words": "",
+   "prefix_words_heard": null,
+   "immediate_transcript_after": "الاثنين إلى أيضا جملة من الفضائل الأخرى المتعلقة",
+   "unmatched_corpus_suffix_words": "الدَّهْرِ وَأَيَّامُ الْبِيضِ صَبِيحَةَ ثَلاَثَ عَشْرَةَ وَأَرْبَعَ عَشْرَةَ وَخَمْسَ عَشْرَةَ",
+   "suffix_words_heard": "0 of 2",
+   "canonical_corpus_text": "صِيَامُ ثَلاَثَةِ أَيَّامٍ مِنْ كُلِّ شَهْرٍ صِيَامُ"
+  },
+  "questions": {
+   "verdict": {
+    "type": "choice",
+    "instructions": "In this Arabic Islamic lecture transcript, determine whether `matched_span_in_lecture` (surrounded by `context_before` and `context_after`) is an actual quotation/citation of `canonical_corpus_text` (`source_type`), or if it is merely ordinary speaker prose/explanation that happens to share words with the corpus text. When `verses_in_passage` is present, the span is that many consecutive verses the engine found back to back: judge them together. When `neighbor_findings` is present, it lists the engine's nearest other findings before and after this one (unverified: they can be false too), with the words between them.",
+    "criteria": {
+     "CORRECT": "The speaker is genuinely quoting, reciting, or invoking this Quranic Ayah, Prophetic Hadith, or Dhikr (verbatim or as a direct religious citation in context).",
+     "FALSE": "False positive: the words are ordinary conversational speech, fiqh explanation, or narrator/person names that coincidentally overlap with corpus vocabulary without quoting the text.",
+     "NOT_SURE": "Ambiguous or partial paraphrase/meaning-only allusion where it is borderline whether the speaker intended a direct quotation."
+    }
+   },
+   "start_missing": {
+    "type": "noul",
+    "instructions": "Was the START of this quote cut off from the detected span? `unmatched_corpus_prefix_words` are the words of the corpus text just before the part that was matched; `immediate_transcript_before` is what the speaker said just before the span; `prefix_words_heard` counts how many of the last corpus words before the span appear there (allowing ASR spelling errors). Answer true only if the speaker actually said words of the quote right before `matched_span_in_lecture`.",
+    "criteria": {
+     "false": "The span starts where the speaker started quoting: no words of the quote are missing at the start.",
+     "true": "Words of `unmatched_corpus_prefix_words` were said right before the span and are missing from its start."
+    }
+   },
+   "end_missing": {
+    "type": "noul",
+    "instructions": "Was the END of this quote cut off from the detected span? `unmatched_corpus_suffix_words` are the words of the corpus text just after the part that was matched; `immediate_transcript_after` is what the speaker said just after the span; `suffix_words_heard` counts how many of the first corpus words after the span appear there (allowing ASR spelling errors). Answer true only if the speaker actually said words of the quote right after `matched_span_in_lecture`.",
+    "criteria": {
+     "false": "The span ends where the speaker stopped quoting: no words of the quote are missing at the end.",
+     "true": "Words of `unmatched_corpus_suffix_words` were said right after the span and are missing from its end."
+    }
+   }
+  }
+ },
+ {
+  "members": [
+   10
+  ],
+  "state": {
+   "source_type": "HADITH",
+   "candidate_reference": "صحيح البخاري (6362)",
+   "has_citation_cue": false,
+   "context_before": "يناسب في هذا المقام أن يقول كم أصوم، فكره النبي صلى الله عليه وسلم مسألة فغضب صلاة الله وسلم عليه، فقال عمر رضي الله عنه",
+   "matched_span_in_lecture": "رضينا بالله ربا وبالإسلام دينا ومحمد صلى الله عليه وسلم رسولا",
+   "context_after": "وببيعته، وقال رأى النبي عليه الصلاة والسلام، قال هذه الكلمات العظيمة الجامعة التي جمعت الدين كلها، لأن الدين يقوم على هذه الأصول الثلاثة التي ذكرها",
+   "immediate_transcript_before": "الله وسلم عليه، فقال عمر رضي الله عنه",
+   "unmatched_corpus_prefix_words": "رَسُولَ اللَّهِ مَنْ أَبِي قَالَ حُذَافَةُ ثُمَّ أَنْشَأَ عُمَرُ فَقَالَ",
+   "prefix_words_heard": "1 of 2",
+   "immediate_transcript_after": "وببيعته، وقال رأى النبي عليه الصلاة والسلام، قال",
+   "unmatched_corpus_suffix_words": "نَعُوذُ بِاللَّهِ مِنَ الْفِتَنِ فَقَالَ رَسُولُ اللَّهِ صلى الله عليه",
+   "suffix_words_heard": "0 of 2",
+   "canonical_corpus_text": "رَضِينَا بِاللَّهِ رَبًّا وَبِالإِسْلاَمِ دِينًا وَبِمُحَمَّدٍ صلى الله عليه وسلم رَسُولاً"
+  },
+  "questions": {
+   "verdict": {
+    "type": "choice",
+    "instructions": "In this Arabic Islamic lecture transcript, determine whether `matched_span_in_lecture` (surrounded by `context_before` and `context_after`) is an actual quotation/citation of `canonical_corpus_text` (`source_type`), or if it is merely ordinary speaker prose/explanation that happens to share words with the corpus text. When `verses_in_passage` is present, the span is that many consecutive verses the engine found back to back: judge them together. When `neighbor_findings` is present, it lists the engine's nearest other findings before and after this one (unverified: they can be false too), with the words between them.",
+    "criteria": {
+     "CORRECT": "The speaker is genuinely quoting, reciting, or invoking this Quranic Ayah, Prophetic Hadith, or Dhikr (verbatim or as a direct religious citation in context).",
+     "FALSE": "False positive: the words are ordinary conversational speech, fiqh explanation, or narrator/person names that coincidentally overlap with corpus vocabulary without quoting the text.",
+     "NOT_SURE": "Ambiguous or partial paraphrase/meaning-only allusion where it is borderline whether the speaker intended a direct quotation."
+    }
+   },
+   "start_missing": {
+    "type": "noul",
+    "instructions": "Was the START of this quote cut off from the detected span? `unmatched_corpus_prefix_words` are the words of the corpus text just before the part that was matched; `immediate_transcript_before` is what the speaker said just before the span; `prefix_words_heard` counts how many of the last corpus words before the span appear there (allowing ASR spelling errors). Answer true only if the speaker actually said words of the quote right before `matched_span_in_lecture`.",
+    "criteria": {
+     "false": "The span starts where the speaker started quoting: no words of the quote are missing at the start.",
+     "true": "Words of `unmatched_corpus_prefix_words` were said right before the span and are missing from its start."
+    }
+   },
+   "end_missing": {
+    "type": "noul",
+    "instructions": "Was the END of this quote cut off from the detected span? `unmatched_corpus_suffix_words` are the words of the corpus text just after the part that was matched; `immediate_transcript_after` is what the speaker said just after the span; `suffix_words_heard` counts how many of the first corpus words after the span appear there (allowing ASR spelling errors). Answer true only if the speaker actually said words of the quote right after `matched_span_in_lecture`.",
+    "criteria": {
+     "false": "The span ends where the speaker stopped quoting: no words of the quote are missing at the end.",
+     "true": "Words of `unmatched_corpus_suffix_words` were said right after the span and are missing from its end."
+    }
+   }
+  }
+ },
+ {
+  "members": [
+   11
+  ],
+  "state": {
+   "source_type": "HADITH",
+   "candidate_reference": "صحيح البخاري (6362)",
+   "has_citation_cue": false,
+   "context_before": "عليه الصلاة والسلام، قال هذه الكلمات العظيمة الجامعة التي جمعت الدين كلها، لأن الدين يقوم على هذه الأصول الثلاثة التي ذكرها عمر رضي الله عنه",
+   "matched_span_in_lecture": "قال رضينا بالله ربا وبالإسلام دينا وبمحمد صلى الله عليه وسلم رسولا",
+   "context_after": "وعن هذه الثلاثة يسأل كل إنسان إذا أدرج في قبله فإنه يأتيه ملكان فيقعدانه ويسألاني من ربك وما دينك ومن نبيك صلى الله عليه وسلم",
+   "immediate_transcript_before": "الأصول الثلاثة التي ذكرها عمر رضي الله عنه",
+   "unmatched_corpus_prefix_words": "يَا رَسُولَ اللَّهِ مَنْ أَبِي قَالَ حُذَافَةُ ثُمَّ أَنْشَأَ عُمَرُ",
+   "prefix_words_heard": "1 of 2",
+   "immediate_transcript_after": "وعن هذه الثلاثة يسأل كل إنسان إذا أدرج",
+   "unmatched_corpus_suffix_words": "نَعُوذُ بِاللَّهِ مِنَ الْفِتَنِ فَقَالَ رَسُولُ اللَّهِ صلى الله عليه",
+   "suffix_words_heard": "0 of 2",
+   "canonical_corpus_text": "فَقَالَ رَضِينَا بِاللَّهِ رَبًّا وَبِالإِسْلاَمِ دِينًا وَبِمُحَمَّدٍ صلى الله عليه وسلم رَسُولاً"
+  },
+  "questions": {
+   "verdict": {
+    "type": "choice",
+    "instructions": "In this Arabic Islamic lecture transcript, determine whether `matched_span_in_lecture` (surrounded by `context_before` and `context_after`) is an actual quotation/citation of `canonical_corpus_text` (`source_type`), or if it is merely ordinary speaker prose/explanation that happens to share words with the corpus text. When `verses_in_passage` is present, the span is that many consecutive verses the engine found back to back: judge them together. When `neighbor_findings` is present, it lists the engine's nearest other findings before and after this one (unverified: they can be false too), with the words between them.",
+    "criteria": {
+     "CORRECT": "The speaker is genuinely quoting, reciting, or invoking this Quranic Ayah, Prophetic Hadith, or Dhikr (verbatim or as a direct religious citation in context).",
+     "FALSE": "False positive: the words are ordinary conversational speech, fiqh explanation, or narrator/person names that coincidentally overlap with corpus vocabulary without quoting the text.",
+     "NOT_SURE": "Ambiguous or partial paraphrase/meaning-only allusion where it is borderline whether the speaker intended a direct quotation."
+    }
+   },
+   "start_missing": {
+    "type": "noul",
+    "instructions": "Was the START of this quote cut off from the detected span? `unmatched_corpus_prefix_words` are the words of the corpus text just before the part that was matched; `immediate_transcript_before` is what the speaker said just before the span; `prefix_words_heard` counts how many of the last corpus words before the span appear there (allowing ASR spelling errors). Answer true only if the speaker actually said words of the quote right before `matched_span_in_lecture`.",
+    "criteria": {
+     "false": "The span starts where the speaker started quoting: no words of the quote are missing at the start.",
+     "true": "Words of `unmatched_corpus_prefix_words` were said right before the span and are missing from its start."
+    }
+   },
+   "end_missing": {
+    "type": "noul",
+    "instructions": "Was the END of this quote cut off from the detected span? `unmatched_corpus_suffix_words` are the words of the corpus text just after the part that was matched; `immediate_transcript_after` is what the speaker said just after the span; `suffix_words_heard` counts how many of the first corpus words after the span appear there (allowing ASR spelling errors). Answer true only if the speaker actually said words of the quote right after `matched_span_in_lecture`.",
+    "criteria": {
+     "false": "The span ends where the speaker stopped quoting: no words of the quote are missing at the end.",
+     "true": "Words of `unmatched_corpus_suffix_words` were said right after the span and are missing from its end."
+    }
+   }
+  }
+ },
+ {
+  "members": [
+   12
+  ],
+  "state": {
+   "source_type": "HADITH",
+   "candidate_reference": "سنن أبي داود (4753)",
+   "has_citation_cue": false,
+   "context_before": "بالله ربا وبالإسلام دينا وبمحمد صلى الله عليه وسلم رسولا وعن هذه الثلاثة يسأل كل إنسان إذا أدرج في قبله فإنه يأتيه ملكان فيقعدانه ويسألاني",
+   "matched_span_in_lecture": "من ربك وما دينك ومن نبيك",
+   "context_after": "صلى الله عليه وسلم ويفوز بصحة الجواب على هذا السؤال أهل الرضا في هذه الحياة الدنيا بالله رباً وبالإسلام ديناً وبمحمد صلى الله عليه وسلم",
+   "immediate_transcript_before": "أدرج في قبله فإنه يأتيه ملكان فيقعدانه ويسألاني",
+   "unmatched_corpus_prefix_words": "خَفْقَ نِعَالِهِمْ إِذَا وَلَّوْا مُدْبِرِينَ حِينَ يُقَالُ لَهُ يَا هَذَا",
+   "prefix_words_heard": "0 of 2",
+   "immediate_transcript_after": "صلى الله عليه وسلم ويفوز بصحة الجواب على",
+   "unmatched_corpus_suffix_words": "قَالَ هَنَّادٌ قَالَ وَيَأْتِيهِ مَلَكَانِ فَيُجْلِسَانِهِ فَيَقُولاَنِ لَهُ مَنْ رَبُّكَ",
+   "suffix_words_heard": "0 of 2",
+   "canonical_corpus_text": "مَنْ رَبُّكَ وَمَا دِينُكَ وَمَنْ نَبِيُّكَ"
+  },
+  "questions": {
+   "verdict": {
+    "type": "choice",
+    "instructions": "In this Arabic Islamic lecture transcript, determine whether `matched_span_in_lecture` (surrounded by `context_before` and `context_after`) is an actual quotation/citation of `canonical_corpus_text` (`source_type`), or if it is merely ordinary speaker prose/explanation that happens to share words with the corpus text. When `verses_in_passage` is present, the span is that many consecutive verses the engine found back to back: judge them together. When `neighbor_findings` is present, it lists the engine's nearest other findings before and after this one (unverified: they can be false too), with the words between them.",
+    "criteria": {
+     "CORRECT": "The speaker is genuinely quoting, reciting, or invoking this Quranic Ayah, Prophetic Hadith, or Dhikr (verbatim or as a direct religious citation in context).",
+     "FALSE": "False positive: the words are ordinary conversational speech, fiqh explanation, or narrator/person names that coincidentally overlap with corpus vocabulary without quoting the text.",
+     "NOT_SURE": "Ambiguous or partial paraphrase/meaning-only allusion where it is borderline whether the speaker intended a direct quotation."
+    }
+   },
+   "start_missing": {
+    "type": "noul",
+    "instructions": "Was the START of this quote cut off from the detected span? `unmatched_corpus_prefix_words` are the words of the corpus text just before the part that was matched; `immediate_transcript_before` is what the speaker said just before the span; `prefix_words_heard` counts how many of the last corpus words before the span appear there (allowing ASR spelling errors). Answer true only if the speaker actually said words of the quote right before `matched_span_in_lecture`.",
+    "criteria": {
+     "false": "The span starts where the speaker started quoting: no words of the quote are missing at the start.",
+     "true": "Words of `unmatched_corpus_prefix_words` were said right before the span and are missing from its start."
+    }
+   },
+   "end_missing": {
+    "type": "noul",
+    "instructions": "Was the END of this quote cut off from the detected span? `unmatched_corpus_suffix_words` are the words of the corpus text just after the part that was matched; `immediate_transcript_after` is what the speaker said just after the span; `suffix_words_heard` counts how many of the first corpus words after the span appear there (allowing ASR spelling errors). Answer true only if the speaker actually said words of the quote right after `matched_span_in_lecture`.",
+    "criteria": {
+     "false": "The span ends where the speaker stopped quoting: no words of the quote are missing at the end.",
+     "true": "Words of `unmatched_corpus_suffix_words` were said right after the span and are missing from its end."
+    }
+   }
+  }
+ },
+ {
+  "members": [
+   13
+  ],
+  "state": {
+   "source_type": "HADITH",
+   "candidate_reference": "صحيح البخاري (6362)",
+   "has_citation_cue": false,
+   "context_before": "ملكان فيقعدانه ويسألاني من ربك وما دينك ومن نبيك صلى الله عليه وسلم ويفوز بصحة الجواب على هذا السؤال أهل الرضا في هذه الحياة الدنيا",
+   "matched_span_in_lecture": "بالله رباً وبالإسلام ديناً وبمحمد صلى الله عليه وسلم رسوله",
+   "context_after": "وهذه الكلمات يشرع للمسلم أن يقولها قولاً متكرراً في أيامه مع سماعه لكل أذن، إذا قال المؤذن أشهد أن لا إله إلا الله، أشهد أن",
+   "immediate_transcript_before": "هذا السؤال أهل الرضا في هذه الحياة الدنيا",
+   "unmatched_corpus_prefix_words": "اللَّهِ مَنْ أَبِي قَالَ حُذَافَةُ ثُمَّ أَنْشَأَ عُمَرُ فَقَالَ رَضِينَا",
+   "prefix_words_heard": "0 of 2",
+   "immediate_transcript_after": "وهذه الكلمات يشرع للمسلم أن يقولها قولاً متكرراً",
+   "unmatched_corpus_suffix_words": "نَعُوذُ بِاللَّهِ مِنَ الْفِتَنِ فَقَالَ رَسُولُ اللَّهِ صلى الله عليه",
+   "suffix_words_heard": "0 of 2",
+   "canonical_corpus_text": "بِاللَّهِ رَبًّا وَبِالإِسْلاَمِ دِينًا وَبِمُحَمَّدٍ صلى الله عليه وسلم رَسُولاً"
+  },
+  "questions": {
+   "verdict": {
+    "type": "choice",
+    "instructions": "In this Arabic Islamic lecture transcript, determine whether `matched_span_in_lecture` (surrounded by `context_before` and `context_after`) is an actual quotation/citation of `canonical_corpus_text` (`source_type`), or if it is merely ordinary speaker prose/explanation that happens to share words with the corpus text. When `verses_in_passage` is present, the span is that many consecutive verses the engine found back to back: judge them together. When `neighbor_findings` is present, it lists the engine's nearest other findings before and after this one (unverified: they can be false too), with the words between them.",
+    "criteria": {
+     "CORRECT": "The speaker is genuinely quoting, reciting, or invoking this Quranic Ayah, Prophetic Hadith, or Dhikr (verbatim or as a direct religious citation in context).",
+     "FALSE": "False positive: the words are ordinary conversational speech, fiqh explanation, or narrator/person names that coincidentally overlap with corpus vocabulary without quoting the text.",
+     "NOT_SURE": "Ambiguous or partial paraphrase/meaning-only allusion where it is borderline whether the speaker intended a direct quotation."
+    }
+   },
+   "start_missing": {
+    "type": "noul",
+    "instructions": "Was the START of this quote cut off from the detected span? `unmatched_corpus_prefix_words` are the words of the corpus text just before the part that was matched; `immediate_transcript_before` is what the speaker said just before the span; `prefix_words_heard` counts how many of the last corpus words before the span appear there (allowing ASR spelling errors). Answer true only if the speaker actually said words of the quote right before `matched_span_in_lecture`.",
+    "criteria": {
+     "false": "The span starts where the speaker started quoting: no words of the quote are missing at the start.",
+     "true": "Words of `unmatched_corpus_prefix_words` were said right before the span and are missing from its start."
+    }
+   },
+   "end_missing": {
+    "type": "noul",
+    "instructions": "Was the END of this quote cut off from the detected span? `unmatched_corpus_suffix_words` are the words of the corpus text just after the part that was matched; `immediate_transcript_after` is what the speaker said just after the span; `suffix_words_heard` counts how many of the first corpus words after the span appear there (allowing ASR spelling errors). Answer true only if the speaker actually said words of the quote right after `matched_span_in_lecture`.",
+    "criteria": {
+     "false": "The span ends where the speaker stopped quoting: no words of the quote are missing at the end.",
+     "true": "Words of `unmatched_corpus_suffix_words` were said right after the span and are missing from its end."
+    }
+   }
+  }
+ },
+ {
+  "members": [
+   14
+  ],
+  "state": {
+   "source_type": "HADITH",
+   "candidate_reference": "صحيح البخاري (7294)",
+   "has_citation_cue": false,
+   "context_before": "سماعه لكل أذن، إذا قال المؤذن أشهد أن لا إله إلا الله، أشهد أن محمد رسول الله يقول بعد إجابته للمؤذن في هذا التشهد يقول",
+   "matched_span_in_lecture": "رضيت بالله رباً وبالإسلام ديناً ومحمد صلى الله عليه وسلم رسولاً",
+   "context_after": "مجدداً إيمانه ورضاه بالله سبحانه وتعالى رباً وبالإسلام ديناً ومحمد صلى الله عليه وسلم رسولاً قال فسئل عن صيام الدهر، أي عن من يصوم الدهر،",
+   "immediate_transcript_before": "يقول بعد إجابته للمؤذن في هذا التشهد يقول",
+   "unmatched_corpus_prefix_words": "أَكْثَرَ أَنْ يَقُولَ سَلُونِي سَلُونِي فَبَرَكَ عُمَرُ عَلَى رُكْبَتَيْهِ فَقَالَ",
+   "prefix_words_heard": "0 of 2",
+   "immediate_transcript_after": "مجدداً إيمانه ورضاه بالله سبحانه وتعالى رباً وبالإسلام",
+   "unmatched_corpus_suffix_words": "قَالَ فَسَكَتَ رَسُولُ اللَّهِ صلى الله عليه وسلم حِينَ قَالَ",
+   "suffix_words_heard": "0 of 2",
+   "canonical_corpus_text": "رَضِينَا بِاللَّهِ رَبًّا وَبِالإِسْلاَمِ دِينًا وَبِمُحَمَّدٍ صلى الله عليه وسلم رَسُولاً"
+  },
+  "questions": {
+   "verdict": {
+    "type": "choice",
+    "instructions": "In this Arabic Islamic lecture transcript, determine whether `matched_span_in_lecture` (surrounded by `context_before` and `context_after`) is an actual quotation/citation of `canonical_corpus_text` (`source_type`), or if it is merely ordinary speaker prose/explanation that happens to share words with the corpus text. When `verses_in_passage` is present, the span is that many consecutive verses the engine found back to back: judge them together. When `neighbor_findings` is present, it lists the engine's nearest other findings before and after this one (unverified: they can be false too), with the words between them.",
+    "criteria": {
+     "CORRECT": "The speaker is genuinely quoting, reciting, or invoking this Quranic Ayah, Prophetic Hadith, or Dhikr (verbatim or as a direct religious citation in context).",
+     "FALSE": "False positive: the words are ordinary conversational speech, fiqh explanation, or narrator/person names that coincidentally overlap with corpus vocabulary without quoting the text.",
+     "NOT_SURE": "Ambiguous or partial paraphrase/meaning-only allusion where it is borderline whether the speaker intended a direct quotation."
+    }
+   },
+   "start_missing": {
+    "type": "noul",
+    "instructions": "Was the START of this quote cut off from the detected span? `unmatched_corpus_prefix_words` are the words of the corpus text just before the part that was matched; `immediate_transcript_before` is what the speaker said just before the span; `prefix_words_heard` counts how many of the last corpus words before the span appear there (allowing ASR spelling errors). Answer true only if the speaker actually said words of the quote right before `matched_span_in_lecture`.",
+    "criteria": {
+     "false": "The span starts where the speaker started quoting: no words of the quote are missing at the start.",
+     "true": "Words of `unmatched_corpus_prefix_words` were said right before the span and are missing from its start."
+    }
+   },
+   "end_missing": {
+    "type": "noul",
+    "instructions": "Was the END of this quote cut off from the detected span? `unmatched_corpus_suffix_words` are the words of the corpus text just after the part that was matched; `immediate_transcript_after` is what the speaker said just after the span; `suffix_words_heard` counts how many of the first corpus words after the span appear there (allowing ASR spelling errors). Answer true only if the speaker actually said words of the quote right after `matched_span_in_lecture`.",
+    "criteria": {
+     "false": "The span ends where the speaker stopped quoting: no words of the quote are missing at the end.",
+     "true": "Words of `unmatched_corpus_suffix_words` were said right after the span and are missing from its end."
+    }
+   }
+  }
+ },
+ {
+  "members": [
+   15
+  ],
+  "state": {
+   "source_type": "HADITH",
+   "candidate_reference": "صحيح مسلم (2747)",
+   "has_citation_cue": false,
+   "context_before": "عن صيام الدهر، أي عن من يصوم الدهر، يصوم ولا يغطر، يصوم أياما وكلها دون أن يغطر، سئل عن ذلك صلوات الله وسلامه عليه قال",
+   "matched_span_in_lecture": "لا صام ولا أفطر، أو ما صام وما أفطر،",
+   "context_after": "شكا الراوي، قال لا صام ولا أفطر، ما أفطر أو ما صام وما أفطر، أي من يصوم الدهر، لأنه لم يحصل له فضل الصوم للمخالفة،",
+   "immediate_transcript_before": "سئل عن ذلك صلوات الله وسلامه عليه قال",
+   "unmatched_corpus_prefix_words": "",
+   "prefix_words_heard": null,
+   "immediate_transcript_after": "شكا الراوي، قال لا صام ولا أفطر، ما",
+   "unmatched_corpus_suffix_words": "قَالَ فَسُئِلَ عَنْ صَوْمِ يَوْمَيْنِ وَإِفْطَارِ يَوْمٍ قَالَ وَمَنْ يُطِيقُ",
+   "suffix_words_heard": "1 of 2",
+   "canonical_corpus_text": "لاَ صَامَ وَلاَ أَفْطَرَ أَوْ مَا صَامَ وَمَا أَفْطَرَ"
+  },
+  "questions": {
+   "verdict": {
+    "type": "choice",
+    "instructions": "In this Arabic Islamic lecture transcript, determine whether `matched_span_in_lecture` (surrounded by `context_before` and `context_after`) is an actual quotation/citation of `canonical_corpus_text` (`source_type`), or if it is merely ordinary speaker prose/explanation that happens to share words with the corpus text. When `verses_in_passage` is present, the span is that many consecutive verses the engine found back to back: judge them together. When `neighbor_findings` is present, it lists the engine's nearest other findings before and after this one (unverified: they can be false too), with the words between them.",
+    "criteria": {
+     "CORRECT": "The speaker is genuinely quoting, reciting, or invoking this Quranic Ayah, Prophetic Hadith, or Dhikr (verbatim or as a direct religious citation in context).",
+     "FALSE": "False positive: the words are ordinary conversational speech, fiqh explanation, or narrator/person names that coincidentally overlap with corpus vocabulary without quoting the text.",
+     "NOT_SURE": "Ambiguous or partial paraphrase/meaning-only allusion where it is borderline whether the speaker intended a direct quotation."
+    }
+   },
+   "start_missing": {
+    "type": "noul",
+    "instructions": "Was the START of this quote cut off from the detected span? `unmatched_corpus_prefix_words` are the words of the corpus text just before the part that was matched; `immediate_transcript_before` is what the speaker said just before the span; `prefix_words_heard` counts how many of the last corpus words before the span appear there (allowing ASR spelling errors). Answer true only if the speaker actually said words of the quote right before `matched_span_in_lecture`.",
+    "criteria": {
+     "false": "The span starts where the speaker started quoting: no words of the quote are missing at the start.",
+     "true": "Words of `unmatched_corpus_prefix_words` were said right before the span and are missing from its start."
+    }
+   },
+   "end_missing": {
+    "type": "noul",
+    "instructions": "Was the END of this quote cut off from the detected span? `unmatched_corpus_suffix_words` are the words of the corpus text just after the part that was matched; `immediate_transcript_after` is what the speaker said just after the span; `suffix_words_heard` counts how many of the first corpus words after the span appear there (allowing ASR spelling errors). Answer true only if the speaker actually said words of the quote right after `matched_span_in_lecture`.",
+    "criteria": {
+     "false": "The span ends where the speaker stopped quoting: no words of the quote are missing at the end.",
+     "true": "Words of `unmatched_corpus_suffix_words` were said right after the span and are missing from its end."
+    }
+   }
+  }
+ },
+ {
+  "members": [
+   16
+  ],
+  "state": {
+   "source_type": "HADITH",
+   "candidate_reference": "صحيح البخاري (5063)",
+   "has_citation_cue": true,
+   "context_before": "لم يحصل له فضل الصوم بسبب المخالفة، المخالفة للهدي، هدي النبي الكريم عليه الصلاة والسلام، وفي مثل هذا المقام قال صلى الله عليه وسلم ومن",
+   "matched_span_in_lecture": "رغب عن سنتي فليس مني،",
+   "context_after": "قال فإني أصوم وأفضل، قال ومن رغب عن سنتي فليس مني، فلم يحصل أجرى الصوم بسبب المخالفة، وما أفضل لأنه أمسك، فليس هو بالمفضر وليس",
+   "immediate_transcript_before": "هذا المقام قال صلى الله عليه وسلم ومن",
+   "unmatched_corpus_prefix_words": "وَأَتْقَاكُمْ لَهُ لَكِنِّي أَصُومُ وَأُفْطِرُ وَأُصَلِّي وَأَرْقُدُ وَأَتَزَوَّجُ النِّسَاءَ فَمَنْ",
+   "prefix_words_heard": "0 of 2",
+   "immediate_transcript_after": "قال فإني أصوم وأفضل، قال ومن رغب عن",
+   "unmatched_corpus_suffix_words": "",
+   "suffix_words_heard": null,
+   "canonical_corpus_text": "رَغِبَ عَنْ سُنَّتِي فَلَيْسَ مِنِّي"
+  },
+  "questions": {
+   "verdict": {
+    "type": "choice",
+    "instructions": "In this Arabic Islamic lecture transcript, determine whether `matched_span_in_lecture` (surrounded by `context_before` and `context_after`) is an actual quotation/citation of `canonical_corpus_text` (`source_type`), or if it is merely ordinary speaker prose/explanation that happens to share words with the corpus text. When `verses_in_passage` is present, the span is that many consecutive verses the engine found back to back: judge them together. When `neighbor_findings` is present, it lists the engine's nearest other findings before and after this one (unverified: they can be false too), with the words between them.",
+    "criteria": {
+     "CORRECT": "The speaker is genuinely quoting, reciting, or invoking this Quranic Ayah, Prophetic Hadith, or Dhikr (verbatim or as a direct religious citation in context).",
+     "FALSE": "False positive: the words are ordinary conversational speech, fiqh explanation, or narrator/person names that coincidentally overlap with corpus vocabulary without quoting the text.",
+     "NOT_SURE": "Ambiguous or partial paraphrase/meaning-only allusion where it is borderline whether the speaker intended a direct quotation."
+    }
+   },
+   "start_missing": {
+    "type": "noul",
+    "instructions": "Was the START of this quote cut off from the detected span? `unmatched_corpus_prefix_words` are the words of the corpus text just before the part that was matched; `immediate_transcript_before` is what the speaker said just before the span; `prefix_words_heard` counts how many of the last corpus words before the span appear there (allowing ASR spelling errors). Answer true only if the speaker actually said words of the quote right before `matched_span_in_lecture`.",
+    "criteria": {
+     "false": "The span starts where the speaker started quoting: no words of the quote are missing at the start.",
+     "true": "Words of `unmatched_corpus_prefix_words` were said right before the span and are missing from its start."
+    }
+   },
+   "end_missing": {
+    "type": "noul",
+    "instructions": "Was the END of this quote cut off from the detected span? `unmatched_corpus_suffix_words` are the words of the corpus text just after the part that was matched; `immediate_transcript_after` is what the speaker said just after the span; `suffix_words_heard` counts how many of the first corpus words after the span appear there (allowing ASR spelling errors). Answer true only if the speaker actually said words of the quote right after `matched_span_in_lecture`.",
+    "criteria": {
+     "false": "The span ends where the speaker stopped quoting: no words of the quote are missing at the end.",
+     "true": "Words of `unmatched_corpus_suffix_words` were said right after the span and are missing from its end."
+    }
+   }
+  }
+ },
+ {
+  "members": [
+   17
+  ],
+  "state": {
+   "source_type": "HADITH",
+   "candidate_reference": "صحيح مسلم (2747)",
+   "has_citation_cue": false,
+   "context_before": "أجرى الصوم بسبب المخالفة، وما أفضل لأنه أمسك، فليس هو بالمفضر وليس هو أيضا بالمحصل لأجل الصيام بسبب مخالفته، هذا معنى قول عليه الصلاة والسلام",
+   "matched_span_in_lecture": "ما صام وما أبضر، قال فسئل عن صيام يومين وإفطار يوم، يعني أن يداوم على ذلك يصوم يومين ويفطر يوم، قال عليه الصلاة والسلام ومن يطيق ذلك، قال وسئل عن صوم يوم وإفطار يومين، قال ليت أن الله عز وجل قوان لذلك، قال وسئل عن صيام يوم وإفطار يوم، قال ذاك صوم أخي داود عليه السلام، قال وسئل عن صيام يوم الأثنين، فقال ذاك يوم ولدت فيه، ويوم بعدت وأنزل علي فيه،",
+   "context_after": "وهذا فيه فضل صيام هذا اليوم يوم الاثنين من كل أسبوع، وذكر عليه الصلاة والسلام أنه يوم ولد فيه صلى الله وسلم عليه، ويوم أنزل",
+   "immediate_transcript_before": "بسبب مخالفته، هذا معنى قول عليه الصلاة والسلام",
+   "unmatched_corpus_prefix_words": "لاَ صَامَ وَلاَ أَفْطَرَ أَوْ",
+   "prefix_words_heard": "0 of 2",
+   "immediate_transcript_after": "وهذا فيه فضل صيام هذا اليوم يوم الاثنين",
+   "unmatched_corpus_suffix_words": "قَالَ فَقَالَ صَوْمُ ثَلاَثَةٍ مِنْ كُلِّ شَهْرٍ وَرَمَضَانَ إِلَى رَمَضَانَ",
+   "suffix_words_heard": "0 of 2",
+   "canonical_corpus_text": "مَا صَامَ وَمَا أَفْطَرَ قَالَ فَسُئِلَ عَنْ صَوْمِ يَوْمَيْنِ وَإِفْطَارِ يَوْمٍ قَالَ وَمَنْ يُطِيقُ ذَلِكَ قَالَ وَسُئِلَ عَنْ صَوْمِ يَوْمٍ وَإِفْطَارِ يَوْمَيْنِ قَالَ لَيْتَ أَنَّ اللَّهَ قَوَّانَا لِذَلِكَ قَالَ وَسُئِلَ عَنْ صَوْمِ يَوْمٍ وَإِفْطَارِ يَوْمٍ قَالَ ذَاكَ صَوْمُ أَخِي دَاوُدَ عَلَيْهِ السَّلاَمُ قَالَ وَسُئِلَ عَنْ صَوْمِ يَوْمِ الاِثْنَيْنِ قَالَ ذَاكَ يَوْمٌ وُلِدْتُ فِيهِ وَيَوْمٌ بُعِثْتُ أَوْ أُنْزِلَ عَلَىَّ فِيهِ"
+  },
+  "questions": {
+   "verdict": {
+    "type": "choice",
+    "instructions": "In this Arabic Islamic lecture transcript, determine whether `matched_span_in_lecture` (surrounded by `context_before` and `context_after`) is an actual quotation/citation of `canonical_corpus_text` (`source_type`), or if it is merely ordinary speaker prose/explanation that happens to share words with the corpus text. When `verses_in_passage` is present, the span is that many consecutive verses the engine found back to back: judge them together. When `neighbor_findings` is present, it lists the engine's nearest other findings before and after this one (unverified: they can be false too), with the words between them.",
+    "criteria": {
+     "CORRECT": "The speaker is genuinely quoting, reciting, or invoking this Quranic Ayah, Prophetic Hadith, or Dhikr (verbatim or as a direct religious citation in context).",
+     "FALSE": "False positive: the words are ordinary conversational speech, fiqh explanation, or narrator/person names that coincidentally overlap with corpus vocabulary without quoting the text.",
+     "NOT_SURE": "Ambiguous or partial paraphrase/meaning-only allusion where it is borderline whether the speaker intended a direct quotation."
+    }
+   },
+   "start_missing": {
+    "type": "noul",
+    "instructions": "Was the START of this quote cut off from the detected span? `unmatched_corpus_prefix_words` are the words of the corpus text just before the part that was matched; `immediate_transcript_before` is what the speaker said just before the span; `prefix_words_heard` counts how many of the last corpus words before the span appear there (allowing ASR spelling errors). Answer true only if the speaker actually said words of the quote right before `matched_span_in_lecture`.",
+    "criteria": {
+     "false": "The span starts where the speaker started quoting: no words of the quote are missing at the start.",
+     "true": "Words of `unmatched_corpus_prefix_words` were said right before the span and are missing from its start."
+    }
+   },
+   "end_missing": {
+    "type": "noul",
+    "instructions": "Was the END of this quote cut off from the detected span? `unmatched_corpus_suffix_words` are the words of the corpus text just after the part that was matched; `immediate_transcript_after` is what the speaker said just after the span; `suffix_words_heard` counts how many of the first corpus words after the span appear there (allowing ASR spelling errors). Answer true only if the speaker actually said words of the quote right after `matched_span_in_lecture`.",
+    "criteria": {
+     "false": "The span ends where the speaker stopped quoting: no words of the quote are missing at the end.",
+     "true": "Words of `unmatched_corpus_suffix_words` were said right after the span and are missing from its end."
+    }
+   }
+  }
+ },
+ {
+  "members": [
+   18
+  ],
+  "state": {
+   "source_type": "HADITH",
+   "candidate_reference": "صحيح مسلم (2747)",
+   "has_citation_cue": false,
+   "context_before": "كل أسبوع، وذكر عليه الصلاة والسلام أنه يوم ولد فيه صلى الله وسلم عليه، ويوم أنزل عليه فيه آية الوحي صلى الله وسلم عليه، ويوم",
+   "matched_span_in_lecture": "بعثه الله تبارك وتعالى فيه قال فصوم ثلاثة أيام من كل شهر ورمضان إلى رمضان صوم الدهر",
+   "context_after": "وهذا فيه فضيلة المواضبة على صيام ثلاثة أيام من كل شهر ولا يشترط في هذه الأيام الثلاثة كما سيأتي بيان ذلك أن تجمع في وقت",
+   "immediate_transcript_before": "فيه آية الوحي صلى الله وسلم عليه، ويوم",
+   "unmatched_corpus_prefix_words": "عَنْ صَوْمِ يَوْمِ الاِثْنَيْنِ قَالَ ذَاكَ يَوْمٌ وُلِدْتُ فِيهِ وَيَوْمٌ",
+   "prefix_words_heard": "1 of 2",
+   "immediate_transcript_after": "وهذا فيه فضيلة المواضبة على صيام ثلاثة أيام",
+   "unmatched_corpus_suffix_words": "قَالَ وَسُئِلَ عَنْ صَوْمِ يَوْمِ عَرَفَةَ فَقَالَ يُكَفِّرُ السَّنَةَ الْمَاضِيَةَ",
+   "suffix_words_heard": "0 of 2",
+   "canonical_corpus_text": "بُعِثْتُ أَوْ أُنْزِلَ عَلَىَّ فِيهِ قَالَ فَقَالَ صَوْمُ ثَلاَثَةٍ مِنْ كُلِّ شَهْرٍ وَرَمَضَانَ إِلَى رَمَضَانَ صَوْمُ الدَّهْرِ"
+  },
+  "questions": {
+   "verdict": {
+    "type": "choice",
+    "instructions": "In this Arabic Islamic lecture transcript, determine whether `matched_span_in_lecture` (surrounded by `context_before` and `context_after`) is an actual quotation/citation of `canonical_corpus_text` (`source_type`), or if it is merely ordinary speaker prose/explanation that happens to share words with the corpus text. When `verses_in_passage` is present, the span is that many consecutive verses the engine found back to back: judge them together. When `neighbor_findings` is present, it lists the engine's nearest other findings before and after this one (unverified: they can be false too), with the words between them.",
+    "criteria": {
+     "CORRECT": "The speaker is genuinely quoting, reciting, or invoking this Quranic Ayah, Prophetic Hadith, or Dhikr (verbatim or as a direct religious citation in context).",
+     "FALSE": "False positive: the words are ordinary conversational speech, fiqh explanation, or narrator/person names that coincidentally overlap with corpus vocabulary without quoting the text.",
+     "NOT_SURE": "Ambiguous or partial paraphrase/meaning-only allusion where it is borderline whether the speaker intended a direct quotation."
+    }
+   },
+   "start_missing": {
+    "type": "noul",
+    "instructions": "Was the START of this quote cut off from the detected span? `unmatched_corpus_prefix_words` are the words of the corpus text just before the part that was matched; `immediate_transcript_before` is what the speaker said just before the span; `prefix_words_heard` counts how many of the last corpus words before the span appear there (allowing ASR spelling errors). Answer true only if the speaker actually said words of the quote right before `matched_span_in_lecture`.",
+    "criteria": {
+     "false": "The span starts where the speaker started quoting: no words of the quote are missing at the start.",
+     "true": "Words of `unmatched_corpus_prefix_words` were said right before the span and are missing from its start."
+    }
+   },
+   "end_missing": {
+    "type": "noul",
+    "instructions": "Was the END of this quote cut off from the detected span? `unmatched_corpus_suffix_words` are the words of the corpus text just after the part that was matched; `immediate_transcript_after` is what the speaker said just after the span; `suffix_words_heard` counts how many of the first corpus words after the span appear there (allowing ASR spelling errors). Answer true only if the speaker actually said words of the quote right after `matched_span_in_lecture`.",
+    "criteria": {
+     "false": "The span ends where the speaker stopped quoting: no words of the quote are missing at the end.",
+     "true": "Words of `unmatched_corpus_suffix_words` were said right after the span and are missing from its end."
+    }
+   }
+  }
+ },
+ {
+  "members": [
+   19
+  ],
+  "state": {
+   "source_type": "QURAN",
+   "candidate_reference": "البقرة: 196",
+   "has_citation_cue": false,
+   "context_before": "وسلم عليه، ويوم بعثه الله تبارك وتعالى فيه قال فصوم ثلاثة أيام من كل شهر ورمضان إلى رمضان صوم الدهر وهذا فيه فضيلة المواضبة على",
+   "matched_span_in_lecture": "صيام ثلاثة أيام",
+   "context_after": "من كل شهر ولا يشترط في هذه الأيام الثلاثة كما سيأتي بيان ذلك أن تجمع في وقت من الشهر متتالية الصوم في أوله أو أوسطه",
+   "immediate_transcript_before": "رمضان صوم الدهر وهذا فيه فضيلة المواضبة على",
+   "unmatched_corpus_prefix_words": "بِالْعُمْرَةِ إِلَى الْحَجِّ فَمَا اسْتَيْسَرَ مِنَ الْهَدْيِ فَمَن لَّمْ يَجِدْ",
+   "prefix_words_heard": "0 of 2",
+   "immediate_transcript_after": "من كل شهر ولا يشترط في هذه الأيام",
+   "unmatched_corpus_suffix_words": "فِي الْحَجِّ وَسَبْعَةٍ إِذَا رَجَعْتُمْ تِلْكَ عَشَرَةٌ كَامِلَةٌ ذَٰلِكَ لِمَن",
+   "suffix_words_heard": "0 of 2",
+   "canonical_corpus_text": "فَصِيَامُ ثَلَاثَةِ أَيَّامٍ",
+   "quran_neighboring_context": {
+    "surah": 2,
+    "ayah": 196,
+    "previous_ayah_text": "وَأَنفِقُوا فِي سَبِيلِ اللَّهِ وَلَا تُلْقُوا بِأَيْدِيكُمْ إِلَى التَّهْلُكَةِ وَأَحْسِنُوا إِنَّ اللَّهَ يُحِبُّ الْمُحْسِنِينَ",
+    "next_ayah_text": "الْحَجُّ أَشْهُرٌ مَّعْلُومَاتٌ فَمَن فَرَضَ فِيهِنَّ الْحَجَّ فَلَا رَفَثَ وَلَا فُسُوقَ وَلَا جِدَالَ فِي الْحَجِّ"
+   }
+  },
+  "questions": {
+   "verdict": {
+    "type": "choice",
+    "instructions": "In this Arabic Islamic lecture transcript, determine whether `matched_span_in_lecture` (surrounded by `context_before` and `context_after`) is an actual quotation/citation of `canonical_corpus_text` (`source_type`), or if it is merely ordinary speaker prose/explanation that happens to share words with the corpus text. When `verses_in_passage` is present, the span is that many consecutive verses the engine found back to back: judge them together. When `neighbor_findings` is present, it lists the engine's nearest other findings before and after this one (unverified: they can be false too), with the words between them.",
+    "criteria": {
+     "CORRECT": "The speaker is genuinely quoting, reciting, or invoking this Quranic Ayah, Prophetic Hadith, or Dhikr (verbatim or as a direct religious citation in context).",
+     "FALSE": "False positive: the words are ordinary conversational speech, fiqh explanation, or narrator/person names that coincidentally overlap with corpus vocabulary without quoting the text.",
+     "NOT_SURE": "Ambiguous or partial paraphrase/meaning-only allusion where it is borderline whether the speaker intended a direct quotation."
+    }
+   },
+   "start_missing": {
+    "type": "noul",
+    "instructions": "Was the START of this quote cut off from the detected span? `unmatched_corpus_prefix_words` are the words of the corpus text just before the part that was matched; `immediate_transcript_before` is what the speaker said just before the span; `prefix_words_heard` counts how many of the last corpus words before the span appear there (allowing ASR spelling errors). Answer true only if the speaker actually said words of the quote right before `matched_span_in_lecture`.",
+    "criteria": {
+     "false": "The span starts where the speaker started quoting: no words of the quote are missing at the start.",
+     "true": "Words of `unmatched_corpus_prefix_words` were said right before the span and are missing from its start."
+    }
+   },
+   "end_missing": {
+    "type": "noul",
+    "instructions": "Was the END of this quote cut off from the detected span? `unmatched_corpus_suffix_words` are the words of the corpus text just after the part that was matched; `immediate_transcript_after` is what the speaker said just after the span; `suffix_words_heard` counts how many of the first corpus words after the span appear there (allowing ASR spelling errors). Answer true only if the speaker actually said words of the quote right after `matched_span_in_lecture`.",
+    "criteria": {
+     "false": "The span ends where the speaker stopped quoting: no words of the quote are missing at the end.",
+     "true": "Words of `unmatched_corpus_suffix_words` were said right after the span and are missing from its end."
+    }
+   }
+  }
+ },
+ {
+  "members": [
+   20
+  ],
+  "state": {
+   "source_type": "QURAN",
+   "candidate_reference": "البقرة: 196",
+   "has_citation_cue": false,
+   "context_before": "مجتمعاً، بل لو صامها مجتمعة في أول الشهر أو في وسطه أو في آخره، أو صامها متفرقة في أثناء الشهر، فإنه يكون بذلك حصل فضيلة",
+   "matched_span_in_lecture": "صيام ثلاثة أيام",
+   "context_after": "من كل شهر، وسيأتي ما يوضح ذلك في حديث أم المؤمنين عائشة رضي الله عنها، قال فصوم ثلاثة أيام من كل شهر ورمضان إلى رمضان",
+   "immediate_transcript_before": "في أثناء الشهر، فإنه يكون بذلك حصل فضيلة",
+   "unmatched_corpus_prefix_words": "بِالْعُمْرَةِ إِلَى الْحَجِّ فَمَا اسْتَيْسَرَ مِنَ الْهَدْيِ فَمَن لَّمْ يَجِدْ",
+   "prefix_words_heard": "0 of 2",
+   "immediate_transcript_after": "من كل شهر، وسيأتي ما يوضح ذلك في",
+   "unmatched_corpus_suffix_words": "فِي الْحَجِّ وَسَبْعَةٍ إِذَا رَجَعْتُمْ تِلْكَ عَشَرَةٌ كَامِلَةٌ ذَٰلِكَ لِمَن",
+   "suffix_words_heard": "0 of 2",
+   "canonical_corpus_text": "فَصِيَامُ ثَلَاثَةِ أَيَّامٍ",
+   "quran_neighboring_context": {
+    "surah": 2,
+    "ayah": 196,
+    "previous_ayah_text": "وَأَنفِقُوا فِي سَبِيلِ اللَّهِ وَلَا تُلْقُوا بِأَيْدِيكُمْ إِلَى التَّهْلُكَةِ وَأَحْسِنُوا إِنَّ اللَّهَ يُحِبُّ الْمُحْسِنِينَ",
+    "next_ayah_text": "الْحَجُّ أَشْهُرٌ مَّعْلُومَاتٌ فَمَن فَرَضَ فِيهِنَّ الْحَجَّ فَلَا رَفَثَ وَلَا فُسُوقَ وَلَا جِدَالَ فِي الْحَجِّ"
+   }
+  },
+  "questions": {
+   "verdict": {
+    "type": "choice",
+    "instructions": "In this Arabic Islamic lecture transcript, determine whether `matched_span_in_lecture` (surrounded by `context_before` and `context_after`) is an actual quotation/citation of `canonical_corpus_text` (`source_type`), or if it is merely ordinary speaker prose/explanation that happens to share words with the corpus text. When `verses_in_passage` is present, the span is that many consecutive verses the engine found back to back: judge them together. When `neighbor_findings` is present, it lists the engine's nearest other findings before and after this one (unverified: they can be false too), with the words between them.",
+    "criteria": {
+     "CORRECT": "The speaker is genuinely quoting, reciting, or invoking this Quranic Ayah, Prophetic Hadith, or Dhikr (verbatim or as a direct religious citation in context).",
+     "FALSE": "False positive: the words are ordinary conversational speech, fiqh explanation, or narrator/person names that coincidentally overlap with corpus vocabulary without quoting the text.",
+     "NOT_SURE": "Ambiguous or partial paraphrase/meaning-only allusion where it is borderline whether the speaker intended a direct quotation."
+    }
+   },
+   "start_missing": {
+    "type": "noul",
+    "instructions": "Was the START of this quote cut off from the detected span? `unmatched_corpus_prefix_words` are the words of the corpus text just before the part that was matched; `immediate_transcript_before` is what the speaker said just before the span; `prefix_words_heard` counts how many of the last corpus words before the span appear there (allowing ASR spelling errors). Answer true only if the speaker actually said words of the quote right before `matched_span_in_lecture`.",
+    "criteria": {
+     "false": "The span starts where the speaker started quoting: no words of the quote are missing at the start.",
+     "true": "Words of `unmatched_corpus_prefix_words` were said right before the span and are missing from its start."
+    }
+   },
+   "end_missing": {
+    "type": "noul",
+    "instructions": "Was the END of this quote cut off from the detected span? `unmatched_corpus_suffix_words` are the words of the corpus text just after the part that was matched; `immediate_transcript_after` is what the speaker said just after the span; `suffix_words_heard` counts how many of the first corpus words after the span appear there (allowing ASR spelling errors). Answer true only if the speaker actually said words of the quote right after `matched_span_in_lecture`.",
+    "criteria": {
+     "false": "The span ends where the speaker stopped quoting: no words of the quote are missing at the end.",
+     "true": "Words of `unmatched_corpus_suffix_words` were said right after the span and are missing from its end."
+    }
+   }
+  }
+ },
+ {
+  "members": [
+   21
+  ],
+  "state": {
+   "source_type": "HADITH",
+   "candidate_reference": "صحيح مسلم (2747)",
+   "has_citation_cue": false,
+   "context_before": "أثناء الشهر، فإنه يكون بذلك حصل فضيلة صيام ثلاثة أيام من كل شهر، وسيأتي ما يوضح ذلك في حديث أم المؤمنين عائشة رضي الله عنها،",
+   "matched_span_in_lecture": "قال فصوم ثلاثة أيام من كل شهر ورمضان إلى رمضان صوم الدهر،",
+   "context_after": "لأن من يصوم ثلاثة أيام من كل شهر فإن الحسنة بعشر أمثالها، فمن صام ثلاثة أيام من كل شهر واضب عليها مع صيامي لشهر رمضان،",
+   "immediate_transcript_before": "في حديث أم المؤمنين عائشة رضي الله عنها،",
+   "unmatched_corpus_prefix_words": "يَوْمٌ وُلِدْتُ فِيهِ وَيَوْمٌ بُعِثْتُ أَوْ أُنْزِلَ عَلَىَّ فِيهِ قَالَ",
+   "prefix_words_heard": "0 of 2",
+   "immediate_transcript_after": "لأن من يصوم ثلاثة أيام من كل شهر",
+   "unmatched_corpus_suffix_words": "قَالَ وَسُئِلَ عَنْ صَوْمِ يَوْمِ عَرَفَةَ فَقَالَ يُكَفِّرُ السَّنَةَ الْمَاضِيَةَ",
+   "suffix_words_heard": "0 of 2",
+   "canonical_corpus_text": "فَقَالَ صَوْمُ ثَلاَثَةٍ مِنْ كُلِّ شَهْرٍ وَرَمَضَانَ إِلَى رَمَضَانَ صَوْمُ الدَّهْرِ"
+  },
+  "questions": {
+   "verdict": {
+    "type": "choice",
+    "instructions": "In this Arabic Islamic lecture transcript, determine whether `matched_span_in_lecture` (surrounded by `context_before` and `context_after`) is an actual quotation/citation of `canonical_corpus_text` (`source_type`), or if it is merely ordinary speaker prose/explanation that happens to share words with the corpus text. When `verses_in_passage` is present, the span is that many consecutive verses the engine found back to back: judge them together. When `neighbor_findings` is present, it lists the engine's nearest other findings before and after this one (unverified: they can be false too), with the words between them.",
+    "criteria": {
+     "CORRECT": "The speaker is genuinely quoting, reciting, or invoking this Quranic Ayah, Prophetic Hadith, or Dhikr (verbatim or as a direct religious citation in context).",
+     "FALSE": "False positive: the words are ordinary conversational speech, fiqh explanation, or narrator/person names that coincidentally overlap with corpus vocabulary without quoting the text.",
+     "NOT_SURE": "Ambiguous or partial paraphrase/meaning-only allusion where it is borderline whether the speaker intended a direct quotation."
+    }
+   },
+   "start_missing": {
+    "type": "noul",
+    "instructions": "Was the START of this quote cut off from the detected span? `unmatched_corpus_prefix_words` are the words of the corpus text just before the part that was matched; `immediate_transcript_before` is what the speaker said just before the span; `prefix_words_heard` counts how many of the last corpus words before the span appear there (allowing ASR spelling errors). Answer true only if the speaker actually said words of the quote right before `matched_span_in_lecture`.",
+    "criteria": {
+     "false": "The span starts where the speaker started quoting: no words of the quote are missing at the start.",
+     "true": "Words of `unmatched_corpus_prefix_words` were said right before the span and are missing from its start."
+    }
+   },
+   "end_missing": {
+    "type": "noul",
+    "instructions": "Was the END of this quote cut off from the detected span? `unmatched_corpus_suffix_words` are the words of the corpus text just after the part that was matched; `immediate_transcript_after` is what the speaker said just after the span; `suffix_words_heard` counts how many of the first corpus words after the span appear there (allowing ASR spelling errors). Answer true only if the speaker actually said words of the quote right after `matched_span_in_lecture`.",
+    "criteria": {
+     "false": "The span ends where the speaker stopped quoting: no words of the quote are missing at the end.",
+     "true": "Words of `unmatched_corpus_suffix_words` were said right after the span and are missing from its end."
+    }
+   }
+  }
+ },
+ {
+  "members": [
+   22
+  ],
+  "state": {
+   "source_type": "HADITH",
+   "candidate_reference": "صحيح البخاري (1976)",
+   "has_citation_cue": false,
+   "context_before": "كل شهر، وسيأتي ما يوضح ذلك في حديث أم المؤمنين عائشة رضي الله عنها، قال فصوم ثلاثة أيام من كل شهر ورمضان إلى رمضان صوم",
+   "matched_span_in_lecture": "الدهر، لأن من يصوم ثلاثة أيام من كل شهر فإن الحسنة بعشر أمثالها،",
+   "context_after": "فمن صام ثلاثة أيام من كل شهر واضب عليها مع صيامي لشهر رمضان، فكأنما صاب الدهر كله، كأنه حياته كلها أمضها صائماً وعلى من فضل",
+   "immediate_transcript_before": "أيام من كل شهر ورمضان إلى رمضان صوم",
+   "unmatched_corpus_prefix_words": "فَإِنَّكَ لاَ تَسْتَطِيعُ ذَلِكَ فَصُمْ وَأَفْطِرْ وَقُمْ وَنَمْ وَصُمْ مِنَ",
+   "prefix_words_heard": "0 of 2",
+   "immediate_transcript_after": "فمن صام ثلاثة أيام من كل شهر واضب",
+   "unmatched_corpus_suffix_words": "وَذَلِكَ مِثْلُ صِيَامِ الدَّهْرِ قُلْتُ إِنِّي أُطِيقُ أَفْضَلَ مِنْ ذَلِكَ",
+   "suffix_words_heard": "0 of 2",
+   "canonical_corpus_text": "الشَّهْرِ ثَلاَثَةَ أَيَّامٍ فَإِنَّ الْحَسَنَةَ بِعَشْرِ أَمْثَالِهَا"
+  },
+  "questions": {
+   "verdict": {
+    "type": "choice",
+    "instructions": "In this Arabic Islamic lecture transcript, determine whether `matched_span_in_lecture` (surrounded by `context_before` and `context_after`) is an actual quotation/citation of `canonical_corpus_text` (`source_type`), or if it is merely ordinary speaker prose/explanation that happens to share words with the corpus text. When `verses_in_passage` is present, the span is that many consecutive verses the engine found back to back: judge them together. When `neighbor_findings` is present, it lists the engine's nearest other findings before and after this one (unverified: they can be false too), with the words between them.",
+    "criteria": {
+     "CORRECT": "The speaker is genuinely quoting, reciting, or invoking this Quranic Ayah, Prophetic Hadith, or Dhikr (verbatim or as a direct religious citation in context).",
+     "FALSE": "False positive: the words are ordinary conversational speech, fiqh explanation, or narrator/person names that coincidentally overlap with corpus vocabulary without quoting the text.",
+     "NOT_SURE": "Ambiguous or partial paraphrase/meaning-only allusion where it is borderline whether the speaker intended a direct quotation."
+    }
+   },
+   "start_missing": {
+    "type": "noul",
+    "instructions": "Was the START of this quote cut off from the detected span? `unmatched_corpus_prefix_words` are the words of the corpus text just before the part that was matched; `immediate_transcript_before` is what the speaker said just before the span; `prefix_words_heard` counts how many of the last corpus words before the span appear there (allowing ASR spelling errors). Answer true only if the speaker actually said words of the quote right before `matched_span_in_lecture`.",
+    "criteria": {
+     "false": "The span starts where the speaker started quoting: no words of the quote are missing at the start.",
+     "true": "Words of `unmatched_corpus_prefix_words` were said right before the span and are missing from its start."
+    }
+   },
+   "end_missing": {
+    "type": "noul",
+    "instructions": "Was the END of this quote cut off from the detected span? `unmatched_corpus_suffix_words` are the words of the corpus text just after the part that was matched; `immediate_transcript_after` is what the speaker said just after the span; `suffix_words_heard` counts how many of the first corpus words after the span appear there (allowing ASR spelling errors). Answer true only if the speaker actually said words of the quote right after `matched_span_in_lecture`.",
+    "criteria": {
+     "false": "The span ends where the speaker stopped quoting: no words of the quote are missing at the end.",
+     "true": "Words of `unmatched_corpus_suffix_words` were said right after the span and are missing from its end."
+    }
+   }
+  }
+ },
+ {
+  "members": [
+   23
+  ],
+  "state": {
+   "source_type": "HADITH",
+   "candidate_reference": "صحيح البخاري (1981)",
+   "has_citation_cue": false,
+   "context_before": "في أيام الشهر يصوم انفرد به مسلم، وقد تقدم في صلاة الضحى حديث أبي هريرة رضي الله عنه أو صاني خليلي صلى الله عليه وسلم",
+   "matched_span_in_lecture": "بثلاث صيام ثلاثة أيام من كل شهر،",
+   "context_after": "الحديث وهو متفق عليه، وحديث أبي الدرداء رضي الله عنه في ذلك وهو من أفراد مسلم ثم أورد رحمه الله تعالى هذا الحديث أن معاذة",
+   "immediate_transcript_before": "عنه أو صاني خليلي صلى الله عليه وسلم",
+   "unmatched_corpus_prefix_words": "",
+   "prefix_words_heard": null,
+   "immediate_transcript_after": "الحديث وهو متفق عليه، وحديث أبي الدرداء رضي",
+   "unmatched_corpus_suffix_words": "وَرَكْعَتَىِ الضُّحَى وَأَنْ أُوتِرَ قَبْلَ أَنْ أَنَامَ",
+   "suffix_words_heard": "0 of 2",
+   "canonical_corpus_text": "بِثَلاَثٍ صِيَامِ ثَلاَثَةِ أَيَّامٍ مِنْ كُلِّ شَهْرٍ"
+  },
+  "questions": {
+   "verdict": {
+    "type": "choice",
+    "instructions": "In this Arabic Islamic lecture transcript, determine whether `matched_span_in_lecture` (surrounded by `context_before` and `context_after`) is an actual quotation/citation of `canonical_corpus_text` (`source_type`), or if it is merely ordinary speaker prose/explanation that happens to share words with the corpus text. When `verses_in_passage` is present, the span is that many consecutive verses the engine found back to back: judge them together. When `neighbor_findings` is present, it lists the engine's nearest other findings before and after this one (unverified: they can be false too), with the words between them.",
+    "criteria": {
+     "CORRECT": "The speaker is genuinely quoting, reciting, or invoking this Quranic Ayah, Prophetic Hadith, or Dhikr (verbatim or as a direct religious citation in context).",
+     "FALSE": "False positive: the words are ordinary conversational speech, fiqh explanation, or narrator/person names that coincidentally overlap with corpus vocabulary without quoting the text.",
+     "NOT_SURE": "Ambiguous or partial paraphrase/meaning-only allusion where it is borderline whether the speaker intended a direct quotation."
+    }
+   },
+   "start_missing": {
+    "type": "noul",
+    "instructions": "Was the START of this quote cut off from the detected span? `unmatched_corpus_prefix_words` are the words of the corpus text just before the part that was matched; `immediate_transcript_before` is what the speaker said just before the span; `prefix_words_heard` counts how many of the last corpus words before the span appear there (allowing ASR spelling errors). Answer true only if the speaker actually said words of the quote right before `matched_span_in_lecture`.",
+    "criteria": {
+     "false": "The span starts where the speaker started quoting: no words of the quote are missing at the start.",
+     "true": "Words of `unmatched_corpus_prefix_words` were said right before the span and are missing from its start."
+    }
+   },
+   "end_missing": {
+    "type": "noul",
+    "instructions": "Was the END of this quote cut off from the detected span? `unmatched_corpus_suffix_words` are the words of the corpus text just after the part that was matched; `immediate_transcript_after` is what the speaker said just after the span; `suffix_words_heard` counts how many of the first corpus words after the span appear there (allowing ASR spelling errors). Answer true only if the speaker actually said words of the quote right after `matched_span_in_lecture`.",
+    "criteria": {
+     "false": "The span ends where the speaker stopped quoting: no words of the quote are missing at the end.",
+     "true": "Words of `unmatched_corpus_suffix_words` were said right after the span and are missing from its end."
+    }
+   }
+  }
+ },
+ {
+  "members": [
+   24
+  ],
+  "state": {
+   "source_type": "HADITH",
+   "candidate_reference": "سنن أبي داود (2453)",
+   "has_citation_cue": true,
+   "context_before": "هذا الحديث أن معاذة رضي الله عنها سألت عائشة رضي الله عنها زوج النبي صلى الله عليه وسلم أكان رسول الله صلى الله عليه وسلم",
+   "matched_span_in_lecture": "يصوم من كل شهر ثلاثة أيام؟ قالت نعم، فقالت لها من أي شهر كان يصوم؟",
+   "context_after": "ومثل هذه السؤالات يسألون عنها حرصاً على الاتباع، والاهتداء بهدي النبي عليه الصلاة والسلام ليست مجرد معلومات يحصلونها، وإنما كانوا يسألون عن هديه من أجل",
+   "immediate_transcript_before": "وسلم أكان رسول الله صلى الله عليه وسلم",
+   "unmatched_corpus_prefix_words": "",
+   "prefix_words_heard": null,
+   "immediate_transcript_after": "ومثل هذه السؤالات يسألون عنها حرصاً على الاتباع،",
+   "unmatched_corpus_suffix_words": "قَالَتْ مَا كَانَ يُبَالِي مِنْ أَىِّ أَيَّامِ الشَّهْرِ كَانَ يَصُومُ",
+   "suffix_words_heard": "0 of 2",
+   "canonical_corpus_text": "يَصُومُ مِنْ كُلِّ شَهْرٍ ثَلاَثَةَ أَيَّامٍ قَالَتْ نَعَمْ قُلْتُ مِنْ أَىِّ شَهْرٍ كَانَ يَصُومُ"
+  },
+  "questions": {
+   "verdict": {
+    "type": "choice",
+    "instructions": "In this Arabic Islamic lecture transcript, determine whether `matched_span_in_lecture` (surrounded by `context_before` and `context_after`) is an actual quotation/citation of `canonical_corpus_text` (`source_type`), or if it is merely ordinary speaker prose/explanation that happens to share words with the corpus text. When `verses_in_passage` is present, the span is that many consecutive verses the engine found back to back: judge them together. When `neighbor_findings` is present, it lists the engine's nearest other findings before and after this one (unverified: they can be false too), with the words between them.",
+    "criteria": {
+     "CORRECT": "The speaker is genuinely quoting, reciting, or invoking this Quranic Ayah, Prophetic Hadith, or Dhikr (verbatim or as a direct religious citation in context).",
+     "FALSE": "False positive: the words are ordinary conversational speech, fiqh explanation, or narrator/person names that coincidentally overlap with corpus vocabulary without quoting the text.",
+     "NOT_SURE": "Ambiguous or partial paraphrase/meaning-only allusion where it is borderline whether the speaker intended a direct quotation."
+    }
+   },
+   "start_missing": {
+    "type": "noul",
+    "instructions": "Was the START of this quote cut off from the detected span? `unmatched_corpus_prefix_words` are the words of the corpus text just before the part that was matched; `immediate_transcript_before` is what the speaker said just before the span; `prefix_words_heard` counts how many of the last corpus words before the span appear there (allowing ASR spelling errors). Answer true only if the speaker actually said words of the quote right before `matched_span_in_lecture`.",
+    "criteria": {
+     "false": "The span starts where the speaker started quoting: no words of the quote are missing at the start.",
+     "true": "Words of `unmatched_corpus_prefix_words` were said right before the span and are missing from its start."
+    }
+   },
+   "end_missing": {
+    "type": "noul",
+    "instructions": "Was the END of this quote cut off from the detected span? `unmatched_corpus_suffix_words` are the words of the corpus text just after the part that was matched; `immediate_transcript_after` is what the speaker said just after the span; `suffix_words_heard` counts how many of the first corpus words after the span appear there (allowing ASR spelling errors). Answer true only if the speaker actually said words of the quote right after `matched_span_in_lecture`.",
+    "criteria": {
+     "false": "The span ends where the speaker stopped quoting: no words of the quote are missing at the end.",
+     "true": "Words of `unmatched_corpus_suffix_words` were said right after the span and are missing from its end."
+    }
+   }
+  }
+ },
+ {
+  "members": [
+   25
+  ],
+  "state": {
+   "source_type": "QURAN",
+   "candidate_reference": "الأحزاب: 21",
+   "has_citation_cue": false,
+   "context_before": "يسألون عنها حرصاً على الاتباع، والاهتداء بهدي النبي عليه الصلاة والسلام ليست مجرد معلومات يحصلونها، وإنما كانوا يسألون عن هديه من أجل اتباعه ونئتسائي به،",
+   "matched_span_in_lecture": "لقد كان لكم في رسول الله أسوة حسنة لمن كان يرجو الله واليوم الآخر وذكر الله كثيراً",
+   "context_after": "ومثل هذه السؤالات توضح لنا الهدف من دراسة فضائل الأعمال، فإن فضائل الأعمال ومدارستها ومذكرتها من أغم المعونة للعبد على العناية بالأعمال الفاضلة، قالت فقلت",
+   "immediate_transcript_before": "يسألون عن هديه من أجل اتباعه ونئتسائي به،",
+   "unmatched_corpus_prefix_words": "",
+   "prefix_words_heard": null,
+   "immediate_transcript_after": "ومثل هذه السؤالات توضح لنا الهدف من دراسة",
+   "unmatched_corpus_suffix_words": "",
+   "suffix_words_heard": null,
+   "canonical_corpus_text": "لَّقَدْ كَانَ لَكُمْ فِي رَسُولِ اللَّهِ أُسْوَةٌ حَسَنَةٌ لِّمَن كَانَ يَرْجُو اللَّهَ وَالْيَوْمَ الْآخِرَ وَذَكَرَ اللَّهَ كَثِيرًا",
+   "quran_neighboring_context": {
+    "surah": 33,
+    "ayah": 21,
+    "previous_ayah_text": "لَوْ أَنَّهُم بَادُونَ فِي الْأَعْرَابِ يَسْأَلُونَ عَنْ أَنبَائِكُمْ وَلَوْ كَانُوا فِيكُم مَّا قَاتَلُوا إِلَّا قَلِيلًا",
+    "next_ayah_text": "وَلَمَّا رَأَى الْمُؤْمِنُونَ الْأَحْزَابَ قَالُوا هَٰذَا مَا وَعَدَنَا اللَّهُ وَرَسُولُهُ وَصَدَقَ اللَّهُ وَرَسُولُهُ وَمَا زَادَهُمْ"
+   }
+  },
+  "questions": {
+   "verdict": {
+    "type": "choice",
+    "instructions": "In this Arabic Islamic lecture transcript, determine whether `matched_span_in_lecture` (surrounded by `context_before` and `context_after`) is an actual quotation/citation of `canonical_corpus_text` (`source_type`), or if it is merely ordinary speaker prose/explanation that happens to share words with the corpus text. When `verses_in_passage` is present, the span is that many consecutive verses the engine found back to back: judge them together. When `neighbor_findings` is present, it lists the engine's nearest other findings before and after this one (unverified: they can be false too), with the words between them.",
+    "criteria": {
+     "CORRECT": "The speaker is genuinely quoting, reciting, or invoking this Quranic Ayah, Prophetic Hadith, or Dhikr (verbatim or as a direct religious citation in context).",
+     "FALSE": "False positive: the words are ordinary conversational speech, fiqh explanation, or narrator/person names that coincidentally overlap with corpus vocabulary without quoting the text.",
+     "NOT_SURE": "Ambiguous or partial paraphrase/meaning-only allusion where it is borderline whether the speaker intended a direct quotation."
+    }
+   },
+   "start_missing": {
+    "type": "noul",
+    "instructions": "Was the START of this quote cut off from the detected span? `unmatched_corpus_prefix_words` are the words of the corpus text just before the part that was matched; `immediate_transcript_before` is what the speaker said just before the span; `prefix_words_heard` counts how many of the last corpus words before the span appear there (allowing ASR spelling errors). Answer true only if the speaker actually said words of the quote right before `matched_span_in_lecture`.",
+    "criteria": {
+     "false": "The span starts where the speaker started quoting: no words of the quote are missing at the start.",
+     "true": "Words of `unmatched_corpus_prefix_words` were said right before the span and are missing from its start."
+    }
+   },
+   "end_missing": {
+    "type": "noul",
+    "instructions": "Was the END of this quote cut off from the detected span? `unmatched_corpus_suffix_words` are the words of the corpus text just after the part that was matched; `immediate_transcript_after` is what the speaker said just after the span; `suffix_words_heard` counts how many of the first corpus words after the span appear there (allowing ASR spelling errors). Answer true only if the speaker actually said words of the quote right after `matched_span_in_lecture`.",
+    "criteria": {
+     "false": "The span ends where the speaker stopped quoting: no words of the quote are missing at the end.",
+     "true": "Words of `unmatched_corpus_suffix_words` were said right after the span and are missing from its end."
+    }
+   }
+  }
+ },
+ {
+  "members": [
+   26
+  ],
+  "state": {
+   "source_type": "QURAN",
+   "candidate_reference": "البقرة: 196",
+   "has_citation_cue": false,
+   "context_before": "وسطه، أو في آخره، وسواء أيضاً صامها المسلم متفرقة أو مجتمعة، فإنه بذلك يكون حصل فضيلة الصيام ثلاثة أيام من كل شهر، كأنما صام الدهر،",
+   "matched_span_in_lecture": "وصيام ثلاثة أيام",
+   "context_after": "من كل شهر وردت فيه فضاء العديدة، فلا يشترط في صيامها أن يؤتى بها مجتمعاً لا في أوله ولا في وسطه ولا في آخره، بل",
+   "immediate_transcript_before": "ثلاثة أيام من كل شهر، كأنما صام الدهر،",
+   "unmatched_corpus_prefix_words": "بِالْعُمْرَةِ إِلَى الْحَجِّ فَمَا اسْتَيْسَرَ مِنَ الْهَدْيِ فَمَن لَّمْ يَجِدْ",
+   "prefix_words_heard": "0 of 2",
+   "immediate_transcript_after": "من كل شهر وردت فيه فضاء العديدة، فلا",
+   "unmatched_corpus_suffix_words": "فِي الْحَجِّ وَسَبْعَةٍ إِذَا رَجَعْتُمْ تِلْكَ عَشَرَةٌ كَامِلَةٌ ذَٰلِكَ لِمَن",
+   "suffix_words_heard": "0 of 2",
+   "canonical_corpus_text": "فَصِيَامُ ثَلَاثَةِ أَيَّامٍ",
+   "quran_neighboring_context": {
+    "surah": 2,
+    "ayah": 196,
+    "previous_ayah_text": "وَأَنفِقُوا فِي سَبِيلِ اللَّهِ وَلَا تُلْقُوا بِأَيْدِيكُمْ إِلَى التَّهْلُكَةِ وَأَحْسِنُوا إِنَّ اللَّهَ يُحِبُّ الْمُحْسِنِينَ",
+    "next_ayah_text": "الْحَجُّ أَشْهُرٌ مَّعْلُومَاتٌ فَمَن فَرَضَ فِيهِنَّ الْحَجَّ فَلَا رَفَثَ وَلَا فُسُوقَ وَلَا جِدَالَ فِي الْحَجِّ"
+   }
+  },
+  "questions": {
+   "verdict": {
+    "type": "choice",
+    "instructions": "In this Arabic Islamic lecture transcript, determine whether `matched_span_in_lecture` (surrounded by `context_before` and `context_after`) is an actual quotation/citation of `canonical_corpus_text` (`source_type`), or if it is merely ordinary speaker prose/explanation that happens to share words with the corpus text. When `verses_in_passage` is present, the span is that many consecutive verses the engine found back to back: judge them together. When `neighbor_findings` is present, it lists the engine's nearest other findings before and after this one (unverified: they can be false too), with the words between them.",
+    "criteria": {
+     "CORRECT": "The speaker is genuinely quoting, reciting, or invoking this Quranic Ayah, Prophetic Hadith, or Dhikr (verbatim or as a direct religious citation in context).",
+     "FALSE": "False positive: the words are ordinary conversational speech, fiqh explanation, or narrator/person names that coincidentally overlap with corpus vocabulary without quoting the text.",
+     "NOT_SURE": "Ambiguous or partial paraphrase/meaning-only allusion where it is borderline whether the speaker intended a direct quotation."
+    }
+   },
+   "start_missing": {
+    "type": "noul",
+    "instructions": "Was the START of this quote cut off from the detected span? `unmatched_corpus_prefix_words` are the words of the corpus text just before the part that was matched; `immediate_transcript_before` is what the speaker said just before the span; `prefix_words_heard` counts how many of the last corpus words before the span appear there (allowing ASR spelling errors). Answer true only if the speaker actually said words of the quote right before `matched_span_in_lecture`.",
+    "criteria": {
+     "false": "The span starts where the speaker started quoting: no words of the quote are missing at the start.",
+     "true": "Words of `unmatched_corpus_prefix_words` were said right before the span and are missing from its start."
+    }
+   },
+   "end_missing": {
+    "type": "noul",
+    "instructions": "Was the END of this quote cut off from the detected span? `unmatched_corpus_suffix_words` are the words of the corpus text just after the part that was matched; `immediate_transcript_after` is what the speaker said just after the span; `suffix_words_heard` counts how many of the first corpus words after the span appear there (allowing ASR spelling errors). Answer true only if the speaker actually said words of the quote right after `matched_span_in_lecture`.",
+    "criteria": {
+     "false": "The span ends where the speaker stopped quoting: no words of the quote are missing at the end.",
+     "true": "Words of `unmatched_corpus_suffix_words` were said right after the span and are missing from its end."
+    }
+   }
+  }
+ },
+ {
+  "members": [
+   27
+  ],
+  "state": {
+   "source_type": "HADITH",
+   "candidate_reference": "صحيح مسلم (2744)",
+   "has_citation_cue": false,
+   "context_before": "بل سواء جاء بها مجتمعة أو جاء بها متفرقة فإنه يكون بذلك حصل الفضيلة، كما قالت أم المؤمنين عائشة رضي الله عنه في هذا الحديث",
+   "matched_span_in_lecture": "لم يكن يغالي من أي أيام الشهر يصوم.",
+   "context_after": "ويؤكد هذا المعنى ما تقدم عند المصنف حديث أبي هريرة قال أوصاني خليلي بثلاثة أيام، سيام ثلاثة أيام من كل شهر، ونحو أيضا حديث بالدردان",
+   "immediate_transcript_before": "المؤمنين عائشة رضي الله عنه في هذا الحديث",
+   "unmatched_corpus_prefix_words": "نَعَمْ فَقُلْتُ لَهَا مِنْ أَىِّ أَيَّامِ الشَّهْرِ كَانَ يَصُومُ قَالَتْ",
+   "prefix_words_heard": "0 of 2",
+   "immediate_transcript_after": "ويؤكد هذا المعنى ما تقدم عند المصنف حديث",
+   "unmatched_corpus_suffix_words": "",
+   "suffix_words_heard": null,
+   "canonical_corpus_text": "لَمْ يَكُنْ يُبَالِي مِنْ أَىِّ أَيَّامِ الشَّهْرِ يَصُومُ"
+  },
+  "questions": {
+   "verdict": {
+    "type": "choice",
+    "instructions": "In this Arabic Islamic lecture transcript, determine whether `matched_span_in_lecture` (surrounded by `context_before` and `context_after`) is an actual quotation/citation of `canonical_corpus_text` (`source_type`), or if it is merely ordinary speaker prose/explanation that happens to share words with the corpus text. When `verses_in_passage` is present, the span is that many consecutive verses the engine found back to back: judge them together. When `neighbor_findings` is present, it lists the engine's nearest other findings before and after this one (unverified: they can be false too), with the words between them.",
+    "criteria": {
+     "CORRECT": "The speaker is genuinely quoting, reciting, or invoking this Quranic Ayah, Prophetic Hadith, or Dhikr (verbatim or as a direct religious citation in context).",
+     "FALSE": "False positive: the words are ordinary conversational speech, fiqh explanation, or narrator/person names that coincidentally overlap with corpus vocabulary without quoting the text.",
+     "NOT_SURE": "Ambiguous or partial paraphrase/meaning-only allusion where it is borderline whether the speaker intended a direct quotation."
+    }
+   },
+   "start_missing": {
+    "type": "noul",
+    "instructions": "Was the START of this quote cut off from the detected span? `unmatched_corpus_prefix_words` are the words of the corpus text just before the part that was matched; `immediate_transcript_before` is what the speaker said just before the span; `prefix_words_heard` counts how many of the last corpus words before the span appear there (allowing ASR spelling errors). Answer true only if the speaker actually said words of the quote right before `matched_span_in_lecture`.",
+    "criteria": {
+     "false": "The span starts where the speaker started quoting: no words of the quote are missing at the start.",
+     "true": "Words of `unmatched_corpus_prefix_words` were said right before the span and are missing from its start."
+    }
+   },
+   "end_missing": {
+    "type": "noul",
+    "instructions": "Was the END of this quote cut off from the detected span? `unmatched_corpus_suffix_words` are the words of the corpus text just after the part that was matched; `immediate_transcript_after` is what the speaker said just after the span; `suffix_words_heard` counts how many of the first corpus words after the span appear there (allowing ASR spelling errors). Answer true only if the speaker actually said words of the quote right after `matched_span_in_lecture`.",
+    "criteria": {
+     "false": "The span ends where the speaker stopped quoting: no words of the quote are missing at the end.",
+     "true": "Words of `unmatched_corpus_suffix_words` were said right after the span and are missing from its end."
+    }
+   }
+  }
+ },
+ {
+  "members": [
+   28
+  ],
+  "state": {
+   "source_type": "HADITH",
+   "candidate_reference": "صحيح البخاري (1178)",
+   "has_citation_cue": false,
+   "context_before": "رضي الله عنه في هذا الحديث لم يكن يغالي من أي أيام الشهر يصوم. ويؤكد هذا المعنى ما تقدم عند المصنف حديث أبي هريرة قال",
+   "matched_span_in_lecture": "أوصاني خليلي بثلاثة أيام، سيام ثلاثة أيام من كل شهر،",
+   "context_after": "ونحو أيضا حديث بالدردان فهذه الأحاديث كلها جاء فيها تفضيل أو فضل سيام ثلاثة أيام من كل شهر دون أن يعين هل هو في الأول",
+   "immediate_transcript_before": "ما تقدم عند المصنف حديث أبي هريرة قال",
+   "unmatched_corpus_prefix_words": "",
+   "prefix_words_heard": null,
+   "immediate_transcript_after": "ونحو أيضا حديث بالدردان فهذه الأحاديث كلها جاء",
+   "unmatched_corpus_suffix_words": "وَصَلاَةِ الضُّحَى وَنَوْمٍ عَلَى وِتْرٍ",
+   "suffix_words_heard": "0 of 2",
+   "canonical_corpus_text": "أَوْصَانِي خَلِيلِي بِثَلاَثٍ لاَ أَدَعُهُنَّ حَتَّى أَمُوتَ صَوْمِ ثَلاَثَةِ أَيَّامٍ مِنْ كُلِّ شَهْرٍ"
+  },
+  "questions": {
+   "verdict": {
+    "type": "choice",
+    "instructions": "In this Arabic Islamic lecture transcript, determine whether `matched_span_in_lecture` (surrounded by `context_before` and `context_after`) is an actual quotation/citation of `canonical_corpus_text` (`source_type`), or if it is merely ordinary speaker prose/explanation that happens to share words with the corpus text. When `verses_in_passage` is present, the span is that many consecutive verses the engine found back to back: judge them together. When `neighbor_findings` is present, it lists the engine's nearest other findings before and after this one (unverified: they can be false too), with the words between them.",
+    "criteria": {
+     "CORRECT": "The speaker is genuinely quoting, reciting, or invoking this Quranic Ayah, Prophetic Hadith, or Dhikr (verbatim or as a direct religious citation in context).",
+     "FALSE": "False positive: the words are ordinary conversational speech, fiqh explanation, or narrator/person names that coincidentally overlap with corpus vocabulary without quoting the text.",
+     "NOT_SURE": "Ambiguous or partial paraphrase/meaning-only allusion where it is borderline whether the speaker intended a direct quotation."
+    }
+   },
+   "start_missing": {
+    "type": "noul",
+    "instructions": "Was the START of this quote cut off from the detected span? `unmatched_corpus_prefix_words` are the words of the corpus text just before the part that was matched; `immediate_transcript_before` is what the speaker said just before the span; `prefix_words_heard` counts how many of the last corpus words before the span appear there (allowing ASR spelling errors). Answer true only if the speaker actually said words of the quote right before `matched_span_in_lecture`.",
+    "criteria": {
+     "false": "The span starts where the speaker started quoting: no words of the quote are missing at the start.",
+     "true": "Words of `unmatched_corpus_prefix_words` were said right before the span and are missing from its start."
+    }
+   },
+   "end_missing": {
+    "type": "noul",
+    "instructions": "Was the END of this quote cut off from the detected span? `unmatched_corpus_suffix_words` are the words of the corpus text just after the part that was matched; `immediate_transcript_after` is what the speaker said just after the span; `suffix_words_heard` counts how many of the first corpus words after the span appear there (allowing ASR spelling errors). Answer true only if the speaker actually said words of the quote right after `matched_span_in_lecture`.",
+    "criteria": {
+     "false": "The span ends where the speaker stopped quoting: no words of the quote are missing at the end.",
+     "true": "Words of `unmatched_corpus_suffix_words` were said right after the span and are missing from its end."
+    }
+   }
+  }
+ },
+ {
+  "members": [
+   29
+  ],
+  "state": {
+   "source_type": "HADITH",
+   "candidate_reference": "بلوغ المرام (209)",
+   "has_citation_cue": false,
+   "context_before": "التي يلبيض أو من آخره، أو يصومها متفرقة أو مجتمعة، الأمر في ذلك واسع، يكون قد أدرك فضيلة صيام ثلاثة الأيام من كل شهر يقول",
+   "matched_span_in_lecture": "الشيخ عبد العزيز بن باز",
+   "context_after": "رحمة الله عليه حول هذه المسألة، قال الأحاديث الصحيحة المستفيضة عن رسول الله صلى الله عليه وسلم ليس فيها ذكر البيض بني الصوم متشاء، كما",
+   "immediate_transcript_before": "فضيلة صيام ثلاثة الأيام من كل شهر يقول",
+   "unmatched_corpus_prefix_words": "أحمد وفي الأصل بيان علة الضعف مع الرد على تحسين",
+   "prefix_words_heard": "0 of 2",
+   "immediate_transcript_after": "رحمة الله عليه حول هذه المسألة، قال الأحاديث",
+   "unmatched_corpus_suffix_words": "حفظه الله للحديث في تعليقه على الفتح",
+   "suffix_words_heard": "1 of 2",
+   "canonical_corpus_text": "الشيخ عبد العزيز بن باز"
+  },
+  "questions": {
+   "verdict": {
+    "type": "choice",
+    "instructions": "In this Arabic Islamic lecture transcript, determine whether `matched_span_in_lecture` (surrounded by `context_before` and `context_after`) is an actual quotation/citation of `canonical_corpus_text` (`source_type`), or if it is merely ordinary speaker prose/explanation that happens to share words with the corpus text. When `verses_in_passage` is present, the span is that many consecutive verses the engine found back to back: judge them together. When `neighbor_findings` is present, it lists the engine's nearest other findings before and after this one (unverified: they can be false too), with the words between them.",
+    "criteria": {
+     "CORRECT": "The speaker is genuinely quoting, reciting, or invoking this Quranic Ayah, Prophetic Hadith, or Dhikr (verbatim or as a direct religious citation in context).",
+     "FALSE": "False positive: the words are ordinary conversational speech, fiqh explanation, or narrator/person names that coincidentally overlap with corpus vocabulary without quoting the text.",
+     "NOT_SURE": "Ambiguous or partial paraphrase/meaning-only allusion where it is borderline whether the speaker intended a direct quotation."
+    }
+   },
+   "start_missing": {
+    "type": "noul",
+    "instructions": "Was the START of this quote cut off from the detected span? `unmatched_corpus_prefix_words` are the words of the corpus text just before the part that was matched; `immediate_transcript_before` is what the speaker said just before the span; `prefix_words_heard` counts how many of the last corpus words before the span appear there (allowing ASR spelling errors). Answer true only if the speaker actually said words of the quote right before `matched_span_in_lecture`.",
+    "criteria": {
+     "false": "The span starts where the speaker started quoting: no words of the quote are missing at the start.",
+     "true": "Words of `unmatched_corpus_prefix_words` were said right before the span and are missing from its start."
+    }
+   },
+   "end_missing": {
+    "type": "noul",
+    "instructions": "Was the END of this quote cut off from the detected span? `unmatched_corpus_suffix_words` are the words of the corpus text just after the part that was matched; `immediate_transcript_after` is what the speaker said just after the span; `suffix_words_heard` counts how many of the first corpus words after the span appear there (allowing ASR spelling errors). Answer true only if the speaker actually said words of the quote right after `matched_span_in_lecture`.",
+    "criteria": {
+     "false": "The span ends where the speaker stopped quoting: no words of the quote are missing at the end.",
+     "true": "Words of `unmatched_corpus_suffix_words` were said right after the span and are missing from its end."
+    }
+   }
+  }
+ },
+ {
+  "members": [
+   30
+  ],
+  "state": {
+   "source_type": "QURAN",
+   "candidate_reference": "البقرة: 196",
+   "has_citation_cue": false,
+   "context_before": "كل سهر، سواء صامها متذرقة أو صامها مجتمعة، فإنه يحصل هذه الفضيلة، حتى مثلا من كان يواضب على صيام الاثنين، فإنه حصل هذه الفضيلة وهي",
+   "matched_span_in_lecture": "صيام ثلاثة أيام،",
+   "context_after": "وإذا خص ثلاثة أيام وصامها في أيام البيض فهذا أفضل كما أشار الشيخ رحمه الله تعالى ونسأل الله الكريم رب العرش العظيم أن ينفعنا أجمعين",
+   "immediate_transcript_before": "على صيام الاثنين، فإنه حصل هذه الفضيلة وهي",
+   "unmatched_corpus_prefix_words": "بِالْعُمْرَةِ إِلَى الْحَجِّ فَمَا اسْتَيْسَرَ مِنَ الْهَدْيِ فَمَن لَّمْ يَجِدْ",
+   "prefix_words_heard": "0 of 2",
+   "immediate_transcript_after": "وإذا خص ثلاثة أيام وصامها في أيام البيض",
+   "unmatched_corpus_suffix_words": "فِي الْحَجِّ وَسَبْعَةٍ إِذَا رَجَعْتُمْ تِلْكَ عَشَرَةٌ كَامِلَةٌ ذَٰلِكَ لِمَن",
+   "suffix_words_heard": "0 of 2",
+   "canonical_corpus_text": "فَصِيَامُ ثَلَاثَةِ أَيَّامٍ",
+   "quran_neighboring_context": {
+    "surah": 2,
+    "ayah": 196,
+    "previous_ayah_text": "وَأَنفِقُوا فِي سَبِيلِ اللَّهِ وَلَا تُلْقُوا بِأَيْدِيكُمْ إِلَى التَّهْلُكَةِ وَأَحْسِنُوا إِنَّ اللَّهَ يُحِبُّ الْمُحْسِنِينَ",
+    "next_ayah_text": "الْحَجُّ أَشْهُرٌ مَّعْلُومَاتٌ فَمَن فَرَضَ فِيهِنَّ الْحَجَّ فَلَا رَفَثَ وَلَا فُسُوقَ وَلَا جِدَالَ فِي الْحَجِّ"
+   }
+  },
+  "questions": {
+   "verdict": {
+    "type": "choice",
+    "instructions": "In this Arabic Islamic lecture transcript, determine whether `matched_span_in_lecture` (surrounded by `context_before` and `context_after`) is an actual quotation/citation of `canonical_corpus_text` (`source_type`), or if it is merely ordinary speaker prose/explanation that happens to share words with the corpus text. When `verses_in_passage` is present, the span is that many consecutive verses the engine found back to back: judge them together. When `neighbor_findings` is present, it lists the engine's nearest other findings before and after this one (unverified: they can be false too), with the words between them.",
+    "criteria": {
+     "CORRECT": "The speaker is genuinely quoting, reciting, or invoking this Quranic Ayah, Prophetic Hadith, or Dhikr (verbatim or as a direct religious citation in context).",
+     "FALSE": "False positive: the words are ordinary conversational speech, fiqh explanation, or narrator/person names that coincidentally overlap with corpus vocabulary without quoting the text.",
+     "NOT_SURE": "Ambiguous or partial paraphrase/meaning-only allusion where it is borderline whether the speaker intended a direct quotation."
+    }
+   },
+   "start_missing": {
+    "type": "noul",
+    "instructions": "Was the START of this quote cut off from the detected span? `unmatched_corpus_prefix_words` are the words of the corpus text just before the part that was matched; `immediate_transcript_before` is what the speaker said just before the span; `prefix_words_heard` counts how many of the last corpus words before the span appear there (allowing ASR spelling errors). Answer true only if the speaker actually said words of the quote right before `matched_span_in_lecture`.",
+    "criteria": {
+     "false": "The span starts where the speaker started quoting: no words of the quote are missing at the start.",
+     "true": "Words of `unmatched_corpus_prefix_words` were said right before the span and are missing from its start."
+    }
+   },
+   "end_missing": {
+    "type": "noul",
+    "instructions": "Was the END of this quote cut off from the detected span? `unmatched_corpus_suffix_words` are the words of the corpus text just after the part that was matched; `immediate_transcript_after` is what the speaker said just after the span; `suffix_words_heard` counts how many of the first corpus words after the span appear there (allowing ASR spelling errors). Answer true only if the speaker actually said words of the quote right after `matched_span_in_lecture`.",
+    "criteria": {
+     "false": "The span ends where the speaker stopped quoting: no words of the quote are missing at the end.",
+     "true": "Words of `unmatched_corpus_suffix_words` were said right after the span and are missing from its end."
+    }
+   }
+  }
+ },
+ {
+  "members": [
+   31
+  ],
+  "state": {
+   "source_type": "QURAN",
+   "candidate_reference": "النساء: 175",
+   "has_citation_cue": false,
+   "context_before": "رب العرش العظيم أن ينفعنا أجمعين بما علمنا وأن يزيدنا علما وأن يصلح لنا شأننا كله وأن لا يكلنا إلى أنفسنا طرف التعين، وأن يهدينا",
+   "matched_span_in_lecture": "إليه صراطا مستقيمة،",
+   "context_after": "وأن يصلح لنا شننا كله، وأن لا يكلنا إلى أنفسنا طرف التعين، وأن يغفر لنا ولوالدين ولمشايخنا، أولاة أمرنا، وللمسلمين والمسلمات، والمؤمنين والمؤمنات، الأحياء منهم",
+   "immediate_transcript_before": "لا يكلنا إلى أنفسنا طرف التعين، وأن يهدينا",
+   "unmatched_corpus_prefix_words": "آمَنُوا بِاللَّهِ وَاعْتَصَمُوا بِهِ فَسَيُدْخِلُهُمْ فِي رَحْمَةٍ مِّنْهُ وَفَضْلٍ وَيَهْدِيهِمْ",
+   "prefix_words_heard": "0 of 2",
+   "immediate_transcript_after": "وأن يصلح لنا شننا كله، وأن لا يكلنا",
+   "unmatched_corpus_suffix_words": "",
+   "suffix_words_heard": null,
+   "canonical_corpus_text": "إِلَيْهِ صِرَاطًا مُّسْتَقِيمًا",
+   "quran_neighboring_context": {
+    "surah": 4,
+    "ayah": 175,
+    "previous_ayah_text": "يَا أَيُّهَا النَّاسُ قَدْ جَاءَكُم بُرْهَانٌ مِّن رَّبِّكُمْ وَأَنزَلْنَا إِلَيْكُمْ نُورًا مُّبِينًا",
+    "next_ayah_text": "يَسْتَفْتُونَكَ قُلِ اللَّهُ يُفْتِيكُمْ فِي الْكَلَالَةِ إِنِ امْرُؤٌ هَلَكَ لَيْسَ لَهُ وَلَدٌ وَلَهُ أُخْتٌ فَلَهَا"
+   }
+  },
+  "questions": {
+   "verdict": {
+    "type": "choice",
+    "instructions": "In this Arabic Islamic lecture transcript, determine whether `matched_span_in_lecture` (surrounded by `context_before` and `context_after`) is an actual quotation/citation of `canonical_corpus_text` (`source_type`), or if it is merely ordinary speaker prose/explanation that happens to share words with the corpus text. When `verses_in_passage` is present, the span is that many consecutive verses the engine found back to back: judge them together. When `neighbor_findings` is present, it lists the engine's nearest other findings before and after this one (unverified: they can be false too), with the words between them.",
+    "criteria": {
+     "CORRECT": "The speaker is genuinely quoting, reciting, or invoking this Quranic Ayah, Prophetic Hadith, or Dhikr (verbatim or as a direct religious citation in context).",
+     "FALSE": "False positive: the words are ordinary conversational speech, fiqh explanation, or narrator/person names that coincidentally overlap with corpus vocabulary without quoting the text.",
+     "NOT_SURE": "Ambiguous or partial paraphrase/meaning-only allusion where it is borderline whether the speaker intended a direct quotation."
+    }
+   },
+   "start_missing": {
+    "type": "noul",
+    "instructions": "Was the START of this quote cut off from the detected span? `unmatched_corpus_prefix_words` are the words of the corpus text just before the part that was matched; `immediate_transcript_before` is what the speaker said just before the span; `prefix_words_heard` counts how many of the last corpus words before the span appear there (allowing ASR spelling errors). Answer true only if the speaker actually said words of the quote right before `matched_span_in_lecture`.",
+    "criteria": {
+     "false": "The span starts where the speaker started quoting: no words of the quote are missing at the start.",
+     "true": "Words of `unmatched_corpus_prefix_words` were said right before the span and are missing from its start."
+    }
+   },
+   "end_missing": {
+    "type": "noul",
+    "instructions": "Was the END of this quote cut off from the detected span? `unmatched_corpus_suffix_words` are the words of the corpus text just after the part that was matched; `immediate_transcript_after` is what the speaker said just after the span; `suffix_words_heard` counts how many of the first corpus words after the span appear there (allowing ASR spelling errors). Answer true only if the speaker actually said words of the quote right after `matched_span_in_lecture`.",
+    "criteria": {
+     "false": "The span ends where the speaker stopped quoting: no words of the quote are missing at the end.",
+     "true": "Words of `unmatched_corpus_suffix_words` were said right after the span and are missing from its end."
+    }
+   }
+  }
+ },
+ {
+  "members": [
+   32
+  ],
+  "state": {
+   "source_type": "QURAN",
+   "candidate_reference": "الأحزاب: 35",
+   "has_citation_cue": false,
+   "context_before": "وأن يهدينا إليه صراطا مستقيمة، وأن يصلح لنا شننا كله، وأن لا يكلنا إلى أنفسنا طرف التعين، وأن يغفر لنا ولوالدين ولمشايخنا، أولاة أمرنا، وللمسلمين",
+   "matched_span_in_lecture": "والمسلمات، والمؤمنين والمؤمنات،",
+   "context_after": "الأحياء منهم الأموات، اللهم آتي نقوسنا تقواها، وزكها، أنت خير من زكاها، أنت ولي، سمع الله تليمًا ولا تليمًا لِم الشَّبِ وَمَالْهَا وَمَولَاهَا وَمَوْلَاهَا اللَّهُمَّ",
+   "immediate_transcript_before": "وأن يغفر لنا ولوالدين ولمشايخنا، أولاة أمرنا، وللمسلمين",
+   "unmatched_corpus_prefix_words": "إِنَّ الْمُسْلِمِينَ",
+   "prefix_words_heard": "1 of 2",
+   "immediate_transcript_after": "الأحياء منهم الأموات، اللهم آتي نقوسنا تقواها، وزكها،",
+   "unmatched_corpus_suffix_words": "وَالْقَانِتِينَ وَالْقَانِتَاتِ وَالصَّادِقِينَ وَالصَّادِقَاتِ وَالصَّابِرِينَ وَالصَّابِرَاتِ وَالْخَاشِعِينَ وَالْخَاشِعَاتِ وَالْمُتَصَدِّقِينَ وَالْمُتَصَدِّقَاتِ",
+   "suffix_words_heard": "0 of 2",
+   "canonical_corpus_text": "وَالْمُسْلِمَاتِ وَالْمُؤْمِنِينَ وَالْمُؤْمِنَاتِ",
+   "quran_neighboring_context": {
+    "surah": 33,
+    "ayah": 35,
+    "previous_ayah_text": "وَاذْكُرْنَ مَا يُتْلَىٰ فِي بُيُوتِكُنَّ مِنْ آيَاتِ اللَّهِ وَالْحِكْمَةِ إِنَّ اللَّهَ كَانَ لَطِيفًا خَبِيرًا",
+    "next_ayah_text": "وَمَا كَانَ لِمُؤْمِنٍ وَلَا مُؤْمِنَةٍ إِذَا قَضَى اللَّهُ وَرَسُولُهُ أَمْرًا أَن يَكُونَ لَهُمُ الْخِيَرَةُ مِنْ"
+   }
+  },
+  "questions": {
+   "verdict": {
+    "type": "choice",
+    "instructions": "In this Arabic Islamic lecture transcript, determine whether `matched_span_in_lecture` (surrounded by `context_before` and `context_after`) is an actual quotation/citation of `canonical_corpus_text` (`source_type`), or if it is merely ordinary speaker prose/explanation that happens to share words with the corpus text. When `verses_in_passage` is present, the span is that many consecutive verses the engine found back to back: judge them together. When `neighbor_findings` is present, it lists the engine's nearest other findings before and after this one (unverified: they can be false too), with the words between them.",
+    "criteria": {
+     "CORRECT": "The speaker is genuinely quoting, reciting, or invoking this Quranic Ayah, Prophetic Hadith, or Dhikr (verbatim or as a direct religious citation in context).",
+     "FALSE": "False positive: the words are ordinary conversational speech, fiqh explanation, or narrator/person names that coincidentally overlap with corpus vocabulary without quoting the text.",
+     "NOT_SURE": "Ambiguous or partial paraphrase/meaning-only allusion where it is borderline whether the speaker intended a direct quotation."
+    }
+   },
+   "start_missing": {
+    "type": "noul",
+    "instructions": "Was the START of this quote cut off from the detected span? `unmatched_corpus_prefix_words` are the words of the corpus text just before the part that was matched; `immediate_transcript_before` is what the speaker said just before the span; `prefix_words_heard` counts how many of the last corpus words before the span appear there (allowing ASR spelling errors). Answer true only if the speaker actually said words of the quote right before `matched_span_in_lecture`.",
+    "criteria": {
+     "false": "The span starts where the speaker started quoting: no words of the quote are missing at the start.",
+     "true": "Words of `unmatched_corpus_prefix_words` were said right before the span and are missing from its start."
+    }
+   },
+   "end_missing": {
+    "type": "noul",
+    "instructions": "Was the END of this quote cut off from the detected span? `unmatched_corpus_suffix_words` are the words of the corpus text just after the part that was matched; `immediate_transcript_after` is what the speaker said just after the span; `suffix_words_heard` counts how many of the first corpus words after the span appear there (allowing ASR spelling errors). Answer true only if the speaker actually said words of the quote right after `matched_span_in_lecture`.",
+    "criteria": {
+     "false": "The span ends where the speaker stopped quoting: no words of the quote are missing at the end.",
+     "true": "Words of `unmatched_corpus_suffix_words` were said right after the span and are missing from its end."
+    }
+   }
+  }
+ },
+ {
+  "members": [
+   33
+  ],
+  "state": {
+   "source_type": "HADITH",
+   "candidate_reference": "صحيح مسلم (6906)",
+   "has_citation_cue": false,
+   "context_before": "كله، وأن لا يكلنا إلى أنفسنا طرف التعين، وأن يغفر لنا ولوالدين ولمشايخنا، أولاة أمرنا، وللمسلمين والمسلمات، والمؤمنين والمؤمنات، الأحياء منهم الأموات، اللهم آتي نقوسنا",
+   "matched_span_in_lecture": "تقواها، وزكها، أنت خير من زكاها، أنت ولي، سمع الله تليمًا ولا تليمًا لِم الشَّبِ وَمَالْهَا وَمَولَاهَا وَمَوْلَاهَا اللَّهُمَّ",
+   "context_after": "إِنَّا نَسْتَلُكَ الْهُدَى وَالتُّقَى وَالْعِفَّةَ وَالْغِنَاءَ اللَّهُمَّ إِنَّا نَسْتَلُكَ الثَّبَاتَ فِي الْأَمْرَ وَالْعَزِيمَةَ عَلَى الْرُشْدِ وَنَسْتَلُكَ مُوجِبَاتِ رَحْمَتِكُ وَعَزَائِمَ مَغْفِرَتِك الله تعالى. أشهد أن لا",
+   "immediate_transcript_before": "والمؤمنين والمؤمنات، الأحياء منهم الأموات، اللهم آتي نقوسنا",
+   "unmatched_corpus_prefix_words": "الْعَجْزِ وَالْكَسَلِ وَالْجُبْنِ وَالْبُخْلِ وَالْهَرَمِ وَعَذَابِ الْقَبْرِ اللَّهُمَّ آتِ نَفْسِي",
+   "prefix_words_heard": "0 of 2",
+   "immediate_transcript_after": "إِنَّا نَسْتَلُكَ الْهُدَى وَالتُّقَى وَالْعِفَّةَ وَالْغِنَاءَ اللَّهُمَّ إِنَّا",
+   "unmatched_corpus_suffix_words": "إِنِّي أَعُوذُ بِكَ مِنْ عِلْمٍ لاَ يَنْفَعُ وَمِنْ قَلْبٍ لاَ",
+   "suffix_words_heard": "0 of 2",
+   "canonical_corpus_text": "تَقْوَاهَا وَزَكِّهَا أَنْتَ خَيْرُ مَنْ زَكَّاهَا أَنْتَ وَلِيُّهَا وَمَوْلاَهَا اللَّهُمَّ"
+  },
+  "questions": {
+   "verdict": {
+    "type": "choice",
+    "instructions": "In this Arabic Islamic lecture transcript, determine whether `matched_span_in_lecture` (surrounded by `context_before` and `context_after`) is an actual quotation/citation of `canonical_corpus_text` (`source_type`), or if it is merely ordinary speaker prose/explanation that happens to share words with the corpus text. When `verses_in_passage` is present, the span is that many consecutive verses the engine found back to back: judge them together. When `neighbor_findings` is present, it lists the engine's nearest other findings before and after this one (unverified: they can be false too), with the words between them.",
+    "criteria": {
+     "CORRECT": "The speaker is genuinely quoting, reciting, or invoking this Quranic Ayah, Prophetic Hadith, or Dhikr (verbatim or as a direct religious citation in context).",
+     "FALSE": "False positive: the words are ordinary conversational speech, fiqh explanation, or narrator/person names that coincidentally overlap with corpus vocabulary without quoting the text.",
+     "NOT_SURE": "Ambiguous or partial paraphrase/meaning-only allusion where it is borderline whether the speaker intended a direct quotation."
+    }
+   },
+   "start_missing": {
+    "type": "noul",
+    "instructions": "Was the START of this quote cut off from the detected span? `unmatched_corpus_prefix_words` are the words of the corpus text just before the part that was matched; `immediate_transcript_before` is what the speaker said just before the span; `prefix_words_heard` counts how many of the last corpus words before the span appear there (allowing ASR spelling errors). Answer true only if the speaker actually said words of the quote right before `matched_span_in_lecture`.",
+    "criteria": {
+     "false": "The span starts where the speaker started quoting: no words of the quote are missing at the start.",
+     "true": "Words of `unmatched_corpus_prefix_words` were said right before the span and are missing from its start."
+    }
+   },
+   "end_missing": {
+    "type": "noul",
+    "instructions": "Was the END of this quote cut off from the detected span? `unmatched_corpus_suffix_words` are the words of the corpus text just after the part that was matched; `immediate_transcript_after` is what the speaker said just after the span; `suffix_words_heard` counts how many of the first corpus words after the span appear there (allowing ASR spelling errors). Answer true only if the speaker actually said words of the quote right after `matched_span_in_lecture`.",
+    "criteria": {
+     "false": "The span ends where the speaker stopped quoting: no words of the quote are missing at the end.",
+     "true": "Words of `unmatched_corpus_suffix_words` were said right after the span and are missing from its end."
+    }
+   }
+  }
+ },
+ {
+  "members": [
+   34
+  ],
+  "state": {
+   "source_type": "HADITH",
+   "candidate_reference": "سنن النسائي (1304)",
+   "has_citation_cue": false,
+   "context_before": "خير من زكاها، أنت ولي، سمع الله تليمًا ولا تليمًا لِم الشَّبِ وَمَالْهَا وَمَولَاهَا وَمَوْلَاهَا اللَّهُمَّ إِنَّا نَسْتَلُكَ الْهُدَى وَالتُّقَى وَالْعِفَّةَ وَالْغِنَاءَ اللَّهُمَّ إِنَّا نَسْتَلُكَ",
+   "matched_span_in_lecture": "الثَّبَاتَ فِي الْأَمْرَ وَالْعَزِيمَةَ عَلَى الْرُشْدِ",
+   "context_after": "وَنَسْتَلُكَ مُوجِبَاتِ رَحْمَتِكُ وَعَزَائِمَ مَغْفِرَتِك الله تعالى. أشهد أن لا إله إلا أنت، أستغفرك وأتوب إليك، اللهم صلِّ وسلِّم على عبدك ورسولك نبينا محمد وآله",
+   "immediate_transcript_before": "نَسْتَلُكَ الْهُدَى وَالتُّقَى وَالْعِفَّةَ وَالْغِنَاءَ اللَّهُمَّ إِنَّا نَسْتَلُكَ",
+   "unmatched_corpus_prefix_words": "اللَّهُمَّ إِنِّي أَسْأَلُكَ",
+   "prefix_words_heard": "0 of 2",
+   "immediate_transcript_after": "وَنَسْتَلُكَ مُوجِبَاتِ رَحْمَتِكُ وَعَزَائِمَ مَغْفِرَتِك الله تعالى. أشهد",
+   "unmatched_corpus_suffix_words": "وَأَسْأَلُكَ شُكْرَ نِعْمَتِكَ وَحُسْنَ عِبَادَتِكَ وَأَسْأَلُكَ قَلْبًا سَلِيمًا وَلِسَانًا صَادِقًا",
+   "suffix_words_heard": "0 of 2",
+   "canonical_corpus_text": "الثَّبَاتَ فِي الأَمْرِ وَالْعَزِيمَةِ عَلَى الرُّشْدِ"
+  },
+  "questions": {
+   "verdict": {
+    "type": "choice",
+    "instructions": "In this Arabic Islamic lecture transcript, determine whether `matched_span_in_lecture` (surrounded by `context_before` and `context_after`) is an actual quotation/citation of `canonical_corpus_text` (`source_type`), or if it is merely ordinary speaker prose/explanation that happens to share words with the corpus text. When `verses_in_passage` is present, the span is that many consecutive verses the engine found back to back: judge them together. When `neighbor_findings` is present, it lists the engine's nearest other findings before and after this one (unverified: they can be false too), with the words between them.",
+    "criteria": {
+     "CORRECT": "The speaker is genuinely quoting, reciting, or invoking this Quranic Ayah, Prophetic Hadith, or Dhikr (verbatim or as a direct religious citation in context).",
+     "FALSE": "False positive: the words are ordinary conversational speech, fiqh explanation, or narrator/person names that coincidentally overlap with corpus vocabulary without quoting the text.",
+     "NOT_SURE": "Ambiguous or partial paraphrase/meaning-only allusion where it is borderline whether the speaker intended a direct quotation."
+    }
+   },
+   "start_missing": {
+    "type": "noul",
+    "instructions": "Was the START of this quote cut off from the detected span? `unmatched_corpus_prefix_words` are the words of the corpus text just before the part that was matched; `immediate_transcript_before` is what the speaker said just before the span; `prefix_words_heard` counts how many of the last corpus words before the span appear there (allowing ASR spelling errors). Answer true only if the speaker actually said words of the quote right before `matched_span_in_lecture`.",
+    "criteria": {
+     "false": "The span starts where the speaker started quoting: no words of the quote are missing at the start.",
+     "true": "Words of `unmatched_corpus_prefix_words` were said right before the span and are missing from its start."
+    }
+   },
+   "end_missing": {
+    "type": "noul",
+    "instructions": "Was the END of this quote cut off from the detected span? `unmatched_corpus_suffix_words` are the words of the corpus text just after the part that was matched; `immediate_transcript_after` is what the speaker said just after the span; `suffix_words_heard` counts how many of the first corpus words after the span appear there (allowing ASR spelling errors). Answer true only if the speaker actually said words of the quote right after `matched_span_in_lecture`.",
+    "criteria": {
+     "false": "The span ends where the speaker stopped quoting: no words of the quote are missing at the end.",
+     "true": "Words of `unmatched_corpus_suffix_words` were said right after the span and are missing from its end."
+    }
+   }
+  }
+ },
+ {
+  "members": [
+   35
+  ],
+  "state": {
+   "source_type": "HADITH",
+   "candidate_reference": "جامع الترمذي (479)",
+   "has_citation_cue": false,
+   "context_before": "تليمًا ولا تليمًا لِم الشَّبِ وَمَالْهَا وَمَولَاهَا وَمَوْلَاهَا اللَّهُمَّ إِنَّا نَسْتَلُكَ الْهُدَى وَالتُّقَى وَالْعِفَّةَ وَالْغِنَاءَ اللَّهُمَّ إِنَّا نَسْتَلُكَ الثَّبَاتَ فِي الْأَمْرَ وَالْعَزِيمَةَ عَلَى الْرُشْدِ وَنَسْتَلُكَ",
+   "matched_span_in_lecture": "مُوجِبَاتِ رَحْمَتِكُ وَعَزَائِمَ مَغْفِرَتِك",
+   "context_after": "الله تعالى. أشهد أن لا إله إلا أنت، أستغفرك وأتوب إليك، اللهم صلِّ وسلِّم على عبدك ورسولك نبينا محمد وآله وصحبه. رزاكم الله خيراً.",
+   "immediate_transcript_before": "نَسْتَلُكَ الثَّبَاتَ فِي الْأَمْرَ وَالْعَزِيمَةَ عَلَى الْرُشْدِ وَنَسْتَلُكَ",
+   "unmatched_corpus_prefix_words": "سُبْحَانَ اللَّهِ رَبِّ الْعَرْشِ الْعَظِيمِ الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ أَسْأَلُكَ",
+   "prefix_words_heard": "0 of 2",
+   "immediate_transcript_after": "الله تعالى. أشهد أن لا إله إلا أنت،",
+   "unmatched_corpus_suffix_words": "وَالْغَنِيمَةَ مِنْ كُلِّ بِرٍّ وَالسَّلاَمَةَ مِنْ كُلِّ إِثْمٍ لاَ تَدَعْ",
+   "suffix_words_heard": "0 of 2",
+   "canonical_corpus_text": "مُوجِبَاتِ رَحْمَتِكَ وَعَزَائِمَ مَغْفِرَتِكَ"
+  },
+  "questions": {
+   "verdict": {
+    "type": "choice",
+    "instructions": "In this Arabic Islamic lecture transcript, determine whether `matched_span_in_lecture` (surrounded by `context_before` and `context_after`) is an actual quotation/citation of `canonical_corpus_text` (`source_type`), or if it is merely ordinary speaker prose/explanation that happens to share words with the corpus text. When `verses_in_passage` is present, the span is that many consecutive verses the engine found back to back: judge them together. When `neighbor_findings` is present, it lists the engine's nearest other findings before and after this one (unverified: they can be false too), with the words between them.",
+    "criteria": {
+     "CORRECT": "The speaker is genuinely quoting, reciting, or invoking this Quranic Ayah, Prophetic Hadith, or Dhikr (verbatim or as a direct religious citation in context).",
+     "FALSE": "False positive: the words are ordinary conversational speech, fiqh explanation, or narrator/person names that coincidentally overlap with corpus vocabulary without quoting the text.",
+     "NOT_SURE": "Ambiguous or partial paraphrase/meaning-only allusion where it is borderline whether the speaker intended a direct quotation."
+    }
+   },
+   "start_missing": {
+    "type": "noul",
+    "instructions": "Was the START of this quote cut off from the detected span? `unmatched_corpus_prefix_words` are the words of the corpus text just before the part that was matched; `immediate_transcript_before` is what the speaker said just before the span; `prefix_words_heard` counts how many of the last corpus words before the span appear there (allowing ASR spelling errors). Answer true only if the speaker actually said words of the quote right before `matched_span_in_lecture`.",
+    "criteria": {
+     "false": "The span starts where the speaker started quoting: no words of the quote are missing at the start.",
+     "true": "Words of `unmatched_corpus_prefix_words` were said right before the span and are missing from its start."
+    }
+   },
+   "end_missing": {
+    "type": "noul",
+    "instructions": "Was the END of this quote cut off from the detected span? `unmatched_corpus_suffix_words` are the words of the corpus text just after the part that was matched; `immediate_transcript_after` is what the speaker said just after the span; `suffix_words_heard` counts how many of the first corpus words after the span appear there (allowing ASR spelling errors). Answer true only if the speaker actually said words of the quote right after `matched_span_in_lecture`.",
+    "criteria": {
+     "false": "The span ends where the speaker stopped quoting: no words of the quote are missing at the end.",
+     "true": "Words of `unmatched_corpus_suffix_words` were said right after the span and are missing from its end."
+    }
+   }
+  }
+ },
+ {
+  "members": [
+   36
+  ],
+  "state": {
+   "source_type": "HADITH",
+   "candidate_reference": "سنن أبي داود (4859)",
+   "has_citation_cue": false,
+   "context_before": "وَمَولَاهَا وَمَوْلَاهَا اللَّهُمَّ إِنَّا نَسْتَلُكَ الْهُدَى وَالتُّقَى وَالْعِفَّةَ وَالْغِنَاءَ اللَّهُمَّ إِنَّا نَسْتَلُكَ الثَّبَاتَ فِي الْأَمْرَ وَالْعَزِيمَةَ عَلَى الْرُشْدِ وَنَسْتَلُكَ مُوجِبَاتِ رَحْمَتِكُ وَعَزَائِمَ مَغْفِرَتِك الله تعالى.",
+   "matched_span_in_lecture": "أشهد أن لا إله إلا أنت، أستغفرك وأتوب إليك،",
+   "context_after": "اللهم صلِّ وسلِّم على عبدك ورسولك نبينا محمد وآله وصحبه. رزاكم الله خيراً.",
+   "immediate_transcript_before": "الْرُشْدِ وَنَسْتَلُكَ مُوجِبَاتِ رَحْمَتِكُ وَعَزَائِمَ مَغْفِرَتِك الله تعالى.",
+   "unmatched_corpus_prefix_words": "سُبْحَانَكَ اللَّهُمَّ وَبِحَمْدِكَ",
+   "prefix_words_heard": "1 of 2",
+   "immediate_transcript_after": "اللهم صلِّ وسلِّم على عبدك ورسولك نبينا محمد",
+   "unmatched_corpus_suffix_words": "فَقَالَ رَجُلٌ يَا رَسُولَ اللَّهِ إِنَّكَ لَتَقُولُ قَوْلاً مَا كُنْتَ",
+   "suffix_words_heard": "0 of 2",
+   "canonical_corpus_text": "أَشْهَدُ أَنْ لاَ إِلَهَ إِلاَّ أَنْتَ أَسْتَغْفِرُكَ وَأَتُوبُ إِلَيْكَ"
+  },
+  "questions": {
+   "verdict": {
+    "type": "choice",
+    "instructions": "In this Arabic Islamic lecture transcript, determine whether `matched_span_in_lecture` (surrounded by `context_before` and `context_after`) is an actual quotation/citation of `canonical_corpus_text` (`source_type`), or if it is merely ordinary speaker prose/explanation that happens to share words with the corpus text. When `verses_in_passage` is present, the span is that many consecutive verses the engine found back to back: judge them together. When `neighbor_findings` is present, it lists the engine's nearest other findings before and after this one (unverified: they can be false too), with the words between them.",
+    "criteria": {
+     "CORRECT": "The speaker is genuinely quoting, reciting, or invoking this Quranic Ayah, Prophetic Hadith, or Dhikr (verbatim or as a direct religious citation in context).",
+     "FALSE": "False positive: the words are ordinary conversational speech, fiqh explanation, or narrator/person names that coincidentally overlap with corpus vocabulary without quoting the text.",
+     "NOT_SURE": "Ambiguous or partial paraphrase/meaning-only allusion where it is borderline whether the speaker intended a direct quotation."
+    }
+   },
+   "start_missing": {
+    "type": "noul",
+    "instructions": "Was the START of this quote cut off from the detected span? `unmatched_corpus_prefix_words` are the words of the corpus text just before the part that was matched; `immediate_transcript_before` is what the speaker said just before the span; `prefix_words_heard` counts how many of the last corpus words before the span appear there (allowing ASR spelling errors). Answer true only if the speaker actually said words of the quote right before `matched_span_in_lecture`.",
+    "criteria": {
+     "false": "The span starts where the speaker started quoting: no words of the quote are missing at the start.",
+     "true": "Words of `unmatched_corpus_prefix_words` were said right before the span and are missing from its start."
+    }
+   },
+   "end_missing": {
+    "type": "noul",
+    "instructions": "Was the END of this quote cut off from the detected span? `unmatched_corpus_suffix_words` are the words of the corpus text just after the part that was matched; `immediate_transcript_after` is what the speaker said just after the span; `suffix_words_heard` counts how many of the first corpus words after the span appear there (allowing ASR spelling errors). Answer true only if the speaker actually said words of the quote right after `matched_span_in_lecture`.",
+    "criteria": {
+     "false": "The span ends where the speaker stopped quoting: no words of the quote are missing at the end.",
+     "true": "Words of `unmatched_corpus_suffix_words` were said right after the span and are missing from its end."
+    }
+   }
+  }
+ }
+]

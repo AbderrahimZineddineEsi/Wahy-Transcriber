@@ -1,0 +1,9746 @@
+[
+ {
+  "word": "إن",
+  "start": 0.02,
+  "end": 0.32,
+  "id": 0,
+  "char_start": 0,
+  "char_end": 2
+ },
+ {
+  "word": "الحمد",
+  "start": 0.32,
+  "end": 0.9,
+  "id": 1,
+  "char_start": 3,
+  "char_end": 8
+ },
+ {
+  "word": "لله",
+  "start": 0.9,
+  "end": 1.38,
+  "id": 2,
+  "char_start": 9,
+  "char_end": 12
+ },
+ {
+  "word": "نحمده",
+  "start": 1.38,
+  "end": 2.64,
+  "id": 3,
+  "char_start": 13,
+  "char_end": 18
+ },
+ {
+  "word": "ونستعينه",
+  "start": 2.64,
+  "end": 3.72,
+  "id": 4,
+  "char_start": 19,
+  "char_end": 27
+ },
+ {
+  "word": "ونستغفره،",
+  "start": 3.72,
+  "end": 5.22,
+  "id": 5,
+  "char_start": 28,
+  "char_end": 37
+ },
+ {
+  "word": "ونعوذ",
+  "start": 5.22,
+  "end": 5.66,
+  "id": 6,
+  "char_start": 38,
+  "char_end": 43
+ },
+ {
+  "word": "بالله",
+  "start": 5.66,
+  "end": 6.16,
+  "id": 7,
+  "char_start": 44,
+  "char_end": 49
+ },
+ {
+  "word": "من",
+  "start": 6.16,
+  "end": 6.44,
+  "id": 8,
+  "char_start": 50,
+  "char_end": 52
+ },
+ {
+  "word": "شرور",
+  "start": 6.44,
+  "end": 6.88,
+  "id": 9,
+  "char_start": 53,
+  "char_end": 57
+ },
+ {
+  "word": "أنفسنا",
+  "start": 6.88,
+  "end": 7.68,
+  "id": 10,
+  "char_start": 58,
+  "char_end": 64
+ },
+ {
+  "word": "ومن",
+  "start": 7.68,
+  "end": 8.04,
+  "id": 11,
+  "char_start": 65,
+  "char_end": 68
+ },
+ {
+  "word": "سيئات",
+  "start": 8.04,
+  "end": 8.78,
+  "id": 12,
+  "char_start": 69,
+  "char_end": 74
+ },
+ {
+  "word": "أعمالنا،",
+  "start": 8.78,
+  "end": 9.78,
+  "id": 13,
+  "char_start": 75,
+  "char_end": 83
+ },
+ {
+  "word": "من",
+  "start": 9.78,
+  "end": 10.46,
+  "id": 14,
+  "char_start": 84,
+  "char_end": 86
+ },
+ {
+  "word": "يهديه",
+  "start": 10.46,
+  "end": 10.98,
+  "id": 15,
+  "char_start": 87,
+  "char_end": 92
+ },
+ {
+  "word": "الله",
+  "start": 10.98,
+  "end": 11.38,
+  "id": 16,
+  "char_start": 93,
+  "char_end": 97
+ },
+ {
+  "word": "فلا",
+  "start": 11.38,
+  "end": 11.9,
+  "id": 17,
+  "char_start": 98,
+  "char_end": 101
+ },
+ {
+  "word": "مضل",
+  "start": 11.9,
+  "end": 12.48,
+  "id": 18,
+  "char_start": 102,
+  "char_end": 105
+ },
+ {
+  "word": "له،",
+  "start": 12.48,
+  "end": 12.9,
+  "id": 19,
+  "char_start": 106,
+  "char_end": 109
+ },
+ {
+  "word": "ومن",
+  "start": 12.9,
+  "end": 13.64,
+  "id": 20,
+  "char_start": 110,
+  "char_end": 113
+ },
+ {
+  "word": "يضلل",
+  "start": 13.64,
+  "end": 14.52,
+  "id": 21,
+  "char_start": 114,
+  "char_end": 118
+ },
+ {
+  "word": "فلا",
+  "start": 14.52,
+  "end": 14.88,
+  "id": 22,
+  "char_start": 119,
+  "char_end": 122
+ },
+ {
+  "word": "هادي",
+  "start": 14.88,
+  "end": 15.34,
+  "id": 23,
+  "char_start": 123,
+  "char_end": 127
+ },
+ {
+  "word": "له،",
+  "start": 15.34,
+  "end": 15.88,
+  "id": 24,
+  "char_start": 128,
+  "char_end": 131
+ },
+ {
+  "word": "يا",
+  "start": 15.88,
+  "end": 16.6,
+  "id": 25,
+  "char_start": 132,
+  "char_end": 134
+ },
+ {
+  "word": "أيها",
+  "start": 16.6,
+  "end": 17.02,
+  "id": 26,
+  "char_start": 135,
+  "char_end": 139
+ },
+ {
+  "word": "الذين",
+  "start": 17.02,
+  "end": 17.56,
+  "id": 27,
+  "char_start": 140,
+  "char_end": 145
+ },
+ {
+  "word": "آمنوا",
+  "start": 17.56,
+  "end": 18.18,
+  "id": 28,
+  "char_start": 146,
+  "char_end": 151
+ },
+ {
+  "word": "اتقوا",
+  "start": 18.18,
+  "end": 18.56,
+  "id": 29,
+  "char_start": 152,
+  "char_end": 157
+ },
+ {
+  "word": "الله",
+  "start": 18.56,
+  "end": 18.94,
+  "id": 30,
+  "char_start": 158,
+  "char_end": 162
+ },
+ {
+  "word": "حق",
+  "start": 18.94,
+  "end": 19.44,
+  "id": 31,
+  "char_start": 163,
+  "char_end": 165
+ },
+ {
+  "word": "ثقاته،",
+  "start": 19.44,
+  "end": 20.46,
+  "id": 32,
+  "char_start": 166,
+  "char_end": 172
+ },
+ {
+  "word": "ولا",
+  "start": 20.46,
+  "end": 21.06,
+  "id": 33,
+  "char_start": 173,
+  "char_end": 176
+ },
+ {
+  "word": "تموتن",
+  "start": 21.06,
+  "end": 22.18,
+  "id": 34,
+  "char_start": 177,
+  "char_end": 182
+ },
+ {
+  "word": "إلا",
+  "start": 22.18,
+  "end": 22.72,
+  "id": 35,
+  "char_start": 183,
+  "char_end": 186
+ },
+ {
+  "word": "وأنتم",
+  "start": 22.72,
+  "end": 23.76,
+  "id": 36,
+  "char_start": 187,
+  "char_end": 192
+ },
+ {
+  "word": "مسلمون",
+  "start": 23.76,
+  "end": 24.42,
+  "id": 37,
+  "char_start": 193,
+  "char_end": 199
+ },
+ {
+  "word": "يا",
+  "start": 25.2,
+  "end": 25.3,
+  "id": 38,
+  "char_start": 200,
+  "char_end": 202
+ },
+ {
+  "word": "أيها",
+  "start": 25.3,
+  "end": 25.96,
+  "id": 39,
+  "char_start": 203,
+  "char_end": 207
+ },
+ {
+  "word": "الناس",
+  "start": 25.96,
+  "end": 26.56,
+  "id": 40,
+  "char_start": 208,
+  "char_end": 213
+ },
+ {
+  "word": "اتقوا",
+  "start": 26.56,
+  "end": 27.1,
+  "id": 41,
+  "char_start": 214,
+  "char_end": 219
+ },
+ {
+  "word": "ربكم",
+  "start": 27.1,
+  "end": 27.78,
+  "id": 42,
+  "char_start": 220,
+  "char_end": 224
+ },
+ {
+  "word": "الذي",
+  "start": 27.78,
+  "end": 28.26,
+  "id": 43,
+  "char_start": 225,
+  "char_end": 229
+ },
+ {
+  "word": "خلقكم",
+  "start": 28.26,
+  "end": 29.26,
+  "id": 44,
+  "char_start": 230,
+  "char_end": 235
+ },
+ {
+  "word": "من",
+  "start": 29.26,
+  "end": 29.62,
+  "id": 45,
+  "char_start": 236,
+  "char_end": 238
+ },
+ {
+  "word": "نفس",
+  "start": 29.62,
+  "end": 30.12,
+  "id": 46,
+  "char_start": 239,
+  "char_end": 242
+ },
+ {
+  "word": "واحدة،",
+  "start": 30.12,
+  "end": 30.96,
+  "id": 47,
+  "char_start": 243,
+  "char_end": 249
+ },
+ {
+  "word": "وخلق",
+  "start": 30.96,
+  "end": 31.96,
+  "id": 48,
+  "char_start": 250,
+  "char_end": 254
+ },
+ {
+  "word": "منها",
+  "start": 31.96,
+  "end": 32.44,
+  "id": 49,
+  "char_start": 255,
+  "char_end": 259
+ },
+ {
+  "word": "زوجها،",
+  "start": 32.44,
+  "end": 33.5,
+  "id": 50,
+  "char_start": 260,
+  "char_end": 266
+ },
+ {
+  "word": "وبث",
+  "start": 33.5,
+  "end": 34.22,
+  "id": 51,
+  "char_start": 267,
+  "char_end": 270
+ },
+ {
+  "word": "منهما",
+  "start": 34.22,
+  "end": 34.96,
+  "id": 52,
+  "char_start": 271,
+  "char_end": 276
+ },
+ {
+  "word": "رجالا",
+  "start": 34.96,
+  "end": 35.68,
+  "id": 53,
+  "char_start": 277,
+  "char_end": 282
+ },
+ {
+  "word": "كثيرا",
+  "start": 35.68,
+  "end": 36.68,
+  "id": 54,
+  "char_start": 283,
+  "char_end": 288
+ },
+ {
+  "word": "ونساء،",
+  "start": 36.68,
+  "end": 38.56,
+  "id": 55,
+  "char_start": 289,
+  "char_end": 295
+ },
+ {
+  "word": "واتقوا",
+  "start": 38.56,
+  "end": 39.46,
+  "id": 56,
+  "char_start": 296,
+  "char_end": 302
+ },
+ {
+  "word": "الله",
+  "start": 39.46,
+  "end": 39.94,
+  "id": 57,
+  "char_start": 303,
+  "char_end": 307
+ },
+ {
+  "word": "الذي",
+  "start": 39.94,
+  "end": 40.46,
+  "id": 58,
+  "char_start": 308,
+  "char_end": 312
+ },
+ {
+  "word": "تساءلون",
+  "start": 40.46,
+  "end": 41.98,
+  "id": 59,
+  "char_start": 313,
+  "char_end": 320
+ },
+ {
+  "word": "به",
+  "start": 41.98,
+  "end": 42.38,
+  "id": 60,
+  "char_start": 321,
+  "char_end": 323
+ },
+ {
+  "word": "والأرحم،",
+  "start": 42.38,
+  "end": 43.6,
+  "id": 61,
+  "char_start": 324,
+  "char_end": 332
+ },
+ {
+  "word": "إن",
+  "start": 43.6,
+  "end": 44.36,
+  "id": 62,
+  "char_start": 333,
+  "char_end": 335
+ },
+ {
+  "word": "الله",
+  "start": 44.36,
+  "end": 44.94,
+  "id": 63,
+  "char_start": 336,
+  "char_end": 340
+ },
+ {
+  "word": "كان",
+  "start": 44.94,
+  "end": 45.64,
+  "id": 64,
+  "char_start": 341,
+  "char_end": 344
+ },
+ {
+  "word": "عليكم",
+  "start": 45.64,
+  "end": 46.44,
+  "id": 65,
+  "char_start": 345,
+  "char_end": 350
+ },
+ {
+  "word": "رقيبا",
+  "start": 46.44,
+  "end": 47.24,
+  "id": 66,
+  "char_start": 351,
+  "char_end": 356
+ },
+ {
+  "word": "يا",
+  "start": 47.56,
+  "end": 48.18,
+  "id": 67,
+  "char_start": 357,
+  "char_end": 359
+ },
+ {
+  "word": "أيها",
+  "start": 48.18,
+  "end": 48.56,
+  "id": 68,
+  "char_start": 360,
+  "char_end": 364
+ },
+ {
+  "word": "الذين",
+  "start": 48.56,
+  "end": 49.1,
+  "id": 69,
+  "char_start": 365,
+  "char_end": 370
+ },
+ {
+  "word": "آمنوا",
+  "start": 49.1,
+  "end": 49.76,
+  "id": 70,
+  "char_start": 371,
+  "char_end": 376
+ },
+ {
+  "word": "اتقوا",
+  "start": 49.76,
+  "end": 50.18,
+  "id": 71,
+  "char_start": 377,
+  "char_end": 382
+ },
+ {
+  "word": "الله",
+  "start": 50.18,
+  "end": 50.58,
+  "id": 72,
+  "char_start": 383,
+  "char_end": 387
+ },
+ {
+  "word": "وقولوا",
+  "start": 50.58,
+  "end": 51.72,
+  "id": 73,
+  "char_start": 388,
+  "char_end": 394
+ },
+ {
+  "word": "قولاً",
+  "start": 51.72,
+  "end": 52.42,
+  "id": 74,
+  "char_start": 395,
+  "char_end": 400
+ },
+ {
+  "word": "سديداً",
+  "start": 52.42,
+  "end": 53.46,
+  "id": 75,
+  "char_start": 401,
+  "char_end": 407
+ },
+ {
+  "word": "يصلح",
+  "start": 53.46,
+  "end": 54.36,
+  "id": 76,
+  "char_start": 408,
+  "char_end": 412
+ },
+ {
+  "word": "لكم",
+  "start": 54.36,
+  "end": 54.7,
+  "id": 77,
+  "char_start": 413,
+  "char_end": 416
+ },
+ {
+  "word": "أعمالكم",
+  "start": 54.7,
+  "end": 55.52,
+  "id": 78,
+  "char_start": 417,
+  "char_end": 424
+ },
+ {
+  "word": "ويغفر",
+  "start": 55.52,
+  "end": 56.3,
+  "id": 79,
+  "char_start": 425,
+  "char_end": 430
+ },
+ {
+  "word": "لكم",
+  "start": 56.3,
+  "end": 56.8,
+  "id": 80,
+  "char_start": 431,
+  "char_end": 434
+ },
+ {
+  "word": "ذنوبكم",
+  "start": 56.8,
+  "end": 57.58,
+  "id": 81,
+  "char_start": 435,
+  "char_end": 441
+ },
+ {
+  "word": "ومن",
+  "start": 57.58,
+  "end": 58.38,
+  "id": 82,
+  "char_start": 442,
+  "char_end": 445
+ },
+ {
+  "word": "يطع",
+  "start": 58.38,
+  "end": 58.78,
+  "id": 83,
+  "char_start": 446,
+  "char_end": 449
+ },
+ {
+  "word": "الله",
+  "start": 58.78,
+  "end": 59.1,
+  "id": 84,
+  "char_start": 450,
+  "char_end": 454
+ },
+ {
+  "word": "ورسوله",
+  "start": 59.1,
+  "end": 60.48,
+  "id": 85,
+  "char_start": 455,
+  "char_end": 461
+ },
+ {
+  "word": "فقد",
+  "start": 60.48,
+  "end": 61.2,
+  "id": 86,
+  "char_start": 462,
+  "char_end": 465
+ },
+ {
+  "word": "فاز",
+  "start": 61.2,
+  "end": 61.86,
+  "id": 87,
+  "char_start": 466,
+  "char_end": 469
+ },
+ {
+  "word": "فوزاً",
+  "start": 61.86,
+  "end": 62.54,
+  "id": 88,
+  "char_start": 470,
+  "char_end": 475
+ },
+ {
+  "word": "عظيماً",
+  "start": 62.54,
+  "end": 63.3,
+  "id": 89,
+  "char_start": 476,
+  "char_end": 482
+ },
+ {
+  "word": "أما",
+  "start": 63.68,
+  "end": 64.02,
+  "id": 90,
+  "char_start": 483,
+  "char_end": 486
+ },
+ {
+  "word": "بعد",
+  "start": 64.02,
+  "end": 64.42,
+  "id": 91,
+  "char_start": 487,
+  "char_end": 490
+ },
+ {
+  "word": "فإن",
+  "start": 64.42,
+  "end": 65.36,
+  "id": 92,
+  "char_start": 491,
+  "char_end": 494
+ },
+ {
+  "word": "أصدق",
+  "start": 65.36,
+  "end": 65.84,
+  "id": 93,
+  "char_start": 495,
+  "char_end": 499
+ },
+ {
+  "word": "الحديث",
+  "start": 65.84,
+  "end": 66.36,
+  "id": 94,
+  "char_start": 500,
+  "char_end": 506
+ },
+ {
+  "word": "كتاب",
+  "start": 66.36,
+  "end": 66.86,
+  "id": 95,
+  "char_start": 507,
+  "char_end": 511
+ },
+ {
+  "word": "الله،",
+  "start": 66.86,
+  "end": 67.48,
+  "id": 96,
+  "char_start": 512,
+  "char_end": 517
+ },
+ {
+  "word": "وأحسن",
+  "start": 67.48,
+  "end": 68.5,
+  "id": 97,
+  "char_start": 518,
+  "char_end": 523
+ },
+ {
+  "word": "الهدي",
+  "start": 68.5,
+  "end": 69.02,
+  "id": 98,
+  "char_start": 524,
+  "char_end": 529
+ },
+ {
+  "word": "هدي",
+  "start": 69.02,
+  "end": 69.5,
+  "id": 99,
+  "char_start": 530,
+  "char_end": 533
+ },
+ {
+  "word": "محمد",
+  "start": 69.5,
+  "end": 70.3,
+  "id": 100,
+  "char_start": 534,
+  "char_end": 538
+ },
+ {
+  "word": "صلى",
+  "start": 70.3,
+  "end": 70.76,
+  "id": 101,
+  "char_start": 539,
+  "char_end": 542
+ },
+ {
+  "word": "الله",
+  "start": 70.76,
+  "end": 71.08,
+  "id": 102,
+  "char_start": 543,
+  "char_end": 547
+ },
+ {
+  "word": "عليه",
+  "start": 71.08,
+  "end": 71.56,
+  "id": 103,
+  "char_start": 548,
+  "char_end": 552
+ },
+ {
+  "word": "وسلم،",
+  "start": 71.56,
+  "end": 73.04,
+  "id": 104,
+  "char_start": 553,
+  "char_end": 558
+ },
+ {
+  "word": "وشر",
+  "start": 73.04,
+  "end": 73.48,
+  "id": 105,
+  "char_start": 559,
+  "char_end": 562
+ },
+ {
+  "word": "الأمور",
+  "start": 73.48,
+  "end": 74.28,
+  "id": 106,
+  "char_start": 563,
+  "char_end": 569
+ },
+ {
+  "word": "محدثاتها،",
+  "start": 74.28,
+  "end": 75.58,
+  "id": 107,
+  "char_start": 570,
+  "char_end": 579
+ },
+ {
+  "word": "وكل",
+  "start": 75.58,
+  "end": 76.52,
+  "id": 108,
+  "char_start": 580,
+  "char_end": 583
+ },
+ {
+  "word": "محدثة",
+  "start": 76.52,
+  "end": 77.48,
+  "id": 109,
+  "char_start": 584,
+  "char_end": 589
+ },
+ {
+  "word": "بدعة،",
+  "start": 77.48,
+  "end": 78.14,
+  "id": 110,
+  "char_start": 590,
+  "char_end": 595
+ },
+ {
+  "word": "وكل",
+  "start": 78.14,
+  "end": 79,
+  "id": 111,
+  "char_start": 596,
+  "char_end": 599
+ },
+ {
+  "word": "بدعة",
+  "start": 79,
+  "end": 79.62,
+  "id": 112,
+  "char_start": 600,
+  "char_end": 604
+ },
+ {
+  "word": "ضلالة",
+  "start": 79.62,
+  "end": 80.38,
+  "id": 113,
+  "char_start": 605,
+  "char_end": 610
+ },
+ {
+  "word": "أيها",
+  "start": 81.02,
+  "end": 81.38,
+  "id": 114,
+  "char_start": 611,
+  "char_end": 615
+ },
+ {
+  "word": "المؤمنون",
+  "start": 81.38,
+  "end": 82.06,
+  "id": 115,
+  "char_start": 616,
+  "char_end": 624
+ },
+ {
+  "word": "إن",
+  "start": 82.06,
+  "end": 82.74,
+  "id": 116,
+  "char_start": 625,
+  "char_end": 627
+ },
+ {
+  "word": "تقوى",
+  "start": 82.74,
+  "end": 83.42,
+  "id": 117,
+  "char_start": 628,
+  "char_end": 632
+ },
+ {
+  "word": "الله",
+  "start": 83.42,
+  "end": 83.82,
+  "id": 118,
+  "char_start": 633,
+  "char_end": 637
+ },
+ {
+  "word": "سفينة",
+  "start": 83.82,
+  "end": 84.78,
+  "id": 119,
+  "char_start": 638,
+  "char_end": 643
+ },
+ {
+  "word": "نجاتكم",
+  "start": 84.78,
+  "end": 85.64,
+  "id": 120,
+  "char_start": 644,
+  "char_end": 650
+ },
+ {
+  "word": "وعروة",
+  "start": 85.64,
+  "end": 87.06,
+  "id": 121,
+  "char_start": 651,
+  "char_end": 656
+ },
+ {
+  "word": "أمانكم",
+  "start": 87.06,
+  "end": 87.9,
+  "id": 122,
+  "char_start": 657,
+  "char_end": 663
+ },
+ {
+  "word": "ألا",
+  "start": 87.9,
+  "end": 88.84,
+  "id": 123,
+  "char_start": 664,
+  "char_end": 667
+ },
+ {
+  "word": "فاتقوا",
+  "start": 88.84,
+  "end": 89.56,
+  "id": 124,
+  "char_start": 668,
+  "char_end": 674
+ },
+ {
+  "word": "الله",
+  "start": 89.56,
+  "end": 89.98,
+  "id": 125,
+  "char_start": 675,
+  "char_end": 679
+ },
+ {
+  "word": "يا",
+  "start": 89.98,
+  "end": 90.66,
+  "id": 126,
+  "char_start": 680,
+  "char_end": 682
+ },
+ {
+  "word": "أيها",
+  "start": 90.66,
+  "end": 91.1,
+  "id": 127,
+  "char_start": 683,
+  "char_end": 687
+ },
+ {
+  "word": "الذين",
+  "start": 91.1,
+  "end": 91.64,
+  "id": 128,
+  "char_start": 688,
+  "char_end": 693
+ },
+ {
+  "word": "آمنوا",
+  "start": 91.64,
+  "end": 92.22,
+  "id": 129,
+  "char_start": 694,
+  "char_end": 699
+ },
+ {
+  "word": "اتقوا",
+  "start": 92.22,
+  "end": 92.66,
+  "id": 130,
+  "char_start": 700,
+  "char_end": 705
+ },
+ {
+  "word": "الله",
+  "start": 92.66,
+  "end": 93,
+  "id": 131,
+  "char_start": 706,
+  "char_end": 710
+ },
+ {
+  "word": "ولتنظر",
+  "start": 93,
+  "end": 94.36,
+  "id": 132,
+  "char_start": 711,
+  "char_end": 717
+ },
+ {
+  "word": "نفس",
+  "start": 94.36,
+  "end": 94.78,
+  "id": 133,
+  "char_start": 718,
+  "char_end": 721
+ },
+ {
+  "word": "ما",
+  "start": 94.78,
+  "end": 95.26,
+  "id": 134,
+  "char_start": 722,
+  "char_end": 724
+ },
+ {
+  "word": "قدمت",
+  "start": 95.26,
+  "end": 96.32,
+  "id": 135,
+  "char_start": 725,
+  "char_end": 729
+ },
+ {
+  "word": "لغد",
+  "start": 96.32,
+  "end": 96.76,
+  "id": 136,
+  "char_start": 730,
+  "char_end": 733
+ },
+ {
+  "word": "واتقوا",
+  "start": 96.76,
+  "end": 97.48,
+  "id": 137,
+  "char_start": 734,
+  "char_end": 740
+ },
+ {
+  "word": "الله",
+  "start": 97.48,
+  "end": 97.76,
+  "id": 138,
+  "char_start": 741,
+  "char_end": 745
+ },
+ {
+  "word": "إن",
+  "start": 97.76,
+  "end": 98.78,
+  "id": 139,
+  "char_start": 746,
+  "char_end": 748
+ },
+ {
+  "word": "الله",
+  "start": 98.78,
+  "end": 99.62,
+  "id": 140,
+  "char_start": 749,
+  "char_end": 753
+ },
+ {
+  "word": "صبير",
+  "start": 99.62,
+  "end": 100.54,
+  "id": 141,
+  "char_start": 754,
+  "char_end": 758
+ },
+ {
+  "word": "بما",
+  "start": 100.54,
+  "end": 101.3,
+  "id": 142,
+  "char_start": 759,
+  "char_end": 762
+ },
+ {
+  "word": "تعملون",
+  "start": 101.3,
+  "end": 102,
+  "id": 143,
+  "char_start": 763,
+  "char_end": 769
+ },
+ {
+  "word": "أيها",
+  "start": 102.68,
+  "end": 103.08,
+  "id": 144,
+  "char_start": 770,
+  "char_end": 774
+ },
+ {
+  "word": "المؤمنون،",
+  "start": 103.08,
+  "end": 104.08,
+  "id": 145,
+  "char_start": 775,
+  "char_end": 784
+ },
+ {
+  "word": "إن",
+  "start": 104.08,
+  "end": 104.6,
+  "id": 146,
+  "char_start": 785,
+  "char_end": 787
+ },
+ {
+  "word": "أشرف",
+  "start": 104.6,
+  "end": 105.06,
+  "id": 147,
+  "char_start": 788,
+  "char_end": 792
+ },
+ {
+  "word": "الناس",
+  "start": 105.06,
+  "end": 105.48,
+  "id": 148,
+  "char_start": 793,
+  "char_end": 798
+ },
+ {
+  "word": "في",
+  "start": 105.48,
+  "end": 105.66,
+  "id": 149,
+  "char_start": 799,
+  "char_end": 801
+ },
+ {
+  "word": "الناس",
+  "start": 105.66,
+  "end": 105.98,
+  "id": 150,
+  "char_start": 802,
+  "char_end": 807
+ },
+ {
+  "word": "مقاما،",
+  "start": 105.98,
+  "end": 106.82,
+  "id": 151,
+  "char_start": 808,
+  "char_end": 814
+ },
+ {
+  "word": "وأعلاهم",
+  "start": 106.82,
+  "end": 107.88,
+  "id": 152,
+  "char_start": 815,
+  "char_end": 822
+ },
+ {
+  "word": "عندهم",
+  "start": 107.88,
+  "end": 108.4,
+  "id": 153,
+  "char_start": 823,
+  "char_end": 828
+ },
+ {
+  "word": "منزله،",
+  "start": 108.4,
+  "end": 109.1,
+  "id": 154,
+  "char_start": 829,
+  "char_end": 835
+ },
+ {
+  "word": "هم",
+  "start": 109.1,
+  "end": 109.66,
+  "id": 155,
+  "char_start": 836,
+  "char_end": 838
+ },
+ {
+  "word": "ملوكهم،",
+  "start": 109.66,
+  "end": 110.72,
+  "id": 156,
+  "char_start": 839,
+  "char_end": 846
+ },
+ {
+  "word": "وإن",
+  "start": 110.72,
+  "end": 111.38,
+  "id": 157,
+  "char_start": 847,
+  "char_end": 850
+ },
+ {
+  "word": "أحدنا",
+  "start": 111.38,
+  "end": 112.1,
+  "id": 158,
+  "char_start": 851,
+  "char_end": 856
+ },
+ {
+  "word": "إذا",
+  "start": 112.1,
+  "end": 112.54,
+  "id": 159,
+  "char_start": 857,
+  "char_end": 860
+ },
+ {
+  "word": "سمع",
+  "start": 112.54,
+  "end": 113.04,
+  "id": 160,
+  "char_start": 861,
+  "char_end": 864
+ },
+ {
+  "word": "نداءً",
+  "start": 113.04,
+  "end": 113.7,
+  "id": 161,
+  "char_start": 865,
+  "char_end": 870
+ },
+ {
+  "word": "من",
+  "start": 113.7,
+  "end": 113.88,
+  "id": 162,
+  "char_start": 871,
+  "char_end": 873
+ },
+ {
+  "word": "ملك",
+  "start": 113.88,
+  "end": 114.26,
+  "id": 163,
+  "char_start": 874,
+  "char_end": 877
+ },
+ {
+  "word": "يعظمه،",
+  "start": 114.26,
+  "end": 115.24,
+  "id": 164,
+  "char_start": 878,
+  "char_end": 884
+ },
+ {
+  "word": "بادر",
+  "start": 115.24,
+  "end": 116.1,
+  "id": 165,
+  "char_start": 885,
+  "char_end": 889
+ },
+ {
+  "word": "إليه،",
+  "start": 116.1,
+  "end": 117.04,
+  "id": 166,
+  "char_start": 890,
+  "char_end": 895
+ },
+ {
+  "word": "فأرخى",
+  "start": 117.04,
+  "end": 117.66,
+  "id": 167,
+  "char_start": 896,
+  "char_end": 901
+ },
+ {
+  "word": "له",
+  "start": 117.66,
+  "end": 117.82,
+  "id": 168,
+  "char_start": 902,
+  "char_end": 904
+ },
+ {
+  "word": "سمعه،",
+  "start": 117.82,
+  "end": 118.58,
+  "id": 169,
+  "char_start": 905,
+  "char_end": 910
+ },
+ {
+  "word": "وجمع",
+  "start": 118.58,
+  "end": 119.28,
+  "id": 170,
+  "char_start": 911,
+  "char_end": 915
+ },
+ {
+  "word": "عليه",
+  "start": 119.28,
+  "end": 119.62,
+  "id": 171,
+  "char_start": 916,
+  "char_end": 920
+ },
+ {
+  "word": "قلبه،",
+  "start": 119.62,
+  "end": 120.68,
+  "id": 172,
+  "char_start": 921,
+  "char_end": 926
+ },
+ {
+  "word": "وأنصت",
+  "start": 120.68,
+  "end": 121.38,
+  "id": 173,
+  "char_start": 927,
+  "char_end": 932
+ },
+ {
+  "word": "إلى",
+  "start": 121.38,
+  "end": 121.66,
+  "id": 174,
+  "char_start": 933,
+  "char_end": 936
+ },
+ {
+  "word": "ما",
+  "start": 121.66,
+  "end": 121.92,
+  "id": 175,
+  "char_start": 937,
+  "char_end": 939
+ },
+ {
+  "word": "يقول،",
+  "start": 121.92,
+  "end": 122.66,
+  "id": 176,
+  "char_start": 940,
+  "char_end": 945
+ },
+ {
+  "word": "وإن",
+  "start": 122.66,
+  "end": 123.48,
+  "id": 177,
+  "char_start": 946,
+  "char_end": 949
+ },
+ {
+  "word": "أعظم",
+  "start": 123.48,
+  "end": 123.98,
+  "id": 178,
+  "char_start": 950,
+  "char_end": 954
+ },
+ {
+  "word": "الملوك",
+  "start": 123.98,
+  "end": 124.46,
+  "id": 179,
+  "char_start": 955,
+  "char_end": 961
+ },
+ {
+  "word": "ملكا،",
+  "start": 124.46,
+  "end": 125.18,
+  "id": 180,
+  "char_start": 962,
+  "char_end": 967
+ },
+ {
+  "word": "وأرفعهم",
+  "start": 125.18,
+  "end": 126.34,
+  "id": 181,
+  "char_start": 968,
+  "char_end": 975
+ },
+ {
+  "word": "رتبةً",
+  "start": 126.34,
+  "end": 127,
+  "id": 182,
+  "char_start": 976,
+  "char_end": 981
+ },
+ {
+  "word": "ومنزله،",
+  "start": 127,
+  "end": 127.82,
+  "id": 183,
+  "char_start": 982,
+  "char_end": 989
+ },
+ {
+  "word": "هو",
+  "start": 127.82,
+  "end": 128.82,
+  "id": 184,
+  "char_start": 990,
+  "char_end": 992
+ },
+ {
+  "word": "الله",
+  "start": 128.82,
+  "end": 129.24,
+  "id": 185,
+  "char_start": 993,
+  "char_end": 997
+ },
+ {
+  "word": "سبحانه",
+  "start": 129.24,
+  "end": 130.26,
+  "id": 186,
+  "char_start": 998,
+  "char_end": 1004
+ },
+ {
+  "word": "وتعالى،",
+  "start": 130.26,
+  "end": 131.24,
+  "id": 187,
+  "char_start": 1005,
+  "char_end": 1012
+ },
+ {
+  "word": "فهو",
+  "start": 131.48,
+  "end": 132,
+  "id": 188,
+  "char_start": 1013,
+  "char_end": 1016
+ },
+ {
+  "word": "ملك",
+  "start": 132,
+  "end": 132.44,
+  "id": 189,
+  "char_start": 1017,
+  "char_end": 1020
+ },
+ {
+  "word": "الملوك",
+  "start": 132.44,
+  "end": 133.16,
+  "id": 190,
+  "char_start": 1021,
+  "char_end": 1027
+ },
+ {
+  "word": "الذي",
+  "start": 133.16,
+  "end": 133.92,
+  "id": 191,
+  "char_start": 1028,
+  "char_end": 1032
+ },
+ {
+  "word": "لا",
+  "start": 133.92,
+  "end": 134.26,
+  "id": 192,
+  "char_start": 1033,
+  "char_end": 1035
+ },
+ {
+  "word": "يزول",
+  "start": 134.26,
+  "end": 135,
+  "id": 193,
+  "char_start": 1036,
+  "char_end": 1040
+ },
+ {
+  "word": "ولا",
+  "start": 135,
+  "end": 135.32,
+  "id": 194,
+  "char_start": 1041,
+  "char_end": 1044
+ },
+ {
+  "word": "يحول،",
+  "start": 135.32,
+  "end": 136.2,
+  "id": 195,
+  "char_start": 1045,
+  "char_end": 1050
+ },
+ {
+  "word": "وإن",
+  "start": 136.2,
+  "end": 136.9,
+  "id": 196,
+  "char_start": 1051,
+  "char_end": 1054
+ },
+ {
+  "word": "الله",
+  "start": 136.9,
+  "end": 137.28,
+  "id": 197,
+  "char_start": 1055,
+  "char_end": 1059
+ },
+ {
+  "word": "سبحانه",
+  "start": 137.28,
+  "end": 138.04,
+  "id": 198,
+  "char_start": 1060,
+  "char_end": 1066
+ },
+ {
+  "word": "وتعالى",
+  "start": 138.04,
+  "end": 138.74,
+  "id": 199,
+  "char_start": 1067,
+  "char_end": 1073
+ },
+ {
+  "word": "نادانا",
+  "start": 138.74,
+  "end": 140.18,
+  "id": 200,
+  "char_start": 1074,
+  "char_end": 1080
+ },
+ {
+  "word": "جنس",
+  "start": 140.18,
+  "end": 140.5,
+  "id": 201,
+  "char_start": 1081,
+  "char_end": 1084
+ },
+ {
+  "word": "الإنسان",
+  "start": 140.5,
+  "end": 141.22,
+  "id": 202,
+  "char_start": 1085,
+  "char_end": 1092
+ },
+ {
+  "word": "في",
+  "start": 141.22,
+  "end": 141.84,
+  "id": 203,
+  "char_start": 1093,
+  "char_end": 1095
+ },
+ {
+  "word": "موضعين",
+  "start": 141.84,
+  "end": 142.82,
+  "id": 204,
+  "char_start": 1096,
+  "char_end": 1102
+ },
+ {
+  "word": "من",
+  "start": 142.82,
+  "end": 143.04,
+  "id": 205,
+  "char_start": 1103,
+  "char_end": 1105
+ },
+ {
+  "word": "القرآن",
+  "start": 143.04,
+  "end": 143.68,
+  "id": 206,
+  "char_start": 1106,
+  "char_end": 1112
+ },
+ {
+  "word": "نداءين",
+  "start": 143.68,
+  "end": 145.18,
+  "id": 207,
+  "char_start": 1113,
+  "char_end": 1119
+ },
+ {
+  "word": "عظيمين",
+  "start": 145.18,
+  "end": 145.94,
+  "id": 208,
+  "char_start": 1120,
+  "char_end": 1126
+ },
+ {
+  "word": "ينبغي",
+  "start": 145.94,
+  "end": 147.16,
+  "id": 209,
+  "char_start": 1127,
+  "char_end": 1132
+ },
+ {
+  "word": "أن",
+  "start": 147.16,
+  "end": 147.4,
+  "id": 210,
+  "char_start": 1133,
+  "char_end": 1135
+ },
+ {
+  "word": "يُبصِر",
+  "start": 147.4,
+  "end": 147.88,
+  "id": 211,
+  "char_start": 1136,
+  "char_end": 1142
+ },
+ {
+  "word": "المؤمن",
+  "start": 147.88,
+  "end": 148.44,
+  "id": 212,
+  "char_start": 1143,
+  "char_end": 1149
+ },
+ {
+  "word": "منزلة",
+  "start": 148.44,
+  "end": 149.1,
+  "id": 213,
+  "char_start": 1150,
+  "char_end": 1155
+ },
+ {
+  "word": "هذين",
+  "start": 149.1,
+  "end": 149.84,
+  "id": 214,
+  "char_start": 1156,
+  "char_end": 1160
+ },
+ {
+  "word": "النداءين",
+  "start": 149.84,
+  "end": 150.64,
+  "id": 215,
+  "char_start": 1161,
+  "char_end": 1169
+ },
+ {
+  "word": "فيه،",
+  "start": 150.64,
+  "end": 151.18,
+  "id": 216,
+  "char_start": 1170,
+  "char_end": 1174
+ },
+ {
+  "word": "وأن",
+  "start": 151.18,
+  "end": 151.96,
+  "id": 217,
+  "char_start": 1175,
+  "char_end": 1178
+ },
+ {
+  "word": "يُلخِي",
+  "start": 151.96,
+  "end": 152.5,
+  "id": 218,
+  "char_start": 1179,
+  "char_end": 1185
+ },
+ {
+  "word": "إليهما",
+  "start": 152.5,
+  "end": 153.12,
+  "id": 219,
+  "char_start": 1186,
+  "char_end": 1192
+ },
+ {
+  "word": "سمعه،",
+  "start": 153.12,
+  "end": 153.78,
+  "id": 220,
+  "char_start": 1193,
+  "char_end": 1198
+ },
+ {
+  "word": "ويُصغِي",
+  "start": 153.78,
+  "end": 154.76,
+  "id": 221,
+  "char_start": 1199,
+  "char_end": 1206
+ },
+ {
+  "word": "إليهما",
+  "start": 154.76,
+  "end": 155.52,
+  "id": 222,
+  "char_start": 1207,
+  "char_end": 1213
+ },
+ {
+  "word": "بقلبه،",
+  "start": 155.52,
+  "end": 156.6,
+  "id": 223,
+  "char_start": 1214,
+  "char_end": 1220
+ },
+ {
+  "word": "ويتفحَّص",
+  "start": 156.6,
+  "end": 157.5,
+  "id": 224,
+  "char_start": 1221,
+  "char_end": 1229
+ },
+ {
+  "word": "حاله",
+  "start": 157.5,
+  "end": 158.18,
+  "id": 225,
+  "char_start": 1230,
+  "char_end": 1234
+ },
+ {
+  "word": "فيهما",
+  "start": 158.18,
+  "end": 158.9,
+  "id": 226,
+  "char_start": 1235,
+  "char_end": 1240
+ },
+ {
+  "word": "فأما",
+  "start": 159.36,
+  "end": 159.86,
+  "id": 227,
+  "char_start": 1241,
+  "char_end": 1245
+ },
+ {
+  "word": "الأول",
+  "start": 159.86,
+  "end": 160.32,
+  "id": 228,
+  "char_start": 1246,
+  "char_end": 1251
+ },
+ {
+  "word": "منهما",
+  "start": 160.32,
+  "end": 161.02,
+  "id": 229,
+  "char_start": 1252,
+  "char_end": 1257
+ },
+ {
+  "word": "فقوله",
+  "start": 161.02,
+  "end": 162.26,
+  "id": 230,
+  "char_start": 1258,
+  "char_end": 1263
+ },
+ {
+  "word": "تعالى",
+  "start": 162.26,
+  "end": 163.1,
+  "id": 231,
+  "char_start": 1264,
+  "char_end": 1269
+ },
+ {
+  "word": "يا",
+  "start": 163.1,
+  "end": 163.8,
+  "id": 232,
+  "char_start": 1270,
+  "char_end": 1272
+ },
+ {
+  "word": "أيها",
+  "start": 163.8,
+  "end": 164.48,
+  "id": 233,
+  "char_start": 1273,
+  "char_end": 1277
+ },
+ {
+  "word": "الإنسان",
+  "start": 164.48,
+  "end": 165.52,
+  "id": 234,
+  "char_start": 1278,
+  "char_end": 1285
+ },
+ {
+  "word": "ما",
+  "start": 165.52,
+  "end": 165.74,
+  "id": 235,
+  "char_start": 1286,
+  "char_end": 1288
+ },
+ {
+  "word": "غرك",
+  "start": 165.74,
+  "end": 166.4,
+  "id": 236,
+  "char_start": 1289,
+  "char_end": 1292
+ },
+ {
+  "word": "بربك",
+  "start": 166.4,
+  "end": 167.14,
+  "id": 237,
+  "char_start": 1293,
+  "char_end": 1297
+ },
+ {
+  "word": "الكريم",
+  "start": 167.14,
+  "end": 167.88,
+  "id": 238,
+  "char_start": 1298,
+  "char_end": 1304
+ },
+ {
+  "word": "الذي",
+  "start": 167.88,
+  "end": 168.84,
+  "id": 239,
+  "char_start": 1305,
+  "char_end": 1309
+ },
+ {
+  "word": "خلقك",
+  "start": 168.84,
+  "end": 169.7,
+  "id": 240,
+  "char_start": 1310,
+  "char_end": 1314
+ },
+ {
+  "word": "فسواك",
+  "start": 169.7,
+  "end": 170.62,
+  "id": 241,
+  "char_start": 1315,
+  "char_end": 1320
+ },
+ {
+  "word": "فعدلك",
+  "start": 170.62,
+  "end": 171.36,
+  "id": 242,
+  "char_start": 1321,
+  "char_end": 1326
+ },
+ {
+  "word": "في",
+  "start": 171.36,
+  "end": 172.1,
+  "id": 243,
+  "char_start": 1327,
+  "char_end": 1329
+ },
+ {
+  "word": "أي",
+  "start": 172.1,
+  "end": 172.6,
+  "id": 244,
+  "char_start": 1330,
+  "char_end": 1332
+ },
+ {
+  "word": "صورة",
+  "start": 172.6,
+  "end": 173.46,
+  "id": 245,
+  "char_start": 1333,
+  "char_end": 1337
+ },
+ {
+  "word": "ما",
+  "start": 173.46,
+  "end": 173.96,
+  "id": 246,
+  "char_start": 1338,
+  "char_end": 1340
+ },
+ {
+  "word": "شاء",
+  "start": 173.96,
+  "end": 174.7,
+  "id": 247,
+  "char_start": 1341,
+  "char_end": 1344
+ },
+ {
+  "word": "ركبك،",
+  "start": 174.7,
+  "end": 175.62,
+  "id": 248,
+  "char_start": 1345,
+  "char_end": 1350
+ },
+ {
+  "word": "وأما",
+  "start": 175.62,
+  "end": 176.28,
+  "id": 249,
+  "char_start": 1351,
+  "char_end": 1355
+ },
+ {
+  "word": "الثاني",
+  "start": 176.28,
+  "end": 177,
+  "id": 250,
+  "char_start": 1356,
+  "char_end": 1362
+ },
+ {
+  "word": "فقوله",
+  "start": 177,
+  "end": 178.02,
+  "id": 251,
+  "char_start": 1363,
+  "char_end": 1368
+ },
+ {
+  "word": "تعالى",
+  "start": 178.02,
+  "end": 178.7,
+  "id": 252,
+  "char_start": 1369,
+  "char_end": 1374
+ },
+ {
+  "word": "يا",
+  "start": 178.7,
+  "end": 179.44,
+  "id": 253,
+  "char_start": 1375,
+  "char_end": 1377
+ },
+ {
+  "word": "أيها",
+  "start": 179.44,
+  "end": 180.08,
+  "id": 254,
+  "char_start": 1378,
+  "char_end": 1382
+ },
+ {
+  "word": "الإنسان",
+  "start": 180.08,
+  "end": 181.14,
+  "id": 255,
+  "char_start": 1383,
+  "char_end": 1390
+ },
+ {
+  "word": "إنك",
+  "start": 181.14,
+  "end": 181.84,
+  "id": 256,
+  "char_start": 1391,
+  "char_end": 1394
+ },
+ {
+  "word": "كادح",
+  "start": 181.84,
+  "end": 182.58,
+  "id": 257,
+  "char_start": 1395,
+  "char_end": 1399
+ },
+ {
+  "word": "إلى",
+  "start": 182.58,
+  "end": 182.98,
+  "id": 258,
+  "char_start": 1400,
+  "char_end": 1403
+ },
+ {
+  "word": "ربك",
+  "start": 182.98,
+  "end": 183.8,
+  "id": 259,
+  "char_start": 1404,
+  "char_end": 1407
+ },
+ {
+  "word": "كدحا",
+  "start": 183.8,
+  "end": 184.6,
+  "id": 260,
+  "char_start": 1408,
+  "char_end": 1412
+ },
+ {
+  "word": "فملاقيه",
+  "start": 184.6,
+  "end": 185.74,
+  "id": 261,
+  "char_start": 1413,
+  "char_end": 1420
+ },
+ {
+  "word": "أما",
+  "start": 186.22,
+  "end": 186.76,
+  "id": 262,
+  "char_start": 1421,
+  "char_end": 1424
+ },
+ {
+  "word": "من",
+  "start": 186.76,
+  "end": 187.06,
+  "id": 263,
+  "char_start": 1425,
+  "char_end": 1427
+ },
+ {
+  "word": "أوتي",
+  "start": 187.06,
+  "end": 187.44,
+  "id": 264,
+  "char_start": 1428,
+  "char_end": 1432
+ },
+ {
+  "word": "كتابه",
+  "start": 187.44,
+  "end": 188.28,
+  "id": 265,
+  "char_start": 1433,
+  "char_end": 1438
+ },
+ {
+  "word": "بيمينه",
+  "start": 188.28,
+  "end": 189.06,
+  "id": 266,
+  "char_start": 1439,
+  "char_end": 1445
+ },
+ {
+  "word": "فسوف",
+  "start": 189.06,
+  "end": 190.04,
+  "id": 267,
+  "char_start": 1446,
+  "char_end": 1450
+ },
+ {
+  "word": "يحاسب",
+  "start": 190.04,
+  "end": 190.92,
+  "id": 268,
+  "char_start": 1451,
+  "char_end": 1456
+ },
+ {
+  "word": "حسابا",
+  "start": 190.92,
+  "end": 191.76,
+  "id": 269,
+  "char_start": 1457,
+  "char_end": 1462
+ },
+ {
+  "word": "يسيرا",
+  "start": 191.76,
+  "end": 192.66,
+  "id": 270,
+  "char_start": 1463,
+  "char_end": 1468
+ },
+ {
+  "word": "وينقلب",
+  "start": 192.66,
+  "end": 194.12,
+  "id": 271,
+  "char_start": 1469,
+  "char_end": 1475
+ },
+ {
+  "word": "إلى",
+  "start": 194.12,
+  "end": 194.56,
+  "id": 272,
+  "char_start": 1476,
+  "char_end": 1479
+ },
+ {
+  "word": "أهله",
+  "start": 194.56,
+  "end": 195.28,
+  "id": 273,
+  "char_start": 1480,
+  "char_end": 1484
+ },
+ {
+  "word": "مسرورا",
+  "start": 195.28,
+  "end": 196.36,
+  "id": 274,
+  "char_start": 1485,
+  "char_end": 1491
+ },
+ {
+  "word": "وأما",
+  "start": 196.92,
+  "end": 197.66,
+  "id": 275,
+  "char_start": 1492,
+  "char_end": 1496
+ },
+ {
+  "word": "من",
+  "start": 197.66,
+  "end": 198.04,
+  "id": 276,
+  "char_start": 1497,
+  "char_end": 1499
+ },
+ {
+  "word": "أوتي",
+  "start": 198.04,
+  "end": 198.66,
+  "id": 277,
+  "char_start": 1500,
+  "char_end": 1504
+ },
+ {
+  "word": "كتابه",
+  "start": 198.66,
+  "end": 199.76,
+  "id": 278,
+  "char_start": 1505,
+  "char_end": 1510
+ },
+ {
+  "word": "وراء",
+  "start": 199.76,
+  "end": 200.48,
+  "id": 279,
+  "char_start": 1511,
+  "char_end": 1515
+ },
+ {
+  "word": "ظهره",
+  "start": 200.48,
+  "end": 201.16,
+  "id": 280,
+  "char_start": 1516,
+  "char_end": 1520
+ },
+ {
+  "word": "فسوف",
+  "start": 201.16,
+  "end": 202.14,
+  "id": 281,
+  "char_start": 1521,
+  "char_end": 1525
+ },
+ {
+  "word": "يدعو",
+  "start": 202.14,
+  "end": 202.8,
+  "id": 282,
+  "char_start": 1526,
+  "char_end": 1530
+ },
+ {
+  "word": "ثبورا",
+  "start": 202.8,
+  "end": 203.52,
+  "id": 283,
+  "char_start": 1531,
+  "char_end": 1536
+ },
+ {
+  "word": "ويصلى",
+  "start": 203.52,
+  "end": 204.7,
+  "id": 284,
+  "char_start": 1537,
+  "char_end": 1542
+ },
+ {
+  "word": "سعيرا",
+  "start": 204.7,
+  "end": 205.54,
+  "id": 285,
+  "char_start": 1543,
+  "char_end": 1548
+ },
+ {
+  "word": "إنه",
+  "start": 205.68,
+  "end": 206.64,
+  "id": 286,
+  "char_start": 1549,
+  "char_end": 1552
+ },
+ {
+  "word": "كان",
+  "start": 206.64,
+  "end": 207.32,
+  "id": 287,
+  "char_start": 1553,
+  "char_end": 1556
+ },
+ {
+  "word": "في",
+  "start": 207.32,
+  "end": 207.66,
+  "id": 288,
+  "char_start": 1557,
+  "char_end": 1559
+ },
+ {
+  "word": "أهله",
+  "start": 207.66,
+  "end": 208.42,
+  "id": 289,
+  "char_start": 1560,
+  "char_end": 1564
+ },
+ {
+  "word": "مسرورا،",
+  "start": 208.42,
+  "end": 209.8,
+  "id": 290,
+  "char_start": 1565,
+  "char_end": 1572
+ },
+ {
+  "word": "إنه",
+  "start": 209.8,
+  "end": 210.8,
+  "id": 291,
+  "char_start": 1573,
+  "char_end": 1576
+ },
+ {
+  "word": "ظن",
+  "start": 210.8,
+  "end": 211.5,
+  "id": 292,
+  "char_start": 1577,
+  "char_end": 1579
+ },
+ {
+  "word": "أن",
+  "start": 211.5,
+  "end": 211.88,
+  "id": 293,
+  "char_start": 1580,
+  "char_end": 1582
+ },
+ {
+  "word": "لن",
+  "start": 211.84532,
+  "end": 212.12532,
+  "id": 294,
+  "char_start": 1583,
+  "char_end": 1585
+ },
+ {
+  "word": "يحور",
+  "start": 212.12532,
+  "end": 212.72533,
+  "id": 295,
+  "char_start": 1586,
+  "char_end": 1590
+ },
+ {
+  "word": "بلى",
+  "start": 212.72533,
+  "end": 213.52533,
+  "id": 296,
+  "char_start": 1591,
+  "char_end": 1594
+ },
+ {
+  "word": "إن",
+  "start": 213.52533,
+  "end": 214.20532,
+  "id": 297,
+  "char_start": 1595,
+  "char_end": 1597
+ },
+ {
+  "word": "ربه",
+  "start": 214.20532,
+  "end": 215.00533,
+  "id": 298,
+  "char_start": 1598,
+  "char_end": 1601
+ },
+ {
+  "word": "كان",
+  "start": 215.00533,
+  "end": 215.74533,
+  "id": 299,
+  "char_start": 1602,
+  "char_end": 1605
+ },
+ {
+  "word": "به",
+  "start": 215.74533,
+  "end": 216.10533,
+  "id": 300,
+  "char_start": 1606,
+  "char_end": 1608
+ },
+ {
+  "word": "بصراً",
+  "start": 216.10533,
+  "end": 217.02533,
+  "id": 301,
+  "char_start": 1609,
+  "char_end": 1614
+ },
+ {
+  "word": "فهذان",
+  "start": 217.44533,
+  "end": 218.10533,
+  "id": 302,
+  "char_start": 1615,
+  "char_end": 1620
+ },
+ {
+  "word": "النداءً",
+  "start": 218.10533,
+  "end": 218.90532,
+  "id": 303,
+  "char_start": 1621,
+  "char_end": 1628
+ },
+ {
+  "word": "هم",
+  "start": 218.90532,
+  "end": 219.60533,
+  "id": 304,
+  "char_start": 1629,
+  "char_end": 1631
+ },
+ {
+  "word": "النداءان",
+  "start": 219.60533,
+  "end": 220.74533,
+  "id": 305,
+  "char_start": 1632,
+  "char_end": 1640
+ },
+ {
+  "word": "الموجودان",
+  "start": 220.74533,
+  "end": 221.90532,
+  "id": 306,
+  "char_start": 1641,
+  "char_end": 1650
+ },
+ {
+  "word": "في",
+  "start": 221.90532,
+  "end": 222.06532,
+  "id": 307,
+  "char_start": 1651,
+  "char_end": 1653
+ },
+ {
+  "word": "القرآن",
+  "start": 222.06532,
+  "end": 222.62532,
+  "id": 308,
+  "char_start": 1654,
+  "char_end": 1660
+ },
+ {
+  "word": "الذان",
+  "start": 223.36533,
+  "end": 224.06532,
+  "id": 309,
+  "char_start": 1661,
+  "char_end": 1666
+ },
+ {
+  "word": "نادى",
+  "start": 224.06532,
+  "end": 224.58533,
+  "id": 310,
+  "char_start": 1667,
+  "char_end": 1671
+ },
+ {
+  "word": "الله",
+  "start": 224.58533,
+  "end": 224.90532,
+  "id": 311,
+  "char_start": 1672,
+  "char_end": 1676
+ },
+ {
+  "word": "سبحانه",
+  "start": 224.90532,
+  "end": 225.74533,
+  "id": 312,
+  "char_start": 1677,
+  "char_end": 1683
+ },
+ {
+  "word": "وتعالى",
+  "start": 225.74533,
+  "end": 226.62532,
+  "id": 313,
+  "char_start": 1684,
+  "char_end": 1690
+ },
+ {
+  "word": "فيهما",
+  "start": 226.62532,
+  "end": 227.30533,
+  "id": 314,
+  "char_start": 1691,
+  "char_end": 1696
+ },
+ {
+  "word": "جنس",
+  "start": 227.30533,
+  "end": 227.64532,
+  "id": 315,
+  "char_start": 1697,
+  "char_end": 1700
+ },
+ {
+  "word": "الإنسان",
+  "start": 227.64532,
+  "end": 228.34532,
+  "id": 316,
+  "char_start": 1701,
+  "char_end": 1708
+ },
+ {
+  "word": "فالمنادي",
+  "start": 228.84532,
+  "end": 229.64532,
+  "id": 317,
+  "char_start": 1709,
+  "char_end": 1717
+ },
+ {
+  "word": "هو",
+  "start": 229.64532,
+  "end": 230.30533,
+  "id": 318,
+  "char_start": 1718,
+  "char_end": 1720
+ },
+ {
+  "word": "ملك",
+  "start": 230.30533,
+  "end": 230.78532,
+  "id": 319,
+  "char_start": 1721,
+  "char_end": 1724
+ },
+ {
+  "word": "الملوك",
+  "start": 230.78532,
+  "end": 231.42532,
+  "id": 320,
+  "char_start": 1725,
+  "char_end": 1731
+ },
+ {
+  "word": "سبحانه",
+  "start": 231.42532,
+  "end": 232.16533,
+  "id": 321,
+  "char_start": 1732,
+  "char_end": 1738
+ },
+ {
+  "word": "والمنادى",
+  "start": 232.16533,
+  "end": 233.56532,
+  "id": 322,
+  "char_start": 1739,
+  "char_end": 1747
+ },
+ {
+  "word": "هو",
+  "start": 233.56532,
+  "end": 234.14532,
+  "id": 323,
+  "char_start": 1748,
+  "char_end": 1750
+ },
+ {
+  "word": "أنت",
+  "start": 234.14532,
+  "end": 234.66533,
+  "id": 324,
+  "char_start": 1751,
+  "char_end": 1754
+ },
+ {
+  "word": "أيها",
+  "start": 234.66533,
+  "end": 235.10533,
+  "id": 325,
+  "char_start": 1755,
+  "char_end": 1759
+ },
+ {
+  "word": "الإنسان",
+  "start": 235.10533,
+  "end": 235.48532,
+  "id": 326,
+  "char_start": 1760,
+  "char_end": 1767
+ },
+ {
+  "word": "وفي",
+  "start": 236.18533,
+  "end": 236.44533,
+  "id": 327,
+  "char_start": 1768,
+  "char_end": 1771
+ },
+ {
+  "word": "كل",
+  "start": 236.44533,
+  "end": 236.80533,
+  "id": 328,
+  "char_start": 1772,
+  "char_end": 1774
+ },
+ {
+  "word": "واحد",
+  "start": 236.80533,
+  "end": 237.44533,
+  "id": 329,
+  "char_start": 1775,
+  "char_end": 1779
+ },
+ {
+  "word": "من",
+  "start": 237.44533,
+  "end": 237.68533,
+  "id": 330,
+  "char_start": 1780,
+  "char_end": 1782
+ },
+ {
+  "word": "النداء",
+  "start": 237.68533,
+  "end": 238.30533,
+  "id": 331,
+  "char_start": 1783,
+  "char_end": 1789
+ },
+ {
+  "word": "معاني",
+  "start": 238.30533,
+  "end": 239.48532,
+  "id": 332,
+  "char_start": 1790,
+  "char_end": 1795
+ },
+ {
+  "word": "جمه،",
+  "start": 239.48532,
+  "end": 240.28532,
+  "id": 333,
+  "char_start": 1796,
+  "char_end": 1800
+ },
+ {
+  "word": "فأما",
+  "start": 240.28532,
+  "end": 240.94533,
+  "id": 334,
+  "char_start": 1801,
+  "char_end": 1805
+ },
+ {
+  "word": "النداء",
+  "start": 240.94533,
+  "end": 241.40533,
+  "id": 335,
+  "char_start": 1806,
+  "char_end": 1812
+ },
+ {
+  "word": "الأول",
+  "start": 241.40533,
+  "end": 241.90533,
+  "id": 336,
+  "char_start": 1813,
+  "char_end": 1818
+ },
+ {
+  "word": "وهو",
+  "start": 241.90533,
+  "end": 242.72533,
+  "id": 337,
+  "char_start": 1819,
+  "char_end": 1822
+ },
+ {
+  "word": "قوله",
+  "start": 242.72533,
+  "end": 243.22533,
+  "id": 338,
+  "char_start": 1823,
+  "char_end": 1827
+ },
+ {
+  "word": "تعالى",
+  "start": 243.22533,
+  "end": 243.92532,
+  "id": 339,
+  "char_start": 1828,
+  "char_end": 1833
+ },
+ {
+  "word": "يا",
+  "start": 243.92532,
+  "end": 244.52533,
+  "id": 340,
+  "char_start": 1834,
+  "char_end": 1836
+ },
+ {
+  "word": "أيها",
+  "start": 244.52533,
+  "end": 245.22533,
+  "id": 341,
+  "char_start": 1837,
+  "char_end": 1841
+ },
+ {
+  "word": "الإنسان",
+  "start": 245.22533,
+  "end": 246.28532,
+  "id": 342,
+  "char_start": 1842,
+  "char_end": 1849
+ },
+ {
+  "word": "ما",
+  "start": 246.28532,
+  "end": 246.54532,
+  "id": 343,
+  "char_start": 1850,
+  "char_end": 1852
+ },
+ {
+  "word": "غرَّك",
+  "start": 246.54532,
+  "end": 247.32532,
+  "id": 344,
+  "char_start": 1853,
+  "char_end": 1858
+ },
+ {
+  "word": "بربك",
+  "start": 247.32532,
+  "end": 248.04532,
+  "id": 345,
+  "char_start": 1859,
+  "char_end": 1863
+ },
+ {
+  "word": "الكريم",
+  "start": 248.04532,
+  "end": 248.72533,
+  "id": 346,
+  "char_start": 1864,
+  "char_end": 1870
+ },
+ {
+  "word": "أي",
+  "start": 248.72533,
+  "end": 249.38533,
+  "id": 347,
+  "char_start": 1871,
+  "char_end": 1873
+ },
+ {
+  "word": "أي",
+  "start": 249.38533,
+  "end": 249.68533,
+  "id": 348,
+  "char_start": 1874,
+  "char_end": 1876
+ },
+ {
+  "word": "شيء",
+  "start": 249.68533,
+  "end": 250.20532,
+  "id": 349,
+  "char_start": 1877,
+  "char_end": 1880
+ },
+ {
+  "word": "أصابك",
+  "start": 250.20532,
+  "end": 250.90533,
+  "id": 350,
+  "char_start": 1881,
+  "char_end": 1886
+ },
+ {
+  "word": "بالغرور",
+  "start": 250.90533,
+  "end": 251.50533,
+  "id": 351,
+  "char_start": 1887,
+  "char_end": 1894
+ },
+ {
+  "word": "حتى",
+  "start": 251.50533,
+  "end": 252.30533,
+  "id": 352,
+  "char_start": 1895,
+  "char_end": 1898
+ },
+ {
+  "word": "اغتررت",
+  "start": 252.30533,
+  "end": 252.98532,
+  "id": 353,
+  "char_start": 1899,
+  "char_end": 1905
+ },
+ {
+  "word": "بحارك",
+  "start": 252.98532,
+  "end": 253.84532,
+  "id": 354,
+  "char_start": 1906,
+  "char_end": 1911
+ },
+ {
+  "word": "من",
+  "start": 253.84532,
+  "end": 254.06532,
+  "id": 355,
+  "char_start": 1912,
+  "char_end": 1914
+ },
+ {
+  "word": "ربك",
+  "start": 254.06532,
+  "end": 254.56532,
+  "id": 356,
+  "char_start": 1915,
+  "char_end": 1918
+ },
+ {
+  "word": "الكريم",
+  "start": 254.56532,
+  "end": 255.18533,
+  "id": 357,
+  "char_start": 1919,
+  "char_end": 1925
+ },
+ {
+  "word": "ثم",
+  "start": 255.18533,
+  "end": 256.02533,
+  "id": 358,
+  "char_start": 1926,
+  "char_end": 1928
+ },
+ {
+  "word": "بيَّن",
+  "start": 256.02533,
+  "end": 256.6653,
+  "id": 359,
+  "char_start": 1929,
+  "char_end": 1934
+ },
+ {
+  "word": "ما",
+  "start": 256.6653,
+  "end": 256.92532,
+  "id": 360,
+  "char_start": 1935,
+  "char_end": 1937
+ },
+ {
+  "word": "أسجاه",
+  "start": 256.92532,
+  "end": 257.5053,
+  "id": 361,
+  "char_start": 1938,
+  "char_end": 1943
+ },
+ {
+  "word": "الله",
+  "start": 257.5053,
+  "end": 257.84534,
+  "id": 362,
+  "char_start": 1944,
+  "char_end": 1948
+ },
+ {
+  "word": "للإنسان",
+  "start": 257.84534,
+  "end": 258.78534,
+  "id": 363,
+  "char_start": 1949,
+  "char_end": 1956
+ },
+ {
+  "word": "من",
+  "start": 258.78534,
+  "end": 258.9453,
+  "id": 364,
+  "char_start": 1957,
+  "char_end": 1959
+ },
+ {
+  "word": "نعمة،",
+  "start": 258.9453,
+  "end": 259.54532,
+  "id": 365,
+  "char_start": 1960,
+  "char_end": 1965
+ },
+ {
+  "word": "فقال",
+  "start": 259.54532,
+  "end": 260.34534,
+  "id": 366,
+  "char_start": 1966,
+  "char_end": 1970
+ },
+ {
+  "word": "الذي",
+  "start": 260.34534,
+  "end": 261.1653,
+  "id": 367,
+  "char_start": 1971,
+  "char_end": 1975
+ },
+ {
+  "word": "خلقك",
+  "start": 261.1653,
+  "end": 261.96533,
+  "id": 368,
+  "char_start": 1976,
+  "char_end": 1980
+ },
+ {
+  "word": "فسواك",
+  "start": 261.96533,
+  "end": 262.8853,
+  "id": 369,
+  "char_start": 1981,
+  "char_end": 1986
+ },
+ {
+  "word": "فعدلك",
+  "start": 262.8853,
+  "end": 263.58533,
+  "id": 370,
+  "char_start": 1987,
+  "char_end": 1992
+ },
+ {
+  "word": "في",
+  "start": 263.58533,
+  "end": 264.12534,
+  "id": 371,
+  "char_start": 1993,
+  "char_end": 1995
+ },
+ {
+  "word": "أي",
+  "start": 264.12534,
+  "end": 264.5053,
+  "id": 372,
+  "char_start": 1996,
+  "char_end": 1998
+ },
+ {
+  "word": "صور،",
+  "start": 264.5053,
+  "end": 264.98532,
+  "id": 373,
+  "char_start": 1999,
+  "char_end": 2003
+ },
+ {
+  "word": "في",
+  "start": 265.0053,
+  "end": 265.02533,
+  "id": 374,
+  "char_start": 2004,
+  "char_end": 2006
+ },
+ {
+  "word": "صورةٍ",
+  "start": 265.02533,
+  "end": 265.3853,
+  "id": 375,
+  "char_start": 2007,
+  "char_end": 2012
+ },
+ {
+  "word": "ما",
+  "start": 265.3853,
+  "end": 265.76532,
+  "id": 376,
+  "char_start": 2013,
+  "char_end": 2015
+ },
+ {
+  "word": "شاء",
+  "start": 265.76532,
+  "end": 266.28534,
+  "id": 377,
+  "char_start": 2016,
+  "char_end": 2019
+ },
+ {
+  "word": "ركبك،",
+  "start": 266.28534,
+  "end": 267.06534,
+  "id": 378,
+  "char_start": 2020,
+  "char_end": 2025
+ },
+ {
+  "word": "أي",
+  "start": 267.06534,
+  "end": 267.3853,
+  "id": 379,
+  "char_start": 2026,
+  "char_end": 2028
+ },
+ {
+  "word": "أن",
+  "start": 267.3853,
+  "end": 267.68533,
+  "id": 380,
+  "char_start": 2029,
+  "char_end": 2031
+ },
+ {
+  "word": "هذا",
+  "start": 267.68533,
+  "end": 268.12534,
+  "id": 381,
+  "char_start": 2032,
+  "char_end": 2035
+ },
+ {
+  "word": "الرب",
+  "start": 268.12534,
+  "end": 268.48532,
+  "id": 382,
+  "char_start": 2036,
+  "char_end": 2040
+ },
+ {
+  "word": "سبحانه",
+  "start": 268.48532,
+  "end": 269.26532,
+  "id": 383,
+  "char_start": 2041,
+  "char_end": 2047
+ },
+ {
+  "word": "وتعالى",
+  "start": 269.26532,
+  "end": 269.96533,
+  "id": 384,
+  "char_start": 2048,
+  "char_end": 2054
+ },
+ {
+  "word": "هو",
+  "start": 269.96533,
+  "end": 270.56534,
+  "id": 385,
+  "char_start": 2055,
+  "char_end": 2057
+ },
+ {
+  "word": "الذي",
+  "start": 270.56534,
+  "end": 270.98532,
+  "id": 386,
+  "char_start": 2058,
+  "char_end": 2062
+ },
+ {
+  "word": "خلق",
+  "start": 270.98532,
+  "end": 271.54532,
+  "id": 387,
+  "char_start": 2063,
+  "char_end": 2066
+ },
+ {
+  "word": "الإنسان",
+  "start": 271.54532,
+  "end": 272.3853,
+  "id": 388,
+  "char_start": 2067,
+  "char_end": 2074
+ },
+ {
+  "word": "وسواه",
+  "start": 272.3853,
+  "end": 273.16534,
+  "id": 389,
+  "char_start": 2075,
+  "char_end": 2080
+ },
+ {
+  "word": "وعدله،",
+  "start": 273.16534,
+  "end": 273.9453,
+  "id": 390,
+  "char_start": 2081,
+  "char_end": 2087
+ },
+ {
+  "word": "وجعله",
+  "start": 273.9453,
+  "end": 274.96533,
+  "id": 391,
+  "char_start": 2088,
+  "char_end": 2093
+ },
+ {
+  "word": "في",
+  "start": 274.96533,
+  "end": 275.24533,
+  "id": 392,
+  "char_start": 2094,
+  "char_end": 2096
+ },
+ {
+  "word": "خلقٍ",
+  "start": 275.24533,
+  "end": 275.84534,
+  "id": 393,
+  "char_start": 2097,
+  "char_end": 2101
+ },
+ {
+  "word": "تام،",
+  "start": 275.84534,
+  "end": 276.46533,
+  "id": 394,
+  "char_start": 2102,
+  "char_end": 2106
+ },
+ {
+  "word": "كما",
+  "start": 276.46533,
+  "end": 277.0053,
+  "id": 395,
+  "char_start": 2107,
+  "char_end": 2110
+ },
+ {
+  "word": "قال",
+  "start": 277.0053,
+  "end": 277.40533,
+  "id": 396,
+  "char_start": 2111,
+  "char_end": 2114
+ },
+ {
+  "word": "الله",
+  "start": 277.40533,
+  "end": 277.80533,
+  "id": 397,
+  "char_start": 2115,
+  "char_end": 2119
+ },
+ {
+  "word": "تعالى",
+  "start": 277.80533,
+  "end": 278.46533,
+  "id": 398,
+  "char_start": 2120,
+  "char_end": 2125
+ },
+ {
+  "word": "لقد",
+  "start": 278.46533,
+  "end": 279.16534,
+  "id": 399,
+  "char_start": 2126,
+  "char_end": 2129
+ },
+ {
+  "word": "خلقنا",
+  "start": 279.16534,
+  "end": 279.92532,
+  "id": 400,
+  "char_start": 2130,
+  "char_end": 2135
+ },
+ {
+  "word": "الإنسان",
+  "start": 279.92532,
+  "end": 280.90533,
+  "id": 401,
+  "char_start": 2136,
+  "char_end": 2143
+ },
+ {
+  "word": "في",
+  "start": 280.90533,
+  "end": 281.14532,
+  "id": 402,
+  "char_start": 2144,
+  "char_end": 2146
+ },
+ {
+  "word": "أحسن",
+  "start": 281.14532,
+  "end": 281.68533,
+  "id": 403,
+  "char_start": 2147,
+  "char_end": 2151
+ },
+ {
+  "word": "تقويم،",
+  "start": 281.68533,
+  "end": 282.46533,
+  "id": 404,
+  "char_start": 2152,
+  "char_end": 2158
+ },
+ {
+  "word": "فأي",
+  "start": 282.46533,
+  "end": 283.14532,
+  "id": 405,
+  "char_start": 2159,
+  "char_end": 2162
+ },
+ {
+  "word": "شيءٍ",
+  "start": 283.14532,
+  "end": 283.74533,
+  "id": 406,
+  "char_start": 2163,
+  "char_end": 2167
+ },
+ {
+  "word": "يغرُّه،",
+  "start": 283.74533,
+  "end": 284.5653,
+  "id": 407,
+  "char_start": 2168,
+  "char_end": 2175
+ },
+ {
+  "word": "وقد",
+  "start": 284.5653,
+  "end": 284.82532,
+  "id": 408,
+  "char_start": 2176,
+  "char_end": 2179
+ },
+ {
+  "word": "جعله",
+  "start": 284.82532,
+  "end": 285.36533,
+  "id": 409,
+  "char_start": 2180,
+  "char_end": 2184
+ },
+ {
+  "word": "الله",
+  "start": 285.36533,
+  "end": 285.64532,
+  "id": 410,
+  "char_start": 2185,
+  "char_end": 2189
+ },
+ {
+  "word": "عز",
+  "start": 285.64532,
+  "end": 286.04532,
+  "id": 411,
+  "char_start": 2190,
+  "char_end": 2192
+ },
+ {
+  "word": "وجل",
+  "start": 286.04532,
+  "end": 286.5653,
+  "id": 412,
+  "char_start": 2193,
+  "char_end": 2196
+ },
+ {
+  "word": "في",
+  "start": 286.5653,
+  "end": 286.80533,
+  "id": 413,
+  "char_start": 2197,
+  "char_end": 2199
+ },
+ {
+  "word": "أحسن",
+  "start": 286.80533,
+  "end": 287.32532,
+  "id": 414,
+  "char_start": 2200,
+  "char_end": 2204
+ },
+ {
+  "word": "صورةٍ،",
+  "start": 287.32532,
+  "end": 288.14532,
+  "id": 415,
+  "char_start": 2205,
+  "char_end": 2211
+ },
+ {
+  "word": "ولو",
+  "start": 288.14532,
+  "end": 288.64532,
+  "id": 416,
+  "char_start": 2212,
+  "char_end": 2215
+ },
+ {
+  "word": "شاء",
+  "start": 288.64532,
+  "end": 289.0053,
+  "id": 417,
+  "char_start": 2216,
+  "char_end": 2219
+ },
+ {
+  "word": "الله",
+  "start": 289.0053,
+  "end": 289.40533,
+  "id": 418,
+  "char_start": 2220,
+  "char_end": 2224
+ },
+ {
+  "word": "عز",
+  "start": 289.40533,
+  "end": 289.74533,
+  "id": 419,
+  "char_start": 2225,
+  "char_end": 2227
+ },
+ {
+  "word": "وجل",
+  "start": 289.74533,
+  "end": 290.22534,
+  "id": 420,
+  "char_start": 2228,
+  "char_end": 2231
+ },
+ {
+  "word": "لجعله",
+  "start": 290.22534,
+  "end": 290.98532,
+  "id": 421,
+  "char_start": 2232,
+  "char_end": 2237
+ },
+ {
+  "word": "في",
+  "start": 290.98532,
+  "end": 291.26532,
+  "id": 422,
+  "char_start": 2238,
+  "char_end": 2240
+ },
+ {
+  "word": "صورةٍ",
+  "start": 291.26532,
+  "end": 291.90533,
+  "id": 423,
+  "char_start": 2241,
+  "char_end": 2246
+ },
+ {
+  "word": "أخرى،",
+  "start": 291.90533,
+  "end": 292.48532,
+  "id": 424,
+  "char_start": 2247,
+  "char_end": 2252
+ },
+ {
+  "word": "فجعله",
+  "start": 292.48532,
+  "end": 293.3853,
+  "id": 425,
+  "char_start": 2253,
+  "char_end": 2258
+ },
+ {
+  "word": "في",
+  "start": 293.3853,
+  "end": 293.66534,
+  "id": 426,
+  "char_start": 2259,
+  "char_end": 2261
+ },
+ {
+  "word": "صورةٍ",
+  "start": 293.66534,
+  "end": 294.40533,
+  "id": 427,
+  "char_start": 2262,
+  "char_end": 2267
+ },
+ {
+  "word": "بهيمةٍ",
+  "start": 294.40533,
+  "end": 294.96533,
+  "id": 428,
+  "char_start": 2268,
+  "char_end": 2274
+ },
+ {
+  "word": "على",
+  "start": 294.96533,
+  "end": 294.98532,
+  "id": 429,
+  "char_start": 2275,
+  "char_end": 2278
+ },
+ {
+  "word": "صورةٍ.",
+  "start": 294.98532,
+  "end": 295.0053,
+  "id": 430,
+  "char_start": 2279,
+  "char_end": 2285
+ },
+ {
+  "word": "وبيان",
+  "start": 295.66534,
+  "end": 302.62534,
+  "id": 431,
+  "char_start": 2286,
+  "char_end": 2291
+ },
+ {
+  "word": "هذا",
+  "start": 302.62534,
+  "end": 302.96533,
+  "id": 432,
+  "char_start": 2292,
+  "char_end": 2295
+ },
+ {
+  "word": "المعنى",
+  "start": 302.96533,
+  "end": 303.52533,
+  "id": 433,
+  "char_start": 2296,
+  "char_end": 2302
+ },
+ {
+  "word": "كثيرٌ",
+  "start": 303.52533,
+  "end": 304.14532,
+  "id": 434,
+  "char_start": 2303,
+  "char_end": 2308
+ },
+ {
+  "word": "في",
+  "start": 304.14532,
+  "end": 304.22534,
+  "id": 435,
+  "char_start": 2309,
+  "char_end": 2311
+ },
+ {
+  "word": "القرآن،",
+  "start": 304.22534,
+  "end": 304.92532,
+  "id": 436,
+  "char_start": 2312,
+  "char_end": 2319
+ },
+ {
+  "word": "يذكر",
+  "start": 304.92532,
+  "end": 305.58533,
+  "id": 437,
+  "char_start": 2320,
+  "char_end": 2324
+ },
+ {
+  "word": "الله",
+  "start": 305.58533,
+  "end": 306.02533,
+  "id": 438,
+  "char_start": 2325,
+  "char_end": 2329
+ },
+ {
+  "word": "سبحانه",
+  "start": 306.02533,
+  "end": 306.78534,
+  "id": 439,
+  "char_start": 2330,
+  "char_end": 2336
+ },
+ {
+  "word": "وتعالى",
+  "start": 306.78534,
+  "end": 307.54532,
+  "id": 440,
+  "char_start": 2337,
+  "char_end": 2343
+ },
+ {
+  "word": "خلقه",
+  "start": 307.54532,
+  "end": 308.20532,
+  "id": 441,
+  "char_start": 2344,
+  "char_end": 2348
+ },
+ {
+  "word": "للإنسان،",
+  "start": 308.20532,
+  "end": 309.20532,
+  "id": 442,
+  "char_start": 2349,
+  "char_end": 2357
+ },
+ {
+  "word": "ليعلم",
+  "start": 309.20532,
+  "end": 309.8853,
+  "id": 443,
+  "char_start": 2358,
+  "char_end": 2363
+ },
+ {
+  "word": "الإنسان",
+  "start": 309.8853,
+  "end": 310.68533,
+  "id": 444,
+  "char_start": 2364,
+  "char_end": 2371
+ },
+ {
+  "word": "أن",
+  "start": 310.68533,
+  "end": 311.22534,
+  "id": 445,
+  "char_start": 2372,
+  "char_end": 2374
+ },
+ {
+  "word": "خالقه",
+  "start": 311.22534,
+  "end": 312.04532,
+  "id": 446,
+  "char_start": 2375,
+  "char_end": 2380
+ },
+ {
+  "word": "ومالكه",
+  "start": 312.04532,
+  "end": 312.92532,
+  "id": 447,
+  "char_start": 2381,
+  "char_end": 2387
+ },
+ {
+  "word": "ومدبِّره",
+  "start": 312.92532,
+  "end": 313.82532,
+  "id": 448,
+  "char_start": 2388,
+  "char_end": 2396
+ },
+ {
+  "word": "هو",
+  "start": 313.82532,
+  "end": 314.30533,
+  "id": 449,
+  "char_start": 2397,
+  "char_end": 2399
+ },
+ {
+  "word": "الله",
+  "start": 314.30533,
+  "end": 314.70532,
+  "id": 450,
+  "char_start": 2400,
+  "char_end": 2404
+ },
+ {
+  "word": "سبحانه",
+  "start": 314.70532,
+  "end": 315.58533,
+  "id": 451,
+  "char_start": 2405,
+  "char_end": 2411
+ },
+ {
+  "word": "وتعالى،",
+  "start": 315.58533,
+  "end": 316.52533,
+  "id": 452,
+  "char_start": 2412,
+  "char_end": 2419
+ },
+ {
+  "word": "قال",
+  "start": 316.52533,
+  "end": 317.02533,
+  "id": 453,
+  "char_start": 2420,
+  "char_end": 2423
+ },
+ {
+  "word": "الله",
+  "start": 317.02533,
+  "end": 317.5053,
+  "id": 454,
+  "char_start": 2424,
+  "char_end": 2428
+ },
+ {
+  "word": "تعالى",
+  "start": 317.5053,
+  "end": 318.22534,
+  "id": 455,
+  "char_start": 2429,
+  "char_end": 2434
+ },
+ {
+  "word": "أَوَلَمْ",
+  "start": 318.22534,
+  "end": 319.18533,
+  "id": 456,
+  "char_start": 2435,
+  "char_end": 2443
+ },
+ {
+  "word": "يَرَى",
+  "start": 319.18533,
+  "end": 319.42532,
+  "id": 457,
+  "char_start": 2444,
+  "char_end": 2449
+ },
+ {
+  "word": "الْإِنسَانُ",
+  "start": 319.42532,
+  "end": 320.28534,
+  "id": 458,
+  "char_start": 2450,
+  "char_end": 2461
+ },
+ {
+  "word": "أَنَّا",
+  "start": 320.28534,
+  "end": 320.80533,
+  "id": 459,
+  "char_start": 2462,
+  "char_end": 2468
+ },
+ {
+  "word": "خَلَقْنَاهُ",
+  "start": 320.80533,
+  "end": 321.80533,
+  "id": 460,
+  "char_start": 2469,
+  "char_end": 2480
+ },
+ {
+  "word": "مِنْ",
+  "start": 321.80533,
+  "end": 322.30533,
+  "id": 461,
+  "char_start": 2481,
+  "char_end": 2485
+ },
+ {
+  "word": "نُطْفَةَ",
+  "start": 322.30533,
+  "end": 322.76532,
+  "id": 462,
+  "char_start": 2486,
+  "char_end": 2494
+ },
+ {
+  "word": "فَإِذَا",
+  "start": 322.76532,
+  "end": 323.62534,
+  "id": 463,
+  "char_start": 2495,
+  "char_end": 2502
+ },
+ {
+  "word": "هُوَ",
+  "start": 323.62534,
+  "end": 324.0653,
+  "id": 464,
+  "char_start": 2503,
+  "char_end": 2507
+ },
+ {
+  "word": "خَصِيمٌ",
+  "start": 324.0653,
+  "end": 324.74533,
+  "id": 465,
+  "char_start": 2508,
+  "char_end": 2515
+ },
+ {
+  "word": "مُّمْ",
+  "start": 324.74533,
+  "end": 324.98532,
+  "id": 466,
+  "char_start": 2516,
+  "char_end": 2521
+ },
+ {
+  "word": "مُّا",
+  "start": 324.98532,
+  "end": 325.0053,
+  "id": 467,
+  "char_start": 2522,
+  "char_end": 2526
+ },
+ {
+  "word": "أَوَرْبُّهُ",
+  "start": 325.0053,
+  "end": 325.02533,
+  "id": 468,
+  "char_start": 2527,
+  "char_end": 2538
+ },
+ {
+  "word": "مِنْ",
+  "start": 325.02533,
+  "end": 325.04532,
+  "id": 469,
+  "char_start": 2539,
+  "char_end": 2543
+ },
+ {
+  "word": "أَوَرْبُّهُ",
+  "start": 325.04532,
+  "end": 325.0653,
+  "id": 470,
+  "char_start": 2544,
+  "char_end": 2555
+ },
+ {
+  "word": "مُّهُمْ",
+  "start": 325.0653,
+  "end": 325.08533,
+  "id": 471,
+  "char_start": 2556,
+  "char_end": 2563
+ },
+ {
+  "word": "أَوْرْبُّهُ",
+  "start": 325.08533,
+  "end": 325.10532,
+  "id": 472,
+  "char_start": 2564,
+  "char_end": 2575
+ },
+ {
+  "word": "مُّهُمْ",
+  "start": 325.10532,
+  "end": 325.12534,
+  "id": 473,
+  "char_start": 2576,
+  "char_end": 2583
+ },
+ {
+  "word": "أَوْرْبُّهُ",
+  "start": 325.12534,
+  "end": 325.14532,
+  "id": 474,
+  "char_start": 2584,
+  "char_end": 2595
+ },
+ {
+  "word": "مُّهُم",
+  "start": 325.14532,
+  "end": 325.16534,
+  "id": 475,
+  "char_start": 2596,
+  "char_end": 2602
+ },
+ {
+  "word": "وقال",
+  "start": 325.8853,
+  "end": 326.28534,
+  "id": 476,
+  "char_start": 2603,
+  "char_end": 2607
+ },
+ {
+  "word": "سبحانه",
+  "start": 326.28534,
+  "end": 327.08533,
+  "id": 477,
+  "char_start": 2608,
+  "char_end": 2614
+ },
+ {
+  "word": "وتعالى",
+  "start": 327.08533,
+  "end": 327.86533,
+  "id": 478,
+  "char_start": 2615,
+  "char_end": 2621
+ },
+ {
+  "word": "اقرأ",
+  "start": 327.86533,
+  "end": 328.70532,
+  "id": 479,
+  "char_start": 2622,
+  "char_end": 2626
+ },
+ {
+  "word": "باسم",
+  "start": 328.70532,
+  "end": 329.0653,
+  "id": 480,
+  "char_start": 2627,
+  "char_end": 2631
+ },
+ {
+  "word": "ربك",
+  "start": 329.0653,
+  "end": 329.62534,
+  "id": 481,
+  "char_start": 2632,
+  "char_end": 2635
+ },
+ {
+  "word": "الذي",
+  "start": 329.62534,
+  "end": 330.0053,
+  "id": 482,
+  "char_start": 2636,
+  "char_end": 2640
+ },
+ {
+  "word": "خلق",
+  "start": 330.0053,
+  "end": 330.5653,
+  "id": 483,
+  "char_start": 2641,
+  "char_end": 2644
+ },
+ {
+  "word": "الإنسان",
+  "start": 330.5653,
+  "end": 332.48532,
+  "id": 484,
+  "char_start": 2645,
+  "char_end": 2652
+ },
+ {
+  "word": "من",
+  "start": 332.48532,
+  "end": 332.64532,
+  "id": 485,
+  "char_start": 2653,
+  "char_end": 2655
+ },
+ {
+  "word": "علقاء،",
+  "start": 332.64532,
+  "end": 333.32532,
+  "id": 486,
+  "char_start": 2656,
+  "char_end": 2662
+ },
+ {
+  "word": "وقال",
+  "start": 333.32532,
+  "end": 334.12534,
+  "id": 487,
+  "char_start": 2663,
+  "char_end": 2667
+ },
+ {
+  "word": "سبحانه",
+  "start": 334.12534,
+  "end": 335.0653,
+  "id": 488,
+  "char_start": 2668,
+  "char_end": 2674
+ },
+ {
+  "word": "وتعالى",
+  "start": 335.0653,
+  "end": 335.98532,
+  "id": 489,
+  "char_start": 2675,
+  "char_end": 2681
+ },
+ {
+  "word": "إنا",
+  "start": 335.98532,
+  "end": 336.9453,
+  "id": 490,
+  "char_start": 2682,
+  "char_end": 2685
+ },
+ {
+  "word": "خلقنا",
+  "start": 336.9453,
+  "end": 337.60535,
+  "id": 491,
+  "char_start": 2686,
+  "char_end": 2691
+ },
+ {
+  "word": "الإنسان",
+  "start": 337.60535,
+  "end": 338.48532,
+  "id": 492,
+  "char_start": 2692,
+  "char_end": 2699
+ },
+ {
+  "word": "من",
+  "start": 338.48532,
+  "end": 338.72534,
+  "id": 493,
+  "char_start": 2700,
+  "char_end": 2702
+ },
+ {
+  "word": "نطفة",
+  "start": 338.72534,
+  "end": 339.40533,
+  "id": 494,
+  "char_start": 2703,
+  "char_end": 2707
+ },
+ {
+  "word": "أمشاج",
+  "start": 339.40533,
+  "end": 340.14532,
+  "id": 495,
+  "char_start": 2708,
+  "char_end": 2713
+ },
+ {
+  "word": "نبتريه،",
+  "start": 340.14532,
+  "end": 341.20532,
+  "id": 496,
+  "char_start": 2714,
+  "char_end": 2721
+ },
+ {
+  "word": "فجعلناه",
+  "start": 341.20532,
+  "end": 342.60535,
+  "id": 497,
+  "char_start": 2722,
+  "char_end": 2729
+ },
+ {
+  "word": "سميعاً",
+  "start": 342.60535,
+  "end": 343.52533,
+  "id": 498,
+  "char_start": 2730,
+  "char_end": 2736
+ },
+ {
+  "word": "بصيراً،",
+  "start": 343.52533,
+  "end": 344.70532,
+  "id": 499,
+  "char_start": 2737,
+  "char_end": 2744
+ },
+ {
+  "word": "وقال",
+  "start": 344.70532,
+  "end": 345.08533,
+  "id": 500,
+  "char_start": 2745,
+  "char_end": 2749
+ },
+ {
+  "word": "تعالى",
+  "start": 345.08533,
+  "end": 345.76532,
+  "id": 501,
+  "char_start": 2750,
+  "char_end": 2755
+ },
+ {
+  "word": "أيحسب",
+  "start": 345.76532,
+  "end": 346.66534,
+  "id": 502,
+  "char_start": 2756,
+  "char_end": 2761
+ },
+ {
+  "word": "الإنسان",
+  "start": 346.66534,
+  "end": 347.66534,
+  "id": 503,
+  "char_start": 2762,
+  "char_end": 2769
+ },
+ {
+  "word": "أن",
+  "start": 347.66534,
+  "end": 347.9453,
+  "id": 504,
+  "char_start": 2770,
+  "char_end": 2772
+ },
+ {
+  "word": "يُترك",
+  "start": 347.9453,
+  "end": 348.3853,
+  "id": 505,
+  "char_start": 2773,
+  "char_end": 2778
+ },
+ {
+  "word": "سُداء،",
+  "start": 348.3853,
+  "end": 349.08533,
+  "id": 506,
+  "char_start": 2779,
+  "char_end": 2785
+ },
+ {
+  "word": "ألم",
+  "start": 349.08533,
+  "end": 349.5653,
+  "id": 507,
+  "char_start": 2786,
+  "char_end": 2789
+ },
+ {
+  "word": "يكن",
+  "start": 349.5653,
+  "end": 350.0053,
+  "id": 508,
+  "char_start": 2790,
+  "char_end": 2793
+ },
+ {
+  "word": "نطفةً",
+  "start": 350.0053,
+  "end": 350.66534,
+  "id": 509,
+  "char_start": 2794,
+  "char_end": 2799
+ },
+ {
+  "word": "من",
+  "start": 350.66534,
+  "end": 351.04532,
+  "id": 510,
+  "char_start": 2800,
+  "char_end": 2802
+ },
+ {
+  "word": "مني",
+  "start": 351.04532,
+  "end": 351.54532,
+  "id": 511,
+  "char_start": 2803,
+  "char_end": 2806
+ },
+ {
+  "word": "يُمنا،",
+  "start": 351.54532,
+  "end": 352.36533,
+  "id": 512,
+  "char_start": 2807,
+  "char_end": 2813
+ },
+ {
+  "word": "فهذا",
+  "start": 352.0053,
+  "end": 353.16534,
+  "id": 513,
+  "char_start": 2814,
+  "char_end": 2818
+ },
+ {
+  "word": "المخلوق",
+  "start": 353.16534,
+  "end": 353.90533,
+  "id": 514,
+  "char_start": 2819,
+  "char_end": 2826
+ },
+ {
+  "word": "الذي",
+  "start": 353.90533,
+  "end": 354.82532,
+  "id": 515,
+  "char_start": 2827,
+  "char_end": 2831
+ },
+ {
+  "word": "يعظم",
+  "start": 354.82532,
+  "end": 355.52533,
+  "id": 516,
+  "char_start": 2832,
+  "char_end": 2836
+ },
+ {
+  "word": "نفسه",
+  "start": 355.52533,
+  "end": 356.10535,
+  "id": 517,
+  "char_start": 2837,
+  "char_end": 2841
+ },
+ {
+  "word": "ويغتر",
+  "start": 356.10535,
+  "end": 357.0653,
+  "id": 518,
+  "char_start": 2842,
+  "char_end": 2847
+ },
+ {
+  "word": "بما",
+  "start": 357.0653,
+  "end": 357.48532,
+  "id": 519,
+  "char_start": 2848,
+  "char_end": 2851
+ },
+ {
+  "word": "هو",
+  "start": 357.48532,
+  "end": 357.70532,
+  "id": 520,
+  "char_start": 2852,
+  "char_end": 2854
+ },
+ {
+  "word": "عليه",
+  "start": 357.70532,
+  "end": 358.20532,
+  "id": 521,
+  "char_start": 2855,
+  "char_end": 2859
+ },
+ {
+  "word": "مع",
+  "start": 358.20532,
+  "end": 358.54532,
+  "id": 522,
+  "char_start": 2860,
+  "char_end": 2862
+ },
+ {
+  "word": "ربه،",
+  "start": 358.54532,
+  "end": 359.14532,
+  "id": 523,
+  "char_start": 2863,
+  "char_end": 2867
+ },
+ {
+  "word": "الخالق",
+  "start": 359.14532,
+  "end": 360.24533,
+  "id": 524,
+  "char_start": 2868,
+  "char_end": 2874
+ },
+ {
+  "word": "له",
+  "start": 360.24533,
+  "end": 360.52533,
+  "id": 525,
+  "char_start": 2875,
+  "char_end": 2877
+ },
+ {
+  "word": "هو",
+  "start": 360.52533,
+  "end": 360.90533,
+  "id": 526,
+  "char_start": 2878,
+  "char_end": 2880
+ },
+ {
+  "word": "الله،",
+  "start": 360.90533,
+  "end": 361.72534,
+  "id": 527,
+  "char_start": 2881,
+  "char_end": 2886
+ },
+ {
+  "word": "والمالك",
+  "start": 361.72534,
+  "end": 362.5053,
+  "id": 528,
+  "char_start": 2887,
+  "char_end": 2894
+ },
+ {
+  "word": "له",
+  "start": 362.5053,
+  "end": 362.82532,
+  "id": 529,
+  "char_start": 2895,
+  "char_end": 2897
+ },
+ {
+  "word": "هو",
+  "start": 362.82532,
+  "end": 363.1853,
+  "id": 530,
+  "char_start": 2898,
+  "char_end": 2900
+ },
+ {
+  "word": "الله،",
+  "start": 363.1853,
+  "end": 363.82532,
+  "id": 531,
+  "char_start": 2901,
+  "char_end": 2906
+ },
+ {
+  "word": "والحاكم",
+  "start": 363.82532,
+  "end": 364.6853,
+  "id": 532,
+  "char_start": 2907,
+  "char_end": 2914
+ },
+ {
+  "word": "فيه",
+  "start": 364.6853,
+  "end": 365.20532,
+  "id": 533,
+  "char_start": 2915,
+  "char_end": 2918
+ },
+ {
+  "word": "هو",
+  "start": 365.20532,
+  "end": 365.46533,
+  "id": 534,
+  "char_start": 2919,
+  "char_end": 2921
+ },
+ {
+  "word": "الله،",
+  "start": 365.46533,
+  "end": 366.0653,
+  "id": 535,
+  "char_start": 2922,
+  "char_end": 2927
+ },
+ {
+  "word": "والمدبر",
+  "start": 366.0653,
+  "end": 367.10535,
+  "id": 536,
+  "char_start": 2928,
+  "char_end": 2935
+ },
+ {
+  "word": "له",
+  "start": 367.10535,
+  "end": 367.48532,
+  "id": 537,
+  "char_start": 2936,
+  "char_end": 2938
+ },
+ {
+  "word": "هو",
+  "start": 367.48532,
+  "end": 367.82532,
+  "id": 538,
+  "char_start": 2939,
+  "char_end": 2941
+ },
+ {
+  "word": "الله،",
+  "start": 367.82532,
+  "end": 368.5653,
+  "id": 539,
+  "char_start": 2942,
+  "char_end": 2947
+ },
+ {
+  "word": "فينبغي",
+  "start": 368.5653,
+  "end": 369.22534,
+  "id": 540,
+  "char_start": 2948,
+  "char_end": 2954
+ },
+ {
+  "word": "للإنسان",
+  "start": 369.22534,
+  "end": 369.9453,
+  "id": 541,
+  "char_start": 2955,
+  "char_end": 2962
+ },
+ {
+  "word": "أن",
+  "start": 369.9453,
+  "end": 370.1853,
+  "id": 542,
+  "char_start": 2963,
+  "char_end": 2965
+ },
+ {
+  "word": "يرتدع",
+  "start": 370.1853,
+  "end": 370.9453,
+  "id": 543,
+  "char_start": 2966,
+  "char_end": 2971
+ },
+ {
+  "word": "عن",
+  "start": 370.9453,
+  "end": 371.1253,
+  "id": 544,
+  "char_start": 2972,
+  "char_end": 2974
+ },
+ {
+  "word": "غيه،",
+  "start": 371.1253,
+  "end": 371.64532,
+  "id": 545,
+  "char_start": 2975,
+  "char_end": 2979
+ },
+ {
+  "word": "وأن",
+  "start": 371.64532,
+  "end": 372.1253,
+  "id": 546,
+  "char_start": 2980,
+  "char_end": 2983
+ },
+ {
+  "word": "يعود",
+  "start": 372.1253,
+  "end": 372.70532,
+  "id": 547,
+  "char_start": 2984,
+  "char_end": 2988
+ },
+ {
+  "word": "إلى",
+  "start": 372.70532,
+  "end": 373.0053,
+  "id": 548,
+  "char_start": 2989,
+  "char_end": 2992
+ },
+ {
+  "word": "رشده،",
+  "start": 373.0053,
+  "end": 373.70532,
+  "id": 549,
+  "char_start": 2993,
+  "char_end": 2998
+ },
+ {
+  "word": "وأن",
+  "start": 373.70532,
+  "end": 374.1253,
+  "id": 550,
+  "char_start": 2999,
+  "char_end": 3002
+ },
+ {
+  "word": "يعلم",
+  "start": 374.1253,
+  "end": 374.54532,
+  "id": 551,
+  "char_start": 3003,
+  "char_end": 3007
+ },
+ {
+  "word": "أن",
+  "start": 374.54532,
+  "end": 374.82532,
+  "id": 552,
+  "char_start": 3008,
+  "char_end": 3010
+ },
+ {
+  "word": "الله",
+  "start": 374.82532,
+  "end": 375.24533,
+  "id": 553,
+  "char_start": 3011,
+  "char_end": 3015
+ },
+ {
+  "word": "الذي",
+  "start": 375.24533,
+  "end": 375.76532,
+  "id": 554,
+  "char_start": 3016,
+  "char_end": 3020
+ },
+ {
+  "word": "خلقه",
+  "start": 375.76532,
+  "end": 376.58533,
+  "id": 555,
+  "char_start": 3021,
+  "char_end": 3025
+ },
+ {
+  "word": "قال",
+  "start": 376.58533,
+  "end": 377.0653,
+  "id": 556,
+  "char_start": 3026,
+  "char_end": 3029
+ },
+ {
+  "word": "له",
+  "start": 377.0653,
+  "end": 377.46533,
+  "id": 557,
+  "char_start": 3030,
+  "char_end": 3032
+ },
+ {
+  "word": "يا",
+  "start": 377.92532,
+  "end": 378.08533,
+  "id": 558,
+  "char_start": 3033,
+  "char_end": 3035
+ },
+ {
+  "word": "أيها",
+  "start": 378.08533,
+  "end": 378.98532,
+  "id": 559,
+  "char_start": 3036,
+  "char_end": 3040
+ },
+ {
+  "word": "الإنسان",
+  "start": 378.98532,
+  "end": 379.86533,
+  "id": 560,
+  "char_start": 3041,
+  "char_end": 3048
+ },
+ {
+  "word": "ما",
+  "start": 379.86533,
+  "end": 380.52533,
+  "id": 561,
+  "char_start": 3049,
+  "char_end": 3051
+ },
+ {
+  "word": "غرَّك",
+  "start": 380.52533,
+  "end": 381.28534,
+  "id": 562,
+  "char_start": 3052,
+  "char_end": 3057
+ },
+ {
+  "word": "بربك",
+  "start": 381.28534,
+  "end": 382.02533,
+  "id": 563,
+  "char_start": 3058,
+  "char_end": 3062
+ },
+ {
+  "word": "الكريم",
+  "start": 382.02533,
+  "end": 382.82532,
+  "id": 564,
+  "char_start": 3063,
+  "char_end": 3069
+ },
+ {
+  "word": "الذي",
+  "start": 382.82532,
+  "end": 383.66534,
+  "id": 565,
+  "char_start": 3070,
+  "char_end": 3074
+ },
+ {
+  "word": "خلقك",
+  "start": 383.66534,
+  "end": 384.5653,
+  "id": 566,
+  "char_start": 3075,
+  "char_end": 3079
+ },
+ {
+  "word": "فسواك",
+  "start": 384.5653,
+  "end": 385.5053,
+  "id": 567,
+  "char_start": 3080,
+  "char_end": 3085
+ },
+ {
+  "word": "فعدلك",
+  "start": 385.5053,
+  "end": 386.22534,
+  "id": 568,
+  "char_start": 3086,
+  "char_end": 3091
+ },
+ {
+  "word": "في",
+  "start": 386.22534,
+  "end": 386.74533,
+  "id": 569,
+  "char_start": 3092,
+  "char_end": 3094
+ },
+ {
+  "word": "أي",
+  "start": 386.74533,
+  "end": 387.20532,
+  "id": 570,
+  "char_start": 3095,
+  "char_end": 3097
+ },
+ {
+  "word": "صورة",
+  "start": 387.20532,
+  "end": 387.96533,
+  "id": 571,
+  "char_start": 3098,
+  "char_end": 3102
+ },
+ {
+  "word": "ما",
+  "start": 387.96533,
+  "end": 388.28534,
+  "id": 572,
+  "char_start": 3103,
+  "char_end": 3105
+ },
+ {
+  "word": "شاء",
+  "start": 388.28534,
+  "end": 388.78534,
+  "id": 573,
+  "char_start": 3106,
+  "char_end": 3109
+ },
+ {
+  "word": "ركَّبك،",
+  "start": 388.78534,
+  "end": 389.64532,
+  "id": 574,
+  "char_start": 3110,
+  "char_end": 3117
+ },
+ {
+  "word": "وأما",
+  "start": 389.64532,
+  "end": 390.20532,
+  "id": 575,
+  "char_start": 3118,
+  "char_end": 3122
+ },
+ {
+  "word": "النداء",
+  "start": 390.20532,
+  "end": 390.6853,
+  "id": 576,
+  "char_start": 3123,
+  "char_end": 3129
+ },
+ {
+  "word": "الثاني",
+  "start": 390.6853,
+  "end": 391.28534,
+  "id": 577,
+  "char_start": 3130,
+  "char_end": 3136
+ },
+ {
+  "word": "فهو",
+  "start": 391.28534,
+  "end": 391.96533,
+  "id": 578,
+  "char_start": 3137,
+  "char_end": 3140
+ },
+ {
+  "word": "نداءٌ",
+  "start": 391.96533,
+  "end": 392.52533,
+  "id": 579,
+  "char_start": 3141,
+  "char_end": 3146
+ },
+ {
+  "word": "عظيم",
+  "start": 392.52533,
+  "end": 392.90533,
+  "id": 580,
+  "char_start": 3147,
+  "char_end": 3151
+ },
+ {
+  "word": "يُبَيِّن",
+  "start": 392.90533,
+  "end": 393.92532,
+  "id": 581,
+  "char_start": 3152,
+  "char_end": 3160
+ },
+ {
+  "word": "فيه",
+  "start": 393.92532,
+  "end": 394.42532,
+  "id": 582,
+  "char_start": 3161,
+  "char_end": 3164
+ },
+ {
+  "word": "الله",
+  "start": 394.42532,
+  "end": 394.76532,
+  "id": 583,
+  "char_start": 3165,
+  "char_end": 3169
+ },
+ {
+  "word": "سبحانه",
+  "start": 394.76532,
+  "end": 395.5653,
+  "id": 584,
+  "char_start": 3170,
+  "char_end": 3176
+ },
+ {
+  "word": "وتعالى",
+  "start": 395.5653,
+  "end": 396.34534,
+  "id": 585,
+  "char_start": 3177,
+  "char_end": 3183
+ },
+ {
+  "word": "حال",
+  "start": 396.34534,
+  "end": 396.96533,
+  "id": 586,
+  "char_start": 3184,
+  "char_end": 3187
+ },
+ {
+  "word": "الإنسان",
+  "start": 396.96533,
+  "end": 397.64532,
+  "id": 587,
+  "char_start": 3188,
+  "char_end": 3195
+ },
+ {
+  "word": "في",
+  "start": 397.64532,
+  "end": 397.90533,
+  "id": 588,
+  "char_start": 3196,
+  "char_end": 3198
+ },
+ {
+  "word": "هذه",
+  "start": 397.90533,
+  "end": 398.24533,
+  "id": 589,
+  "char_start": 3199,
+  "char_end": 3202
+ },
+ {
+  "word": "الدنيا،",
+  "start": 398.24533,
+  "end": 399.1253,
+  "id": 590,
+  "char_start": 3203,
+  "char_end": 3210
+ },
+ {
+  "word": "إذ",
+  "start": 399.1253,
+  "end": 399.48532,
+  "id": 591,
+  "char_start": 3211,
+  "char_end": 3213
+ },
+ {
+  "word": "قال",
+  "start": 399.48532,
+  "end": 399.84534,
+  "id": 592,
+  "char_start": 3214,
+  "char_end": 3217
+ },
+ {
+  "word": "يا",
+  "start": 399.84534,
+  "end": 400.5053,
+  "id": 593,
+  "char_start": 3218,
+  "char_end": 3220
+ },
+ {
+  "word": "أيها",
+  "start": 400.5053,
+  "end": 401.1853,
+  "id": 594,
+  "char_start": 3221,
+  "char_end": 3225
+ },
+ {
+  "word": "الإنسان",
+  "start": 401.1853,
+  "end": 402.08533,
+  "id": 595,
+  "char_start": 3226,
+  "char_end": 3233
+ },
+ {
+  "word": "إنك",
+  "start": 402.08533,
+  "end": 403.04532,
+  "id": 596,
+  "char_start": 3234,
+  "char_end": 3237
+ },
+ {
+  "word": "كادِحٌ",
+  "start": 403.04532,
+  "end": 403.78534,
+  "id": 597,
+  "char_start": 3238,
+  "char_end": 3244
+ },
+ {
+  "word": "إلى",
+  "start": 403.78534,
+  "end": 404.22534,
+  "id": 598,
+  "char_start": 3245,
+  "char_end": 3248
+ },
+ {
+  "word": "ربك",
+  "start": 404.22534,
+  "end": 405.0053,
+  "id": 599,
+  "char_start": 3249,
+  "char_end": 3252
+ },
+ {
+  "word": "كدحًا",
+  "start": 405.0053,
+  "end": 405.66534,
+  "id": 600,
+  "char_start": 3253,
+  "char_end": 3258
+ },
+ {
+  "word": "فمُلاقيه،",
+  "start": 405.66534,
+  "end": 406.70532,
+  "id": 601,
+  "char_start": 3259,
+  "char_end": 3268
+ },
+ {
+  "word": "إِنَّكَ",
+  "start": 406.92532,
+  "end": 407.84534,
+  "id": 602,
+  "char_start": 3269,
+  "char_end": 3276
+ },
+ {
+  "word": "عَامِلٌ",
+  "start": 407.84534,
+  "end": 408.48532,
+  "id": 603,
+  "char_start": 3277,
+  "char_end": 3284
+ },
+ {
+  "word": "لِلَّهِ",
+  "start": 408.48532,
+  "end": 409.16534,
+  "id": 604,
+  "char_start": 3285,
+  "char_end": 3292
+ },
+ {
+  "word": "عَزَّ",
+  "start": 409.16534,
+  "end": 409.5053,
+  "id": 605,
+  "char_start": 3293,
+  "char_end": 3298
+ },
+ {
+  "word": "وَجَلَّ",
+  "start": 409.5053,
+  "end": 410.04532,
+  "id": 606,
+  "char_start": 3299,
+  "char_end": 3306
+ },
+ {
+  "word": "عَمَلًا",
+  "start": 410.04532,
+  "end": 410.5653,
+  "id": 607,
+  "char_start": 3307,
+  "char_end": 3314
+ },
+ {
+  "word": "فَمُلاقِيهِ",
+  "start": 410.5653,
+  "end": 411.64532,
+  "id": 608,
+  "char_start": 3315,
+  "char_end": 3326
+ },
+ {
+  "word": "فأنت",
+  "start": 411.64532,
+  "end": 412.40533,
+  "id": 609,
+  "char_start": 3327,
+  "char_end": 3331
+ },
+ {
+  "word": "مُلاقٍ",
+  "start": 412.40533,
+  "end": 413.08533,
+  "id": 610,
+  "char_start": 3332,
+  "char_end": 3338
+ },
+ {
+  "word": "الله",
+  "start": 413.08533,
+  "end": 413.4453,
+  "id": 611,
+  "char_start": 3339,
+  "char_end": 3343
+ },
+ {
+  "word": "سبحانه",
+  "start": 413.4453,
+  "end": 414.30533,
+  "id": 612,
+  "char_start": 3344,
+  "char_end": 3350
+ },
+ {
+  "word": "وتعالى",
+  "start": 414.30533,
+  "end": 415.0653,
+  "id": 613,
+  "char_start": 3351,
+  "char_end": 3357
+ },
+ {
+  "word": "ليس",
+  "start": 415.0653,
+  "end": 415.98532,
+  "id": 614,
+  "char_start": 3358,
+  "char_end": 3361
+ },
+ {
+  "word": "بينك",
+  "start": 415.98532,
+  "end": 416.64532,
+  "id": 615,
+  "char_start": 3362,
+  "char_end": 3366
+ },
+ {
+  "word": "وبينه",
+  "start": 416.64532,
+  "end": 417.4453,
+  "id": 616,
+  "char_start": 3367,
+  "char_end": 3372
+ },
+ {
+  "word": "تُرزُمان",
+  "start": 417.4453,
+  "end": 418.30533,
+  "id": 617,
+  "char_start": 3373,
+  "char_end": 3381
+ },
+ {
+  "word": "وأنت",
+  "start": 418.30533,
+  "end": 419.22534,
+  "id": 618,
+  "char_start": 3382,
+  "char_end": 3386
+ },
+ {
+  "word": "مُلاقٍ",
+  "start": 419.22534,
+  "end": 420.02533,
+  "id": 619,
+  "char_start": 3387,
+  "char_end": 3393
+ },
+ {
+  "word": "عَمِلَكَ",
+  "start": 420.02533,
+  "end": 420.6853,
+  "id": 620,
+  "char_start": 3394,
+  "char_end": 3402
+ },
+ {
+  "word": "الذي",
+  "start": 420.6853,
+  "end": 421.0053,
+  "id": 621,
+  "char_start": 3403,
+  "char_end": 3407
+ },
+ {
+  "word": "عَمِلت",
+  "start": 421.0053,
+  "end": 421.6253,
+  "id": 622,
+  "char_start": 3408,
+  "char_end": 3414
+ },
+ {
+  "word": "وعند",
+  "start": 421.6253,
+  "end": 422.36533,
+  "id": 623,
+  "char_start": 3415,
+  "char_end": 3419
+ },
+ {
+  "word": "ذلك",
+  "start": 422.36533,
+  "end": 422.96533,
+  "id": 624,
+  "char_start": 3420,
+  "char_end": 3423
+ },
+ {
+  "word": "يفترِقُ",
+  "start": 422.96533,
+  "end": 423.6853,
+  "id": 625,
+  "char_start": 3424,
+  "char_end": 3431
+ },
+ {
+  "word": "الناس،",
+  "start": 423.67065,
+  "end": 424.35065,
+  "id": 626,
+  "char_start": 3432,
+  "char_end": 3438
+ },
+ {
+  "word": "كما",
+  "start": 424.35065,
+  "end": 424.81064,
+  "id": 627,
+  "char_start": 3439,
+  "char_end": 3442
+ },
+ {
+  "word": "قال",
+  "start": 424.81064,
+  "end": 425.19064,
+  "id": 628,
+  "char_start": 3443,
+  "char_end": 3446
+ },
+ {
+  "word": "الله",
+  "start": 425.19064,
+  "end": 425.69064,
+  "id": 629,
+  "char_start": 3447,
+  "char_end": 3451
+ },
+ {
+  "word": "سبحانه",
+  "start": 425.69064,
+  "end": 426.63065,
+  "id": 630,
+  "char_start": 3452,
+  "char_end": 3458
+ },
+ {
+  "word": "وتعالى،",
+  "start": 426.63065,
+  "end": 427.89066,
+  "id": 631,
+  "char_start": 3459,
+  "char_end": 3466
+ },
+ {
+  "word": "فأما",
+  "start": 427.89066,
+  "end": 428.39066,
+  "id": 632,
+  "char_start": 3467,
+  "char_end": 3471
+ },
+ {
+  "word": "من",
+  "start": 428.39066,
+  "end": 428.67065,
+  "id": 633,
+  "char_start": 3472,
+  "char_end": 3474
+ },
+ {
+  "word": "أوتي",
+  "start": 428.67065,
+  "end": 429.15067,
+  "id": 634,
+  "char_start": 3475,
+  "char_end": 3479
+ },
+ {
+  "word": "كتابه",
+  "start": 429.15067,
+  "end": 430.07065,
+  "id": 635,
+  "char_start": 3480,
+  "char_end": 3485
+ },
+ {
+  "word": "بيمينه،",
+  "start": 430.07065,
+  "end": 430.97064,
+  "id": 636,
+  "char_start": 3486,
+  "char_end": 3493
+ },
+ {
+  "word": "فسوف",
+  "start": 430.97064,
+  "end": 431.67065,
+  "id": 637,
+  "char_start": 3494,
+  "char_end": 3498
+ },
+ {
+  "word": "يحاسب",
+  "start": 431.67065,
+  "end": 432.51065,
+  "id": 638,
+  "char_start": 3499,
+  "char_end": 3504
+ },
+ {
+  "word": "حسابًا",
+  "start": 432.51065,
+  "end": 433.21066,
+  "id": 639,
+  "char_start": 3505,
+  "char_end": 3511
+ },
+ {
+  "word": "يسيرًا،",
+  "start": 433.21066,
+  "end": 434.37064,
+  "id": 640,
+  "char_start": 3512,
+  "char_end": 3519
+ },
+ {
+  "word": "وينقلب",
+  "start": 434.37064,
+  "end": 435.13065,
+  "id": 641,
+  "char_start": 3520,
+  "char_end": 3526
+ },
+ {
+  "word": "إلى",
+  "start": 435.13065,
+  "end": 435.51065,
+  "id": 642,
+  "char_start": 3527,
+  "char_end": 3530
+ },
+ {
+  "word": "أهله",
+  "start": 435.51065,
+  "end": 436.17065,
+  "id": 643,
+  "char_start": 3531,
+  "char_end": 3535
+ },
+ {
+  "word": "مسورًا،",
+  "start": 436.17065,
+  "end": 437.63065,
+  "id": 644,
+  "char_start": 3536,
+  "char_end": 3543
+ },
+ {
+  "word": "فيعرض",
+  "start": 437.63065,
+  "end": 438.11066,
+  "id": 645,
+  "char_start": 3544,
+  "char_end": 3549
+ },
+ {
+  "word": "الله",
+  "start": 438.11066,
+  "end": 438.47064,
+  "id": 646,
+  "char_start": 3550,
+  "char_end": 3554
+ },
+ {
+  "word": "عليه",
+  "start": 438.47064,
+  "end": 439.05066,
+  "id": 647,
+  "char_start": 3555,
+  "char_end": 3559
+ },
+ {
+  "word": "سيئاته،",
+  "start": 439.05066,
+  "end": 440.07065,
+  "id": 648,
+  "char_start": 3560,
+  "char_end": 3567
+ },
+ {
+  "word": "ويقرِّره",
+  "start": 440.07065,
+  "end": 441.35065,
+  "id": 649,
+  "char_start": 3568,
+  "char_end": 3576
+ },
+ {
+  "word": "على",
+  "start": 441.35065,
+  "end": 441.79065,
+  "id": 650,
+  "char_start": 3577,
+  "char_end": 3580
+ },
+ {
+  "word": "ذنوبه،",
+  "start": 441.79065,
+  "end": 442.67065,
+  "id": 651,
+  "char_start": 3581,
+  "char_end": 3587
+ },
+ {
+  "word": "ثم",
+  "start": 442.67065,
+  "end": 443.05066,
+  "id": 652,
+  "char_start": 3588,
+  "char_end": 3590
+ },
+ {
+  "word": "يستوها",
+  "start": 443.05066,
+  "end": 443.95065,
+  "id": 653,
+  "char_start": 3591,
+  "char_end": 3597
+ },
+ {
+  "word": "الله",
+  "start": 443.95065,
+  "end": 444.21066,
+  "id": 654,
+  "char_start": 3598,
+  "char_end": 3602
+ },
+ {
+  "word": "عليه",
+  "start": 444.21066,
+  "end": 444.93066,
+  "id": 655,
+  "char_start": 3603,
+  "char_end": 3607
+ },
+ {
+  "word": "في",
+  "start": 444.93066,
+  "end": 445.15063,
+  "id": 656,
+  "char_start": 3608,
+  "char_end": 3610
+ },
+ {
+  "word": "الآخرة،",
+  "start": 445.15063,
+  "end": 445.87067,
+  "id": 657,
+  "char_start": 3611,
+  "char_end": 3618
+ },
+ {
+  "word": "كما",
+  "start": 445.87067,
+  "end": 446.39066,
+  "id": 658,
+  "char_start": 3619,
+  "char_end": 3622
+ },
+ {
+  "word": "سترها",
+  "start": 446.39066,
+  "end": 447.19064,
+  "id": 659,
+  "char_start": 3623,
+  "char_end": 3628
+ },
+ {
+  "word": "عليه",
+  "start": 447.19064,
+  "end": 447.75064,
+  "id": 660,
+  "char_start": 3629,
+  "char_end": 3633
+ },
+ {
+  "word": "في",
+  "start": 447.75064,
+  "end": 447.99066,
+  "id": 661,
+  "char_start": 3634,
+  "char_end": 3636
+ },
+ {
+  "word": "الدنيا،",
+  "start": 447.99066,
+  "end": 448.95065,
+  "id": 662,
+  "char_start": 3637,
+  "char_end": 3644
+ },
+ {
+  "word": "وحينئذ",
+  "start": 449.01065,
+  "end": 449.73065,
+  "id": 663,
+  "char_start": 3645,
+  "char_end": 3651
+ },
+ {
+  "word": "يرجع",
+  "start": 449.73065,
+  "end": 450.33066,
+  "id": 664,
+  "char_start": 3652,
+  "char_end": 3656
+ },
+ {
+  "word": "إلى",
+  "start": 450.33066,
+  "end": 450.65063,
+  "id": 665,
+  "char_start": 3657,
+  "char_end": 3660
+ },
+ {
+  "word": "أهله",
+  "start": 450.65063,
+  "end": 451.23065,
+  "id": 666,
+  "char_start": 3661,
+  "char_end": 3665
+ },
+ {
+  "word": "مسوراً،",
+  "start": 451.23065,
+  "end": 452.33066,
+  "id": 667,
+  "char_start": 3666,
+  "char_end": 3673
+ },
+ {
+  "word": "وأما",
+  "start": 452.33066,
+  "end": 453.13065,
+  "id": 668,
+  "char_start": 3674,
+  "char_end": 3678
+ },
+ {
+  "word": "من",
+  "start": 453.13065,
+  "end": 453.51065,
+  "id": 669,
+  "char_start": 3679,
+  "char_end": 3681
+ },
+ {
+  "word": "أوتي",
+  "start": 453.51065,
+  "end": 454.05066,
+  "id": 670,
+  "char_start": 3682,
+  "char_end": 3686
+ },
+ {
+  "word": "كتابه",
+  "start": 454.05066,
+  "end": 455.07065,
+  "id": 671,
+  "char_start": 3687,
+  "char_end": 3692
+ },
+ {
+  "word": "بشماله",
+  "start": 455.07065,
+  "end": 456.01065,
+  "id": 672,
+  "char_start": 3693,
+  "char_end": 3699
+ },
+ {
+  "word": "من",
+  "start": 456.01065,
+  "end": 456.33066,
+  "id": 673,
+  "char_start": 3700,
+  "char_end": 3702
+ },
+ {
+  "word": "وراء",
+  "start": 456.33066,
+  "end": 456.77066,
+  "id": 674,
+  "char_start": 3703,
+  "char_end": 3707
+ },
+ {
+  "word": "ظهره،",
+  "start": 456.77066,
+  "end": 457.49066,
+  "id": 675,
+  "char_start": 3708,
+  "char_end": 3713
+ },
+ {
+  "word": "فسوف",
+  "start": 457.49066,
+  "end": 458.19064,
+  "id": 676,
+  "char_start": 3714,
+  "char_end": 3718
+ },
+ {
+  "word": "يدعو",
+  "start": 458.19064,
+  "end": 458.83066,
+  "id": 677,
+  "char_start": 3719,
+  "char_end": 3723
+ },
+ {
+  "word": "ثبوراً،",
+  "start": 458.83066,
+  "end": 459.87067,
+  "id": 678,
+  "char_start": 3724,
+  "char_end": 3731
+ },
+ {
+  "word": "أي",
+  "start": 459.87067,
+  "end": 460.07065,
+  "id": 679,
+  "char_start": 3732,
+  "char_end": 3734
+ },
+ {
+  "word": "ويلاً،",
+  "start": 460.07065,
+  "end": 460.95065,
+  "id": 680,
+  "char_start": 3735,
+  "char_end": 3741
+ },
+ {
+  "word": "ويصلى",
+  "start": 460.95065,
+  "end": 461.71066,
+  "id": 681,
+  "char_start": 3742,
+  "char_end": 3747
+ },
+ {
+  "word": "سعيراً،",
+  "start": 461.71066,
+  "end": 462.93066,
+  "id": 682,
+  "char_start": 3748,
+  "char_end": 3755
+ },
+ {
+  "word": "أي",
+  "start": 462.93066,
+  "end": 463.17065,
+  "id": 683,
+  "char_start": 3756,
+  "char_end": 3758
+ },
+ {
+  "word": "نارًا",
+  "start": 463.17065,
+  "end": 463.75064,
+  "id": 684,
+  "char_start": 3759,
+  "char_end": 3764
+ },
+ {
+  "word": "تترضى،",
+  "start": 463.75064,
+  "end": 464.89066,
+  "id": 685,
+  "char_start": 3765,
+  "char_end": 3771
+ },
+ {
+  "word": "وقد",
+  "start": 464.89066,
+  "end": 465.27066,
+  "id": 686,
+  "char_start": 3772,
+  "char_end": 3775
+ },
+ {
+  "word": "أخبر",
+  "start": 465.27066,
+  "end": 465.75064,
+  "id": 687,
+  "char_start": 3776,
+  "char_end": 3780
+ },
+ {
+  "word": "الله",
+  "start": 465.75064,
+  "end": 466.17065,
+  "id": 688,
+  "char_start": 3781,
+  "char_end": 3785
+ },
+ {
+  "word": "عن",
+  "start": 466.17065,
+  "end": 466.51065,
+  "id": 689,
+  "char_start": 3786,
+  "char_end": 3788
+ },
+ {
+  "word": "حاله",
+  "start": 466.51065,
+  "end": 467.03064,
+  "id": 690,
+  "char_start": 3789,
+  "char_end": 3793
+ },
+ {
+  "word": "فقال",
+  "start": 467.03064,
+  "end": 467.79065,
+  "id": 691,
+  "char_start": 3794,
+  "char_end": 3798
+ },
+ {
+  "word": "إنه",
+  "start": 467.79065,
+  "end": 468.67065,
+  "id": 692,
+  "char_start": 3799,
+  "char_end": 3802
+ },
+ {
+  "word": "كان",
+  "start": 468.67065,
+  "end": 469.25064,
+  "id": 693,
+  "char_start": 3803,
+  "char_end": 3806
+ },
+ {
+  "word": "في",
+  "start": 469.25064,
+  "end": 469.51065,
+  "id": 694,
+  "char_start": 3807,
+  "char_end": 3809
+ },
+ {
+  "word": "أهله",
+  "start": 469.51065,
+  "end": 470.11066,
+  "id": 695,
+  "char_start": 3810,
+  "char_end": 3814
+ },
+ {
+  "word": "مسوراً،",
+  "start": 470.11066,
+  "end": 471.31064,
+  "id": 696,
+  "char_start": 3815,
+  "char_end": 3822
+ },
+ {
+  "word": "مغترًّا",
+  "start": 471.31064,
+  "end": 472.25064,
+  "id": 697,
+  "char_start": 3823,
+  "char_end": 3830
+ },
+ {
+  "word": "بحاله",
+  "start": 472.25064,
+  "end": 473.05066,
+  "id": 698,
+  "char_start": 3831,
+  "char_end": 3836
+ },
+ {
+  "word": "وماله",
+  "start": 473.05066,
+  "end": 473.85065,
+  "id": 699,
+  "char_start": 3837,
+  "char_end": 3842
+ },
+ {
+  "word": "وولده،",
+  "start": 473.85065,
+  "end": 474.63065,
+  "id": 700,
+  "char_start": 3843,
+  "char_end": 3849
+ },
+ {
+  "word": "تارِك",
+  "start": 474.63065,
+  "end": 475.43066,
+  "id": 701,
+  "char_start": 3850,
+  "char_end": 3855
+ },
+ {
+  "word": "للعمل",
+  "start": 475.43066,
+  "end": 476.11066,
+  "id": 702,
+  "char_start": 3856,
+  "char_end": 3861
+ },
+ {
+  "word": "لله",
+  "start": 476.11066,
+  "end": 476.71066,
+  "id": 703,
+  "char_start": 3862,
+  "char_end": 3865
+ },
+ {
+  "word": "سبحانه",
+  "start": 476.71066,
+  "end": 477.49066,
+  "id": 704,
+  "char_start": 3866,
+  "char_end": 3872
+ },
+ {
+  "word": "وتعالى،",
+  "start": 477.49066,
+  "end": 478.59064,
+  "id": 705,
+  "char_start": 3873,
+  "char_end": 3880
+ },
+ {
+  "word": "فسوف",
+  "start": 478.63065,
+  "end": 479.33066,
+  "id": 706,
+  "char_start": 3881,
+  "char_end": 3885
+ },
+ {
+  "word": "يدعو",
+  "start": 479.33066,
+  "end": 479.93066,
+  "id": 707,
+  "char_start": 3886,
+  "char_end": 3890
+ },
+ {
+  "word": "ثبوراً",
+  "start": 479.93066,
+  "end": 480.81064,
+  "id": 708,
+  "char_start": 3891,
+  "char_end": 3897
+ },
+ {
+  "word": "ويصلى",
+  "start": 480.81064,
+  "end": 481.67065,
+  "id": 709,
+  "char_start": 3898,
+  "char_end": 3903
+ },
+ {
+  "word": "سعيراً",
+  "start": 481.67065,
+  "end": 482.75064,
+  "id": 710,
+  "char_start": 3904,
+  "char_end": 3910
+ },
+ {
+  "word": "إنه",
+  "start": 482.75064,
+  "end": 483.49066,
+  "id": 711,
+  "char_start": 3911,
+  "char_end": 3914
+ },
+ {
+  "word": "كان",
+  "start": 483.49066,
+  "end": 484.09064,
+  "id": 712,
+  "char_start": 3915,
+  "char_end": 3918
+ },
+ {
+  "word": "في",
+  "start": 484.09064,
+  "end": 484.39066,
+  "id": 713,
+  "char_start": 3919,
+  "char_end": 3921
+ },
+ {
+  "word": "أهله",
+  "start": 484.39066,
+  "end": 484.97064,
+  "id": 714,
+  "char_start": 3922,
+  "char_end": 3926
+ },
+ {
+  "word": "مسروراً",
+  "start": 484.97064,
+  "end": 486.21063,
+  "id": 715,
+  "char_start": 3927,
+  "char_end": 3934
+ },
+ {
+  "word": "إنه",
+  "start": 486.21063,
+  "end": 486.99066,
+  "id": 716,
+  "char_start": 3935,
+  "char_end": 3938
+ },
+ {
+  "word": "ظن",
+  "start": 486.99066,
+  "end": 487.51065,
+  "id": 717,
+  "char_start": 3939,
+  "char_end": 3941
+ },
+ {
+  "word": "أن",
+  "start": 487.51065,
+  "end": 487.73065,
+  "id": 718,
+  "char_start": 3942,
+  "char_end": 3944
+ },
+ {
+  "word": "لن",
+  "start": 487.73065,
+  "end": 488.05066,
+  "id": 719,
+  "char_start": 3945,
+  "char_end": 3947
+ },
+ {
+  "word": "يحور",
+  "start": 488.05066,
+  "end": 488.57065,
+  "id": 720,
+  "char_start": 3948,
+  "char_end": 3952
+ },
+ {
+  "word": "أي",
+  "start": 488.57065,
+  "end": 489.21063,
+  "id": 721,
+  "char_start": 3953,
+  "char_end": 3955
+ },
+ {
+  "word": "لن",
+  "start": 489.21063,
+  "end": 489.53064,
+  "id": 722,
+  "char_start": 3956,
+  "char_end": 3958
+ },
+ {
+  "word": "يرجع",
+  "start": 489.53064,
+  "end": 490.05066,
+  "id": 723,
+  "char_start": 3959,
+  "char_end": 3963
+ },
+ {
+  "word": "لله",
+  "start": 490.05066,
+  "end": 490.59064,
+  "id": 724,
+  "char_start": 3964,
+  "char_end": 3967
+ },
+ {
+  "word": "سبحانه",
+  "start": 490.59064,
+  "end": 491.43066,
+  "id": 725,
+  "char_start": 3968,
+  "char_end": 3974
+ },
+ {
+  "word": "وتعالى",
+  "start": 491.43066,
+  "end": 492.25064,
+  "id": 726,
+  "char_start": 3975,
+  "char_end": 3981
+ },
+ {
+  "word": "بلى",
+  "start": 492.25064,
+  "end": 492.97064,
+  "id": 727,
+  "char_start": 3982,
+  "char_end": 3985
+ },
+ {
+  "word": "إن",
+  "start": 492.97064,
+  "end": 493.41064,
+  "id": 728,
+  "char_start": 3986,
+  "char_end": 3988
+ },
+ {
+  "word": "ربه",
+  "start": 493.41064,
+  "end": 494.07065,
+  "id": 729,
+  "char_start": 3989,
+  "char_end": 3992
+ },
+ {
+  "word": "كان",
+  "start": 494.07065,
+  "end": 494.59064,
+  "id": 730,
+  "char_start": 3993,
+  "char_end": 3996
+ },
+ {
+  "word": "به",
+  "start": 494.59064,
+  "end": 494.89066,
+  "id": 731,
+  "char_start": 3997,
+  "char_end": 3999
+ },
+ {
+  "word": "بصيراً",
+  "start": 494.89066,
+  "end": 495.89066,
+  "id": 732,
+  "char_start": 4000,
+  "char_end": 4006
+ },
+ {
+  "word": "أي",
+  "start": 495.89066,
+  "end": 496.31067,
+  "id": 733,
+  "char_start": 4007,
+  "char_end": 4009
+ },
+ {
+  "word": "عالماً",
+  "start": 496.31067,
+  "end": 497.03064,
+  "id": 734,
+  "char_start": 4010,
+  "char_end": 4016
+ },
+ {
+  "word": "بحاله",
+  "start": 497.03064,
+  "end": 497.65063,
+  "id": 735,
+  "char_start": 4017,
+  "char_end": 4022
+ },
+ {
+  "word": "وعند",
+  "start": 497.65063,
+  "end": 498.25064,
+  "id": 736,
+  "char_start": 4023,
+  "char_end": 4027
+ },
+ {
+  "word": "ذلك",
+  "start": 498.25064,
+  "end": 498.83066,
+  "id": 737,
+  "char_start": 4028,
+  "char_end": 4031
+ },
+ {
+  "word": "يمتاز",
+  "start": 498.83066,
+  "end": 499.53064,
+  "id": 738,
+  "char_start": 4032,
+  "char_end": 4037
+ },
+ {
+  "word": "الناس",
+  "start": 499.53064,
+  "end": 500.09064,
+  "id": 739,
+  "char_start": 4038,
+  "char_end": 4043
+ },
+ {
+  "word": "كما",
+  "start": 500.09064,
+  "end": 500.61066,
+  "id": 740,
+  "char_start": 4044,
+  "char_end": 4047
+ },
+ {
+  "word": "قال",
+  "start": 500.61066,
+  "end": 501.05066,
+  "id": 741,
+  "char_start": 4048,
+  "char_end": 4051
+ },
+ {
+  "word": "الله",
+  "start": 501.05066,
+  "end": 501.51065,
+  "id": 742,
+  "char_start": 4052,
+  "char_end": 4056
+ },
+ {
+  "word": "سبحانه",
+  "start": 501.51065,
+  "end": 502.37067,
+  "id": 743,
+  "char_start": 4057,
+  "char_end": 4063
+ },
+ {
+  "word": "وتعالى",
+  "start": 502.37067,
+  "end": 503.23065,
+  "id": 744,
+  "char_start": 4064,
+  "char_end": 4070
+ },
+ {
+  "word": "أفمن",
+  "start": 503.23065,
+  "end": 504.09064,
+  "id": 745,
+  "char_start": 4071,
+  "char_end": 4075
+ },
+ {
+  "word": "كان",
+  "start": 504.09064,
+  "end": 504.55066,
+  "id": 746,
+  "char_start": 4076,
+  "char_end": 4079
+ },
+ {
+  "word": "مؤمناً",
+  "start": 504.55066,
+  "end": 505.39066,
+  "id": 747,
+  "char_start": 4080,
+  "char_end": 4086
+ },
+ {
+  "word": "كمن",
+  "start": 505.39066,
+  "end": 505.71063,
+  "id": 748,
+  "char_start": 4087,
+  "char_end": 4090
+ },
+ {
+  "word": "كان",
+  "start": 505.71063,
+  "end": 506.31067,
+  "id": 749,
+  "char_start": 4091,
+  "char_end": 4094
+ },
+ {
+  "word": "فاسقاً",
+  "start": 506.31067,
+  "end": 507.35065,
+  "id": 750,
+  "char_start": 4095,
+  "char_end": 4101
+ },
+ {
+  "word": "لا",
+  "start": 507.35065,
+  "end": 507.67065,
+  "id": 751,
+  "char_start": 4102,
+  "char_end": 4104
+ },
+ {
+  "word": "يستعود",
+  "start": 507.67065,
+  "end": 508.55066,
+  "id": 752,
+  "char_start": 4105,
+  "char_end": 4111
+ },
+ {
+  "word": "وأما",
+  "start": 509.01065,
+  "end": 509.63065,
+  "id": 753,
+  "char_start": 4112,
+  "char_end": 4116
+ },
+ {
+  "word": "الذين",
+  "start": 509.63065,
+  "end": 510.29065,
+  "id": 754,
+  "char_start": 4117,
+  "char_end": 4122
+ },
+ {
+  "word": "كفروا",
+  "start": 510.29065,
+  "end": 511.01065,
+  "id": 755,
+  "char_start": 4123,
+  "char_end": 4128
+ },
+ {
+  "word": "فإن",
+  "start": 511.01065,
+  "end": 511.71063,
+  "id": 756,
+  "char_start": 4129,
+  "char_end": 4132
+ },
+ {
+  "word": "عذابهم",
+  "start": 511.71063,
+  "end": 512.67065,
+  "id": 757,
+  "char_start": 4133,
+  "char_end": 4139
+ },
+ {
+  "word": "النار",
+  "start": 512.67065,
+  "end": 513.23065,
+  "id": 758,
+  "char_start": 4140,
+  "char_end": 4145
+ },
+ {
+  "word": "كما",
+  "start": 513.23065,
+  "end": 513.6307,
+  "id": 759,
+  "char_start": 4146,
+  "char_end": 4149
+ },
+ {
+  "word": "أخبر",
+  "start": 513.6307,
+  "end": 514.03064,
+  "id": 760,
+  "char_start": 4150,
+  "char_end": 4154
+ },
+ {
+  "word": "الله",
+  "start": 514.03064,
+  "end": 514.53064,
+  "id": 761,
+  "char_start": 4155,
+  "char_end": 4159
+ },
+ {
+  "word": "سبحانه",
+  "start": 514.53064,
+  "end": 515.41064,
+  "id": 762,
+  "char_start": 4160,
+  "char_end": 4166
+ },
+ {
+  "word": "وتعالى",
+  "start": 515.41064,
+  "end": 516.31067,
+  "id": 763,
+  "char_start": 4167,
+  "char_end": 4173
+ },
+ {
+  "word": "عنهم،",
+  "start": 516.31067,
+  "end": 517.0106,
+  "id": 764,
+  "char_start": 4174,
+  "char_end": 4179
+ },
+ {
+  "word": "فيا",
+  "start": 517.0106,
+  "end": 517.6907,
+  "id": 765,
+  "char_start": 4180,
+  "char_end": 4183
+ },
+ {
+  "word": "أيها",
+  "start": 517.6907,
+  "end": 518.1907,
+  "id": 766,
+  "char_start": 4184,
+  "char_end": 4188
+ },
+ {
+  "word": "الإنسان",
+  "start": 518.1907,
+  "end": 519.1307,
+  "id": 767,
+  "char_start": 4189,
+  "char_end": 4196
+ },
+ {
+  "word": "ما",
+  "start": 519.1307,
+  "end": 524.37067,
+  "id": 768,
+  "char_start": 4197,
+  "char_end": 4199
+ },
+ {
+  "word": "غرك",
+  "start": 524.37067,
+  "end": 525.17065,
+  "id": 769,
+  "char_start": 4200,
+  "char_end": 4203
+ },
+ {
+  "word": "بربك",
+  "start": 525.17065,
+  "end": 525.93066,
+  "id": 770,
+  "char_start": 4204,
+  "char_end": 4208
+ },
+ {
+  "word": "الكريم",
+  "start": 525.93066,
+  "end": 526.73065,
+  "id": 771,
+  "char_start": 4209,
+  "char_end": 4215
+ },
+ {
+  "word": "الذي",
+  "start": 526.73065,
+  "end": 527.53064,
+  "id": 772,
+  "char_start": 4216,
+  "char_end": 4220
+ },
+ {
+  "word": "خلقك",
+  "start": 527.53064,
+  "end": 528.37067,
+  "id": 773,
+  "char_start": 4221,
+  "char_end": 4225
+ },
+ {
+  "word": "فسواك",
+  "start": 528.37067,
+  "end": 529.37067,
+  "id": 774,
+  "char_start": 4226,
+  "char_end": 4231
+ },
+ {
+  "word": "فعدلك",
+  "start": 529.37067,
+  "end": 530.11066,
+  "id": 775,
+  "char_start": 4232,
+  "char_end": 4237
+ },
+ {
+  "word": "في",
+  "start": 530.11066,
+  "end": 530.6307,
+  "id": 776,
+  "char_start": 4238,
+  "char_end": 4240
+ },
+ {
+  "word": "أي",
+  "start": 530.6307,
+  "end": 531.05066,
+  "id": 777,
+  "char_start": 4241,
+  "char_end": 4243
+ },
+ {
+  "word": "صورة",
+  "start": 531.05066,
+  "end": 531.81067,
+  "id": 778,
+  "char_start": 4244,
+  "char_end": 4248
+ },
+ {
+  "word": "ما",
+  "start": 531.81067,
+  "end": 532.11066,
+  "id": 779,
+  "char_start": 4249,
+  "char_end": 4251
+ },
+ {
+  "word": "شاركبك",
+  "start": 532.11066,
+  "end": 533.09064,
+  "id": 780,
+  "char_start": 4252,
+  "char_end": 4258
+ },
+ {
+  "word": "يا",
+  "start": 533.53064,
+  "end": 533.81067,
+  "id": 781,
+  "char_start": 4259,
+  "char_end": 4261
+ },
+ {
+  "word": "أيها",
+  "start": 533.81067,
+  "end": 534.61066,
+  "id": 782,
+  "char_start": 4262,
+  "char_end": 4266
+ },
+ {
+  "word": "الإنسان",
+  "start": 534.61066,
+  "end": 535.53064,
+  "id": 783,
+  "char_start": 4267,
+  "char_end": 4274
+ },
+ {
+  "word": "إنك",
+  "start": 535.53064,
+  "end": 536.41064,
+  "id": 784,
+  "char_start": 4275,
+  "char_end": 4278
+ },
+ {
+  "word": "كادح",
+  "start": 536.41064,
+  "end": 537.2507,
+  "id": 785,
+  "char_start": 4279,
+  "char_end": 4283
+ },
+ {
+  "word": "إلى",
+  "start": 537.2507,
+  "end": 537.65063,
+  "id": 786,
+  "char_start": 4284,
+  "char_end": 4287
+ },
+ {
+  "word": "ربك",
+  "start": 537.65063,
+  "end": 538.41064,
+  "id": 787,
+  "char_start": 4288,
+  "char_end": 4291
+ },
+ {
+  "word": "كدحًا",
+  "start": 538.41064,
+  "end": 539.11066,
+  "id": 788,
+  "char_start": 4292,
+  "char_end": 4297
+ },
+ {
+  "word": "فملاقيه،",
+  "start": 539.11066,
+  "end": 540.3906,
+  "id": 789,
+  "char_start": 4298,
+  "char_end": 4306
+ },
+ {
+  "word": "فأما",
+  "start": 540.3906,
+  "end": 541.17065,
+  "id": 790,
+  "char_start": 4307,
+  "char_end": 4311
+ },
+ {
+  "word": "من",
+  "start": 541.17065,
+  "end": 541.61066,
+  "id": 791,
+  "char_start": 4312,
+  "char_end": 4314
+ },
+ {
+  "word": "أوتي",
+  "start": 541.61066,
+  "end": 542.17065,
+  "id": 792,
+  "char_start": 4315,
+  "char_end": 4319
+ },
+ {
+  "word": "كتابه",
+  "start": 542.17065,
+  "end": 543.31067,
+  "id": 793,
+  "char_start": 4320,
+  "char_end": 4325
+ },
+ {
+  "word": "بيمينه،",
+  "start": 543.31067,
+  "end": 544.5106,
+  "id": 794,
+  "char_start": 4326,
+  "char_end": 4333
+ },
+ {
+  "word": "فسوف",
+  "start": 544.5106,
+  "end": 545.23065,
+  "id": 795,
+  "char_start": 4334,
+  "char_end": 4338
+ },
+ {
+  "word": "يحاسب",
+  "start": 545.23065,
+  "end": 546.09064,
+  "id": 796,
+  "char_start": 4339,
+  "char_end": 4344
+ },
+ {
+  "word": "حسابًا",
+  "start": 546.09064,
+  "end": 546.79065,
+  "id": 797,
+  "char_start": 4345,
+  "char_end": 4351
+ },
+ {
+  "word": "يسيرًا،",
+  "start": 546.79065,
+  "end": 547.71063,
+  "id": 798,
+  "char_start": 4352,
+  "char_end": 4359
+ },
+ {
+  "word": "وينقلب",
+  "start": 547.71063,
+  "end": 548.71063,
+  "id": 799,
+  "char_start": 4360,
+  "char_end": 4366
+ },
+ {
+  "word": "إلى",
+  "start": 548.71063,
+  "end": 549.1306,
+  "id": 800,
+  "char_start": 4367,
+  "char_end": 4370
+ },
+ {
+  "word": "أهله",
+  "start": 549.1306,
+  "end": 549.79065,
+  "id": 801,
+  "char_start": 4371,
+  "char_end": 4375
+ },
+ {
+  "word": "مسورًا،",
+  "start": 549.79065,
+  "end": 550.91064,
+  "id": 802,
+  "char_start": 4376,
+  "char_end": 4383
+ },
+ {
+  "word": "وأما",
+  "start": 550.91064,
+  "end": 551.7706,
+  "id": 803,
+  "char_start": 4384,
+  "char_end": 4388
+ },
+ {
+  "word": "من",
+  "start": 551.7706,
+  "end": 552.17065,
+  "id": 804,
+  "char_start": 4389,
+  "char_end": 4391
+ },
+ {
+  "word": "أوتي",
+  "start": 552.17065,
+  "end": 552.7706,
+  "id": 805,
+  "char_start": 4392,
+  "char_end": 4396
+ },
+ {
+  "word": "كتابه",
+  "start": 552.7706,
+  "end": 553.7507,
+  "id": 806,
+  "char_start": 4397,
+  "char_end": 4402
+ },
+ {
+  "word": "وراء",
+  "start": 553.7507,
+  "end": 554.29065,
+  "id": 807,
+  "char_start": 4403,
+  "char_end": 4407
+ },
+ {
+  "word": "ظهره،",
+  "start": 554.29065,
+  "end": 555.03064,
+  "id": 808,
+  "char_start": 4408,
+  "char_end": 4413
+ },
+ {
+  "word": "فسوف",
+  "start": 555.03064,
+  "end": 555.79065,
+  "id": 809,
+  "char_start": 4414,
+  "char_end": 4418
+ },
+ {
+  "word": "يدعو",
+  "start": 555.79065,
+  "end": 556.3906,
+  "id": 810,
+  "char_start": 4419,
+  "char_end": 4423
+ },
+ {
+  "word": "ذبورًا،",
+  "start": 556.3906,
+  "end": 557.3906,
+  "id": 811,
+  "char_start": 4424,
+  "char_end": 4431
+ },
+ {
+  "word": "ويصلى",
+  "start": 557.3906,
+  "end": 558.17065,
+  "id": 812,
+  "char_start": 4432,
+  "char_end": 4437
+ },
+ {
+  "word": "سعيرًا،",
+  "start": 558.17065,
+  "end": 559.35065,
+  "id": 813,
+  "char_start": 4438,
+  "char_end": 4445
+ },
+ {
+  "word": "إنه",
+  "start": 559.35065,
+  "end": 560.1907,
+  "id": 814,
+  "char_start": 4446,
+  "char_end": 4449
+ },
+ {
+  "word": "كان",
+  "start": 560.1907,
+  "end": 560.8906,
+  "id": 815,
+  "char_start": 4450,
+  "char_end": 4453
+ },
+ {
+  "word": "في",
+  "start": 560.8906,
+  "end": 561.2507,
+  "id": 816,
+  "char_start": 4454,
+  "char_end": 4456
+ },
+ {
+  "word": "أهله",
+  "start": 561.2507,
+  "end": 561.91064,
+  "id": 817,
+  "char_start": 4457,
+  "char_end": 4461
+ },
+ {
+  "word": "مسورًا،",
+  "start": 561.91064,
+  "end": 562.59064,
+  "id": 818,
+  "char_start": 4462,
+  "char_end": 4469
+ },
+ {
+  "word": "إنه",
+  "start": 563.31067,
+  "end": 563.91064,
+  "id": 819,
+  "char_start": 4470,
+  "char_end": 4473
+ },
+ {
+  "word": "ظن",
+  "start": 563.91064,
+  "end": 564.67065,
+  "id": 820,
+  "char_start": 4474,
+  "char_end": 4476
+ },
+ {
+  "word": "أن",
+  "start": 564.67065,
+  "end": 564.85065,
+  "id": 821,
+  "char_start": 4477,
+  "char_end": 4479
+ },
+ {
+  "word": "ليحور،",
+  "start": 564.85065,
+  "end": 565.99066,
+  "id": 822,
+  "char_start": 4480,
+  "char_end": 4486
+ },
+ {
+  "word": "بلى",
+  "start": 565.99066,
+  "end": 566.5707,
+  "id": 823,
+  "char_start": 4487,
+  "char_end": 4490
+ },
+ {
+  "word": "إن",
+  "start": 566.5707,
+  "end": 567.11066,
+  "id": 824,
+  "char_start": 4491,
+  "char_end": 4493
+ },
+ {
+  "word": "ربه",
+  "start": 567.11066,
+  "end": 567.8906,
+  "id": 825,
+  "char_start": 4494,
+  "char_end": 4497
+ },
+ {
+  "word": "كان",
+  "start": 567.8906,
+  "end": 568.47064,
+  "id": 826,
+  "char_start": 4498,
+  "char_end": 4501
+ },
+ {
+  "word": "به",
+  "start": 568.47064,
+  "end": 568.7706,
+  "id": 827,
+  "char_start": 4502,
+  "char_end": 4504
+ },
+ {
+  "word": "بصيرا،",
+  "start": 568.7706,
+  "end": 569.7507,
+  "id": 828,
+  "char_start": 4505,
+  "char_end": 4511
+ },
+ {
+  "word": "أقول",
+  "start": 569.7507,
+  "end": 570.1907,
+  "id": 829,
+  "char_start": 4512,
+  "char_end": 4516
+ },
+ {
+  "word": "ما",
+  "start": 570.1907,
+  "end": 570.37067,
+  "id": 830,
+  "char_start": 4517,
+  "char_end": 4519
+ },
+ {
+  "word": "تسمعون،",
+  "start": 570.37067,
+  "end": 571.2507,
+  "id": 831,
+  "char_start": 4520,
+  "char_end": 4527
+ },
+ {
+  "word": "وأستغفر",
+  "start": 571.2507,
+  "end": 571.85065,
+  "id": 832,
+  "char_start": 4528,
+  "char_end": 4535
+ },
+ {
+  "word": "الله",
+  "start": 571.85065,
+  "end": 572.0707,
+  "id": 833,
+  "char_start": 4536,
+  "char_end": 4540
+ },
+ {
+  "word": "العلي",
+  "start": 572.0707,
+  "end": 572.41064,
+  "id": 834,
+  "char_start": 4541,
+  "char_end": 4546
+ },
+ {
+  "word": "العظيم",
+  "start": 572.41064,
+  "end": 572.8307,
+  "id": 835,
+  "char_start": 4547,
+  "char_end": 4553
+ },
+ {
+  "word": "لي",
+  "start": 572.8307,
+  "end": 572.97064,
+  "id": 836,
+  "char_start": 4554,
+  "char_end": 4556
+ },
+ {
+  "word": "ولكم",
+  "start": 572.97064,
+  "end": 573.2706,
+  "id": 837,
+  "char_start": 4557,
+  "char_end": 4561
+ },
+ {
+  "word": "فاستغفروه",
+  "start": 573.2706,
+  "end": 574.1306,
+  "id": 838,
+  "char_start": 4562,
+  "char_end": 4571
+ },
+ {
+  "word": "إنه",
+  "start": 574.1306,
+  "end": 574.5707,
+  "id": 839,
+  "char_start": 4572,
+  "char_end": 4575
+ },
+ {
+  "word": "هو",
+  "start": 574.5707,
+  "end": 575.0106,
+  "id": 840,
+  "char_start": 4576,
+  "char_end": 4578
+ },
+ {
+  "word": "الغفور",
+  "start": 575.0106,
+  "end": 575.3307,
+  "id": 841,
+  "char_start": 4579,
+  "char_end": 4585
+ },
+ {
+  "word": "الرحيم",
+  "start": 575.3307,
+  "end": 575.85065,
+  "id": 842,
+  "char_start": 4586,
+  "char_end": 4592
+ },
+ {
+  "word": "الحمد",
+  "start": 578.29065,
+  "end": 578.73065,
+  "id": 843,
+  "char_start": 4593,
+  "char_end": 4598
+ },
+ {
+  "word": "لله",
+  "start": 578.73065,
+  "end": 579.21063,
+  "id": 844,
+  "char_start": 4599,
+  "char_end": 4602
+ },
+ {
+  "word": "حمداً",
+  "start": 579.21063,
+  "end": 579.67065,
+  "id": 845,
+  "char_start": 4603,
+  "char_end": 4608
+ },
+ {
+  "word": "حمداً،",
+  "start": 579.67065,
+  "end": 580.81067,
+  "id": 846,
+  "char_start": 4609,
+  "char_end": 4615
+ },
+ {
+  "word": "والشكر",
+  "start": 580.81067,
+  "end": 581.35065,
+  "id": 847,
+  "char_start": 4616,
+  "char_end": 4622
+ },
+ {
+  "word": "له",
+  "start": 581.35065,
+  "end": 581.65063,
+  "id": 848,
+  "char_start": 4623,
+  "char_end": 4625
+ },
+ {
+  "word": "توالياً",
+  "start": 581.65063,
+  "end": 582.5106,
+  "id": 849,
+  "char_start": 4626,
+  "char_end": 4633
+ },
+ {
+  "word": "وتتراه،",
+  "start": 582.5106,
+  "end": 583.85065,
+  "id": 850,
+  "char_start": 4634,
+  "char_end": 4641
+ },
+ {
+  "word": "وأشهد",
+  "start": 583.85065,
+  "end": 584.2706,
+  "id": 851,
+  "char_start": 4642,
+  "char_end": 4647
+ },
+ {
+  "word": "أن",
+  "start": 584.2706,
+  "end": 584.55066,
+  "id": 852,
+  "char_start": 4648,
+  "char_end": 4650
+ },
+ {
+  "word": "لا",
+  "start": 584.55066,
+  "end": 584.7507,
+  "id": 853,
+  "char_start": 4651,
+  "char_end": 4653
+ },
+ {
+  "word": "إله",
+  "start": 584.7507,
+  "end": 585.21063,
+  "id": 854,
+  "char_start": 4654,
+  "char_end": 4657
+ },
+ {
+  "word": "إلا",
+  "start": 585.21063,
+  "end": 585.5707,
+  "id": 855,
+  "char_start": 4658,
+  "char_end": 4661
+ },
+ {
+  "word": "الله",
+  "start": 585.5707,
+  "end": 585.99066,
+  "id": 856,
+  "char_start": 4662,
+  "char_end": 4666
+ },
+ {
+  "word": "وحده",
+  "start": 585.99066,
+  "end": 586.65063,
+  "id": 857,
+  "char_start": 4667,
+  "char_end": 4671
+ },
+ {
+  "word": "لا",
+  "start": 586.65063,
+  "end": 587.0106,
+  "id": 858,
+  "char_start": 4672,
+  "char_end": 4674
+ },
+ {
+  "word": "شريك",
+  "start": 587.0106,
+  "end": 587.65063,
+  "id": 859,
+  "char_start": 4675,
+  "char_end": 4679
+ },
+ {
+  "word": "له",
+  "start": 587.65063,
+  "end": 587.85065,
+  "id": 860,
+  "char_start": 4680,
+  "char_end": 4682
+ },
+ {
+  "word": "هو",
+  "start": 587.85065,
+  "end": 588.59064,
+  "id": 861,
+  "char_start": 4683,
+  "char_end": 4685
+ },
+ {
+  "word": "الحق",
+  "start": 588.59064,
+  "end": 589.0707,
+  "id": 862,
+  "char_start": 4686,
+  "char_end": 4690
+ },
+ {
+  "word": "المبين",
+  "start": 589.0707,
+  "end": 589.67065,
+  "id": 863,
+  "char_start": 4691,
+  "char_end": 4697
+ },
+ {
+  "word": "واشهد",
+  "start": 590.35065,
+  "end": 590.87067,
+  "id": 864,
+  "char_start": 4698,
+  "char_end": 4703
+ },
+ {
+  "word": "أن",
+  "start": 590.87067,
+  "end": 591.1306,
+  "id": 865,
+  "char_start": 4704,
+  "char_end": 4706
+ },
+ {
+  "word": "محمدا",
+  "start": 591.1306,
+  "end": 591.8307,
+  "id": 866,
+  "char_start": 4707,
+  "char_end": 4712
+ },
+ {
+  "word": "عبده",
+  "start": 591.8307,
+  "end": 592.47064,
+  "id": 867,
+  "char_start": 4713,
+  "char_end": 4717
+ },
+ {
+  "word": "ورسوله",
+  "start": 592.47064,
+  "end": 593.53064,
+  "id": 868,
+  "char_start": 4718,
+  "char_end": 4724
+ },
+ {
+  "word": "حجة",
+  "start": 593.53064,
+  "end": 594.5707,
+  "id": 869,
+  "char_start": 4725,
+  "char_end": 4728
+ },
+ {
+  "word": "هو",
+  "start": 594.5707,
+  "end": 594.8307,
+  "id": 870,
+  "char_start": 4729,
+  "char_end": 4731
+ },
+ {
+  "word": "على",
+  "start": 594.8307,
+  "end": 595.17065,
+  "id": 871,
+  "char_start": 4732,
+  "char_end": 4735
+ },
+ {
+  "word": "خلقه",
+  "start": 595.17065,
+  "end": 595.8906,
+  "id": 872,
+  "char_start": 4736,
+  "char_end": 4740
+ },
+ {
+  "word": "ورحمته",
+  "start": 595.8906,
+  "end": 596.67065,
+  "id": 873,
+  "char_start": 4741,
+  "char_end": 4747
+ },
+ {
+  "word": "المهدات",
+  "start": 596.67065,
+  "end": 597.3906,
+  "id": 874,
+  "char_start": 4748,
+  "char_end": 4755
+ },
+ {
+  "word": "للعالمين",
+  "start": 597.3906,
+  "end": 598.17065,
+  "id": 875,
+  "char_start": 4756,
+  "char_end": 4764
+ },
+ {
+  "word": "اللهم",
+  "start": 598.79065,
+  "end": 599.1306,
+  "id": 876,
+  "char_start": 4765,
+  "char_end": 4770
+ },
+ {
+  "word": "صل",
+  "start": 599.1306,
+  "end": 599.55066,
+  "id": 877,
+  "char_start": 4771,
+  "char_end": 4773
+ },
+ {
+  "word": "على",
+  "start": 599.55066,
+  "end": 599.81067,
+  "id": 878,
+  "char_start": 4774,
+  "char_end": 4777
+ },
+ {
+  "word": "محمد",
+  "start": 599.81067,
+  "end": 600.5106,
+  "id": 879,
+  "char_start": 4778,
+  "char_end": 4782
+ },
+ {
+  "word": "وعلى",
+  "start": 600.5106,
+  "end": 601.0106,
+  "id": 880,
+  "char_start": 4783,
+  "char_end": 4787
+ },
+ {
+  "word": "آل",
+  "start": 601.0106,
+  "end": 601.29065,
+  "id": 881,
+  "char_start": 4788,
+  "char_end": 4790
+ },
+ {
+  "word": "محمد،",
+  "start": 601.29065,
+  "end": 602.1306,
+  "id": 882,
+  "char_start": 4791,
+  "char_end": 4796
+ },
+ {
+  "word": "كما",
+  "start": 602.1306,
+  "end": 602.7706,
+  "id": 883,
+  "char_start": 4797,
+  "char_end": 4800
+ },
+ {
+  "word": "صليت",
+  "start": 602.7706,
+  "end": 603.3906,
+  "id": 884,
+  "char_start": 4801,
+  "char_end": 4805
+ },
+ {
+  "word": "على",
+  "start": 603.3906,
+  "end": 603.73065,
+  "id": 885,
+  "char_start": 4806,
+  "char_end": 4809
+ },
+ {
+  "word": "إبراهيم",
+  "start": 603.73065,
+  "end": 604.55066,
+  "id": 886,
+  "char_start": 4810,
+  "char_end": 4817
+ },
+ {
+  "word": "وعلى",
+  "start": 604.55066,
+  "end": 605.0707,
+  "id": 887,
+  "char_start": 4818,
+  "char_end": 4822
+ },
+ {
+  "word": "آل",
+  "start": 605.0707,
+  "end": 605.4507,
+  "id": 888,
+  "char_start": 4823,
+  "char_end": 4825
+ },
+ {
+  "word": "إبراهيم",
+  "start": 605.4507,
+  "end": 606.29065,
+  "id": 889,
+  "char_start": 4826,
+  "char_end": 4833
+ },
+ {
+  "word": "إنك",
+  "start": 606.29065,
+  "end": 606.93066,
+  "id": 890,
+  "char_start": 4834,
+  "char_end": 4837
+ },
+ {
+  "word": "حميدٌ",
+  "start": 606.93066,
+  "end": 607.5707,
+  "id": 891,
+  "char_start": 4838,
+  "char_end": 4843
+ },
+ {
+  "word": "مجيد",
+  "start": 607.5707,
+  "end": 608.0106,
+  "id": 892,
+  "char_start": 4844,
+  "char_end": 4848
+ },
+ {
+  "word": "اللهم",
+  "start": 608.6306,
+  "end": 609.17065,
+  "id": 893,
+  "char_start": 4849,
+  "char_end": 4854
+ },
+ {
+  "word": "بارك",
+  "start": 609.17065,
+  "end": 609.71063,
+  "id": 894,
+  "char_start": 4855,
+  "char_end": 4859
+ },
+ {
+  "word": "على",
+  "start": 609.71063,
+  "end": 609.93066,
+  "id": 895,
+  "char_start": 4860,
+  "char_end": 4863
+ },
+ {
+  "word": "محمد",
+  "start": 609.93066,
+  "end": 610.5707,
+  "id": 896,
+  "char_start": 4864,
+  "char_end": 4868
+ },
+ {
+  "word": "وعلى",
+  "start": 610.5707,
+  "end": 611.15063,
+  "id": 897,
+  "char_start": 4869,
+  "char_end": 4873
+ },
+ {
+  "word": "آل",
+  "start": 611.15063,
+  "end": 611.47064,
+  "id": 898,
+  "char_start": 4874,
+  "char_end": 4876
+ },
+ {
+  "word": "محمد،",
+  "start": 611.47064,
+  "end": 612.23065,
+  "id": 899,
+  "char_start": 4877,
+  "char_end": 4882
+ },
+ {
+  "word": "كما",
+  "start": 612.23065,
+  "end": 612.8906,
+  "id": 900,
+  "char_start": 4883,
+  "char_end": 4886
+ },
+ {
+  "word": "باركت",
+  "start": 612.8906,
+  "end": 613.67065,
+  "id": 901,
+  "char_start": 4887,
+  "char_end": 4892
+ },
+ {
+  "word": "على",
+  "start": 613.67065,
+  "end": 613.8906,
+  "id": 902,
+  "char_start": 4893,
+  "char_end": 4896
+ },
+ {
+  "word": "إبراهيم",
+  "start": 613.8906,
+  "end": 614.85065,
+  "id": 903,
+  "char_start": 4897,
+  "char_end": 4904
+ },
+ {
+  "word": "وعلى",
+  "start": 614.85065,
+  "end": 615.37067,
+  "id": 904,
+  "char_start": 4905,
+  "char_end": 4909
+ },
+ {
+  "word": "آل",
+  "start": 615.37067,
+  "end": 615.8906,
+  "id": 905,
+  "char_start": 4910,
+  "char_end": 4912
+ },
+ {
+  "word": "إبراهيم",
+  "start": 615.8906,
+  "end": 616.71063,
+  "id": 906,
+  "char_start": 4913,
+  "char_end": 4920
+ },
+ {
+  "word": "إنك",
+  "start": 616.71063,
+  "end": 617.79065,
+  "id": 907,
+  "char_start": 4921,
+  "char_end": 4924
+ },
+ {
+  "word": "حميدٌ",
+  "start": 617.79065,
+  "end": 618.55066,
+  "id": 908,
+  "char_start": 4925,
+  "char_end": 4930
+ },
+ {
+  "word": "مجيد",
+  "start": 618.55066,
+  "end": 619.03064,
+  "id": 909,
+  "char_start": 4931,
+  "char_end": 4935
+ },
+ {
+  "word": "أما",
+  "start": 619.65063,
+  "end": 619.99066,
+  "id": 910,
+  "char_start": 4936,
+  "char_end": 4939
+ },
+ {
+  "word": "بعد،",
+  "start": 619.99066,
+  "end": 620.55066,
+  "id": 911,
+  "char_start": 4940,
+  "char_end": 4944
+ },
+ {
+  "word": "أيها",
+  "start": 620.55066,
+  "end": 621.31067,
+  "id": 912,
+  "char_start": 4945,
+  "char_end": 4949
+ },
+ {
+  "word": "المؤمنون،",
+  "start": 621.31067,
+  "end": 622.53064,
+  "id": 913,
+  "char_start": 4950,
+  "char_end": 4959
+ },
+ {
+  "word": "إن",
+  "start": 622.53064,
+  "end": 622.6306,
+  "id": 914,
+  "char_start": 4960,
+  "char_end": 4962
+ },
+ {
+  "word": "نداء",
+  "start": 622.6306,
+  "end": 623.11066,
+  "id": 915,
+  "char_start": 4963,
+  "char_end": 4967
+ },
+ {
+  "word": "الله",
+  "start": 623.11066,
+  "end": 623.5707,
+  "id": 916,
+  "char_start": 4968,
+  "char_end": 4972
+ },
+ {
+  "word": "سبحانه",
+  "start": 623.5707,
+  "end": 624.3906,
+  "id": 917,
+  "char_start": 4973,
+  "char_end": 4979
+ },
+ {
+  "word": "وتعالى",
+  "start": 624.3906,
+  "end": 625.15063,
+  "id": 918,
+  "char_start": 4980,
+  "char_end": 4986
+ },
+ {
+  "word": "لنا",
+  "start": 625.15063,
+  "end": 625.59064,
+  "id": 919,
+  "char_start": 4987,
+  "char_end": 4990
+ },
+ {
+  "word": "جنس",
+  "start": 625.59064,
+  "end": 625.93066,
+  "id": 920,
+  "char_start": 4991,
+  "char_end": 4994
+ },
+ {
+  "word": "الإنسان",
+  "start": 625.93066,
+  "end": 626.59064,
+  "id": 921,
+  "char_start": 4995,
+  "char_end": 5002
+ },
+ {
+  "word": "مرتين",
+  "start": 626.59064,
+  "end": 627.8906,
+  "id": 922,
+  "char_start": 5003,
+  "char_end": 5008
+ },
+ {
+  "word": "في",
+  "start": 627.8906,
+  "end": 628.03064,
+  "id": 923,
+  "char_start": 5009,
+  "char_end": 5011
+ },
+ {
+  "word": "القرآن",
+  "start": 628.03064,
+  "end": 628.65063,
+  "id": 924,
+  "char_start": 5012,
+  "char_end": 5018
+ },
+ {
+  "word": "بالنداءين",
+  "start": 628.65063,
+  "end": 630.2507,
+  "id": 925,
+  "char_start": 5019,
+  "char_end": 5028
+ },
+ {
+  "word": "المذكورين،",
+  "start": 630.2507,
+  "end": 631.43066,
+  "id": 926,
+  "char_start": 5029,
+  "char_end": 5039
+ },
+ {
+  "word": "تنبيه",
+  "start": 631.43066,
+  "end": 632.3307,
+  "id": 927,
+  "char_start": 5040,
+  "char_end": 5045
+ },
+ {
+  "word": "لحقيقة",
+  "start": 632.3307,
+  "end": 633.15063,
+  "id": 928,
+  "char_start": 5046,
+  "char_end": 5052
+ },
+ {
+  "word": "ما",
+  "start": 633.15063,
+  "end": 633.41064,
+  "id": 929,
+  "char_start": 5053,
+  "char_end": 5055
+ },
+ {
+  "word": "فيهما",
+  "start": 633.41064,
+  "end": 633.99066,
+  "id": 930,
+  "char_start": 5056,
+  "char_end": 5061
+ },
+ {
+  "word": "من",
+  "start": 633.99066,
+  "end": 634.61066,
+  "id": 931,
+  "char_start": 5062,
+  "char_end": 5064
+ },
+ {
+  "word": "الأمر",
+  "start": 634.61066,
+  "end": 635.03064,
+  "id": 932,
+  "char_start": 5065,
+  "char_end": 5070
+ },
+ {
+  "word": "العظيم،",
+  "start": 635.03064,
+  "end": 635.8307,
+  "id": 933,
+  "char_start": 5071,
+  "char_end": 5078
+ },
+ {
+  "word": "وأن",
+  "start": 635.816,
+  "end": 636.416,
+  "id": 934,
+  "char_start": 5079,
+  "char_end": 5082
+ },
+ {
+  "word": "المرأ",
+  "start": 636.416,
+  "end": 636.856,
+  "id": 935,
+  "char_start": 5083,
+  "char_end": 5088
+ },
+ {
+  "word": "صائر",
+  "start": 636.856,
+  "end": 637.456,
+  "id": 936,
+  "char_start": 5089,
+  "char_end": 5093
+ },
+ {
+  "word": "إلى",
+  "start": 637.456,
+  "end": 637.656,
+  "id": 937,
+  "char_start": 5094,
+  "char_end": 5097
+ },
+ {
+  "word": "الله",
+  "start": 637.656,
+  "end": 638.076,
+  "id": 938,
+  "char_start": 5098,
+  "char_end": 5102
+ },
+ {
+  "word": "سبحانه",
+  "start": 638.076,
+  "end": 638.896,
+  "id": 939,
+  "char_start": 5103,
+  "char_end": 5109
+ },
+ {
+  "word": "وتعالى،",
+  "start": 638.896,
+  "end": 639.756,
+  "id": 940,
+  "char_start": 5110,
+  "char_end": 5117
+ },
+ {
+  "word": "وحينئذ",
+  "start": 639.756,
+  "end": 640.716,
+  "id": 941,
+  "char_start": 5118,
+  "char_end": 5124
+ },
+ {
+  "word": "يتذكر",
+  "start": 640.716,
+  "end": 641.896,
+  "id": 942,
+  "char_start": 5125,
+  "char_end": 5130
+ },
+ {
+  "word": "الإنسان",
+  "start": 641.896,
+  "end": 642.636,
+  "id": 943,
+  "char_start": 5131,
+  "char_end": 5138
+ },
+ {
+  "word": "ما",
+  "start": 642.636,
+  "end": 642.816,
+  "id": 944,
+  "char_start": 5139,
+  "char_end": 5141
+ },
+ {
+  "word": "يتذكر",
+  "start": 642.816,
+  "end": 643.536,
+  "id": 945,
+  "char_start": 5142,
+  "char_end": 5147
+ },
+ {
+  "word": "من",
+  "start": 643.536,
+  "end": 644.11597,
+  "id": 946,
+  "char_start": 5148,
+  "char_end": 5150
+ },
+ {
+  "word": "سعيه",
+  "start": 644.11597,
+  "end": 644.696,
+  "id": 947,
+  "char_start": 5151,
+  "char_end": 5155
+ },
+ {
+  "word": "الذي",
+  "start": 644.696,
+  "end": 645.05597,
+  "id": 948,
+  "char_start": 5156,
+  "char_end": 5160
+ },
+ {
+  "word": "سعاه،",
+  "start": 645.05597,
+  "end": 645.776,
+  "id": 949,
+  "char_start": 5161,
+  "char_end": 5166
+ },
+ {
+  "word": "فمن",
+  "start": 645.776,
+  "end": 646.336,
+  "id": 950,
+  "char_start": 5167,
+  "char_end": 5170
+ },
+ {
+  "word": "أفلح",
+  "start": 646.336,
+  "end": 646.836,
+  "id": 951,
+  "char_start": 5171,
+  "char_end": 5175
+ },
+ {
+  "word": "وأنجح",
+  "start": 646.836,
+  "end": 647.456,
+  "id": 952,
+  "char_start": 5176,
+  "char_end": 5181
+ },
+ {
+  "word": "سعد،",
+  "start": 647.456,
+  "end": 648.036,
+  "id": 953,
+  "char_start": 5182,
+  "char_end": 5186
+ },
+ {
+  "word": "ومن",
+  "start": 648.036,
+  "end": 648.776,
+  "id": 954,
+  "char_start": 5187,
+  "char_end": 5190
+ },
+ {
+  "word": "أساء",
+  "start": 648.776,
+  "end": 649.416,
+  "id": 955,
+  "char_start": 5191,
+  "char_end": 5195
+ },
+ {
+  "word": "خاب",
+  "start": 649.416,
+  "end": 649.876,
+  "id": 956,
+  "char_start": 5196,
+  "char_end": 5199
+ },
+ {
+  "word": "وخسر،",
+  "start": 649.876,
+  "end": 650.636,
+  "id": 957,
+  "char_start": 5200,
+  "char_end": 5205
+ },
+ {
+  "word": "كما",
+  "start": 650.636,
+  "end": 651.17596,
+  "id": 958,
+  "char_start": 5206,
+  "char_end": 5209
+ },
+ {
+  "word": "قال",
+  "start": 651.17596,
+  "end": 651.596,
+  "id": 959,
+  "char_start": 5210,
+  "char_end": 5213
+ },
+ {
+  "word": "الله",
+  "start": 651.596,
+  "end": 652.05597,
+  "id": 960,
+  "char_start": 5214,
+  "char_end": 5218
+ },
+ {
+  "word": "سبحانه",
+  "start": 652.05597,
+  "end": 652.876,
+  "id": 961,
+  "char_start": 5219,
+  "char_end": 5225
+ },
+ {
+  "word": "وتعالى",
+  "start": 652.876,
+  "end": 653.636,
+  "id": 962,
+  "char_start": 5226,
+  "char_end": 5232
+ },
+ {
+  "word": "كلا",
+  "start": 653.716,
+  "end": 654.55597,
+  "id": 963,
+  "char_start": 5233,
+  "char_end": 5236
+ },
+ {
+  "word": "إذا",
+  "start": 654.55597,
+  "end": 655.05597,
+  "id": 964,
+  "char_start": 5237,
+  "char_end": 5240
+ },
+ {
+  "word": "دُكَّت",
+  "start": 655.05597,
+  "end": 655.576,
+  "id": 965,
+  "char_start": 5241,
+  "char_end": 5247
+ },
+ {
+  "word": "الأرض",
+  "start": 655.576,
+  "end": 656.11597,
+  "id": 966,
+  "char_start": 5248,
+  "char_end": 5253
+ },
+ {
+  "word": "دكًا",
+  "start": 656.11597,
+  "end": 656.776,
+  "id": 967,
+  "char_start": 5254,
+  "char_end": 5258
+ },
+ {
+  "word": "دكًا،",
+  "start": 656.776,
+  "end": 657.716,
+  "id": 968,
+  "char_start": 5259,
+  "char_end": 5264
+ },
+ {
+  "word": "وجاء",
+  "start": 657.716,
+  "end": 658.956,
+  "id": 969,
+  "char_start": 5265,
+  "char_end": 5269
+ },
+ {
+  "word": "ربك",
+  "start": 658.956,
+  "end": 659.756,
+  "id": 970,
+  "char_start": 5270,
+  "char_end": 5273
+ },
+ {
+  "word": "والملك",
+  "start": 659.756,
+  "end": 660.516,
+  "id": 971,
+  "char_start": 5274,
+  "char_end": 5280
+ },
+ {
+  "word": "صفًا",
+  "start": 660.516,
+  "end": 661.17596,
+  "id": 972,
+  "char_start": 5281,
+  "char_end": 5285
+ },
+ {
+  "word": "صفًا،",
+  "start": 661.17596,
+  "end": 662.316,
+  "id": 973,
+  "char_start": 5286,
+  "char_end": 5291
+ },
+ {
+  "word": "وجيء",
+  "start": 662.316,
+  "end": 663.376,
+  "id": 974,
+  "char_start": 5292,
+  "char_end": 5296
+ },
+ {
+  "word": "يومئذٍ",
+  "start": 663.376,
+  "end": 664.216,
+  "id": 975,
+  "char_start": 5297,
+  "char_end": 5303
+ },
+ {
+  "word": "بجهنم،",
+  "start": 664.216,
+  "end": 665.456,
+  "id": 976,
+  "char_start": 5304,
+  "char_end": 5310
+ },
+ {
+  "word": "يومئذ",
+  "start": 665.456,
+  "end": 666.496,
+  "id": 977,
+  "char_start": 5311,
+  "char_end": 5316
+ },
+ {
+  "word": "يتذكر",
+  "start": 666.496,
+  "end": 667.496,
+  "id": 978,
+  "char_start": 5317,
+  "char_end": 5322
+ },
+ {
+  "word": "الإنسان",
+  "start": 667.496,
+  "end": 668.656,
+  "id": 979,
+  "char_start": 5323,
+  "char_end": 5330
+ },
+ {
+  "word": "وأنا",
+  "start": 668.656,
+  "end": 669.436,
+  "id": 980,
+  "char_start": 5331,
+  "char_end": 5335
+ },
+ {
+  "word": "له",
+  "start": 669.436,
+  "end": 669.836,
+  "id": 981,
+  "char_start": 5336,
+  "char_end": 5338
+ },
+ {
+  "word": "الذكرى،",
+  "start": 669.836,
+  "end": 670.756,
+  "id": 982,
+  "char_start": 5339,
+  "char_end": 5346
+ },
+ {
+  "word": "يقول",
+  "start": 670.756,
+  "end": 671.456,
+  "id": 983,
+  "char_start": 5347,
+  "char_end": 5351
+ },
+ {
+  "word": "يا",
+  "start": 671.456,
+  "end": 671.816,
+  "id": 984,
+  "char_start": 5352,
+  "char_end": 5354
+ },
+ {
+  "word": "ليتني",
+  "start": 671.816,
+  "end": 672.67596,
+  "id": 985,
+  "char_start": 5355,
+  "char_end": 5360
+ },
+ {
+  "word": "قدَّمت",
+  "start": 672.67596,
+  "end": 673.596,
+  "id": 986,
+  "char_start": 5361,
+  "char_end": 5367
+ },
+ {
+  "word": "لحياتي،",
+  "start": 673.596,
+  "end": 674.876,
+  "id": 987,
+  "char_start": 5368,
+  "char_end": 5375
+ },
+ {
+  "word": "فيومئذ",
+  "start": 674.876,
+  "end": 675.716,
+  "id": 988,
+  "char_start": 5376,
+  "char_end": 5382
+ },
+ {
+  "word": "لا",
+  "start": 675.716,
+  "end": 675.996,
+  "id": 989,
+  "char_start": 5383,
+  "char_end": 5385
+ },
+ {
+  "word": "يعذِّب",
+  "start": 675.996,
+  "end": 676.796,
+  "id": 990,
+  "char_start": 5386,
+  "char_end": 5392
+ },
+ {
+  "word": "عذابه",
+  "start": 676.796,
+  "end": 677.536,
+  "id": 991,
+  "char_start": 5393,
+  "char_end": 5398
+ },
+ {
+  "word": "أحد،",
+  "start": 677.536,
+  "end": 678.156,
+  "id": 992,
+  "char_start": 5399,
+  "char_end": 5403
+ },
+ {
+  "word": "ولا",
+  "start": 678.156,
+  "end": 678.656,
+  "id": 993,
+  "char_start": 5404,
+  "char_end": 5407
+ },
+ {
+  "word": "يُوثِق",
+  "start": 678.656,
+  "end": 679.516,
+  "id": 994,
+  "char_start": 5408,
+  "char_end": 5414
+ },
+ {
+  "word": "وتاقه",
+  "start": 679.516,
+  "end": 680.436,
+  "id": 995,
+  "char_start": 5415,
+  "char_end": 5420
+ },
+ {
+  "word": "أحد،",
+  "start": 680.436,
+  "end": 681.136,
+  "id": 996,
+  "char_start": 5421,
+  "char_end": 5425
+ },
+ {
+  "word": "ألا",
+  "start": 681.136,
+  "end": 681.756,
+  "id": 997,
+  "char_start": 5426,
+  "char_end": 5429
+ },
+ {
+  "word": "أيها",
+  "start": 681.756,
+  "end": 682.356,
+  "id": 998,
+  "char_start": 5430,
+  "char_end": 5434
+ },
+ {
+  "word": "المؤمنون،",
+  "start": 682.356,
+  "end": 683.196,
+  "id": 999,
+  "char_start": 5435,
+  "char_end": 5444
+ },
+ {
+  "word": "فأعملوا",
+  "start": 683.396,
+  "end": 684.11597,
+  "id": 1000,
+  "char_start": 5445,
+  "char_end": 5452
+ },
+ {
+  "word": "لذلك",
+  "start": 684.11597,
+  "end": 684.696,
+  "id": 1001,
+  "char_start": 5453,
+  "char_end": 5457
+ },
+ {
+  "word": "اليوم،",
+  "start": 684.696,
+  "end": 685.276,
+  "id": 1002,
+  "char_start": 5458,
+  "char_end": 5464
+ },
+ {
+  "word": "فإن",
+  "start": 685.276,
+  "end": 685.816,
+  "id": 1003,
+  "char_start": 5465,
+  "char_end": 5468
+ },
+ {
+  "word": "الله",
+  "start": 685.816,
+  "end": 686.17596,
+  "id": 1004,
+  "char_start": 5469,
+  "char_end": 5473
+ },
+ {
+  "word": "سبحانه",
+  "start": 686.17596,
+  "end": 687.016,
+  "id": 1005,
+  "char_start": 5474,
+  "char_end": 5480
+ },
+ {
+  "word": "وتعالى",
+  "start": 687.016,
+  "end": 687.916,
+  "id": 1006,
+  "char_start": 5481,
+  "char_end": 5487
+ },
+ {
+  "word": "قد",
+  "start": 687.916,
+  "end": 688.336,
+  "id": 1007,
+  "char_start": 5488,
+  "char_end": 5490
+ },
+ {
+  "word": "أبان",
+  "start": 688.336,
+  "end": 688.996,
+  "id": 1008,
+  "char_start": 5491,
+  "char_end": 5495
+ },
+ {
+  "word": "لكم",
+  "start": 688.996,
+  "end": 689.416,
+  "id": 1009,
+  "char_start": 5496,
+  "char_end": 5499
+ },
+ {
+  "word": "المحجة،",
+  "start": 689.416,
+  "end": 690.23596,
+  "id": 1010,
+  "char_start": 5500,
+  "char_end": 5507
+ },
+ {
+  "word": "وأقام",
+  "start": 690.23596,
+  "end": 691.276,
+  "id": 1011,
+  "char_start": 5508,
+  "char_end": 5513
+ },
+ {
+  "word": "عليكم",
+  "start": 691.276,
+  "end": 691.956,
+  "id": 1012,
+  "char_start": 5514,
+  "char_end": 5519
+ },
+ {
+  "word": "الحجة،",
+  "start": 691.956,
+  "end": 692.776,
+  "id": 1013,
+  "char_start": 5520,
+  "char_end": 5526
+ },
+ {
+  "word": "فاستجيبوا",
+  "start": 692.776,
+  "end": 694.016,
+  "id": 1014,
+  "char_start": 5527,
+  "char_end": 5536
+ },
+ {
+  "word": "لنداء",
+  "start": 694.016,
+  "end": 694.61597,
+  "id": 1015,
+  "char_start": 5537,
+  "char_end": 5542
+ },
+ {
+  "word": "ربكم،",
+  "start": 694.61597,
+  "end": 695.416,
+  "id": 1016,
+  "char_start": 5543,
+  "char_end": 5548
+ },
+ {
+  "word": "وتمسكوا",
+  "start": 695.416,
+  "end": 696.596,
+  "id": 1017,
+  "char_start": 5549,
+  "char_end": 5556
+ },
+ {
+  "word": "دينكم،",
+  "start": 696.596,
+  "end": 697.436,
+  "id": 1018,
+  "char_start": 5557,
+  "char_end": 5563
+ },
+ {
+  "word": "وابتغوا",
+  "start": 697.436,
+  "end": 698.336,
+  "id": 1019,
+  "char_start": 5564,
+  "char_end": 5571
+ },
+ {
+  "word": "مرضاته",
+  "start": 698.336,
+  "end": 699.256,
+  "id": 1020,
+  "char_start": 5572,
+  "char_end": 5578
+ },
+ {
+  "word": "سبحانه،",
+  "start": 699.256,
+  "end": 700.276,
+  "id": 1021,
+  "char_start": 5579,
+  "char_end": 5586
+ },
+ {
+  "word": "واسعوا",
+  "start": 700.276,
+  "end": 700.756,
+  "id": 1022,
+  "char_start": 5587,
+  "char_end": 5593
+ },
+ {
+  "word": "في",
+  "start": 700.756,
+  "end": 701.016,
+  "id": 1023,
+  "char_start": 5594,
+  "char_end": 5596
+ },
+ {
+  "word": "دنياكم",
+  "start": 701.016,
+  "end": 701.836,
+  "id": 1024,
+  "char_start": 5597,
+  "char_end": 5603
+ },
+ {
+  "word": "بما",
+  "start": 701.836,
+  "end": 702.23596,
+  "id": 1025,
+  "char_start": 5604,
+  "char_end": 5607
+ },
+ {
+  "word": "يحبه",
+  "start": 702.23596,
+  "end": 702.996,
+  "id": 1026,
+  "char_start": 5608,
+  "char_end": 5612
+ },
+ {
+  "word": "ويرضاه،",
+  "start": 702.996,
+  "end": 703.916,
+  "id": 1027,
+  "char_start": 5613,
+  "char_end": 5620
+ },
+ {
+  "word": "واعلموا",
+  "start": 703.916,
+  "end": 704.776,
+  "id": 1028,
+  "char_start": 5621,
+  "char_end": 5628
+ },
+ {
+  "word": "أنكم",
+  "start": 704.776,
+  "end": 705.496,
+  "id": 1029,
+  "char_start": 5629,
+  "char_end": 5633
+ },
+ {
+  "word": "إليهم",
+  "start": 705.496,
+  "end": 706.096,
+  "id": 1030,
+  "char_start": 5634,
+  "char_end": 5639
+ },
+ {
+  "word": "انقلبون،",
+  "start": 706.096,
+  "end": 706.996,
+  "id": 1031,
+  "char_start": 5640,
+  "char_end": 5648
+ },
+ {
+  "word": "وإلى",
+  "start": 706.996,
+  "end": 707.55597,
+  "id": 1032,
+  "char_start": 5649,
+  "char_end": 5653
+ },
+ {
+  "word": "الآخرة",
+  "start": 707.55597,
+  "end": 708.316,
+  "id": 1033,
+  "char_start": 5654,
+  "char_end": 5660
+ },
+ {
+  "word": "صائرون،",
+  "start": 708.316,
+  "end": 709.336,
+  "id": 1034,
+  "char_start": 5661,
+  "char_end": 5668
+ },
+ {
+  "word": "وأن",
+  "start": 709.336,
+  "end": 709.876,
+  "id": 1035,
+  "char_start": 5669,
+  "char_end": 5672
+ },
+ {
+  "word": "أمامكم",
+  "start": 709.876,
+  "end": 710.716,
+  "id": 1036,
+  "char_start": 5673,
+  "char_end": 5679
+ },
+ {
+  "word": "حساب",
+  "start": 710.716,
+  "end": 711.416,
+  "id": 1037,
+  "char_start": 5680,
+  "char_end": 5684
+ },
+ {
+  "word": "وجزاء،",
+  "start": 711.416,
+  "end": 712.196,
+  "id": 1038,
+  "char_start": 5685,
+  "char_end": 5691
+ },
+ {
+  "word": "وأن",
+  "start": 712.316,
+  "end": 712.896,
+  "id": 1039,
+  "char_start": 5692,
+  "char_end": 5695
+ },
+ {
+  "word": "الحساب",
+  "start": 712.896,
+  "end": 713.676,
+  "id": 1040,
+  "char_start": 5696,
+  "char_end": 5702
+ },
+ {
+  "word": "والجزاء",
+  "start": 713.676,
+  "end": 714.516,
+  "id": 1041,
+  "char_start": 5703,
+  "char_end": 5710
+ },
+ {
+  "word": "من",
+  "start": 714.516,
+  "end": 714.836,
+  "id": 1042,
+  "char_start": 5711,
+  "char_end": 5713
+ },
+ {
+  "word": "ملككم",
+  "start": 714.836,
+  "end": 715.55597,
+  "id": 1043,
+  "char_start": 5714,
+  "char_end": 5719
+ },
+ {
+  "word": "الذي",
+  "start": 715.55597,
+  "end": 715.976,
+  "id": 1044,
+  "char_start": 5720,
+  "char_end": 5724
+ },
+ {
+  "word": "ناداكم،",
+  "start": 715.976,
+  "end": 716.896,
+  "id": 1045,
+  "char_start": 5725,
+  "char_end": 5732
+ },
+ {
+  "word": "فقال",
+  "start": 716.896,
+  "end": 717.61597,
+  "id": 1046,
+  "char_start": 5733,
+  "char_end": 5737
+ },
+ {
+  "word": "لكم",
+  "start": 717.61597,
+  "end": 718.05597,
+  "id": 1047,
+  "char_start": 5738,
+  "char_end": 5741
+ },
+ {
+  "word": "في",
+  "start": 718.05597,
+  "end": 718.276,
+  "id": 1048,
+  "char_start": 5742,
+  "char_end": 5744
+ },
+ {
+  "word": "تلك",
+  "start": 718.276,
+  "end": 718.756,
+  "id": 1049,
+  "char_start": 5745,
+  "char_end": 5748
+ },
+ {
+  "word": "الآيتين",
+  "start": 718.756,
+  "end": 719.576,
+  "id": 1050,
+  "char_start": 5749,
+  "char_end": 5756
+ },
+ {
+  "word": "يا",
+  "start": 719.576,
+  "end": 720.156,
+  "id": 1051,
+  "char_start": 5757,
+  "char_end": 5759
+ },
+ {
+  "word": "أيها",
+  "start": 720.156,
+  "end": 720.956,
+  "id": 1052,
+  "char_start": 5760,
+  "char_end": 5764
+ },
+ {
+  "word": "الإنسان،",
+  "start": 720.956,
+  "end": 721.85596,
+  "id": 1053,
+  "char_start": 5765,
+  "char_end": 5773
+ },
+ {
+  "word": "ألا",
+  "start": 721.85596,
+  "end": 722.456,
+  "id": 1054,
+  "char_start": 5774,
+  "char_end": 5777
+ },
+ {
+  "word": "فيا",
+  "start": 722.456,
+  "end": 723.096,
+  "id": 1055,
+  "char_start": 5778,
+  "char_end": 5781
+ },
+ {
+  "word": "أيها",
+  "start": 723.096,
+  "end": 723.676,
+  "id": 1056,
+  "char_start": 5782,
+  "char_end": 5786
+ },
+ {
+  "word": "الإنسان،",
+  "start": 723.676,
+  "end": 724.61597,
+  "id": 1057,
+  "char_start": 5787,
+  "char_end": 5795
+ },
+ {
+  "word": "كرِّر",
+  "start": 724.61597,
+  "end": 725.23596,
+  "id": 1058,
+  "char_start": 5796,
+  "char_end": 5801
+ },
+ {
+  "word": "النظر",
+  "start": 725.23596,
+  "end": 725.696,
+  "id": 1059,
+  "char_start": 5802,
+  "char_end": 5807
+ },
+ {
+  "word": "في",
+  "start": 725.696,
+  "end": 725.896,
+  "id": 1060,
+  "char_start": 5808,
+  "char_end": 5810
+ },
+ {
+  "word": "ذلك",
+  "start": 725.896,
+  "end": 726.376,
+  "id": 1061,
+  "char_start": 5811,
+  "char_end": 5814
+ },
+ {
+  "word": "النداء،",
+  "start": 726.376,
+  "end": 727.096,
+  "id": 1062,
+  "char_start": 5815,
+  "char_end": 5822
+ },
+ {
+  "word": "وانظر",
+  "start": 727.096,
+  "end": 727.876,
+  "id": 1063,
+  "char_start": 5823,
+  "char_end": 5828
+ },
+ {
+  "word": "ما",
+  "start": 727.876,
+  "end": 728.05597,
+  "id": 1064,
+  "char_start": 5829,
+  "char_end": 5831
+ },
+ {
+  "word": "فيه",
+  "start": 728.05597,
+  "end": 728.536,
+  "id": 1065,
+  "char_start": 5832,
+  "char_end": 5835
+ },
+ {
+  "word": "من",
+  "start": 728.536,
+  "end": 728.756,
+  "id": 1066,
+  "char_start": 5836,
+  "char_end": 5838
+ },
+ {
+  "word": "المعاني",
+  "start": 728.756,
+  "end": 729.416,
+  "id": 1067,
+  "char_start": 5839,
+  "char_end": 5846
+ },
+ {
+  "word": "العظام",
+  "start": 729.416,
+  "end": 729.916,
+  "id": 1068,
+  "char_start": 5847,
+  "char_end": 5853
+ },
+ {
+  "word": "الجليلة،",
+  "start": 729.916,
+  "end": 730.73596,
+  "id": 1069,
+  "char_start": 5854,
+  "char_end": 5862
+ },
+ {
+  "word": "واعتبر،",
+  "start": 730.73596,
+  "end": 731.776,
+  "id": 1070,
+  "char_start": 5863,
+  "char_end": 5870
+ },
+ {
+  "word": "وادكر،",
+  "start": 731.776,
+  "end": 732.776,
+  "id": 1071,
+  "char_start": 5871,
+  "char_end": 5877
+ },
+ {
+  "word": "قبل",
+  "start": 732.776,
+  "end": 733.376,
+  "id": 1072,
+  "char_start": 5878,
+  "char_end": 5881
+ },
+ {
+  "word": "أن",
+  "start": 733.376,
+  "end": 733.596,
+  "id": 1073,
+  "char_start": 5882,
+  "char_end": 5884
+ },
+ {
+  "word": "يأتي",
+  "start": 733.596,
+  "end": 734.156,
+  "id": 1074,
+  "char_start": 5885,
+  "char_end": 5889
+ },
+ {
+  "word": "يوم",
+  "start": 734.156,
+  "end": 734.656,
+  "id": 1075,
+  "char_start": 5890,
+  "char_end": 5893
+ },
+ {
+  "word": "لا",
+  "start": 734.656,
+  "end": 734.936,
+  "id": 1076,
+  "char_start": 5894,
+  "char_end": 5896
+ },
+ {
+  "word": "يمكن",
+  "start": 734.936,
+  "end": 735.536,
+  "id": 1077,
+  "char_start": 5897,
+  "char_end": 5901
+ },
+ {
+  "word": "فيه",
+  "start": 735.536,
+  "end": 736.136,
+  "id": 1078,
+  "char_start": 5902,
+  "char_end": 5905
+ },
+ {
+  "word": "الاعتبار",
+  "start": 736.136,
+  "end": 736.85596,
+  "id": 1079,
+  "char_start": 5906,
+  "char_end": 5914
+ },
+ {
+  "word": "ولا",
+  "start": 736.85596,
+  "end": 737.176,
+  "id": 1080,
+  "char_start": 5915,
+  "char_end": 5918
+ },
+ {
+  "word": "الاتعاض،",
+  "start": 737.176,
+  "end": 737.956,
+  "id": 1081,
+  "char_start": 5919,
+  "char_end": 5927
+ },
+ {
+  "word": "اللهم",
+  "start": 738.35596,
+  "end": 738.676,
+  "id": 1082,
+  "char_start": 5928,
+  "char_end": 5933
+ },
+ {
+  "word": "أتِ",
+  "start": 738.676,
+  "end": 738.976,
+  "id": 1083,
+  "char_start": 5934,
+  "char_end": 5937
+ },
+ {
+  "word": "نفوسنا",
+  "start": 738.976,
+  "end": 739.476,
+  "id": 1084,
+  "char_start": 5938,
+  "char_end": 5944
+ },
+ {
+  "word": "تقواها،",
+  "start": 739.476,
+  "end": 740.796,
+  "id": 1085,
+  "char_start": 5945,
+  "char_end": 5952
+ },
+ {
+  "word": "وزكِّها",
+  "start": 740.796,
+  "end": 741.316,
+  "id": 1086,
+  "char_start": 5953,
+  "char_end": 5960
+ },
+ {
+  "word": "أنت",
+  "start": 741.316,
+  "end": 741.85596,
+  "id": 1087,
+  "char_start": 5961,
+  "char_end": 5964
+ },
+ {
+  "word": "خير",
+  "start": 741.85596,
+  "end": 742.23596,
+  "id": 1088,
+  "char_start": 5965,
+  "char_end": 5968
+ },
+ {
+  "word": "من",
+  "start": 742.23596,
+  "end": 742.416,
+  "id": 1089,
+  "char_start": 5969,
+  "char_end": 5971
+ },
+ {
+  "word": "زكاها،",
+  "start": 742.416,
+  "end": 743.216,
+  "id": 1090,
+  "char_start": 5972,
+  "char_end": 5978
+ },
+ {
+  "word": "أنت",
+  "start": 743.216,
+  "end": 743.816,
+  "id": 1091,
+  "char_start": 5979,
+  "char_end": 5982
+ },
+ {
+  "word": "وليها",
+  "start": 743.816,
+  "end": 744.416,
+  "id": 1092,
+  "char_start": 5983,
+  "char_end": 5988
+ },
+ {
+  "word": "ومولاها،",
+  "start": 744.416,
+  "end": 745.676,
+  "id": 1093,
+  "char_start": 5989,
+  "char_end": 5997
+ },
+ {
+  "word": "اللهم",
+  "start": 745.676,
+  "end": 746.05597,
+  "id": 1094,
+  "char_start": 5998,
+  "char_end": 6003
+ },
+ {
+  "word": "إنا",
+  "start": 746.05597,
+  "end": 746.35596,
+  "id": 1095,
+  "char_start": 6004,
+  "char_end": 6007
+ },
+ {
+  "word": "نسألك",
+  "start": 746.35596,
+  "end": 746.716,
+  "id": 1096,
+  "char_start": 6008,
+  "char_end": 6013
+ },
+ {
+  "word": "الهدى",
+  "start": 746.716,
+  "end": 747.23596,
+  "id": 1097,
+  "char_start": 6014,
+  "char_end": 6019
+ },
+ {
+  "word": "والتقى",
+  "start": 747.23596,
+  "end": 748.456,
+  "id": 1098,
+  "char_start": 6020,
+  "char_end": 6026
+ },
+ {
+  "word": "والعفاف",
+  "start": 748.456,
+  "end": 749.256,
+  "id": 1099,
+  "char_start": 6027,
+  "char_end": 6034
+ },
+ {
+  "word": "والغنى،",
+  "start": 749.256,
+  "end": 750.156,
+  "id": 1100,
+  "char_start": 6035,
+  "char_end": 6042
+ },
+ {
+  "word": "اللهم",
+  "start": 750.156,
+  "end": 750.73596,
+  "id": 1101,
+  "char_start": 6043,
+  "char_end": 6048
+ },
+ {
+  "word": "حبِّب",
+  "start": 750.73596,
+  "end": 751.256,
+  "id": 1102,
+  "char_start": 6049,
+  "char_end": 6054
+ },
+ {
+  "word": "إلينا",
+  "start": 751.256,
+  "end": 751.61597,
+  "id": 1103,
+  "char_start": 6055,
+  "char_end": 6060
+ },
+ {
+  "word": "الإيمان،",
+  "start": 751.61597,
+  "end": 752.776,
+  "id": 1104,
+  "char_start": 6061,
+  "char_end": 6069
+ },
+ {
+  "word": "وزيِّنه",
+  "start": 752.776,
+  "end": 753.316,
+  "id": 1105,
+  "char_start": 6070,
+  "char_end": 6077
+ },
+ {
+  "word": "في",
+  "start": 753.316,
+  "end": 753.496,
+  "id": 1106,
+  "char_start": 6078,
+  "char_end": 6080
+ },
+ {
+  "word": "قلوبنا،",
+  "start": 753.496,
+  "end": 754.55597,
+  "id": 1107,
+  "char_start": 6081,
+  "char_end": 6088
+ },
+ {
+  "word": "وكرِّ",
+  "start": 754.55597,
+  "end": 755.016,
+  "id": 1108,
+  "char_start": 6089,
+  "char_end": 6094
+ },
+ {
+  "word": "إلينا",
+  "start": 755.016,
+  "end": 755.576,
+  "id": 1109,
+  "char_start": 6095,
+  "char_end": 6100
+ },
+ {
+  "word": "الكفر",
+  "start": 755.576,
+  "end": 756.036,
+  "id": 1110,
+  "char_start": 6101,
+  "char_end": 6106
+ },
+ {
+  "word": "والحسوق",
+  "start": 756.036,
+  "end": 756.836,
+  "id": 1111,
+  "char_start": 6107,
+  "char_end": 6114
+ },
+ {
+  "word": "والعصيان،",
+  "start": 756.836,
+  "end": 758.276,
+  "id": 1112,
+  "char_start": 6115,
+  "char_end": 6124
+ },
+ {
+  "word": "واجعلنا",
+  "start": 758.276,
+  "end": 759.05597,
+  "id": 1113,
+  "char_start": 6125,
+  "char_end": 6132
+ },
+ {
+  "word": "من",
+  "start": 759.05597,
+  "end": 759.416,
+  "id": 1114,
+  "char_start": 6133,
+  "char_end": 6135
+ },
+ {
+  "word": "عبادك",
+  "start": 759.416,
+  "end": 760.096,
+  "id": 1115,
+  "char_start": 6136,
+  "char_end": 6141
+ },
+ {
+  "word": "الصالحين،",
+  "start": 760.096,
+  "end": 761.11597,
+  "id": 1116,
+  "char_start": 6142,
+  "char_end": 6151
+ },
+ {
+  "word": "اللهم",
+  "start": 761.11597,
+  "end": 761.61597,
+  "id": 1117,
+  "char_start": 6152,
+  "char_end": 6157
+ },
+ {
+  "word": "بارِك",
+  "start": 761.61597,
+  "end": 762.11597,
+  "id": 1118,
+  "char_start": 6158,
+  "char_end": 6163
+ },
+ {
+  "word": "لنا",
+  "start": 762.11597,
+  "end": 762.456,
+  "id": 1119,
+  "char_start": 6164,
+  "char_end": 6167
+ },
+ {
+  "word": "في",
+  "start": 762.456,
+  "end": 762.716,
+  "id": 1120,
+  "char_start": 6168,
+  "char_end": 6170
+ },
+ {
+  "word": "فعل",
+  "start": 762.716,
+  "end": 762.996,
+  "id": 1121,
+  "char_start": 6171,
+  "char_end": 6174
+ },
+ {
+  "word": "الخيرات،",
+  "start": 762.996,
+  "end": 763.976,
+  "id": 1122,
+  "char_start": 6175,
+  "char_end": 6183
+ },
+ {
+  "word": "وهيِّئ",
+  "start": 763.976,
+  "end": 764.476,
+  "id": 1123,
+  "char_start": 6184,
+  "char_end": 6190
+ },
+ {
+  "word": "لنا",
+  "start": 764.476,
+  "end": 764.73596,
+  "id": 1124,
+  "char_start": 6191,
+  "char_end": 6194
+ },
+ {
+  "word": "إتيان",
+  "start": 764.73596,
+  "end": 765.216,
+  "id": 1125,
+  "char_start": 6195,
+  "char_end": 6200
+ },
+ {
+  "word": "الطاعات،",
+  "start": 765.216,
+  "end": 766.036,
+  "id": 1126,
+  "char_start": 6201,
+  "char_end": 6209
+ },
+ {
+  "word": "وباعد",
+  "start": 766.036,
+  "end": 766.816,
+  "id": 1127,
+  "char_start": 6210,
+  "char_end": 6215
+ },
+ {
+  "word": "بيننا",
+  "start": 766.816,
+  "end": 767.456,
+  "id": 1128,
+  "char_start": 6216,
+  "char_end": 6221
+ },
+ {
+  "word": "وباعدنا،",
+  "start": 767.456,
+  "end": 767.696,
+  "id": 1129,
+  "char_start": 6222,
+  "char_end": 6230
+ },
+ {
+  "word": "اللهم",
+  "start": 767.716,
+  "end": 770.436,
+  "id": 1130,
+  "char_start": 6231,
+  "char_end": 6236
+ },
+ {
+  "word": "أحينا",
+  "start": 770.436,
+  "end": 771.016,
+  "id": 1131,
+  "char_start": 6237,
+  "char_end": 6242
+ },
+ {
+  "word": "على",
+  "start": 771.016,
+  "end": 771.296,
+  "id": 1132,
+  "char_start": 6243,
+  "char_end": 6246
+ },
+ {
+  "word": "خير",
+  "start": 771.296,
+  "end": 771.656,
+  "id": 1133,
+  "char_start": 6247,
+  "char_end": 6250
+ },
+ {
+  "word": "حال،",
+  "start": 771.656,
+  "end": 772.296,
+  "id": 1134,
+  "char_start": 6251,
+  "char_end": 6255
+ },
+ {
+  "word": "وأمِتنا",
+  "start": 772.296,
+  "end": 773.136,
+  "id": 1135,
+  "char_start": 6256,
+  "char_end": 6263
+ },
+ {
+  "word": "على",
+  "start": 773.136,
+  "end": 773.376,
+  "id": 1136,
+  "char_start": 6264,
+  "char_end": 6267
+ },
+ {
+  "word": "خير",
+  "start": 773.376,
+  "end": 773.756,
+  "id": 1137,
+  "char_start": 6268,
+  "char_end": 6271
+ },
+ {
+  "word": "حال،",
+  "start": 773.756,
+  "end": 774.656,
+  "id": 1138,
+  "char_start": 6272,
+  "char_end": 6276
+ },
+ {
+  "word": "أقلبنا",
+  "start": 774.656,
+  "end": 775.296,
+  "id": 1139,
+  "char_start": 6277,
+  "char_end": 6283
+ },
+ {
+  "word": "جميعاً",
+  "start": 775.296,
+  "end": 776.216,
+  "id": 1140,
+  "char_start": 6284,
+  "char_end": 6290
+ },
+ {
+  "word": "إلى",
+  "start": 776.216,
+  "end": 776.396,
+  "id": 1141,
+  "char_start": 6291,
+  "char_end": 6294
+ },
+ {
+  "word": "خير",
+  "start": 776.396,
+  "end": 776.936,
+  "id": 1142,
+  "char_start": 6295,
+  "char_end": 6298
+ },
+ {
+  "word": "المآل،",
+  "start": 776.936,
+  "end": 777.776,
+  "id": 1143,
+  "char_start": 6299,
+  "char_end": 6305
+ },
+ {
+  "word": "اللهم",
+  "start": 777.776,
+  "end": 778.35596,
+  "id": 1144,
+  "char_start": 6306,
+  "char_end": 6311
+ },
+ {
+  "word": "أحينا",
+  "start": 778.35596,
+  "end": 778.85596,
+  "id": 1145,
+  "char_start": 6312,
+  "char_end": 6317
+ },
+ {
+  "word": "على",
+  "start": 778.85596,
+  "end": 779.05597,
+  "id": 1146,
+  "char_start": 6318,
+  "char_end": 6321
+ },
+ {
+  "word": "الإسلام",
+  "start": 779.05597,
+  "end": 779.496,
+  "id": 1147,
+  "char_start": 6322,
+  "char_end": 6329
+ },
+ {
+  "word": "والسنة،",
+  "start": 779.496,
+  "end": 780.496,
+  "id": 1148,
+  "char_start": 6330,
+  "char_end": 6337
+ },
+ {
+  "word": "وتوفنا",
+  "start": 780.496,
+  "end": 781.296,
+  "id": 1149,
+  "char_start": 6338,
+  "char_end": 6344
+ },
+ {
+  "word": "على",
+  "start": 781.296,
+  "end": 781.716,
+  "id": 1150,
+  "char_start": 6345,
+  "char_end": 6348
+ },
+ {
+  "word": "الإسلام",
+  "start": 781.716,
+  "end": 782.23596,
+  "id": 1151,
+  "char_start": 6349,
+  "char_end": 6356
+ },
+ {
+  "word": "والسنة،",
+  "start": 782.23596,
+  "end": 783.05597,
+  "id": 1152,
+  "char_start": 6357,
+  "char_end": 6364
+ },
+ {
+  "word": "اللهم",
+  "start": 783.05597,
+  "end": 783.516,
+  "id": 1153,
+  "char_start": 6365,
+  "char_end": 6370
+ },
+ {
+  "word": "فرِّج",
+  "start": 783.516,
+  "end": 783.956,
+  "id": 1154,
+  "char_start": 6371,
+  "char_end": 6376
+ },
+ {
+  "word": "قُربَ",
+  "start": 783.956,
+  "end": 784.23596,
+  "id": 1155,
+  "char_start": 6377,
+  "char_end": 6382
+ },
+ {
+  "word": "المكروبين،",
+  "start": 784.23596,
+  "end": 785.256,
+  "id": 1156,
+  "char_start": 6383,
+  "char_end": 6393
+ },
+ {
+  "word": "ونفِّس",
+  "start": 785.256,
+  "end": 785.876,
+  "id": 1157,
+  "char_start": 6394,
+  "char_end": 6400
+ },
+ {
+  "word": "هموم",
+  "start": 785.876,
+  "end": 786.376,
+  "id": 1158,
+  "char_start": 6401,
+  "char_end": 6405
+ },
+ {
+  "word": "المهمومين،",
+  "start": 786.376,
+  "end": 787.516,
+  "id": 1159,
+  "char_start": 6406,
+  "char_end": 6416
+ },
+ {
+  "word": "واقضِ",
+  "start": 787.516,
+  "end": 788.016,
+  "id": 1160,
+  "char_start": 6417,
+  "char_end": 6422
+ },
+ {
+  "word": "الدَّين",
+  "start": 788.016,
+  "end": 788.55597,
+  "id": 1161,
+  "char_start": 6423,
+  "char_end": 6430
+ },
+ {
+  "word": "عن",
+  "start": 788.55597,
+  "end": 788.836,
+  "id": 1162,
+  "char_start": 6431,
+  "char_end": 6433
+ },
+ {
+  "word": "المدينين،",
+  "start": 788.836,
+  "end": 789.876,
+  "id": 1163,
+  "char_start": 6434,
+  "char_end": 6443
+ },
+ {
+  "word": "واشفِ",
+  "start": 789.876,
+  "end": 790.276,
+  "id": 1164,
+  "char_start": 6444,
+  "char_end": 6449
+ },
+ {
+  "word": "مرضَنا",
+  "start": 790.276,
+  "end": 790.936,
+  "id": 1165,
+  "char_start": 6450,
+  "char_end": 6456
+ },
+ {
+  "word": "ومرضَانا",
+  "start": 790.936,
+  "end": 791.996,
+  "id": 1166,
+  "char_start": 6457,
+  "char_end": 6465
+ },
+ {
+  "word": "ومرضَ",
+  "start": 791.996,
+  "end": 792.536,
+  "id": 1167,
+  "char_start": 6466,
+  "char_end": 6471
+ },
+ {
+  "word": "المسلمين،",
+  "start": 792.536,
+  "end": 793.376,
+  "id": 1168,
+  "char_start": 6472,
+  "char_end": 6481
+ },
+ {
+  "word": "اللهم",
+  "start": 793.376,
+  "end": 793.85596,
+  "id": 1169,
+  "char_start": 6482,
+  "char_end": 6487
+ },
+ {
+  "word": "وفِّق",
+  "start": 793.85596,
+  "end": 794.276,
+  "id": 1170,
+  "char_start": 6488,
+  "char_end": 6493
+ },
+ {
+  "word": "وليَّ",
+  "start": 794.276,
+  "end": 794.496,
+  "id": 1171,
+  "char_start": 6494,
+  "char_end": 6499
+ },
+ {
+  "word": "أمرنا",
+  "start": 794.496,
+  "end": 794.976,
+  "id": 1172,
+  "char_start": 6500,
+  "char_end": 6505
+ },
+ {
+  "word": "بتوفيقِك،",
+  "start": 794.976,
+  "end": 796.016,
+  "id": 1173,
+  "char_start": 6506,
+  "char_end": 6515
+ },
+ {
+  "word": "وأيِّده",
+  "start": 796.016,
+  "end": 796.796,
+  "id": 1174,
+  "char_start": 6516,
+  "char_end": 6523
+ },
+ {
+  "word": "بتأييدِك،",
+  "start": 796.796,
+  "end": 797.696,
+  "id": 1175,
+  "char_start": 6524,
+  "char_end": 6533
+ },
+ {
+  "word": "وازقه",
+  "start": 797.956,
+  "end": 798.436,
+  "id": 1176,
+  "char_start": 6534,
+  "char_end": 6539
+ },
+ {
+  "word": "البطانة",
+  "start": 798.436,
+  "end": 799.11597,
+  "id": 1177,
+  "char_start": 6540,
+  "char_end": 6547
+ },
+ {
+  "word": "الناصحة",
+  "start": 799.11597,
+  "end": 799.836,
+  "id": 1178,
+  "char_start": 6548,
+  "char_end": 6555
+ },
+ {
+  "word": "الصالحة،",
+  "start": 799.836,
+  "end": 800.876,
+  "id": 1179,
+  "char_start": 6556,
+  "char_end": 6564
+ },
+ {
+  "word": "وجنبه",
+  "start": 800.876,
+  "end": 801.596,
+  "id": 1180,
+  "char_start": 6565,
+  "char_end": 6570
+ },
+ {
+  "word": "بطانة",
+  "start": 801.596,
+  "end": 802.456,
+  "id": 1181,
+  "char_start": 6571,
+  "char_end": 6576
+ },
+ {
+  "word": "السوء",
+  "start": 802.456,
+  "end": 803.216,
+  "id": 1182,
+  "char_start": 6577,
+  "char_end": 6582
+ },
+ {
+  "word": "اللهم",
+  "start": 803.476,
+  "end": 803.956,
+  "id": 1183,
+  "char_start": 6583,
+  "char_end": 6588
+ },
+ {
+  "word": "أغثنا،",
+  "start": 803.956,
+  "end": 804.776,
+  "id": 1184,
+  "char_start": 6589,
+  "char_end": 6595
+ },
+ {
+  "word": "اللهم",
+  "start": 804.776,
+  "end": 805.73596,
+  "id": 1185,
+  "char_start": 6596,
+  "char_end": 6601
+ },
+ {
+  "word": "أغثنا،",
+  "start": 805.73596,
+  "end": 806.696,
+  "id": 1186,
+  "char_start": 6602,
+  "char_end": 6608
+ },
+ {
+  "word": "اللهم",
+  "start": 806.696,
+  "end": 807.73596,
+  "id": 1187,
+  "char_start": 6609,
+  "char_end": 6614
+ },
+ {
+  "word": "أغثنا،",
+  "start": 807.73596,
+  "end": 808.996,
+  "id": 1188,
+  "char_start": 6615,
+  "char_end": 6621
+ },
+ {
+  "word": "اللهم",
+  "start": 808.996,
+  "end": 809.55597,
+  "id": 1189,
+  "char_start": 6622,
+  "char_end": 6627
+ },
+ {
+  "word": "اسقنا",
+  "start": 809.55597,
+  "end": 810.076,
+  "id": 1190,
+  "char_start": 6628,
+  "char_end": 6633
+ },
+ {
+  "word": "الغيت",
+  "start": 810.076,
+  "end": 810.656,
+  "id": 1191,
+  "char_start": 6634,
+  "char_end": 6639
+ },
+ {
+  "word": "ولا",
+  "start": 810.656,
+  "end": 810.976,
+  "id": 1192,
+  "char_start": 6640,
+  "char_end": 6643
+ },
+ {
+  "word": "تجعلنا",
+  "start": 810.976,
+  "end": 811.756,
+  "id": 1193,
+  "char_start": 6644,
+  "char_end": 6650
+ },
+ {
+  "word": "من",
+  "start": 811.756,
+  "end": 811.936,
+  "id": 1194,
+  "char_start": 6651,
+  "char_end": 6653
+ },
+ {
+  "word": "القانطين",
+  "start": 811.936,
+  "end": 812.816,
+  "id": 1195,
+  "char_start": 6654,
+  "char_end": 6662
+ },
+ {
+  "word": "اللهم",
+  "start": 821.716,
+  "end": 822.196,
+  "id": 1196,
+  "char_start": 6663,
+  "char_end": 6668
+ },
+ {
+  "word": "اسق",
+  "start": 822.196,
+  "end": 822.476,
+  "id": 1197,
+  "char_start": 6669,
+  "char_end": 6672
+ },
+ {
+  "word": "البلاد",
+  "start": 822.476,
+  "end": 823.016,
+  "id": 1198,
+  "char_start": 6673,
+  "char_end": 6679
+ },
+ {
+  "word": "والعباد،",
+  "start": 823.016,
+  "end": 823.936,
+  "id": 1199,
+  "char_start": 6680,
+  "char_end": 6688
+ },
+ {
+  "word": "اللهم",
+  "start": 823.936,
+  "end": 829.876,
+  "id": 1200,
+  "char_start": 6689,
+  "char_end": 6694
+ },
+ {
+  "word": "انشر",
+  "start": 829.876,
+  "end": 830.256,
+  "id": 1201,
+  "char_start": 6695,
+  "char_end": 6699
+ },
+ {
+  "word": "رحمتك،",
+  "start": 830.256,
+  "end": 831.11597,
+  "id": 1202,
+  "char_start": 6700,
+  "char_end": 6706
+ },
+ {
+  "word": "اللهم",
+  "start": 831.11597,
+  "end": 835.996,
+  "id": 1203,
+  "char_start": 6707,
+  "char_end": 6712
+ },
+ {
+  "word": "لا",
+  "start": 835.996,
+  "end": 836.196,
+  "id": 1204,
+  "char_start": 6713,
+  "char_end": 6715
+ },
+ {
+  "word": "تعاملنا",
+  "start": 836.196,
+  "end": 837.256,
+  "id": 1205,
+  "char_start": 6716,
+  "char_end": 6723
+ },
+ {
+  "word": "بما",
+  "start": 837.256,
+  "end": 837.716,
+  "id": 1206,
+  "char_start": 6724,
+  "char_end": 6727
+ },
+ {
+  "word": "نحن",
+  "start": 837.716,
+  "end": 838.05597,
+  "id": 1207,
+  "char_start": 6728,
+  "char_end": 6731
+ },
+ {
+  "word": "أهله،",
+  "start": 838.05597,
+  "end": 838.73596,
+  "id": 1208,
+  "char_start": 6732,
+  "char_end": 6737
+ },
+ {
+  "word": "وعاملنا",
+  "start": 838.73596,
+  "end": 840.05597,
+  "id": 1209,
+  "char_start": 6738,
+  "char_end": 6745
+ },
+ {
+  "word": "بما",
+  "start": 840.05597,
+  "end": 840.636,
+  "id": 1210,
+  "char_start": 6746,
+  "char_end": 6749
+ },
+ {
+  "word": "أنت",
+  "start": 840.636,
+  "end": 841.156,
+  "id": 1211,
+  "char_start": 6750,
+  "char_end": 6753
+ },
+ {
+  "word": "أهله،",
+  "start": 841.156,
+  "end": 841.73596,
+  "id": 1212,
+  "char_start": 6754,
+  "char_end": 6759
+ },
+ {
+  "word": "إنك",
+  "start": 841.73596,
+  "end": 842.35596,
+  "id": 1213,
+  "char_start": 6760,
+  "char_end": 6763
+ },
+ {
+  "word": "أنت",
+  "start": 842.35596,
+  "end": 842.716,
+  "id": 1214,
+  "char_start": 6764,
+  "char_end": 6767
+ },
+ {
+  "word": "أهل",
+  "start": 842.716,
+  "end": 842.996,
+  "id": 1215,
+  "char_start": 6768,
+  "char_end": 6771
+ },
+ {
+  "word": "التقوى",
+  "start": 842.996,
+  "end": 843.716,
+  "id": 1216,
+  "char_start": 6772,
+  "char_end": 6778
+ },
+ {
+  "word": "والمغفرة",
+  "start": 843.716,
+  "end": 844.516,
+  "id": 1217,
+  "char_start": 6779,
+  "char_end": 6787
+ }
+]
