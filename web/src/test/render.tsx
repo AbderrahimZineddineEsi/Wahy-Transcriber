@@ -20,13 +20,18 @@ export type Handler = (call: Call) => Response | Promise<Response> | undefined;
 export const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json" } });
 
+function parseBody(text: string, type: string): unknown {
+  if (!text) return undefined;
+  return type.includes("json") ? JSON.parse(text) : text; // multipart bodies stay raw text
+}
+
 /** Replace fetch with a fake server. `handler` may answer a call; health answers 200 `health()` otherwise. */
 export function fakeServer(handler: Handler = () => undefined, health: () => Health = () => healthy) {
   const calls: Call[] = [];
   vi.stubGlobal("fetch", async (request: Request) => {
     const url = new URL(request.url);
     const text = request.method === "GET" ? "" : await request.clone().text();
-    const call: Call = { method: request.method, path: url.pathname, body: text ? JSON.parse(text) : undefined };
+    const call: Call = { method: request.method, path: url.pathname, body: parseBody(text, request.headers.get("content-type") ?? "") };
     calls.push(call);
     const answer = await handler(call);
     if (answer) return answer;

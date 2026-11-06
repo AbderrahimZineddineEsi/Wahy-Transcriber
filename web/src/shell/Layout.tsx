@@ -1,6 +1,7 @@
 import type { ComponentType } from "react";
 import { Link, NavLink, Outlet } from "react-router-dom";
 import { useHealth } from "../api/health";
+import { JobWatcher } from "../features/lectures/JobWatcher";
 import { CorporaIcon, LecturesIcon, RequestsIcon, SettingsIcon, ThemeIcon, TrainingIcon } from "./icons";
 import { useI18n, type MessageKey } from "./i18n";
 import { useTheme } from "./theme";
@@ -22,6 +23,7 @@ export function Layout() {
       <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:z-30 focus:bg-surface focus:p-2">
         <SkipText />
       </a>
+      <JobWatcher />
       <Header />
       <div className="grid grid-cols-[var(--spacing-rail)_1fr] max-[720px]:grid-cols-1">
         <Rail />

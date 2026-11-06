@@ -808,3 +808,53 @@ cd web && npm run api:generate          # regenerate the types after changing th
 cd web && npm test && npm run e2e       # Vitest, then the Playwright smoke test (starts both servers itself)
 scripts/dev.sh                          # server on 8120, web on 5173: open http://localhost:5173/settings
 ```
+
+## Phase 11 — Web: new lecture and saved lectures
+
+### What was built
+
+The Lectures screen (`web/src/features/lectures/`): a **new lecture** panel with five ways in (pasted text or
+subtitles, a `.txt/.srt/.vtt` file, a YouTube link, an uploaded audio/video file, the sample), a **running** panel
+with each job's stages and a live percentage, and the **saved lectures** table (search, rename, delete, delete all).
+Also a plain lecture page (`/lectures/:id`: transcript, the quotes found, attach media) that phase 12 will replace,
+and "open the last lecture at startup" (F-007).
+
+### Concepts
+
+- **Forms with controlled inputs.** `const [url, setUrl] = useState("")` plus `value={url} onChange={…}` makes React
+  the owner of the field, so the Start button can be `disabled={url.trim() === ""}`. Like a Flutter `TextEditingController`
+  whose listener rebuilds the widget.
+- **Mutations.** `useMutation` is the write side of TanStack Query: `create.mutate(input, { onSuccess })`. When it
+  settles we call `invalidateQueries(["lectures"])`, which marks the cached list stale so the table refetches by itself.
+  No manual refresh anywhere.
+- **Progress streams (server-sent events).** `new EventSource("/api/jobs/<id>/events")` keeps one HTTP request open and
+  the server writes `event: job` lines; each one becomes `setJob(snapshot)`. The `useJobStream` hook opens it in an
+  effect and closes it in the effect's cleanup (or when the job ends), the React version of subscribing in `initState`
+  and cancelling in `dispose`. The jobs list is also polled every 2 s while a job is unfinished, so a card still catches
+  up if the stream drops.
+- **Chaining two server jobs in the client.** The server runs transcription and detection as separate jobs. `JobWatcher`
+  (mounted in the layout, so it works on every screen) watches the job list: a finished `transcribe` job whose lecture has
+  no detect job and no findings starts one. The two guards make it safe to reload the page.
+- **Multipart upload.** The generated types say a file is a `string`; the real body is a `FormData`. A tiny `multipart()`
+  helper returns `{ body, bodySerializer: () => formData }`, so openapi-fetch sends the file and the types still check
+  the rest.
+
+### How it was tested
+
+- Vitest (6 new tests, 25 in all) with a fake server and a fake `EventSource` that the test pushes snapshots into:
+  paste → lecture + detection job with its three stages, moving to "detect" and then "7 quotes"; a YouTube link sends the
+  chosen model, shows `Transcribe 62%`, and starting detection when transcription ends (with the fallback reason
+  shown); a file import; the sample; search, rename, two-step delete and delete all; last lecture reopened, and a deleted
+  one falling back to the list.
+- Playwright against the real server: an `.srt` becomes a lecture, its detection job finishes, the transcript and a
+  Fatiha finding show, then rename and delete.
+- Milestone A, live (`e2e/live-youtube.spec.ts`, on request only): a real Mohammed Meziane khutba link (16 min) went
+  download → audio → Groq transcription → detection by itself: 1713 words and 28 findings in 28 s.
+
+**Try:**
+
+```bash
+cd web && npm test                                                    # Vitest
+cd web && npm run e2e                                                 # Playwright (own server and temp data)
+cd web && WAHY_E2E_LIVE=1 npx playwright test e2e/live-youtube.spec.ts   # the real YouTube run (uses .env keys)
+```

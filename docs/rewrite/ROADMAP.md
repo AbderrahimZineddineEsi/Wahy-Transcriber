@@ -179,7 +179,7 @@ decisions and why). The problems being fixed are in the friction map: https://cl
     Features: F-001, F-002, F-004 to F-006, F-008, F-010, F-124, F-128.
   - Learn: React components and hooks; how generated API types catch breaking changes.
 
-- [ ] **11. Web: new lecture and saved lectures**: Sonnet 5.5, medium.
+- [x] **11. Web: new lecture and saved lectures**: Sonnet 5.5, medium.
   - New lecture (paste, file, YouTube, upload, sample), the saved lectures list, transcription and detection progress.
   - Done when: Vitest and Playwright pass.
   - Feature check (**milestone A**): paste a YouTube link in the new app; the transcript and findings appear.

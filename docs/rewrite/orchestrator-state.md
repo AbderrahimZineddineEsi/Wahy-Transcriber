@@ -53,3 +53,7 @@ anything new; phase 8 is already ticked.
 - Child: refactoring-step-10, session ID 3b181005-9e71-4391-b571-c4357614da22, log: /tmp/claude-1000/-home-zeno-Documents-work-new-projects-Wahy-Transcriber/428c450a-c0e2-4fc7-86dc-884ec1da7570/scratchpad/step-10.json, launched 2026-11-06.
 - Phases 8, 8b (adhkar editable) and 9 are done and pushed (004a043).
 - If it died: git status/log, then `claude -p --resume 3b181005-9e71-4391-b571-c4357614da22 "Continue phase 10 from where you stopped; finish, tick, commit and push."`
+
+## Running now: phase 11 Web: new lecture and saved lectures (Sonnet 5.5, medium)
+- Child: refactoring-step-11, session ID 25c1f9e9-6b88-4995-a092-f6f9484a099f, log: /tmp/claude-1000/-home-zeno-Documents-work-new-projects-Wahy-Transcriber/428c450a-c0e2-4fc7-86dc-884ec1da7570/scratchpad/step-11.json. Phase 10 done (e5d231a).
+- If it died: git status/log, then `claude -p --resume 25c1f9e9-6b88-4995-a092-f6f9484a099f "Continue phase 11 from where you stopped; finish, tick, commit and push."`

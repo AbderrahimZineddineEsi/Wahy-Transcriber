@@ -5,6 +5,23 @@ State for recovery (session IDs, what to do if a child died) is in `orchestrator
 
 <!-- NEW REPORTS GO BELOW THIS LINE -->
 
+## 2026-11-06 — Phase 10 (Web shell) done; phase 11 started
+
+Gate passed. Commit `e5d231a` "rewrite phase 10: Web shell" pushed, phase ticked.
+- Built: header (server badge, running-jobs pill), rail, Settings screen (API key rows set/not set, status table, language
+  and theme switches, both remembered), error toasts with a "Details" report that never contains a request body, API types
+  generated from the server's OpenAPI (`npm run api:generate` in `web/`).
+- **Server routes added by the child** (needed by the settings screen, recorded under Changes in the roadmap):
+  `GET /api/health` now reports keys, GPU, engine, corpus and running jobs; `PUT /api/settings/keys/{provider}` writes the
+  key to `.env` and uses it at once. Keys never come back in any answer.
+- Tests: server 164 passed, 1 skipped (live), ruff clean; web Vitest 19 passed, typecheck, lint and build clean;
+  Playwright smoke test 1 passed (Arabic right-to-left, theme and language kept after reload, saved key shows as set,
+  `/api/health` does not contain the key). `scripts/test.sh` now also runs Playwright.
+- Feature check passed (app opens, language/theme switch, saved key shown as set); screenshots compared with the mockup.
+- Note: the rail has no "open lecture" place and no count badges yet (phases 11 and 12).
+- **Phase 11 (Web: new lecture and saved lectures, Sonnet 5.5, medium)** is running as `refactoring-step-11`. Its
+  Feature check (milestone A) needs a live YouTube link; if the live run can't happen headless it will ask.
+
 ## 2026-11-06 — Phase 9 (Screen design) done; phase 10 started
 
 Gate passed. Commit `004a043` "rewrite phase 9: Screen design" pushed to `origin/factory-reset`, phase ticked.
