@@ -6,12 +6,13 @@ import { writeStored } from "../../shell/storage";
 import { useFindings, useLecture, useVersion, useVersions, type LectureDetail } from "./api";
 import { LectureHeader, TABS, type Tab } from "./view/LectureHeader";
 import { LectureView } from "./view/LectureView";
+import { VerifyPage } from "../verification/VerifyPage";
 import { fromRow, fromSnapshot, type EngineFinding, type FindingRow } from "./view/model";
 
 export const LAST_LECTURE_KEY = "wahy.last-lecture";
 
-/** One open lecture: its header (title, tabs, version) and the open tab. Only the view tab exists so far;
- *  edit, verify, Tafrigh and export arrive in phases 15 to 19. */
+/** One open lecture: its header (title, tabs, version) and the open tab. The view and verify tabs exist so far;
+ *  edit, Tafrigh and export arrive in phases 16 to 19. */
 export function LecturePage() {
   const params = useParams();
   const id = Number(params.id);
@@ -68,7 +69,15 @@ function Body({ lecture, tab }: { lecture: LectureDetail; tab: Tab }) {
           </button>
         </div>
       )}
-      {tab !== "view" ? (
+      {tab === "verify" ? (
+        versionId !== null ? (
+          <p role="status" className="panel panel-b m-0 text-ink-2">{t("verify.onlyCurrent")}</p>
+        ) : liveFindings ? (
+          <VerifyPage lecture={lecture} findings={liveFindings} />
+        ) : (
+          <p className="text-ink-2">{t("lecture.loadingFindings")}</p>
+        )
+      ) : tab !== "view" ? (
         <section className="panel">
           <div className="panel-h">
             <h2 className="text-xl font-semibold">{t(`tab.${tab}` as MessageKey)}</h2>

@@ -1,7 +1,9 @@
 import { useEffect, useState, type CSSProperties, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import { useI18n, type MessageKey } from "../../../shell/i18n";
-import type { ViewFinding, Word } from "./model";
+import { useToasts } from "../../../shell/toasts";
+import { useExpand, useSetVerdict, type Verdict } from "../../verification/api";
+import { isClipped, type ViewFinding, type Word } from "./model";
 import { quoteText } from "./Player";
 
 /** Where to put a floating box under `anchor`, inside the scrolling reader (so it scrolls with the text).
@@ -37,6 +39,17 @@ export function FindingCard({ f, words, lectureId, style, hasMedia, standard, re
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);
   const others = f.candidates.filter((c) => c !== f.ref);
+  const toasts = useToasts();
+  const setVerdict = useSetVerdict(lectureId);
+  const expand = useExpand(lectureId);
+  const canAct = !readOnly && f.id !== null;
+  const expandIt = () =>
+    expand.mutate(f.id!, {
+      onSuccess: (r) => {
+        const added = r.added.start + r.added.end;
+        toasts.success(r.changed ? t("card.expanded", { n: added }) : t("card.expandNothing"));
+      },
+    });
   return (
     <div className="pop" style={style} role="dialog" aria-label={f.ref} data-testid="finding-card">
       <button className="iconbtn x" title={t("card.close")} aria-label={t("card.close")} onClick={onClose}>
@@ -55,17 +68,42 @@ export function FindingCard({ f, words, lectureId, style, hasMedia, standard, re
         <div className="text-s text-ink-2">{t("card.ambiguous", { n: f.candidates.length, list: others.join("، ") })}</div>
       )}
       <div className="quote">{quoteText(words, f, standard)}</div>
+      {canAct && (
+        <div className="row" role="group" aria-label={t("card.yourVerdict")}>
+          <span className="text-xs text-ink-3">{t("card.yourVerdict")}</span>
+          {(["CORRECT", "NOT_SURE", "FALSE"] as Verdict[]).map((v) => {
+            const key = v === "CORRECT" ? "ok" : v === "FALSE" ? "bad" : "unsure";
+            return (
+              <button
+                key={v}
+                className="chip"
+                style={{ color: `var(--wahy-${key})` }}
+                aria-pressed={f.verdict === key && f.verifier === "human"}
+                onClick={() => setVerdict.mutate({ findingId: f.id!, verdict: v })}
+              >
+                <span className="dot" />
+                <span className="text-ink-2">{t(`verdict.${key}` as MessageKey)}</span>
+              </button>
+            );
+          })}
+        </div>
+      )}
       <div className="row">
         {hasMedia && (
           <button className="btn small primary" onClick={onPlay}>
             {t("card.play")}
           </button>
         )}
-        {!readOnly && f.id !== null && (
+        {canAct && (
           <>
             <Link className="btn small" to={`/lectures/${lectureId}/edit?finding=${f.id}`}>
               {t("card.edit")}
             </Link>
+            {isClipped(f) && (
+              <button className="btn small" disabled={expand.isPending} onClick={expandIt}>
+                {t("card.expand")}
+              </button>
+            )}
             <Link className="btn small ghost" to={`/lectures/${lectureId}/verify?finding=${f.id}`}>
               {t("card.verify")}
             </Link>

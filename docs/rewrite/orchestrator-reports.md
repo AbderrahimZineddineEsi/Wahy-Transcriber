@@ -5,6 +5,32 @@ State for recovery (session IDs, what to do if a child died) is in `orchestrator
 
 <!-- NEW REPORTS GO BELOW THIS LINE -->
 
+## 2026-11-06 19:55 — Phase 14 (Verification pass and telemetry, server) done; phase 15 started
+
+Gate passed. Commit `2ae3607` "rewrite phase 14: Verification pass and telemetry (server)" pushed, phase ticked.
+- Built: `server/wahy/features/verification/` (verifier settings with prompt presets and rules incl. the two new optional
+  rules N-020, off by default; estimate of findings, requests, tokens, cost, time; preview of the exact request body;
+  a pass job over the default scope or hand-picked findings with pause, resume, cancel and resume after a server restart;
+  pass metrics; your verdict saved as a gold label; "approve all"; expand of a missing start or end, moved to
+  `engine/src/expand.ts`) and `server/wahy/features/telemetry/` (request log showing findings judged, verdicts and your
+  corrections; one request's exact payloads; clear).
+- **Feature check passed with real Laya on your GTX 1050**: sample lecture, `laya-wahy-r6-v3_mixed`, 8 findings in 6
+  requests, 19.5 s, 8 verdicts saved: 7 CORRECT, 1 FALSE (صحيح مسلم 2149). Pass metrics match the 6 logged requests.
+- Tests: `test_verification.py` 23 (fake verifier); `test_verification_golden.py` 32 (on all 4 golden inputs Laya reads
+  exactly the old app's envelope for v1, v2 (4 option sets) and v3 (both)); engine +5 expand tests. `scripts/test.sh`:
+  old backend 152 passed, 1 deselected (the known failing test); server 272 (+6 live skipped); engine 111; web 59;
+  Playwright 4.
+- **Decisions the child made (recorded under Changes):**
+  1. A v1 Laya checkpoint now reads v1 envelopes (the old app sent it v3, the mismatch ADR 0003 forbids).
+  2. Verdicts store the boundary as COMPLETE / MISSING_* / EXTRA_*; the models' COMPLETE_SPAN is saved as COMPLETE.
+     `MISSING_BOTH` is new to the web view, so phase 15 must handle it.
+  3. Migration 0004 adds verdict details and the ids of the findings each AI request was about.
+  4. When expand finds no matching word it says so and changes nothing (the old code marked it complete anyway). Undoing
+     an expand waits for phase 16's edit log.
+- The one deselected old-backend test is the known one from phase 3 (`test_review_endpoint_survives_a_server_reload`,
+  fixed by phase 18); nothing new.
+- **Phase 15 (Web: verification and telemetry, Sonnet 5.5, high)** is running as `refactoring-step-15`.
+
 ## 2026-11-06 19:40 — Phase 13 (AI provider layer) done, live check passed; phase 14 started
 
 Gate passed. Commit `6e0e658` "rewrite phase 13: AI provider layer" pushed, phase ticked. Live tests ran with your OK

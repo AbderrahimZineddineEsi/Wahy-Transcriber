@@ -739,3 +739,153 @@
     }
   }
 }
+
+/* Verification and the request log (phase 15), after the mockup's "verify" and "requests" screens. */
+@layer components {
+  .vgrid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(300px, 400px);
+    gap: calc(var(--spacing) * 4);
+    align-items: start;
+  }
+  .vgrid > aside {
+    position: sticky;
+    top: calc(var(--spacing-header) + 16px);
+  }
+  @media (max-width: 1100px) {
+    .vgrid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .vgrid > aside {
+      position: static;
+    }
+  }
+  .grid2 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: calc(var(--spacing) * 3);
+  }
+  .stat {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .stat b {
+    font: 500 var(--text-xl) var(--font-mono);
+  }
+  /* "10 s" and "0 ms" must read left to right even inside an Arabic page */
+  .stat b,
+  .stat dd,
+  table.data td.font-mono {
+    unicode-bidi: plaintext;
+  }
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: calc(var(--spacing) * 3) calc(var(--spacing) * 4);
+  }
+  .bar {
+    height: 8px;
+    border-radius: 99px;
+    background: var(--wahy-surface-2);
+    overflow: hidden;
+  }
+  .bar i {
+    display: block;
+    height: 100%;
+    width: 0;
+    background: var(--wahy-accent);
+    transition: width 0.3s;
+  }
+  .flist {
+    display: flex;
+    flex-direction: column;
+    max-height: 70vh;
+    overflow-y: auto;
+  }
+  .frow {
+    display: grid;
+    grid-template-columns: auto auto minmax(0, 1fr) auto;
+    gap: calc(var(--spacing) * 3);
+    align-items: center;
+    padding: 10px calc(var(--spacing) * 4);
+    border-bottom: 1px solid var(--wahy-line);
+    content-visibility: auto;
+    contain-intrinsic-size: auto 44px;
+    cursor: pointer;
+  }
+  .frow:last-child {
+    border-bottom: 0;
+  }
+  .frow input {
+    accent-color: var(--wahy-accent);
+    margin: 0;
+  }
+  .frow .t {
+    font-family: var(--font-read);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 1rem;
+  }
+  pre.code {
+    margin: 0;
+    font: 12.5px/1.7 var(--font-mono);
+    background: var(--wahy-surface-2);
+    padding: calc(var(--spacing) * 3);
+    border-radius: var(--radius-m);
+    overflow: auto;
+    max-height: 420px;
+    direction: ltr;
+    text-align: left;
+    white-space: pre;
+  }
+  pre.code.wrap {
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .vchip.busy {
+    background: var(--wahy-accent-soft);
+    color: var(--wahy-accent);
+  }
+  .cut {
+    font-size: 0.8em;
+    color: var(--wahy-unsure);
+    margin-inline: 2px;
+  }
+  details.opts > summary {
+    cursor: pointer;
+    font-size: var(--text-s);
+    color: var(--wahy-ink-2);
+    padding: 4px 0;
+  }
+  details.opts[open] > summary {
+    margin-bottom: calc(var(--spacing) * 2);
+  }
+  textarea.input {
+    height: auto;
+    padding-block: 8px;
+    font-family: var(--font-mono);
+    font-size: var(--text-s);
+  }
+  .mrow {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 2px calc(var(--spacing) * 3);
+    width: 100%;
+    padding: 8px 10px;
+    border: 0;
+    border-bottom: 1px solid var(--wahy-line);
+    background: transparent;
+    color: inherit;
+    text-align: start;
+    cursor: pointer;
+  }
+  .mrow:hover,
+  .mrow[aria-pressed="true"] {
+    background: var(--wahy-accent-soft);
+  }
+  tr.picked td {
+    background: var(--wahy-accent-soft);
+  }
+}

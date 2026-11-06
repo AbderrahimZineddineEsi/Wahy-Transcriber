@@ -1,5 +1,6 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import { LAST_LECTURE_KEY, LecturePage } from "./features/lectures/LecturePage";
+import { RequestsPage } from "./features/telemetry/RequestsPage";
 import { LecturesPage } from "./features/lectures/LecturesPage";
 import { readStored } from "./shell/storage";
 import { ComingSoon } from "./features/placeholders/ComingSoon";
@@ -23,7 +24,7 @@ export function App() {
         <Route path="lectures/:id/:tab" element={<LecturePage />} />
         <Route path="corpora" element={<ComingSoon title="page.corpora" />} />
         <Route path="training" element={<ComingSoon title="page.training" />} />
-        <Route path="requests" element={<ComingSoon title="page.requests" />} />
+        <Route path="requests" element={<RequestsPage />} />
         <Route path="settings" element={<SettingsPage />} />
         <Route path="*" element={<ComingSoon title="page.notFound" />} />
       </Route>

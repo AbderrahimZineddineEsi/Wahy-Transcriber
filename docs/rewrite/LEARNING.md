@@ -1099,3 +1099,83 @@ curl -X POST localhost:8120/api/lectures/1/verification/estimate \
      -H 'content-type: application/json' -d '{"scope":"ALL","options":{"provider":"laya"}}'
 curl 'localhost:8120/api/telemetry/requests?limit=5'                               # the request log
 ```
+
+## Phase 15 — Web: verification and telemetry
+
+The web app can now run a verification pass and show what it cost. Two places changed:
+
+- **The lecture's "Verify" tab** (`web/src/features/verification/`). On the left, the quotes that will be sent, each
+  with a tick box; you can choose by scope (hadith and suspects, hadith only, all) or by hand, with search, kind and
+  verdict filters, "select shown", "none" and "invert". On the right, the verifier (Laya, Gemini, JEV or an OpenRouter
+  chat model) with its options, the **estimate** (quotes, requests, tokens, cost, time), the **Start** button and
+  the pass's **progress** with pause, resume and cancel. When the pass ends you see its numbers (requests, time, tokens,
+  cost, verdict counts) and "Approve all", which asks twice before it saves gold labels.
+- **The request log** (`/requests`, `web/src/features/telemetry/`). One row per AI request: time, provider, quote,
+  verdict with its probability, your correction, size, tokens, cost, time taken. Click a row and the inspector shows the
+  exact JSON sent and received, readable or raw, with a copy button for each.
+
+Smaller pieces: the quote card now has your own verdict buttons and, for a quote whose start or end is missing, a
+"Complete the quote" button (it calls the server's expand). The transcript draws a ✂ at the edge that is missing.
+Unticking "Ordinary speech" in the lecture view still turns those quotes into plain words (phase 12 built it; phase 15
+checks it against real verdicts).
+
+### New ideas
+
+**Optimistic updates.** Normally a button waits for the server and then shows the result: click, wait 300 ms, see the
+change. An *optimistic update* shows the result first, and fixes it if the server says no. In
+`api.ts`, `useSetVerdict` does it in four steps with TanStack Query:
+
+```ts
+onMutate:  save a copy of the cached findings, then change the one finding in the cache  // the chip changes now
+onError:   put the saved copy back                                                        // the server refused
+onSettled: ask the server for the real findings again                                     // whatever happened, end true
+```
+
+The same pattern saves the verifier settings (`useUpdateSettings`): the provider button turns on at once. The test
+`a refused settings change puts the old verifier back` makes the server answer 422 and checks the old button is
+pressed again. It is the same idea as setting state first in Flutter and rolling it back in a `catch`.
+
+**State that comes from the server versus state that is only the screen's.** The settings and the findings live on the
+server, so they are *queries* (cached, shared by every component). Which boxes are ticked is the screen's own state
+(`useState`), and it is turned into the list of ids the estimate and the pass send. The estimate is a query whose key
+contains those ids and the settings, so changing either asks again, after a 250 ms pause so that typing does not send
+one request per key.
+
+**Following a job.** A pass is a job that keeps running if you close the page. The tab looks for a running `verify` job
+of this lecture in the jobs list and follows it with the same event stream the transcription card uses
+(`useJobStream`). After each finished request it asks for the findings again, so the chips fill in while it runs.
+
+**One rule written twice.** The tick boxes must match the server's idea of a scope, so `selection.ts` repeats the
+server's `in_scope` rule. The pass then sends explicit ids, never the scope name, so the server rule cannot silently
+disagree with what you saw ticked. A test pins the rule.
+
+### How it was tested
+
+- Vitest (80 tests; 21 new): `selection.test.ts` (scopes, filters, none, invert), `VerifyPage.test.tsx` (the default
+  ticks; unticking changes the estimate, F-087; "three picked, three sent", F-084; progress, pause, numbers and the
+  two-step approve, F-088/089/091; the optimistic verdict and settings, with the server refusing; the preview, F-086;
+  the ✂ badge, F-090; complete the quote), `RequestsPage.test.tsx` (one row per request, F-095; readable and raw
+  JSON with copy, F-096; clear asks first).
+- Playwright (6 tests; 2 new in `e2e/verification.spec.ts`), with the server's fake verifier: a real pass over the sample
+  lecture, then the log and the inspector; and hiding "ordinary speech" keeps every word.
+- **Feature check, with the real Laya on your GTX 1050** (`e2e/live-laya.spec.ts`, 27 s): the sample lecture, checkpoint
+  `laya-wahy-r6-v3_mixed`. The pass finished, every ticked quote got a verdict, the log showed the Laya requests and the
+  inspector showed the v3 envelope (the passage العصر 1-3 as one request). Hiding "ordinary speech" hid Laya's false
+  finding (Muslim 2149) in the transcript and kept all its words.
+- `scripts/test.sh` all green:
+
+  | Suite | Result |
+  |---|---|
+  | Old backend | 152 |
+  | Server | 272, plus 6 live tests skipped |
+  | Engine | 111 |
+  | Web | 80 |
+  | Playwright | 6 (plus 1 live Laya test on request) |
+
+**Try:**
+
+```bash
+cd web && npx vitest run src/features/verification          # selection rules + the verify tab
+cd web && npx playwright test e2e/verification.spec.ts       # a whole pass in the real app, fake verifier
+cd web && WAHY_E2E_LIVE=1 npx playwright test e2e/live-laya.spec.ts   # the same with the real Laya (GPU)
+```

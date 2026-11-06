@@ -9,7 +9,7 @@ export type Word = components["schemas"]["WordOut"];
 
 export type Kind = "quran" | "hadith" | "dhikr";
 export type VerdictKey = "ok" | "unsure" | "bad" | "none";
-export type BoundaryKey = "complete" | "missStart" | "missEnd" | "extraStart" | "extraEnd";
+export type BoundaryKey = "complete" | "missStart" | "missEnd" | "missBoth" | "extraStart" | "extraEnd";
 
 /** The engine's finding object (what `data` holds); the caption builder reads it as it is. */
 export type EngineFinding = CaptionFinding & Record<string, unknown>;
@@ -36,7 +36,7 @@ export type ViewFinding = {
 const KIND: Record<string, Kind> = { QURAN: "quran", HADITH: "hadith", ADHKAR: "dhikr" };
 const VERDICT: Record<string, VerdictKey> = { CORRECT: "ok", NOT_SURE: "unsure", FALSE: "bad" };
 const BOUNDARY: Record<string, BoundaryKey> = {
-  COMPLETE: "complete", MISSING_START: "missStart", MISSING_END: "missEnd", EXTRA_START: "extraStart", EXTRA_END: "extraEnd",
+  COMPLETE: "complete", MISSING_START: "missStart", MISSING_END: "missEnd", MISSING_BOTH: "missBoth", EXTRA_START: "extraStart", EXTRA_END: "extraEnd",
 };
 
 export const kindOf = (sourceType: string | undefined): Kind => KIND[sourceType ?? ""] ?? "hadith"; // custom quotes read as hadith
@@ -86,7 +86,7 @@ export type PresetKey = keyof typeof PRESETS;
 export const DEFAULT_FILTER: Filter = { kind: "all", show: ALL_VERDICTS, clipped: false };
 
 /** A verdict says the start or the end of the quote is missing (a false finding is never "clipped"). */
-export const isClipped = (f: ViewFinding) => (f.boundary === "missStart" || f.boundary === "missEnd") && f.verdict !== "bad";
+export const isClipped = (f: ViewFinding) => (f.boundary === "missStart" || f.boundary === "missEnd" || f.boundary === "missBoth") && f.verdict !== "bad";
 
 /** Whether a finding is shown as a quote. A hidden one keeps its words: they show as ordinary speech. */
 export function isShown(f: ViewFinding, filter: Filter): boolean {

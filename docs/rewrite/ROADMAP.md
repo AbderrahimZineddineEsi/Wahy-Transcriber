@@ -221,13 +221,20 @@ decisions and why). The problems being fixed are in the friction map: https://cl
     Features: F-065, F-084 to F-089, F-091 to F-093, F-095, F-096, N-020.
   - Learn: orchestrating a job.
 
-- [ ] **15. Web: verification and telemetry**: Sonnet 5.5, high.
+- [x] **15. Web: verification and telemetry**: Sonnet 5.5, high.
   - Verifier settings (provider, model, options), the estimate dialog where quotes can be unticked, progress with
     pause, verdict chips, the expand button, and the request log with its inspector.
   - Done when: Vitest and Playwright pass.
   - Feature check: verify the sample lecture with Laya in the new app; filtering out "ordinary speech" hides those
     findings in the transcript and the captions but keeps their words.
     Features: F-036, F-037, F-066, F-080 to F-091, F-095, F-096.
+  - Feature check result (2026-11-06): `e2e/live-laya.spec.ts` verified the sample lecture with Laya
+    `laya-wahy-r6-v3_mixed` on the GTX 1050 (27 s): every ticked quote got a verdict, the log showed the Laya requests with
+    the v3 envelope, and hiding "ordinary speech" hid the false finding (Muslim 2149) and kept all its words.
+  - Notes: the estimate is a panel beside the list (as in the approved mockup), not a dialog. A row in a running pass
+    shows "Queued", not "checking": the server does not say which finding is in flight. The quote card got the user's
+    verdict buttons and "Complete the quote"; the transcript got the ✂ marks (`MISSING_BOTH` is now a boundary the
+    view knows). Laya's load/unload buttons (F-097, F-098) belong to the later phase that lists them.
   - Learn: optimistic updates.
 
 ### Editing and export

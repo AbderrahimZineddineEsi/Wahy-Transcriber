@@ -74,3 +74,7 @@ anything new; phase 8 is already ticked.
 ## Running now: phase 14 Verification pass and telemetry (server) (Opus 5.5, high)
 - Child: refactoring-step-14, session ID c2432f0d-19cd-4c4f-86d5-727358cc9fe2, log: /tmp/claude-1000/-home-zeno-Documents-work-new-projects-Wahy-Transcriber/428c450a-c0e2-4fc7-86dc-884ec1da7570/scratchpad/step-14.json. Launcher: /tmp/claude-1000/-home-zeno-Documents-work-new-projects-Wahy-Transcriber/428c450a-c0e2-4fc7-86dc-884ec1da7570/scratchpad/run_phase.sh. Phase 13 done (6e0e658).
 - If it died (usage limit?): git status/log, then `claude -p --resume c2432f0d-19cd-4c4f-86d5-727358cc9fe2 "Continue phase 14 from where you stopped..."`
+
+## Running now: phase 15 Web: verification and telemetry (Sonnet 5.5, high)
+- Child: refactoring-step-15, session ID 463951de-720e-4402-be0d-4657e1bdb09f, log: /tmp/claude-1000/-home-zeno-Documents-work-new-projects-Wahy-Transcriber/428c450a-c0e2-4fc7-86dc-884ec1da7570/scratchpad/step-15.json. Phase 14 done (2ae3607).
+- If it died: git status/log, then `claude -p --resume 463951de-720e-4402-be0d-4657e1bdb09f "Continue phase 15 from where you stopped..."`

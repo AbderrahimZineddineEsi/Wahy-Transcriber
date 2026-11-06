@@ -1,4 +1,5 @@
 import { memo, useEffect, useLayoutEffect, useRef, type MouseEvent, type RefObject } from "react";
+import { useI18n } from "../../../shell/i18n";
 import type { Clock } from "./clock";
 import type { Paragraph, ViewFinding, Word } from "./model";
 import { wordAt } from "./sync";
@@ -36,7 +37,12 @@ export const Transcript = memo(function Transcript({ paragraphs, words, onWord, 
   );
 });
 
+/** F-090: a verdict that says the quote starts or ends too early/late is drawn as a ✂ at that edge. */
+const cutAt = (f: ViewFinding, edge: "start" | "end") =>
+  f.verdict !== "bad" && (f.boundary === "missBoth" || f.boundary === (edge === "start" ? "missStart" : "missEnd"));
+
 const ParagraphView = memo(function ParagraphView({ p, words }: { p: Paragraph; words: readonly Word[] }) {
+  const { t } = useI18n();
   return (
     <p data-first={p.first} data-last={p.last} style={{ containIntrinsicSize: `auto ${Math.ceil((p.last - p.first + 1) / 11) * 2.8}em` }}>
       {p.pieces.map((piece) => {
@@ -55,6 +61,11 @@ const ParagraphView = memo(function ParagraphView({ p, words }: { p: Paragraph; 
           <span key={`q${f.start}`}>
             <span className={`f ${f.kind}${f.verdict === "bad" ? " bad" : ""}`} data-f={f.key} data-kind={f.kind} data-verdict={f.verdict}>
               <span className="br">{open}</span>
+              {cutAt(f, "start") && (
+                <span className="cut" title={t("boundary.missStart")} data-cut="start">
+                  ✂
+                </span>
+              )}
               {piece.tokens.map((tok, k) => (
                 <span key={k}>
                   <span className="w" data-i={tok.i}>
@@ -63,6 +74,11 @@ const ParagraphView = memo(function ParagraphView({ p, words }: { p: Paragraph; 
                   {k < piece.tokens.length - 1 ? " " : ""}
                 </span>
               ))}
+              {cutAt(f, "end") && (
+                <span className="cut" title={t("boundary.missEnd")} data-cut="end">
+                  ✂
+                </span>
+              )}
               <span className="br">{close}</span>
               <button type="button" className="ref" data-ref={f.key} aria-label={f.ref}>
                 <span className={`vd ${f.verdict}`} />
