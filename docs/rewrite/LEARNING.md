@@ -736,3 +736,75 @@ prepared the real Open Hadith Data through the API.
 xdg-open docs/rewrite/mockups/screens.html     # click a word, press تشغيل, click a reference tag, open التحرير
 grep -n "quran" web/src/shell/tokens.css       # one colour, three places: light, dark, and the Tailwind name
 ```
+
+## Phase 10: Web shell (2026-11-06)
+
+### What was built
+
+- **The shell** (`web/src/shell/`): a header (brand, server badge, running-jobs pill, language and theme buttons), a
+  rail with the app's places (lectures, sources, training data, request log, settings), and the page area. Every
+  place except Settings is a "coming soon" panel until its phase. The mockup's look comes from `tokens.css`; the
+  small shared pieces (`.panel`, `.btn`, `.vchip`, `.seg`) are written once in `index.css`.
+- **i18n by keys** (`shell/i18n/`): `t("nav.settings")` looks the text up in `ar.ts` or `en.ts`. Arabic is the
+  default; the choice sets `<html lang dir>` and is remembered in `localStorage`.
+- **Theme** (`shell/theme.tsx`): light, dark, or follow the system, through `<html data-theme>` (the tokens do the
+  rest). Remembered the same way.
+- **Toasts and the error report** (`shell/toasts.tsx`, `ErrorReport.tsx`): success and error messages; an error toast
+  has a "Details" button that opens a Markdown report (endpoint, status, what the server said, the last ten requests,
+  the stack) to copy. It never contains a request body, so a key you were saving cannot end up in it.
+- **The API client** (`web/src/api/`): `schema.d.ts` is generated from the server's OpenAPI file
+  (`openapi.json`); `client.ts` wraps `openapi-fetch` so a 4xx/5xx or a dead server throws one kind of error.
+- **Settings screen** (`features/settings/`): API keys (set / not set, save, remove), a status table (server, engine,
+  corpus, GPU and loaded model) and the interface switches.
+- **Server side** (needed for the settings screen): `GET /api/health` now reports keys, GPU, engine, corpus and
+  running jobs; `PUT /api/settings/keys/{provider}` writes the key to `.env` (kept `0600`) and uses it at once.
+  Keys go in and never come out: the answers only say "set" or "not set".
+
+### New concepts
+
+- **Components and hooks.** A React component is a function that returns what the screen should look like for
+  its current data. A hook is a function starting with `use` that gives a component a capability. In `KeyRow`,
+  `const [value, setValue] = useState("")` remembers what you typed; when `setValue` runs, React calls `KeyRow` again
+  and the input shows the new value. It is the same idea as a Flutter `StatefulWidget`'s `setState`, but there is no
+  class, and the state lives right next to the code that uses it.
+- **Context.** `useI18n()` can be called from any component because `<I18nProvider>` at the top holds the language and
+  hands it down, like `Provider` in Flutter. That is why the nesting order in `Providers.tsx` matters: toasts need the
+  language, so they sit inside it.
+- **Server state with TanStack Query.** `useHealth()` is `useQuery({ queryKey: ["health"], queryFn, refetchInterval })`.
+  The library fetches, caches under that key, shares one request between every component that asks, refetches every
+  10 s, and tells each component when the data changes. After saving a key, `queryClient.setQueryData(["health"], …)`
+  updates the cache and every screen showing key status redraws; no manual refresh. Compare with the old app, where
+  10 files edited one global object and called render by hand.
+- **Generated API types.** `npm run api:generate` (in `web/`) asks the Python server for its OpenAPI schema, saves it
+  as `openapi.json`, and `openapi-typescript` turns it into `schema.d.ts`. Then `api.PUT("/api/settings/keys/{provider}",
+  { body: { value } })` is checked by TypeScript: a wrong path, a wrong field or a changed response is a compile error.
+  If someone changes the server and forgets to regenerate, `server/tests/test_openapi.py` fails; if they regenerate and
+  the web code no longer fits, `npm run typecheck` fails. Either way the break is found before anything runs.
+- **Keys that never come back.** The browser sends a key once, the server stores it, and every later answer is a
+  boolean. The check is a test: `test_a_saved_key_shows_as_set_and_is_never_returned` looks for the key text in the
+  response, and the Playwright test looks for it in the page HTML.
+- **A smoke test.** One Playwright test that opens the real app, against the real server (own temp database and
+  `.env`), and walks the main path. It cannot find every bug, but it fails at once when the app does not start,
+  the proxy is wrong, or a screen crashes.
+
+### How it was checked
+
+- Server: `server/tests/test_health.py` (health shape; a saved key is set, usable at once, survives a restart, is
+  never returned; removing; unknown provider; a line break is refused; `.env` keeps other lines and mode 600) and
+  `test_openapi.py`. 164 pass.
+- Web (Vitest, 19 tests): language and theme switch and are remembered; an unreachable server shows in the header; a
+  missing corpus shows the banner; a saved key flips to "set"; a failed save opens an error report that names the
+  endpoint and does not hold the key; both language files have the same keys and `{slots}`.
+- Playwright smoke: opens in Arabic right to left, switches the theme and language (kept after a reload), saves a
+  Gemini key, sees it as set, and checks `/api/health` agrees and does not contain the key.
+- A pitfall found on the way: my shell has a real `GEMINI_API_KEY`, and environment variables beat `.env`, so the
+  first smoke run saw the key as already set. The test server now starts with all four keys set to empty.
+- Screenshots of the Settings screen (Arabic light, English dark) were compared with the mockup by eye.
+
+**Try:**
+
+```bash
+cd web && npm run api:generate          # regenerate the types after changing the server's routes
+cd web && npm test && npm run e2e       # Vitest, then the Playwright smoke test (starts both servers itself)
+scripts/dev.sh                          # server on 8120, web on 5173: open http://localhost:5173/settings
+```

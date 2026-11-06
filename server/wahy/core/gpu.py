@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import gc
 import logging
+import subprocess
 import sys
 import threading
 from collections import Counter
@@ -56,6 +57,26 @@ def free_cuda_memory() -> None:
     torch = sys.modules.get("torch")
     if torch is not None and torch.cuda.is_available():
         torch.cuda.empty_cache()
+
+
+@dataclass(frozen=True)
+class CudaCard:
+    name: str
+    total_mb: int
+    free_mb: int
+
+
+def cuda_card() -> CudaCard | None:
+    """The first NVIDIA card as `nvidia-smi` sees it, or None (no card, no driver, or the tool timed out).
+    Asking the tool avoids importing torch just to answer a health check."""
+    try:
+        out = subprocess.run(
+            ["nvidia-smi", "--query-gpu=name,memory.total,memory.free", "--format=csv,noheader,nounits"],
+            capture_output=True, text=True, timeout=3, check=True).stdout
+        name, total, free = (part.strip() for part in out.splitlines()[0].split(","))
+        return CudaCard(name, int(total), int(free))
+    except (OSError, subprocess.SubprocessError, ValueError, IndexError):
+        return None
 
 
 class GpuOwner:

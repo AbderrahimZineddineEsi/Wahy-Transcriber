@@ -1,0 +1,3430 @@
+{
+  "components": {
+    "schemas": {
+      "ActivateRequest": {
+        "properties": {
+          "source_id": {
+            "title": "Source Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "source_id"
+        ],
+        "title": "ActivateRequest",
+        "type": "object"
+      },
+      "Body_attach_media_api_lectures__lecture_id__media_put": {
+        "properties": {
+          "file": {
+            "contentMediaType": "application/octet-stream",
+            "title": "File",
+            "type": "string"
+          }
+        },
+        "required": [
+          "file"
+        ],
+        "title": "Body_attach_media_api_lectures__lecture_id__media_put",
+        "type": "object"
+      },
+      "Body_import_text_file_api_lectures_import_post": {
+        "properties": {
+          "file": {
+            "contentMediaType": "application/octet-stream",
+            "title": "File",
+            "type": "string"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          }
+        },
+        "required": [
+          "file"
+        ],
+        "title": "Body_import_text_file_api_lectures_import_post",
+        "type": "object"
+      },
+      "Body_transcribe_upload_api_transcriptions_upload_post": {
+        "properties": {
+          "auto_fallback": {
+            "default": true,
+            "title": "Auto Fallback",
+            "type": "boolean"
+          },
+          "file": {
+            "contentMediaType": "application/octet-stream",
+            "title": "File",
+            "type": "string"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          }
+        },
+        "required": [
+          "file"
+        ],
+        "title": "Body_transcribe_upload_api_transcriptions_upload_post",
+        "type": "object"
+      },
+      "Body_upload_source_api_corpora_sources__source_id__upload_post": {
+        "properties": {
+          "file": {
+            "contentMediaType": "application/octet-stream",
+            "title": "File",
+            "type": "string"
+          }
+        },
+        "required": [
+          "file"
+        ],
+        "title": "Body_upload_source_api_corpora_sources__source_id__upload_post",
+        "type": "object"
+      },
+      "CorpusHealth": {
+        "properties": {
+          "hadith_source": {
+            "title": "Hadith Source",
+            "type": "string"
+          },
+          "ready": {
+            "description": "the Quran and hadith corpus file exists",
+            "title": "Ready",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "ready",
+          "hadith_source"
+        ],
+        "title": "CorpusHealth",
+        "type": "object"
+      },
+      "CorpusInfo": {
+        "description": "What the engine has loaded. Starts the engine worker if it is not running (seconds).",
+        "properties": {
+          "adhkar": {
+            "title": "Adhkar",
+            "type": "integer"
+          },
+          "custom_quotes": {
+            "title": "Custom Quotes",
+            "type": "integer"
+          },
+          "fingerprint": {
+            "additionalProperties": true,
+            "title": "Fingerprint",
+            "type": "object"
+          },
+          "hadith_source": {
+            "title": "Hadith Source",
+            "type": "string"
+          },
+          "hadiths": {
+            "title": "Hadiths",
+            "type": "integer"
+          },
+          "quran": {
+            "title": "Quran",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "quran",
+          "hadiths",
+          "adhkar",
+          "custom_quotes",
+          "hadith_source",
+          "fingerprint"
+        ],
+        "title": "CorpusInfo",
+        "type": "object"
+      },
+      "CreateLecture": {
+        "description": "Pasted text or the content of a subtitle file. Subtitle cues are recognised from the content (or from\n`filename`), anything else is plain text.",
+        "properties": {
+          "filename": {
+            "default": "",
+            "title": "Filename",
+            "type": "string"
+          },
+          "text": {
+            "minLength": 1,
+            "title": "Text",
+            "type": "string"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "title": "CreateLecture",
+        "type": "object"
+      },
+      "CreateVersion": {
+        "properties": {
+          "name": {
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "snapshot": {
+            "additionalProperties": true,
+            "title": "Snapshot",
+            "type": "object"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "CreateVersion",
+        "type": "object"
+      },
+      "DetectRequest": {
+        "description": "Overrides for one detection; what is left out comes from the saved settings.",
+        "properties": {
+          "adhkar": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Adhkar"
+          },
+          "engine": {
+            "anyOf": [
+              {
+                "pattern": "^v[345](:loose)?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Engine"
+          },
+          "qiraat": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Za-z_]{1,32}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Qiraat"
+          }
+        },
+        "title": "DetectRequest",
+        "type": "object"
+      },
+      "DetectStarted": {
+        "properties": {
+          "job": {
+            "$ref": "#/components/schemas/JobSnapshot"
+          }
+        },
+        "required": [
+          "job"
+        ],
+        "title": "DetectStarted",
+        "type": "object"
+      },
+      "DetectionPatch": {
+        "properties": {
+          "adhkar": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Adhkar"
+          },
+          "engine": {
+            "anyOf": [
+              {
+                "pattern": "^v[345](:loose)?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Engine"
+          },
+          "qiraat": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Za-z_]{1,32}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Qiraat"
+          }
+        },
+        "title": "DetectionPatch",
+        "type": "object"
+      },
+      "DetectionSettings": {
+        "description": "What a detection uses unless the request says otherwise (remembered between sessions).",
+        "properties": {
+          "adhkar": {
+            "default": true,
+            "description": "look for adhkar too",
+            "title": "Adhkar",
+            "type": "boolean"
+          },
+          "engine": {
+            "default": "v5",
+            "pattern": "^v[345](:loose)?$",
+            "title": "Engine",
+            "type": "string"
+          },
+          "qiraat": {
+            "default": "AUTO",
+            "pattern": "^[A-Za-z_]{1,32}$",
+            "title": "Qiraat",
+            "type": "string"
+          }
+        },
+        "title": "DetectionSettings",
+        "type": "object"
+      },
+      "DhikrIn": {
+        "properties": {
+          "category": {
+            "default": "أذكار متفرقة",
+            "title": "Category",
+            "type": "string"
+          },
+          "ref": {
+            "title": "Ref",
+            "type": "string"
+          },
+          "t": {
+            "title": "T",
+            "type": "string"
+          }
+        },
+        "required": [
+          "ref",
+          "t"
+        ],
+        "title": "DhikrIn",
+        "type": "object"
+      },
+      "DhikrOut": {
+        "properties": {
+          "category": {
+            "title": "Category",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "is_custom": {
+            "title": "Is Custom",
+            "type": "boolean"
+          },
+          "ref": {
+            "title": "Ref",
+            "type": "string"
+          },
+          "t": {
+            "title": "T",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "category",
+          "ref",
+          "t",
+          "is_custom",
+          "created_at"
+        ],
+        "title": "DhikrOut",
+        "type": "object"
+      },
+      "EngineHealth": {
+        "properties": {
+          "calls": {
+            "title": "Calls",
+            "type": "integer"
+          },
+          "running": {
+            "title": "Running",
+            "type": "boolean"
+          },
+          "starts": {
+            "title": "Starts",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "running",
+          "starts",
+          "calls"
+        ],
+        "title": "EngineHealth",
+        "type": "object"
+      },
+      "FindingOut": {
+        "properties": {
+          "data": {
+            "additionalProperties": true,
+            "description": "the engine's whole finding object",
+            "title": "Data",
+            "type": "object"
+          },
+          "display_ref": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Display Ref"
+          },
+          "engine": {
+            "title": "Engine",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "idx": {
+            "title": "Idx",
+            "type": "integer"
+          },
+          "source_type": {
+            "title": "Source Type",
+            "type": "string"
+          },
+          "unit_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unit Id"
+          },
+          "word_end": {
+            "title": "Word End",
+            "type": "integer"
+          },
+          "word_start": {
+            "title": "Word Start",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "idx",
+          "engine",
+          "source_type",
+          "unit_id",
+          "display_ref",
+          "word_start",
+          "word_end",
+          "data"
+        ],
+        "title": "FindingOut",
+        "type": "object"
+      },
+      "FindingsOut": {
+        "properties": {
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "findings": {
+            "items": {
+              "$ref": "#/components/schemas/FindingOut"
+            },
+            "title": "Findings",
+            "type": "array"
+          },
+          "lecture_id": {
+            "title": "Lecture Id",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "lecture_id",
+          "count",
+          "findings"
+        ],
+        "title": "FindingsOut",
+        "type": "object"
+      },
+      "GpuHealth": {
+        "properties": {
+          "card": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "the NVIDIA card's name, or null when there is none",
+            "title": "Card"
+          },
+          "free_mb": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Free Mb"
+          },
+          "in_use": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "the model a job is using now",
+            "title": "In Use"
+          },
+          "resident": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "the model loaded on the GPU now",
+            "title": "Resident"
+          },
+          "total_mb": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Total Mb"
+          },
+          "waiting": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Waiting",
+            "type": "array"
+          }
+        },
+        "title": "GpuHealth",
+        "type": "object"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "Health": {
+        "properties": {
+          "corpus": {
+            "$ref": "#/components/schemas/CorpusHealth"
+          },
+          "engine": {
+            "$ref": "#/components/schemas/EngineHealth"
+          },
+          "gpu": {
+            "$ref": "#/components/schemas/GpuHealth"
+          },
+          "keys": {
+            "additionalProperties": {
+              "type": "boolean"
+            },
+            "description": "provider → is its key set",
+            "title": "Keys",
+            "type": "object"
+          },
+          "running_jobs": {
+            "title": "Running Jobs",
+            "type": "integer"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "keys",
+          "gpu",
+          "engine",
+          "corpus",
+          "running_jobs"
+        ],
+        "title": "Health",
+        "type": "object"
+      },
+      "JobSnapshot": {
+        "description": "What the web app sees of a job: the API's response and each event on its progress stream.",
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "finished_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finished At"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "lecture_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lecture Id"
+          },
+          "params": {
+            "additionalProperties": true,
+            "title": "Params",
+            "type": "object"
+          },
+          "progress": {
+            "additionalProperties": true,
+            "title": "Progress",
+            "type": "object"
+          },
+          "result": {
+            "anyOf": [
+              {},
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Result"
+          },
+          "started_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started At"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "status",
+          "lecture_id",
+          "params",
+          "progress",
+          "result",
+          "error",
+          "created_at",
+          "started_at",
+          "finished_at",
+          "updated_at"
+        ],
+        "title": "JobSnapshot",
+        "type": "object"
+      },
+      "KeyUpdate": {
+        "description": "`value` is the new key; an empty or missing value removes it.",
+        "properties": {
+          "value": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "title": "KeyUpdate",
+        "type": "object"
+      },
+      "LectureDetail": {
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "duration_s": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration S"
+          },
+          "has_media": {
+            "title": "Has Media",
+            "type": "boolean"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "language": {
+            "title": "Language",
+            "type": "string"
+          },
+          "source_kind": {
+            "title": "Source Kind",
+            "type": "string"
+          },
+          "source_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Url"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "transcription_model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Transcription Model"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          },
+          "version_count": {
+            "title": "Version Count",
+            "type": "integer"
+          },
+          "word_count": {
+            "title": "Word Count",
+            "type": "integer"
+          },
+          "words": {
+            "items": {
+              "$ref": "#/components/schemas/WordOut"
+            },
+            "title": "Words",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "source_kind",
+          "source_url",
+          "has_media",
+          "duration_s",
+          "language",
+          "transcription_model",
+          "word_count",
+          "version_count",
+          "created_at",
+          "updated_at",
+          "words"
+        ],
+        "title": "LectureDetail",
+        "type": "object"
+      },
+      "LectureSummary": {
+        "description": "One row of the saved lectures list.",
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "duration_s": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration S"
+          },
+          "has_media": {
+            "title": "Has Media",
+            "type": "boolean"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "language": {
+            "title": "Language",
+            "type": "string"
+          },
+          "source_kind": {
+            "title": "Source Kind",
+            "type": "string"
+          },
+          "source_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Url"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "transcription_model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Transcription Model"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          },
+          "version_count": {
+            "title": "Version Count",
+            "type": "integer"
+          },
+          "word_count": {
+            "title": "Word Count",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "source_kind",
+          "source_url",
+          "has_media",
+          "duration_s",
+          "language",
+          "transcription_model",
+          "word_count",
+          "version_count",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "LectureSummary",
+        "type": "object"
+      },
+      "ModelInfo": {
+        "properties": {
+          "available": {
+            "title": "Available",
+            "type": "boolean"
+          },
+          "default": {
+            "default": false,
+            "title": "Default",
+            "type": "boolean"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "kind",
+          "available"
+        ],
+        "title": "ModelInfo",
+        "type": "object"
+      },
+      "PrepareRequest": {
+        "properties": {
+          "redownload": {
+            "default": false,
+            "description": "throw the cached download away and fetch it again",
+            "title": "Redownload",
+            "type": "boolean"
+          }
+        },
+        "title": "PrepareRequest",
+        "type": "object"
+      },
+      "QuoteIn": {
+        "properties": {
+          "ref": {
+            "default": "حديث خارج القاعدة",
+            "title": "Ref",
+            "type": "string"
+          },
+          "t": {
+            "description": "the text, at least 4 characters",
+            "title": "T",
+            "type": "string"
+          }
+        },
+        "required": [
+          "t"
+        ],
+        "title": "QuoteIn",
+        "type": "object"
+      },
+      "QuoteOut": {
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "ref": {
+            "title": "Ref",
+            "type": "string"
+          },
+          "t": {
+            "title": "T",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "ref",
+          "t",
+          "created_at"
+        ],
+        "title": "QuoteOut",
+        "type": "object"
+      },
+      "RenameLecture": {
+        "properties": {
+          "title": {
+            "minLength": 1,
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "title"
+        ],
+        "title": "RenameLecture",
+        "type": "object"
+      },
+      "RenameVersion": {
+        "properties": {
+          "name": {
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "RenameVersion",
+        "type": "object"
+      },
+      "SearchHit": {
+        "properties": {
+          "displayRef": {
+            "title": "Displayref",
+            "type": "string"
+          },
+          "fullText": {
+            "title": "Fulltext",
+            "type": "string"
+          },
+          "sourceType": {
+            "title": "Sourcetype",
+            "type": "string"
+          },
+          "unitId": {
+            "title": "Unitid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "unitId",
+          "sourceType",
+          "displayRef",
+          "fullText"
+        ],
+        "title": "SearchHit",
+        "type": "object"
+      },
+      "SourceOut": {
+        "description": "A hadith corpus source. `status`: ready | preparing | missing.",
+        "properties": {
+          "active": {
+            "title": "Active",
+            "type": "boolean"
+          },
+          "built_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Built At"
+          },
+          "builtin": {
+            "title": "Builtin",
+            "type": "boolean"
+          },
+          "by_book": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "integer"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "By Book"
+          },
+          "count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Count"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "page_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Page Url"
+          },
+          "preparing_job": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Preparing Job"
+          },
+          "size_mb": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Size Mb"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Version"
+          },
+          "zip_cached": {
+            "title": "Zip Cached",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "description",
+          "builtin",
+          "page_url",
+          "version",
+          "status",
+          "active",
+          "count",
+          "by_book",
+          "built_at",
+          "size_mb",
+          "zip_cached",
+          "preparing_job"
+        ],
+        "title": "SourceOut",
+        "type": "object"
+      },
+      "TranscribeOptions": {
+        "properties": {
+          "auto_fallback": {
+            "default": true,
+            "description": "when the model fails, try the next one (Groq, then local turbo, then local small)",
+            "title": "Auto Fallback",
+            "type": "boolean"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "a model id from /api/transcription/models; default: Groq when its key is set, else local small",
+            "title": "Model"
+          }
+        },
+        "title": "TranscribeOptions",
+        "type": "object"
+      },
+      "ValidationError": {
+        "properties": {
+          "ctx": {
+            "title": "Context",
+            "type": "object"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
+      },
+      "VersionDetail": {
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "lecture_id": {
+            "title": "Lecture Id",
+            "type": "integer"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "snapshot": {
+            "additionalProperties": true,
+            "title": "Snapshot",
+            "type": "object"
+          }
+        },
+        "required": [
+          "id",
+          "lecture_id",
+          "name",
+          "created_at",
+          "snapshot"
+        ],
+        "title": "VersionDetail",
+        "type": "object"
+      },
+      "VersionSummary": {
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "lecture_id": {
+            "title": "Lecture Id",
+            "type": "integer"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "lecture_id",
+          "name",
+          "created_at"
+        ],
+        "title": "VersionSummary",
+        "type": "object"
+      },
+      "WordOut": {
+        "properties": {
+          "end": {
+            "title": "End",
+            "type": "number"
+          },
+          "idx": {
+            "title": "Idx",
+            "type": "integer"
+          },
+          "start": {
+            "title": "Start",
+            "type": "number"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "idx",
+          "text",
+          "start",
+          "end"
+        ],
+        "title": "WordOut",
+        "type": "object"
+      },
+      "YoutubeRequest": {
+        "properties": {
+          "auto_fallback": {
+            "default": true,
+            "description": "when the model fails, try the next one (Groq, then local turbo, then local small)",
+            "title": "Auto Fallback",
+            "type": "boolean"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "a model id from /api/transcription/models; default: Groq when its key is set, else local small",
+            "title": "Model"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          },
+          "url": {
+            "title": "Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ],
+        "title": "YoutubeRequest",
+        "type": "object"
+      },
+      "wahy__features__corpora__schemas__Started": {
+        "properties": {
+          "job": {
+            "$ref": "#/components/schemas/JobSnapshot"
+          }
+        },
+        "required": [
+          "job"
+        ],
+        "title": "Started",
+        "type": "object"
+      },
+      "wahy__features__transcription__schemas__Started": {
+        "description": "A lecture and the transcription job that is filling it; follow the job at /api/jobs/{id}/events.",
+        "properties": {
+          "job": {
+            "$ref": "#/components/schemas/JobSnapshot"
+          },
+          "lecture": {
+            "$ref": "#/components/schemas/LectureSummary"
+          }
+        },
+        "required": [
+          "lecture",
+          "job"
+        ],
+        "title": "Started",
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "title": "Wahy-Finder",
+    "version": "0.1.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/api/corpora/active-hadith-source": {
+      "put": {
+        "description": "Choose which hadith source the engine searches. A source that is not prepared is refused (409).",
+        "operationId": "choose_hadith_source_api_corpora_active_hadith_source_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ActivateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SourceOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Choose Hadith Source",
+        "tags": [
+          "corpora"
+        ]
+      }
+    },
+    "/api/corpora/adhkar": {
+      "get": {
+        "operationId": "list_adhkar_api_corpora_adhkar_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/DhikrOut"
+                  },
+                  "title": "Response List Adhkar Api Corpora Adhkar Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "List Adhkar",
+        "tags": [
+          "corpora"
+        ]
+      },
+      "post": {
+        "operationId": "add_dhikr_api_corpora_adhkar_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DhikrIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DhikrOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Add Dhikr",
+        "tags": [
+          "corpora"
+        ]
+      }
+    },
+    "/api/corpora/adhkar/{dhikr_id}": {
+      "delete": {
+        "operationId": "delete_dhikr_api_corpora_adhkar__dhikr_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "dhikr_id",
+            "required": true,
+            "schema": {
+              "title": "Dhikr Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Delete Dhikr",
+        "tags": [
+          "corpora"
+        ]
+      },
+      "put": {
+        "operationId": "update_dhikr_api_corpora_adhkar__dhikr_id__put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "dhikr_id",
+            "required": true,
+            "schema": {
+              "title": "Dhikr Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DhikrIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DhikrOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Update Dhikr",
+        "tags": [
+          "corpora"
+        ]
+      }
+    },
+    "/api/corpora/custom-quotes": {
+      "get": {
+        "operationId": "list_quotes_api_corpora_custom_quotes_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/QuoteOut"
+                  },
+                  "title": "Response List Quotes Api Corpora Custom Quotes Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "List Quotes",
+        "tags": [
+          "corpora"
+        ]
+      },
+      "post": {
+        "operationId": "add_quote_api_corpora_custom_quotes_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuoteIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuoteOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Add Quote",
+        "tags": [
+          "corpora"
+        ]
+      }
+    },
+    "/api/corpora/custom-quotes/{quote_id}": {
+      "delete": {
+        "operationId": "delete_quote_api_corpora_custom_quotes__quote_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "quote_id",
+            "required": true,
+            "schema": {
+              "title": "Quote Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Delete Quote",
+        "tags": [
+          "corpora"
+        ]
+      },
+      "put": {
+        "operationId": "update_quote_api_corpora_custom_quotes__quote_id__put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "quote_id",
+            "required": true,
+            "schema": {
+              "title": "Quote Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuoteIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuoteOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Update Quote",
+        "tags": [
+          "corpora"
+        ]
+      }
+    },
+    "/api/corpora/info": {
+      "get": {
+        "description": "What the engine has loaded: the Quran and hadith counts and the engine's fingerprint. The first call\nstarts the engine worker, which takes a few seconds.",
+        "operationId": "corpus_info_api_corpora_info_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CorpusInfo"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Corpus Info",
+        "tags": [
+          "corpora"
+        ]
+      }
+    },
+    "/api/corpora/sources": {
+      "get": {
+        "operationId": "list_sources_api_corpora_sources_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/SourceOut"
+                  },
+                  "title": "Response List Sources Api Corpora Sources Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "List Sources",
+        "tags": [
+          "corpora"
+        ]
+      }
+    },
+    "/api/corpora/sources/{source_id}": {
+      "delete": {
+        "description": "Forget a prepared source and its cached download (the engine goes back to the built-in hadiths if it\nwas the one in use). Prepare it again to download it afresh.",
+        "operationId": "delete_source_api_corpora_sources__source_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "source_id",
+            "required": true,
+            "schema": {
+              "title": "Source Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "keep_download",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Keep Download",
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Delete Source",
+        "tags": [
+          "corpora"
+        ]
+      }
+    },
+    "/api/corpora/sources/{source_id}/prepare": {
+      "post": {
+        "operationId": "prepare_source_api_corpora_sources__source_id__prepare_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "source_id",
+            "required": true,
+            "schema": {
+              "title": "Source Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/PrepareRequest"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Body"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/wahy__features__corpora__schemas__Started"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Prepare Source",
+        "tags": [
+          "corpora"
+        ]
+      }
+    },
+    "/api/corpora/sources/{source_id}/upload": {
+      "post": {
+        "description": "For when the download is blocked: upload the release zip by hand; the source is prepared from it.",
+        "operationId": "upload_source_api_corpora_sources__source_id__upload_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "source_id",
+            "required": true,
+            "schema": {
+              "title": "Source Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_upload_source_api_corpora_sources__source_id__upload_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/wahy__features__corpora__schemas__Started"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Upload Source",
+        "tags": [
+          "corpora"
+        ]
+      }
+    },
+    "/api/corpus/search": {
+      "get": {
+        "description": "Corpus units (ayat, hadiths, adhkar, custom quotes) whose reference or text contains `q`. An empty `q`\nlists the first units. The first call starts the engine worker, which takes a few seconds.",
+        "operationId": "search_corpus_api_corpus_search_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "default": "",
+              "title": "Q",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "kind",
+            "required": false,
+            "schema": {
+              "default": "ALL",
+              "title": "Kind",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 30,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/SearchHit"
+                  },
+                  "title": "Response Search Corpus Api Corpus Search Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Search Corpus",
+        "tags": [
+          "detection"
+        ]
+      }
+    },
+    "/api/detection/settings": {
+      "get": {
+        "operationId": "get_detection_settings_api_detection_settings_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DetectionSettings"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Get Detection Settings",
+        "tags": [
+          "detection"
+        ]
+      },
+      "patch": {
+        "description": "Change the engine choice, the Qira'ah or the adhkar switch used by the next detection.",
+        "operationId": "update_detection_settings_api_detection_settings_patch",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DetectionPatch"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DetectionSettings"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Update Detection Settings",
+        "tags": [
+          "detection"
+        ]
+      }
+    },
+    "/api/health": {
+      "get": {
+        "operationId": "health_api_health_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Health",
+        "tags": [
+          "settings"
+        ]
+      }
+    },
+    "/api/jobs": {
+      "get": {
+        "operationId": "list_jobs_api_jobs_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "lecture_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Lecture Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "kind",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Kind"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/JobSnapshot"
+                  },
+                  "title": "Response List Jobs Api Jobs Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List Jobs",
+        "tags": [
+          "jobs"
+        ]
+      }
+    },
+    "/api/jobs/{job_id}": {
+      "get": {
+        "operationId": "get_job_api_jobs__job_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobSnapshot"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Job",
+        "tags": [
+          "jobs"
+        ]
+      }
+    },
+    "/api/jobs/{job_id}/cancel": {
+      "post": {
+        "operationId": "cancel_job_api_jobs__job_id__cancel_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobSnapshot"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Cancel Job",
+        "tags": [
+          "jobs"
+        ]
+      }
+    },
+    "/api/jobs/{job_id}/events": {
+      "get": {
+        "description": "The job's progress stream. In the browser: `new EventSource(\"/api/jobs/<id>/events\")`.",
+        "operationId": "job_events_api_jobs__job_id__events_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "text/event-stream": {}
+            },
+            "description": "One `data:` line per change, each a JobSnapshot as JSON; the stream ends when the job ends."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Job Events",
+        "tags": [
+          "jobs"
+        ]
+      }
+    },
+    "/api/jobs/{job_id}/pause": {
+      "post": {
+        "operationId": "pause_job_api_jobs__job_id__pause_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobSnapshot"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Pause Job",
+        "tags": [
+          "jobs"
+        ]
+      }
+    },
+    "/api/jobs/{job_id}/resume": {
+      "post": {
+        "operationId": "resume_job_api_jobs__job_id__resume_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobSnapshot"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Resume Job",
+        "tags": [
+          "jobs"
+        ]
+      }
+    },
+    "/api/lectures": {
+      "delete": {
+        "description": "Delete every lecture. Needs `?confirm=true`.",
+        "operationId": "delete_all_lectures_api_lectures_delete",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "confirm",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Confirm",
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "integer"
+                  },
+                  "title": "Response Delete All Lectures Api Lectures Delete",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Delete All Lectures",
+        "tags": [
+          "lectures"
+        ]
+      },
+      "get": {
+        "operationId": "list_lectures_api_lectures_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/LectureSummary"
+                  },
+                  "title": "Response List Lectures Api Lectures Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "List Lectures",
+        "tags": [
+          "lectures"
+        ]
+      },
+      "post": {
+        "description": "Pasted text, or the content of an .srt / .vtt file (subtitle cues keep their times).",
+        "operationId": "create_lecture_api_lectures_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateLecture"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LectureDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Create Lecture",
+        "tags": [
+          "lectures"
+        ]
+      }
+    },
+    "/api/lectures/import": {
+      "post": {
+        "description": "Upload a .txt, .srt or .vtt file.",
+        "operationId": "import_text_file_api_lectures_import_post",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_import_text_file_api_lectures_import_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LectureDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Import Text File",
+        "tags": [
+          "lectures"
+        ]
+      }
+    },
+    "/api/lectures/sample": {
+      "post": {
+        "description": "The fixed sample lecture.",
+        "operationId": "create_sample_lecture_api_lectures_sample_post",
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LectureDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Create Sample Lecture",
+        "tags": [
+          "lectures"
+        ]
+      }
+    },
+    "/api/lectures/{lecture_id}": {
+      "delete": {
+        "operationId": "delete_lecture_api_lectures__lecture_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "lecture_id",
+            "required": true,
+            "schema": {
+              "title": "Lecture Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Delete Lecture",
+        "tags": [
+          "lectures"
+        ]
+      },
+      "get": {
+        "operationId": "get_lecture_api_lectures__lecture_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "lecture_id",
+            "required": true,
+            "schema": {
+              "title": "Lecture Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LectureDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Lecture",
+        "tags": [
+          "lectures"
+        ]
+      },
+      "patch": {
+        "operationId": "rename_lecture_api_lectures__lecture_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "lecture_id",
+            "required": true,
+            "schema": {
+              "title": "Lecture Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RenameLecture"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LectureSummary"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Rename Lecture",
+        "tags": [
+          "lectures"
+        ]
+      }
+    },
+    "/api/lectures/{lecture_id}/detect": {
+      "post": {
+        "description": "Find the quotes in a lecture (replacing its findings; earlier ones are kept as a lecture version).\nReturns the job; follow it at GET /api/jobs/{id}/events.",
+        "operationId": "detect_api_lectures__lecture_id__detect_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "lecture_id",
+            "required": true,
+            "schema": {
+              "title": "Lecture Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/DetectRequest"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Body"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DetectStarted"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Detect",
+        "tags": [
+          "detection"
+        ]
+      }
+    },
+    "/api/lectures/{lecture_id}/findings": {
+      "get": {
+        "operationId": "lecture_findings_api_lectures__lecture_id__findings_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "lecture_id",
+            "required": true,
+            "schema": {
+              "title": "Lecture Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FindingsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Lecture Findings",
+        "tags": [
+          "detection"
+        ]
+      }
+    },
+    "/api/lectures/{lecture_id}/media": {
+      "get": {
+        "description": "The lecture's video or audio, for the player (supports Range requests, so seeking works).",
+        "operationId": "get_media_api_lectures__lecture_id__media_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "lecture_id",
+            "required": true,
+            "schema": {
+              "title": "Lecture Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Media",
+        "tags": [
+          "lectures"
+        ]
+      },
+      "put": {
+        "description": "Attach a local video or audio file to the lecture.",
+        "operationId": "attach_media_api_lectures__lecture_id__media_put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "lecture_id",
+            "required": true,
+            "schema": {
+              "title": "Lecture Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_attach_media_api_lectures__lecture_id__media_put"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LectureSummary"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Attach Media",
+        "tags": [
+          "lectures"
+        ]
+      }
+    },
+    "/api/lectures/{lecture_id}/transcribe": {
+      "post": {
+        "description": "Transcribe (again) a lecture that has a link or media. The new words replace the old ones.",
+        "operationId": "transcribe_lecture_api_lectures__lecture_id__transcribe_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "lecture_id",
+            "required": true,
+            "schema": {
+              "title": "Lecture Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TranscribeOptions"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/wahy__features__transcription__schemas__Started"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Transcribe Lecture",
+        "tags": [
+          "transcription"
+        ]
+      }
+    },
+    "/api/lectures/{lecture_id}/versions": {
+      "get": {
+        "operationId": "list_versions_api_lectures__lecture_id__versions_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "lecture_id",
+            "required": true,
+            "schema": {
+              "title": "Lecture Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/VersionSummary"
+                  },
+                  "title": "Response List Versions Api Lectures  Lecture Id  Versions Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List Versions",
+        "tags": [
+          "lectures"
+        ]
+      },
+      "post": {
+        "operationId": "save_version_api_lectures__lecture_id__versions_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "lecture_id",
+            "required": true,
+            "schema": {
+              "title": "Lecture Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateVersion"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionSummary"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Save Version",
+        "tags": [
+          "lectures"
+        ]
+      }
+    },
+    "/api/lectures/{lecture_id}/versions/{version_id}": {
+      "delete": {
+        "operationId": "delete_version_api_lectures__lecture_id__versions__version_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "lecture_id",
+            "required": true,
+            "schema": {
+              "title": "Lecture Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "path",
+            "name": "version_id",
+            "required": true,
+            "schema": {
+              "title": "Version Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Delete Version",
+        "tags": [
+          "lectures"
+        ]
+      },
+      "get": {
+        "operationId": "get_version_api_lectures__lecture_id__versions__version_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "lecture_id",
+            "required": true,
+            "schema": {
+              "title": "Lecture Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "path",
+            "name": "version_id",
+            "required": true,
+            "schema": {
+              "title": "Version Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Version",
+        "tags": [
+          "lectures"
+        ]
+      },
+      "patch": {
+        "operationId": "rename_version_api_lectures__lecture_id__versions__version_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "lecture_id",
+            "required": true,
+            "schema": {
+              "title": "Lecture Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "path",
+            "name": "version_id",
+            "required": true,
+            "schema": {
+              "title": "Version Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RenameVersion"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionSummary"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Rename Version",
+        "tags": [
+          "lectures"
+        ]
+      }
+    },
+    "/api/settings/keys/{provider}": {
+      "put": {
+        "description": "Save one provider's key in the server's .env (empty removes it). Answers which keys are set.",
+        "operationId": "save_key_api_settings_keys__provider__put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "provider",
+            "required": true,
+            "schema": {
+              "title": "Provider",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/KeyUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "boolean"
+                  },
+                  "title": "Response Save Key Api Settings Keys  Provider  Put",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Save Key",
+        "tags": [
+          "settings"
+        ]
+      }
+    },
+    "/api/transcription/models": {
+      "get": {
+        "operationId": "list_models_api_transcription_models_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ModelInfo"
+                  },
+                  "title": "Response List Models Api Transcription Models Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "List Models",
+        "tags": [
+          "transcription"
+        ]
+      }
+    },
+    "/api/transcriptions/upload": {
+      "post": {
+        "description": "Make a lecture from an uploaded audio or video file.",
+        "operationId": "transcribe_upload_api_transcriptions_upload_post",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_transcribe_upload_api_transcriptions_upload_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/wahy__features__transcription__schemas__Started"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Transcribe Upload",
+        "tags": [
+          "transcription"
+        ]
+      }
+    },
+    "/api/transcriptions/youtube": {
+      "post": {
+        "description": "Make a lecture from a YouTube link: download, extract the audio, transcribe.",
+        "operationId": "transcribe_youtube_api_transcriptions_youtube_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/YoutubeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/wahy__features__transcription__schemas__Started"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Transcribe Youtube",
+        "tags": [
+          "transcription"
+        ]
+      }
+    }
+  }
+}

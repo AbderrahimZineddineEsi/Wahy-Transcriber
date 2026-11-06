@@ -36,7 +36,7 @@ def _no_real_keys(monkeypatch: pytest.MonkeyPatch) -> None:
 
 @pytest.fixture
 def settings(tmp_path) -> Settings:
-    return Settings(data_dir=tmp_path / "data", _env_file=None)
+    return Settings(data_dir=tmp_path / "data", env_path=tmp_path / ".env", _env_file=None)
 
 
 @pytest.fixture

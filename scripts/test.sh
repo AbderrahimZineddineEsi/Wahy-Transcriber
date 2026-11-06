@@ -19,4 +19,5 @@ echo "== web =="
 npm run --silent test --workspace web
 npm run --silent typecheck --workspace web
 npm run --silent lint --workspace web
+npm run --silent e2e --workspace web
 echo "ALL GREEN"

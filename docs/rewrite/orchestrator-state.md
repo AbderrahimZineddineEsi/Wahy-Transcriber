@@ -48,3 +48,8 @@ anything new; phase 8 is already ticked.
 - Phase 9 child (6f? see step-9.id) ended with a QUESTION (approve mockups / approve with changes / publish first). Not yet answered.
 
 ## 2026-11-06: user approved the phase 9 mockups ("it's good go on"). Resuming child 0e099faa-754d-4f86-81f7-243de709d645 to record it, tick phase 9, commit and push. Log: /tmp/claude-1000/-home-zeno-Documents-work-new-projects-Wahy-Transcriber/428c450a-c0e2-4fc7-86dc-884ec1da7570/scratchpad/step-9b.json. Next: phase 10.
+
+## Running now: phase 10 Web shell (Sonnet 5.5, high)
+- Child: refactoring-step-10, session ID 3b181005-9e71-4391-b571-c4357614da22, log: /tmp/claude-1000/-home-zeno-Documents-work-new-projects-Wahy-Transcriber/428c450a-c0e2-4fc7-86dc-884ec1da7570/scratchpad/step-10.json, launched 2026-11-06.
+- Phases 8, 8b (adhkar editable) and 9 are done and pushed (004a043).
+- If it died: git status/log, then `claude -p --resume 3b181005-9e71-4391-b571-c4357614da22 "Continue phase 10 from where you stopped; finish, tick, commit and push."`

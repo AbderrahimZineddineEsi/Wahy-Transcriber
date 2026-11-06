@@ -8,22 +8,35 @@
     "build": "tsc --noEmit && vite build",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src",
-    "test": "vitest run"
+    "test": "vitest run",
+    "api:generate": "cd ../server && uv run python ../scripts/dump_openapi.py && cd ../web && openapi-typescript src/api/openapi.json -o src/api/schema.d.ts",
+    "e2e": "playwright test"
   },
   "dependencies": {
+    "@fontsource/amiri": "^5.3.0",
+    "@fontsource/ibm-plex-mono": "^5.3.0",
+    "@fontsource/ibm-plex-sans-arabic": "^5.3.0",
+    "@fontsource/noto-naskh-arabic": "^5.3.0",
+    "@tanstack/react-query": "^5.106.1",
+    "openapi-fetch": "^0.17.0",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^7.18.5"
   },
   "devDependencies": {
     "@eslint/js": "^9.14.0",
+    "@playwright/test": "^1.65.0",
     "@tailwindcss/vite": "^4.0.0",
+    "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.0.0",
+    "@testing-library/user-event": "^14.6.8",
     "@types/react": "^18.3.0",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.0",
     "eslint": "^9.14.0",
     "eslint-plugin-react-hooks": "^5.0.0",
     "jsdom": "^25.0.0",
+    "openapi-typescript": "^7.13.0",
     "tailwindcss": "^4.0.0",
     "typescript": "^5.6.0",
     "typescript-eslint": "^8.13.0",

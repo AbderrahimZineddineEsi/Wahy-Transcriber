@@ -5,6 +5,14 @@ State for recovery (session IDs, what to do if a child died) is in `orchestrator
 
 <!-- NEW REPORTS GO BELOW THIS LINE -->
 
+## 2026-11-06 — Phase 9 (Screen design) done; phase 10 started
+
+Gate passed. Commit `004a043` "rewrite phase 9: Screen design" pushed to `origin/factory-reset`, phase ticked.
+- Your approval ("it's good go on") is recorded under Design wishes in `features.md` and in the roadmap Changes.
+- The adhkar-as-editable-rows change (`60ad135`) is kept in the mockup and `features.md`.
+- Web typecheck and lint pass, Vitest 1/1. No Feature check for this phase.
+- **Phase 10 (Web shell, Sonnet 5.5, high)** is running as `refactoring-step-10`.
+
 ## 2026-11-06 — Mockups published; adhkar correction done; still waiting for your verdict on phase 9
 
 **Needs you: phase 9 verdict.** Mockups are published as a private page: https://claude.ai/artifact/QLhgNejsyQDbFexdv8nujm

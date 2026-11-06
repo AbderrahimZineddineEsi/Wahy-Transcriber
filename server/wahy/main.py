@@ -7,7 +7,7 @@ unfinished as interrupted, and create the shared machinery that routes reach thr
     jobs    core/jobs.py     the job runner
     gpu     core/gpu.py      the GPU owner
     engine  core/engine.py   the engine worker client (the worker itself starts on the first call)
-    lectures, transcription, corpora, detection
+    lectures, transcription, corpora, detection, settings_service
             the feature services (features/*/service.py)
 
 Shutdown: running jobs stop at their next check (they show as interrupted), the GPU is freed and the engine
@@ -34,6 +34,8 @@ from wahy.features.detection.service import DetectionService
 from wahy.features.jobs.router import router as jobs_router
 from wahy.features.lectures.router import router as lectures_router
 from wahy.features.lectures.service import LectureService
+from wahy.features.settings.router import router as settings_router
+from wahy.features.settings.service import SettingsService
 from wahy.features.transcription.router import router as transcription_router
 from wahy.features.transcription.service import TranscriptionService
 
@@ -58,6 +60,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         app.state.corpora = CorporaService(db, s, jobs, app.state.engine)
         app.state.detection = DetectionService(db, s, jobs, app.state.engine, app.state.lectures,
                                                app.state.corpora)
+        app.state.settings_service = SettingsService(s, app.state.gpu, app.state.engine, jobs,
+                                                     app.state.corpora)
         try:
             yield
         finally:
@@ -68,10 +72,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     app = FastAPI(title="Wahy-Finder", version="0.1.0", lifespan=lifespan)
 
-    @app.get("/api/health")
-    def health() -> dict[str, str]:
-        return {"status": "ok"}
-
+    app.include_router(settings_router)
     app.include_router(jobs_router)
     app.include_router(lectures_router)
     app.include_router(transcription_router)

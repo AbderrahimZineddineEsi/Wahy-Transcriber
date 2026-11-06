@@ -170,7 +170,7 @@ decisions and why). The problems being fixed are in the friction map: https://cl
     Features: F-001, F-030, F-042, F-047, and the Design wishes.
   - Learn: design tokens; right-to-left layout.
 
-- [ ] **10. Web shell**: Sonnet 5.5, high. ADR 0008.
+- [x] **10. Web shell**: Sonnet 5.5, high. ADR 0008.
   - Layout and navigation, the theme toggle, i18n by keys (Arabic default and right-to-left, English), and a settings
     screen (API keys saved on the server; health, GPU and key status). Add error toasts, the API client and types
     generated from OpenAPI, the TanStack Query setup, and a Playwright smoke test.
@@ -369,3 +369,9 @@ Each entry: date, what changed, the user's words.
 - **2026-11-06**: Phase 9 (done): the mockups in `docs/rewrite/mockups/screens.html` (published at
   https://claude.ai/artifact/QLhgNejsyQDbFexdv8nujm) are approved as is, and the tokens are in `web/src/shell/tokens.css`.
   The draft was committed before approval because a headless session cannot wait for an answer. User: "it's good go on".
+- **2026-11-06**: Phase 10 (done): the settings screen needed two small server routes that no earlier phase had, so
+  they were added inside phase 10: `GET /api/health` now lists keys, GPU, engine, corpus and running jobs (F-128), and
+  `PUT /api/settings/keys/{provider}` saves a key to `.env` (F-010). The web app's types come from
+  `web/src/api/openapi.json` (`npm run api:generate`), and `scripts/test.sh` now also runs the Playwright smoke test.
+  The rail has no "open lecture" place and no count badges yet: they arrive with the screens that own them (phases
+  11 and 12 onward).

@@ -29,3 +29,5 @@ web/dist/
 /backend/runs/
 /data/*
 !/data/.gitkeep
+web/test-results/
+web/playwright-report/
