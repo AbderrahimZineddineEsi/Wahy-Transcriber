@@ -20,6 +20,7 @@ export function App() {
         <Route index element={<Navigate to={lastLecturePath()} replace />} />
         <Route path="lectures" element={<LecturesPage />} />
         <Route path="lectures/:id" element={<LecturePage />} />
+        <Route path="lectures/:id/:tab" element={<LecturePage />} />
         <Route path="corpora" element={<ComingSoon title="page.corpora" />} />
         <Route path="training" element={<ComingSoon title="page.training" />} />
         <Route path="requests" element={<ComingSoon title="page.requests" />} />

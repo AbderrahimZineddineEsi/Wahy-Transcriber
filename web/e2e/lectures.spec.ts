@@ -25,10 +25,10 @@ test("an .srt file becomes a lecture with findings; it can be renamed and delete
   // open it: the transcript and the verses found
   await job.getByRole("link", { name: "فتح المحاضرة" }).click();
   await expect(page.getByTestId("transcript")).toContainText("الحمد لله رب العالمين");
-  await expect(page.getByTestId("findings").locator("li").first()).toContainText(/الفاتحة|1:/);
+  await expect(page.getByTestId("transcript").locator(".ref").first()).toContainText(/الفاتحة|1:/);
 
   // rename, then delete: the list shows exactly what is left
-  await page.getByRole("link", { name: "كل المحاضرات" }).click();
+  await page.getByRole("navigation", { name: "التنقل" }).getByRole("link", { name: "المحاضرات", exact: true }).click();
   await row.getByRole("button", { name: "إعادة تسمية" }).click();
   await page.getByLabel("العنوان الجديد").fill("خطبة معاد تسميتها");
   await page.getByLabel("العنوان الجديد").press("Enter");

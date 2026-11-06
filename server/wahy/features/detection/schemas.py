@@ -31,6 +31,18 @@ class DetectRequest(DetectionPatch):
     """Overrides for one detection; what is left out comes from the saved settings."""
 
 
+class VerdictOut(BaseModel):
+    """The newest verdict on a finding (a verifier's or the user's). Values are the old app's strings."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    verdict: str = Field(description="CORRECT | FALSE | NOT_SURE")
+    boundary: str | None = Field(
+        None, description="COMPLETE | MISSING_START | MISSING_END | EXTRA_START | EXTRA_END")
+    verifier: str
+    model: str | None = None
+
+
 class FindingOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -43,6 +55,7 @@ class FindingOut(BaseModel):
     word_start: int
     word_end: int
     data: dict[str, Any] = Field(description="the engine's whole finding object")
+    verdict: VerdictOut | None = Field(None, description="the newest verdict, or none when it is unverified")
 
 
 class FindingsOut(BaseModel):

@@ -858,3 +858,69 @@ cd web && npm test                                                    # Vitest
 cd web && npm run e2e                                                 # Playwright (own server and temp data)
 cd web && WAHY_E2E_LIVE=1 npx playwright test e2e/live-youtube.spec.ts   # the real YouTube run (uses .env keys)
 ```
+
+## Phase 12 — Lecture view
+
+### What was built
+
+The main screen (`web/src/features/lectures/view/`): the transcript on the reading side and the video beside it,
+the spoken word lit in yellow as the media plays, a click on any word seeking the video there, each quote highlighted by
+kind with its brackets and a reference tag that opens the quote's card (verdict, boundary, play exactly the quote,
+edit, verify). Around it: the counts, the three layouts, the kind and verdict filters with presets, the clipped filter,
+"standard script", auto-follow, a reading progress bar, search, double-click to correct a word, the live caption over
+the video, a "now" card, the lecture tabs (view, edit, verify, Tafrigh, export; only view is built), and the lecture
+version picker (view a saved version read only, save, rename, delete).
+
+Three things outside the web app were needed:
+- `engine/src/captions.ts`: the old caption builder as a pure module. The web preview uses it now and the server's
+  export will use it in phase 16, so both build the same captions. It reproduces the golden SRT files for all 4 inputs
+  × 4 engines and the alternative style (24 tests).
+- `GET /api/lectures/{id}/findings` now carries each finding's newest verdict (none yet; phase 14 writes them).
+- `PATCH /api/lectures/{id}/words/{idx}` corrects one word and keeps its timing (F-041).
+
+### Concepts
+
+- **Refs and effects.** A ref (`useRef`) is a box React does not watch: changing it re-renders nothing. An effect
+  runs after React has put the DOM on screen. Together they let code touch the DOM directly when React would be
+  too slow. Here the player time changes 60 times a second, so it lives outside React state, in a tiny store
+  (`clock.ts`). The transcript marker is moved by hand in an effect: `els[i].classList.add("now")`. It is like keeping
+  a value in a Flutter `ValueNotifier` and rebuilding only one small `ValueListenableBuilder` instead of the page.
+- **Subscribing to one value.** `useClock(clock, s => Math.floor(s.t))` uses React's `useSyncExternalStore`: the time
+  label re-renders once a second, the caption overlay only when the caption changes, and the transcript never.
+- **Time to word is a binary search.** `wordAt(starts, t)` finds the last word that has started in about 15 steps on
+  20,000 words, instead of a scan. ASR sometimes gives a word a start a little earlier than the word before, so the
+  start list is made non-decreasing first (`startTimes`), or the search could get lost. In a pause the last word stays lit.
+- **Rendering thousands of words without lag.** (1) `memo`: the transcript re-renders only when its paragraphs change,
+  not on every click. (2) `content-visibility: auto` on each paragraph: the browser skips drawing paragraphs off
+  screen. (3) The "already spoken" colour is a class on whole paragraphs before the current one and per word only
+  inside it, so a jump from the start to the end touches a few hundred elements, not 20,000 (this cut a late click
+  from about 1 s to 22 ms). (4) `useDeferredValue`: after a filter change the toolbar answers at once and React
+  renders the new transcript in the background.
+- **requestAnimationFrame.** The video's own `timeupdate` event fires about 4 times a second, too slow for word by
+  word. While playing, a `requestAnimationFrame` loop reads `video.currentTime` once per screen frame.
+
+### How it was tested
+
+- Vitest, 34 new tests (59 in the web app): `sync.test.ts` covers time to word before the first word, at a start, in
+  a pause, after the end, with jittered starts, against a plain scan on 2,000 words, and the speed on 20,000 words.
+  It also covers the caption on screen with its hold time. `model.test.ts` covers the filters, presets, clipped,
+  paragraphs (never inside a quote), standard-script tokens, search, and the fact that a hidden finding's words stay in
+  the captions. `LectureView.test.tsx` drives the screen against a fake server: the marker after a click, the card and
+  its edit link, the filters, the script switch, search, correcting a word, versions, layout, paragraph marks and the rail.
+- Playwright against the real server and a silent 140-second video made with ffmpeg, on the sample lecture (milestone B).
+  Clicking the first word of آية الكرسي takes the video to 87.05 s and lights that word. Playing moves the marker on,
+  and pausing leaves it on the word at the paused time. Back 5 s and an early word also seek. The quote card's "play"
+  stops at the quote's last word.
+- The 2-hour check (`e2e/perf-long-lecture.spec.ts`, on request) uses the sample text 72 times: 20,160 words, 576
+  findings and a silent 2-hour video. It opens in about 2.1 s. Playback runs at 60 fps with no long tasks. A click near
+  the end paints in 22 ms. A filter change takes about 1.7 s on the dev server (React in development mode; the toolbar
+  stays responsive meanwhile).
+- Screenshots in light, dark and phone width (no horizontal scroll) compared with the mockup by eye.
+
+**Try:**
+
+```bash
+cd web && npx vitest run src/features/lectures/view                          # the word-sync and view tests
+cd web && npx playwright test e2e/lecture-view.spec.ts                       # click-to-seek in a real browser
+cd web && WAHY_E2E_PERF=1 npx playwright test e2e/perf-long-lecture.spec.ts  # the 2-hour measurement
+```

@@ -1,17 +1,21 @@
-import { useEffect } from "react";
-import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { ApiError } from "../../api/client";
-import { useI18n } from "../../shell/i18n";
+import { useI18n, type MessageKey } from "../../shell/i18n";
 import { writeStored } from "../../shell/storage";
-import { useToasts } from "../../shell/toasts";
-import { useAttachMedia, useFindings, useLecture, type LectureDetail } from "./api";
+import { useFindings, useLecture, useVersion, useVersions, type LectureDetail } from "./api";
+import { LectureHeader, TABS, type Tab } from "./view/LectureHeader";
+import { LectureView } from "./view/LectureView";
+import { fromRow, fromSnapshot, type EngineFinding, type FindingRow } from "./view/model";
 
 export const LAST_LECTURE_KEY = "wahy.last-lecture";
 
-/** A plain view of one lecture: its transcript and the quotes found. The real lecture screen (video, word
- *  highlighting, verdicts) is phase 12 and replaces this page. */
+/** One open lecture: its header (title, tabs, version) and the open tab. Only the view tab exists so far;
+ *  edit, verify, Tafrigh and export arrive in phases 15 to 19. */
 export function LecturePage() {
-  const id = Number(useParams().id);
+  const params = useParams();
+  const id = Number(params.id);
+  const tab = (params.tab ?? "view") as Tab;
   const lecture = useLecture(id);
   const navigate = useNavigate();
 
@@ -25,60 +29,61 @@ export function LecturePage() {
     }
   }, [lecture.error, navigate]);
 
-  if (!Number.isInteger(id)) return <Navigate to="/lectures" replace />;
+  if (!Number.isInteger(id) || !TABS.includes(tab)) return <Navigate to="/lectures" replace />;
   if (!lecture.data) return null;
-  return <Body lecture={lecture.data} />;
+  return <Body key={id} lecture={lecture.data} tab={tab} />;
 }
 
-function Body({ lecture }: { lecture: LectureDetail }) {
+type Snapshot = { engine?: string; findings?: EngineFinding[]; verdicts?: (FindingRow["verdict"] | null)[] };
+
+function Body({ lecture, tab }: { lecture: LectureDetail; tab: Tab }) {
   const { t } = useI18n();
-  const toasts = useToasts();
-  const findings = useFindings(lecture.id);
-  const attach = useAttachMedia(lecture.id);
+  const live = useFindings(lecture.id);
+  const [versionId, setVersionId] = useState<number | null>(null);
+  const version = useVersion(lecture.id, versionId);
+  const versions = useVersions(lecture.id);
+  const versionName = versions.data?.find((v) => v.id === versionId)?.name ?? "";
+
+  const liveFindings = useMemo(() => live.data?.findings.map(fromRow), [live.data]);
+  const versionFindings = useMemo(() => {
+    const snap = version.data?.snapshot as Snapshot | undefined;
+    return snap ? (snap.findings ?? []).map((d, i) => fromSnapshot(d, i, snap.verdicts?.[i] ?? null)) : undefined;
+  }, [version.data]);
+  const findings = versionId === null ? liveFindings : versionFindings;
+
+  // "save a version" keeps the current findings as the engine gave them, with their verdicts
+  const snapshot = useCallback(() => {
+    const rows = live.data?.findings ?? [];
+    return { engine: rows[0]?.engine ?? null, findings: rows.map((r) => r.data), verdicts: rows.map((r) => r.verdict ?? null) };
+  }, [live.data]);
+
   return (
     <>
-      <div className="row">
-        <Link to="/lectures" className="text-accent underline">{t("lecture.back")}</Link>
-        <h1 className="text-xl font-semibold">{lecture.title}</h1>
-        <span className="mono text-s text-ink-3">{t("lecture.words", { n: lecture.word_count })}</span>
-        <span className={`vchip ${lecture.has_media ? "ok" : "none"}`}>{lecture.has_media ? t("lecture.hasMedia") : t("lecture.noMedia")}</span>
-        <span className="flex-1" />
-        <label className="btn small cursor-pointer">
-          {t("lecture.attach")}
-          <input
-            type="file"
-            accept="audio/*,video/*,.mp3,.mp4,.wav"
-            className="sr-only"
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) attach.mutate(file, { onSuccess: () => toasts.success(t("lecture.attached")) });
-            }}
-          />
-        </label>
-      </div>
-      <p className="m-0 text-s text-ink-3">{t("lecture.previewNote")}</p>
-      <div className="grid grid-cols-[repeat(auto-fit,minmax(320px,1fr))] items-start gap-3">
-        <section className="panel" aria-labelledby="tr-title">
-          <div className="panel-h"><h3 id="tr-title" className="text-l font-semibold">{t("lecture.transcript")}</h3></div>
-          <p className="panel-b m-0 font-read leading-loose" data-testid="transcript">{lecture.words.map((w) => w.text).join(" ")}</p>
-        </section>
-        <section className="panel" aria-labelledby="fi-title">
+      <LectureHeader lecture={lecture} findings={findings} snapshot={snapshot} versionId={versionId} onVersion={setVersionId} />
+      {versionId !== null && (
+        <div role="status" className="row rounded-m bg-unsure-soft px-4 py-2 text-s text-unsure">
+          <span>{t("version.viewing", { name: versionName })}</span>
+          <button className="btn small ghost" onClick={() => setVersionId(null)}>
+            {t("version.backToCurrent")}
+          </button>
+        </div>
+      )}
+      {tab !== "view" ? (
+        <section className="panel">
           <div className="panel-h">
-            <h3 id="fi-title" className="text-l font-semibold">{t("lecture.findings")}</h3>
-            <span className="mono text-s text-ink-3">{findings.data?.count ?? ""}</span>
+            <h2 className="text-xl font-semibold">{t(`tab.${tab}` as MessageKey)}</h2>
           </div>
-          <ul className="panel-b m-0 list-none p-4" data-testid="findings">
-            {findings.data?.findings.length === 0 && <li className="text-ink-2">{t("lecture.noFindings")}</li>}
-            {findings.data?.findings.map((f) => (
-              <li key={f.id} className="row" data-kind={f.source_type}>
-                <span className="vchip none">{f.source_type}</span>
-                <span>{f.display_ref}</span>
-                <span className="mono text-xs text-ink-3">{f.word_start}–{f.word_end}</span>
-              </li>
-            ))}
-          </ul>
+          <p className="panel-b m-0 text-ink-2">
+            <span>
+              <b>{t("page.comingTitle")}</b> — {t("lecture.comingTab")}
+            </span>
+          </p>
         </section>
-      </div>
+      ) : findings ? (
+        <LectureView lecture={lecture} findings={findings} readOnly={versionId !== null} />
+      ) : (
+        <p className="text-ink-2">{t("lecture.loadingFindings")}</p>
+      )}
     </>
   );
 }

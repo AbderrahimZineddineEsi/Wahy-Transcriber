@@ -559,6 +559,26 @@ export interface paths {
         patch: operations["rename_version_api_lectures__lecture_id__versions__version_id__patch"];
         trace?: never;
     };
+    "/api/lectures/{lecture_id}/words/{idx}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Edit Word
+         * @description Correct one word's text; its timing and the findings stay as they are.
+         */
+        patch: operations["edit_word_api_lectures__lecture_id__words__idx__patch"];
+        trace?: never;
+    };
     "/api/settings/keys/{provider}": {
         parameters: {
             query?: never;
@@ -838,6 +858,8 @@ export interface components {
             source_type: string;
             /** Unit Id */
             unit_id: string | null;
+            /** @description the newest verdict, or none when it is unverified */
+            verdict?: components["schemas"]["VerdictOut"] | null;
             /** Word End */
             word_end: number;
             /** Word Start */
@@ -1158,6 +1180,26 @@ export interface components {
             /** Error Type */
             type: string;
         };
+        /**
+         * VerdictOut
+         * @description The newest verdict on a finding (a verifier's or the user's). Values are the old app's strings.
+         */
+        VerdictOut: {
+            /**
+             * Boundary
+             * @description COMPLETE | MISSING_START | MISSING_END | EXTRA_START | EXTRA_END
+             */
+            boundary?: string | null;
+            /** Model */
+            model?: string | null;
+            /**
+             * Verdict
+             * @description CORRECT | FALSE | NOT_SURE
+             */
+            verdict: string;
+            /** Verifier */
+            verifier: string;
+        };
         /** VersionDetail */
         VersionDetail: {
             /**
@@ -1189,6 +1231,14 @@ export interface components {
             lecture_id: number;
             /** Name */
             name: string;
+        };
+        /** WordEdit */
+        WordEdit: {
+            /**
+             * Text
+             * @description the corrected word (one word)
+             */
+            text: string;
         };
         /** WordOut */
         WordOut: {
@@ -2494,6 +2544,42 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["VersionSummary"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    edit_word_api_lectures__lecture_id__words__idx__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                lecture_id: number;
+                idx: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["WordEdit"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WordOut"];
                 };
             };
             /** @description Validation Error */

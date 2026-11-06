@@ -55,6 +55,7 @@ function server(state: { lectures: Lecture[]; jobs: Job[] }, extra: (call: Call)
     if (call.path === "/api/jobs" && call.method === "GET") return json(state.jobs);
     if (call.path === "/api/transcription/models") return json(models);
     if (call.path.endsWith("/findings")) return json({ lecture_id: 1, count: 0, findings: [] });
+    if (call.path.endsWith("/versions")) return json([]);
   });
 }
 
@@ -215,7 +216,7 @@ test("the last opened lecture opens at startup, and a deleted one falls back to 
   window.localStorage.setItem("wahy.last-lecture", "5");
   renderApp("/");
   expect(await screen.findByRole("heading", { name: "الأخير" })).toBeInTheDocument();
-  expect(screen.getByTestId("transcript")).toHaveTextContent("بسم");
+  expect(await screen.findByTestId("transcript")).toHaveTextContent("بسم");
 
   window.localStorage.setItem("wahy.last-lecture", "9");
   renderApp("/");

@@ -58,6 +58,10 @@ class VersionNotFound(LectureError, KeyError):
     pass
 
 
+class WordNotFound(LectureError, LookupError):
+    pass
+
+
 class BadLectureInput(LectureError, ValueError):
     """The input is unusable (the API answers 422)."""
 
@@ -202,6 +206,21 @@ class LectureService:
             if transcription_model is not None:
                 lecture.transcription_model = transcription_model
             lecture.updated_at = utcnow()
+
+    def edit_word(self, lecture_id: int, idx: int, text: str) -> WordOut:
+        """Correct one word's text in place (F-041). Its timing stays, and so do the findings, which point at
+        word positions. One word only: changing the number of words is the full-text editor's job."""
+        text = text.strip()
+        if not text or len(text.split()) != 1:
+            raise BadLectureInput("give exactly one word (use the full-text editor to add or remove words)")
+        with self.db.session() as s:
+            lecture = self._lecture(s, lecture_id)
+            word = s.scalar(select(Word).where(Word.lecture_id == lecture_id, Word.idx == idx))
+            if word is None:
+                raise WordNotFound(idx)
+            word.text = text
+            lecture.updated_at = utcnow()
+            return WordOut(idx=word.idx, text=word.text, start=word.start, end=word.end)
 
     def set_media(self, lecture_id: int, media_path: str, *, duration_s: float | None = None,
                   title_if_untitled: str | None = None) -> None:

@@ -24,7 +24,7 @@ from collections import Counter
 from datetime import UTC, datetime
 from typing import Any
 
-from sqlalchemy import delete, insert, select
+from sqlalchemy import delete, func, insert, select
 
 from wahy.core.db import Database
 from wahy.core.engine import EngineClient
@@ -32,10 +32,11 @@ from wahy.core.jobs import JobContext, JobRunner, JobSnapshot
 from wahy.core.settings import Settings
 from wahy.features.corpora.service import CorporaService
 from wahy.features.detection.models import Finding
-from wahy.features.detection.schemas import DetectionSettings, FindingOut, FindingsOut, SearchHit
+from wahy.features.detection.schemas import DetectionSettings, FindingOut, FindingsOut, SearchHit, VerdictOut
 from wahy.features.lectures.models import Word
 from wahy.features.lectures.service import LectureService
 from wahy.features.settings.store import SettingsStore
+from wahy.features.verification.models import Verdict
 
 SETTINGS_KEY = "detection"
 SEARCH_KINDS = ("ALL", "QURAN", "HADITH", "ADHKAR")
@@ -145,8 +146,18 @@ class DetectionService:
         self.lectures.list_one(lecture_id)                      # LectureNotFound
         with self.db.session() as s:
             rows = s.scalars(select(Finding).where(Finding.lecture_id == lecture_id).order_by(Finding.idx))
-            items = [FindingOut.model_validate(r) for r in rows]
+            newest = self._newest_verdicts(s, lecture_id)
+            items = [FindingOut.model_validate(r).model_copy(update={"verdict": newest.get(r.id)})
+                     for r in list(rows)]
         return FindingsOut(lecture_id=lecture_id, count=len(items), findings=items)
+
+    @staticmethod
+    def _newest_verdicts(s: Any, lecture_id: int) -> dict[int, VerdictOut]:
+        """finding id → its newest verdict (the highest id wins: a later override beats an earlier pass)."""
+        newest = (select(func.max(Verdict.id)).join(Finding, Finding.id == Verdict.finding_id)
+                  .where(Finding.lecture_id == lecture_id).group_by(Verdict.finding_id))
+        rows = s.scalars(select(Verdict).where(Verdict.id.in_(newest)))
+        return {v.finding_id: VerdictOut.model_validate(v) for v in rows}
 
     def search(self, text: str, *, kind: str = "ALL", limit: int = 30) -> list[SearchHit]:
         """Corpus units whose reference or text contains `text` (F-061)."""

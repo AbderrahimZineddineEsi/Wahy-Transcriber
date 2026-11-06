@@ -468,6 +468,17 @@
             ],
             "title": "Unit Id"
           },
+          "verdict": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/VerdictOut"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "the newest verdict, or none when it is unverified"
+          },
           "word_end": {
             "title": "Word End",
             "type": "integer"
@@ -1313,6 +1324,49 @@
         "title": "ValidationError",
         "type": "object"
       },
+      "VerdictOut": {
+        "description": "The newest verdict on a finding (a verifier's or the user's). Values are the old app's strings.",
+        "properties": {
+          "boundary": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "COMPLETE | MISSING_START | MISSING_END | EXTRA_START | EXTRA_END",
+            "title": "Boundary"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          },
+          "verdict": {
+            "description": "CORRECT | FALSE | NOT_SURE",
+            "title": "Verdict",
+            "type": "string"
+          },
+          "verifier": {
+            "title": "Verifier",
+            "type": "string"
+          }
+        },
+        "required": [
+          "verdict",
+          "verifier"
+        ],
+        "title": "VerdictOut",
+        "type": "object"
+      },
       "VersionDetail": {
         "properties": {
           "created_at": {
@@ -1375,6 +1429,21 @@
           "created_at"
         ],
         "title": "VersionSummary",
+        "type": "object"
+      },
+      "WordEdit": {
+        "properties": {
+          "text": {
+            "description": "the corrected word (one word)",
+            "minLength": 1,
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "title": "WordEdit",
         "type": "object"
       },
       "WordOut": {
@@ -3255,6 +3324,68 @@
           }
         },
         "summary": "Rename Version",
+        "tags": [
+          "lectures"
+        ]
+      }
+    },
+    "/api/lectures/{lecture_id}/words/{idx}": {
+      "patch": {
+        "description": "Correct one word's text; its timing and the findings stay as they are.",
+        "operationId": "edit_word_api_lectures__lecture_id__words__idx__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "lecture_id",
+            "required": true,
+            "schema": {
+              "title": "Lecture Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "path",
+            "name": "idx",
+            "required": true,
+            "schema": {
+              "title": "Idx",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WordEdit"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WordOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Edit Word",
         "tags": [
           "lectures"
         ]

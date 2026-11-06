@@ -186,7 +186,7 @@ decisions and why). The problems being fixed are in the friction map: https://cl
     Features: F-007, F-016 to F-020, F-023, F-024, F-026, F-027.
   - Learn: forms, server state, progress streams in React.
 
-- [ ] **12. Lecture view**: Opus 5.5, high.
+- [x] **12. Lecture view**: Opus 5.5, high.
   - Transcript beside the video with word-by-word highlighting in sync, click a word to seek, findings highlighted
     with their reference, the verdict filter, and the live caption preview. It must stay smooth on a 2-hour lecture.
   - Done when: Vitest covers the word-sync logic (time to word) and Playwright covers click-to-seek.
@@ -375,3 +375,12 @@ Each entry: date, what changed, the user's words.
   `web/src/api/openapi.json` (`npm run api:generate`), and `scripts/test.sh` now also runs the Playwright smoke test.
   The rail has no "open lecture" place and no count badges yet: they arrive with the screens that own them (phases
   11 and 12 onward).
+- **2026-11-06**: Phase 12 (done): the caption builder moved into `engine/src/captions.ts` (golden SRT identical), so
+  the web preview and phase 16's export share it; the web app imports it as `@wahy/engine/captions`. Two small server
+  additions the view needed: each finding carries its newest verdict (`GET .../findings`), and
+  `PATCH /api/lectures/{id}/words/{idx}` corrects one word in place (F-041; phase 16 moves it into the edit log so it
+  can be undone). "Standard script" (F-038) is a view setting for now; phase 16 decides how it reaches the exports.
+  Versions: a saved version opens read only; switching back to it as the current findings is not built. The other
+  lecture tabs (edit, verify, Tafrigh, export) are placeholders until their phases. The 2-hour check is
+  `WAHY_E2E_PERF=1 npx playwright test e2e/perf-long-lecture.spec.ts`, not part of `scripts/test.sh`.
+

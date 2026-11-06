@@ -21,6 +21,8 @@ from wahy.features.lectures.schemas import (
     RenameVersion,
     VersionDetail,
     VersionSummary,
+    WordEdit,
+    WordOut,
 )
 from wahy.features.lectures.service import (
     BadLectureInput,
@@ -28,6 +30,7 @@ from wahy.features.lectures.service import (
     LectureNotFound,
     LectureService,
     VersionNotFound,
+    WordNotFound,
 )
 
 router = APIRouter(prefix="/api/lectures", tags=["lectures"])
@@ -48,7 +51,7 @@ def lecture_errors() -> Iterator[None]:
     """The lecture errors as HTTP answers: 404 not found, 422 unusable input, 400 bad media, 409 can't now."""
     try:
         yield
-    except (LectureNotFound, VersionNotFound) as e:
+    except (LectureNotFound, VersionNotFound, WordNotFound) as e:
         raise HTTPException(404, f"not found: {e}") from None
     except BadLectureInput as e:
         raise HTTPException(422, str(e)) from None
@@ -118,6 +121,13 @@ def rename_lecture(lecture_id: int, body: RenameLecture, lectures: Lectures) -> 
 def delete_lecture(lecture_id: int, lectures: Lectures) -> None:
     with lecture_errors():
         lectures.delete(lecture_id)
+
+
+@router.patch("/{lecture_id}/words/{idx}")
+def edit_word(lecture_id: int, idx: int, body: WordEdit, lectures: Lectures) -> WordOut:
+    """Correct one word's text; its timing and the findings stay as they are."""
+    with lecture_errors():
+        return lectures.edit_word(lecture_id, idx, body.text)
 
 
 @router.get("/{lecture_id}/media")

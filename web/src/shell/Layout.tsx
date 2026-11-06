@@ -1,17 +1,18 @@
 import type { ComponentType } from "react";
-import { Link, NavLink, Outlet } from "react-router-dom";
+import { Link, NavLink, Outlet, useMatch } from "react-router-dom";
 import { useHealth } from "../api/health";
 import { JobWatcher } from "../features/lectures/JobWatcher";
-import { CorporaIcon, LecturesIcon, RequestsIcon, SettingsIcon, ThemeIcon, TrainingIcon } from "./icons";
+import { LAST_LECTURE_KEY } from "../features/lectures/LecturePage";
+import { CorporaIcon, LectureIcon, LecturesIcon, RequestsIcon, SettingsIcon, ThemeIcon, TrainingIcon } from "./icons";
 import { useI18n, type MessageKey } from "./i18n";
+import { readStored } from "./storage";
 import { useTheme } from "./theme";
 
 type Place = { to: string; label: MessageKey; icon: ComponentType; badge?: number };
 
-// The app's places (docs/rewrite/mockups). "The open lecture" joins this list in phase 12, and the count
+// The app's places (docs/rewrite/mockups). "The open lecture" is the last lecture opened (phase 12); the count
 // badges (F-001) arrive with the screens that own the counts.
 const PLACES: Place[] = [
-  { to: "/lectures", label: "nav.lectures", icon: LecturesIcon },
   { to: "/corpora", label: "nav.corpora", icon: CorporaIcon },
   { to: "/training", label: "nav.training", icon: TrainingIcon },
   { to: "/requests", label: "nav.requests", icon: RequestsIcon },
@@ -90,8 +91,14 @@ function ServerBadge() {
 
 function Rail() {
   const { t } = useI18n();
+  // the lecture on screen, or else the last one opened (read again on every navigation, since useMatch re-renders)
+  const open = useMatch("/lectures/:id/*")?.params.id;
+  const last = Number(open ?? readStored(LAST_LECTURE_KEY));
   return (
     <nav aria-label={t("nav.label")} className="flex flex-col gap-0.5 border-line bg-surface px-2 py-3 max-[720px]:flex-row max-[720px]:overflow-x-auto max-[720px]:border-b max-[720px]:p-1 min-[721px]:border-e">
+      <RailLink place={{ to: "/lectures", label: "nav.lectures", icon: LecturesIcon }} end />
+      {Number.isInteger(last) && last > 0 && <RailLink place={{ to: `/lectures/${last}`, label: "nav.lecture", icon: LectureIcon }} />}
+      <span className="mx-1.5 my-2 h-px bg-line max-[720px]:hidden" />
       {PLACES.map((place) => (
         <RailLink key={place.to} place={place} />
       ))}
@@ -101,12 +108,13 @@ function Rail() {
   );
 }
 
-function RailLink({ place }: { place: Place }) {
+function RailLink({ place, end }: { place: Place; end?: boolean }) {
   const { t } = useI18n();
   const Icon = place.icon;
   return (
     <NavLink
       to={place.to}
+      end={end}
       className={({ isActive }) =>
         `relative flex flex-none flex-col items-center gap-0.5 rounded-m px-1 py-2.5 text-xs max-[720px]:min-w-16 ${isActive ? "bg-accent-soft font-semibold text-accent" : "text-ink-2 hover:bg-surface-2 hover:text-ink"}`
       }

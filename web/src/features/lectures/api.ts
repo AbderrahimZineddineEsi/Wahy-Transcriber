@@ -201,3 +201,69 @@ export function useJobStream(initial: Job): Job {
   }, [initial.id, finished, queryClient]);
   return job;
 }
+
+// ---- the lecture screen (phase 12) ------------------------------------------------------------------------------
+
+export type Version = components["schemas"]["VersionSummary"];
+export type WordOut = components["schemas"]["WordOut"];
+
+export function useVersions(id: number) {
+  return useQuery({
+    queryKey: ["versions", id],
+    queryFn: () => data(api.GET("/api/lectures/{lecture_id}/versions", { params: { path: { lecture_id: id } } })),
+  });
+}
+
+/** One saved version with its snapshot; nothing is fetched while `versionId` is null (the current findings). */
+export function useVersion(id: number, versionId: number | null) {
+  return useQuery({
+    queryKey: ["version", id, versionId],
+    enabled: versionId !== null,
+    queryFn: () =>
+      data(api.GET("/api/lectures/{lecture_id}/versions/{version_id}", { params: { path: { lecture_id: id, version_id: versionId! } } })),
+  });
+}
+
+function useVersionMutation<A>(id: number, fn: (args: A) => Promise<unknown>) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: fn,
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["versions", id] });
+      void queryClient.invalidateQueries({ queryKey: ["lectures"] });
+    },
+  });
+}
+
+export function useSaveVersion(id: number) {
+  return useVersionMutation(id, ({ name, snapshot }: { name: string; snapshot: Record<string, unknown> }) =>
+    data(api.POST("/api/lectures/{lecture_id}/versions", { params: { path: { lecture_id: id } }, body: { name, snapshot } })),
+  );
+}
+
+export function useRenameVersion(id: number) {
+  return useVersionMutation(id, ({ versionId, name }: { versionId: number; name: string }) =>
+    data(api.PATCH("/api/lectures/{lecture_id}/versions/{version_id}", { params: { path: { lecture_id: id, version_id: versionId } }, body: { name } })),
+  );
+}
+
+export function useDeleteVersion(id: number) {
+  // a refused delete (the last version) throws in the client's middleware, like every failed call
+  return useVersionMutation(id, (versionId: number) =>
+    api.DELETE("/api/lectures/{lecture_id}/versions/{version_id}", { params: { path: { lecture_id: id, version_id: versionId } } }),
+  );
+}
+
+/** F-041: correct one word; its timing stays. The open lecture's cached words are updated in place. */
+export function useEditWord(id: number) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ idx, text }: { idx: number; text: string }) =>
+      data(api.PATCH("/api/lectures/{lecture_id}/words/{idx}", { params: { path: { lecture_id: id, idx } }, body: { text } })),
+    onSuccess: (word: WordOut) => {
+      queryClient.setQueryData<LectureDetail>(["lecture", id], (old) =>
+        old ? { ...old, words: old.words.map((w) => (w.idx === word.idx ? word : w)) } : old,
+      );
+    },
+  });
+}

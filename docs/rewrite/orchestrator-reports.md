@@ -5,6 +5,24 @@ State for recovery (session IDs, what to do if a child died) is in `orchestrator
 
 <!-- NEW REPORTS GO BELOW THIS LINE -->
 
+## 2026-11-06 — Phase 11 (Web: new lecture and saved lectures) done, milestone A passed; phase 12 started
+
+Gate passed. Commit `fb1c192` "rewrite phase 11: Web: new lecture and saved lectures" pushed, phase ticked.
+- Built in `web/src/features/lectures/`: new lecture (paste, `.txt/.srt/.vtt` file, YouTube link, upload, sample, title,
+  remembered transcription model and fallback switch); running-jobs panel with stages, live percentage, pause, resume and
+  cancel; a watcher that starts detection by itself after a transcription finishes (not repeated on reload); saved
+  lectures table (search, rename, delete with second click, delete all); a plain lecture page (transcript, findings,
+  attach media F-026) that phase 12 replaces; the app reopens the last lecture (F-007).
+- Tests: Vitest 25 pass (6 new), typecheck, lint, build clean; Playwright against the real server 2 pass (a real `.srt`
+  becomes a lecture, detection finishes, a Fatiha finding shows, rename and delete work). Server Python tests not run
+  (no server code changed).
+- **Milestone A passed live**: a ~16 min Mohammed Meziane khutba (`Y9n3OjY7Qtg`) went download, audio, Groq
+  transcription, detection by itself: 1713 words and 28 findings in 28 s. Test: `web/e2e/live-youtube.spec.ts`, runs only
+  with `WAHY_E2E_LIVE=1`.
+- Small changes to existing files: `web/playwright.config.ts` now points the test server at the real `data/corpus.json`;
+  `web/src/test/render.tsx` keeps non-JSON request bodies as raw text.
+- **Phase 12 (Lecture view, Opus 5.5, high)** is running as `refactoring-step-12`.
+
 ## 2026-11-06 — Phase 10 (Web shell) done; phase 11 started
 
 Gate passed. Commit `e5d231a` "rewrite phase 10: Web shell" pushed, phase ticked.

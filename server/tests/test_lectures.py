@@ -183,3 +183,24 @@ def test_a_version_of_another_lecture_is_not_found(client):
 def test_io_bytes_upload_roundtrip_of_a_text_file(client):
     r = client.post("/api/lectures/import", files={"file": ("n.txt", io.BytesIO("سلام عليكم".encode()))})
     assert r.status_code == 201 and r.json()["title"] == "n"
+
+
+# ---- editing one word (F-041) --------------------------------------------------------------------------------
+
+def test_editing_a_word_changes_its_text_and_keeps_its_timing(client):
+    lecture = client.post("/api/lectures", json={"text": SRT}).json()
+    before = lecture["words"][1]
+    r = client.patch(f"/api/lectures/{lecture['id']}/words/1", json={"text": " اللّه "})
+    assert r.status_code == 200
+    assert r.json() == {**before, "text": "اللّه"}
+    after = client.get(f"/api/lectures/{lecture['id']}").json()["words"]
+    assert after[1] == {**before, "text": "اللّه"}
+    assert [w for i, w in enumerate(after) if i != 1] == [w for i, w in enumerate(lecture["words"]) if i != 1]
+
+
+def test_editing_a_word_refuses_two_words_and_unknown_places(client):
+    lecture = client.post("/api/lectures", json={"text": SRT}).json()
+    assert client.patch(f"/api/lectures/{lecture['id']}/words/0", json={"text": "بسم الله"}).status_code == 422
+    assert client.patch(f"/api/lectures/{lecture['id']}/words/0", json={"text": "  "}).status_code == 422
+    assert client.patch(f"/api/lectures/{lecture['id']}/words/99", json={"text": "x"}).status_code == 404
+    assert client.patch("/api/lectures/999/words/0", json={"text": "x"}).status_code == 404

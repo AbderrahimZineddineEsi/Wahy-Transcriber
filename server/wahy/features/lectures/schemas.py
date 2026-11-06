@@ -15,6 +15,10 @@ class WordOut(BaseModel):
     end: float
 
 
+class WordEdit(BaseModel):
+    text: str = Field(min_length=1, description="the corrected word (one word)")
+
+
 class LectureSummary(BaseModel):
     """One row of the saved lectures list."""
 

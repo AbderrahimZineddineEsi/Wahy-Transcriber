@@ -27,8 +27,9 @@ function installedChromium(): string | undefined {
 
 export default defineConfig({
   testDir: "e2e",
-  testIgnore: live ? [] : ["**/live-*.spec.ts"],
-  timeout: live ? 600_000 : 30_000,
+  // live-*: real APIs (WAHY_E2E_LIVE=1); perf-*: the 2-hour lecture measurement (WAHY_E2E_PERF=1), slow
+  testIgnore: [...(live ? [] : ["**/live-*.spec.ts"]), ...(process.env.WAHY_E2E_PERF === "1" ? [] : ["**/perf-*.spec.ts"])],
+  timeout: live || process.env.WAHY_E2E_PERF === "1" ? 600_000 : 30_000,
   fullyParallel: false,
   workers: 1,
   use: { baseURL: "http://127.0.0.1:5174", trace: "retain-on-failure" },

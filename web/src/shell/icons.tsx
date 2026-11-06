@@ -14,6 +14,11 @@ export const LecturesIcon = () => (
     <path d="M3 9h18M8 4v5" />
   </Icon>
 );
+export const LectureIcon = () => (
+  <Icon>
+    <path d="M4 5h11M4 10h16M4 15h9M4 20h13" />
+  </Icon>
+);
 export const CorporaIcon = () => (
   <Icon>
     <path d="M4 4h6a2 2 0 0 1 2 2v14a2 2 0 0 0-2-2H4zM20 4h-6a2 2 0 0 0-2 2v14a2 2 0 0 1 2-2h6z" />

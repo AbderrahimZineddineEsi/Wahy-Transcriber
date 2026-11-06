@@ -110,6 +110,22 @@ def test_detecting_again_replaces_the_findings_and_keeps_the_old_ones_as_a_lectu
     assert saved["engine"] == "v5" and [f["unitId"] for f in saved["findings"]] == ["112:1", "112:2"]
 
 
+def test_each_finding_carries_its_newest_verdict_or_none(api):
+    from wahy.features.verification.models import Verdict
+
+    lecture_id = make_lecture(api)
+    run_job(api, api.post(f"/api/lectures/{lecture_id}/detect").json())
+    first, second = api.get(f"/api/lectures/{lecture_id}/findings").json()["findings"]
+    assert first["verdict"] is None and second["verdict"] is None
+    with api.app.state.db.session() as s:
+        s.add(Verdict(finding_id=first["id"], verifier="laya", model="v3_mixed", verdict="CORRECT",
+                      boundary="MISSING_END"))
+        s.add(Verdict(finding_id=first["id"], verifier="human", verdict="FALSE", boundary="COMPLETE"))
+    first, second = api.get(f"/api/lectures/{lecture_id}/findings").json()["findings"]
+    assert first["verdict"] == {"verdict": "FALSE", "boundary": "COMPLETE", "verifier": "human", "model": None}
+    assert second["verdict"] is None
+
+
 def test_a_lecture_without_words_fails_the_job_and_an_unknown_lecture_is_404(api):
     empty = api.app.state.lectures.create_empty(title="empty", source_kind="youtube", source_url="https://x.y/z")
     job = run_job(api, api.post(f"/api/lectures/{empty}/detect").json())

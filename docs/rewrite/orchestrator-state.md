@@ -57,3 +57,7 @@ anything new; phase 8 is already ticked.
 ## Running now: phase 11 Web: new lecture and saved lectures (Sonnet 5.5, medium)
 - Child: refactoring-step-11, session ID 25c1f9e9-6b88-4995-a092-f6f9484a099f, log: /tmp/claude-1000/-home-zeno-Documents-work-new-projects-Wahy-Transcriber/428c450a-c0e2-4fc7-86dc-884ec1da7570/scratchpad/step-11.json. Phase 10 done (e5d231a).
 - If it died: git status/log, then `claude -p --resume 25c1f9e9-6b88-4995-a092-f6f9484a099f "Continue phase 11 from where you stopped; finish, tick, commit and push."`
+
+## Running now: phase 12 Lecture view (Opus 5.5, high)
+- Child: refactoring-step-12, session ID b1959715-1ae9-4b89-9ae8-7a2db256e77f, log: /tmp/claude-1000/-home-zeno-Documents-work-new-projects-Wahy-Transcriber/428c450a-c0e2-4fc7-86dc-884ec1da7570/scratchpad/step-12.json. Phase 11 done (fb1c192), milestone A passed.
+- If it died: git status/log, then `claude -p --resume b1959715-1ae9-4b89-9ae8-7a2db256e77f "Continue phase 12 from where you stopped; finish, tick, commit and push."`
