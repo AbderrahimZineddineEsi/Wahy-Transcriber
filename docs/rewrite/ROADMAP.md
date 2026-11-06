@@ -161,7 +161,7 @@ decisions and why). The problems being fixed are in the friction map: https://cl
 
 ### First screens
 
-- [ ] **9. Screen design**: Opus 5.5, high.
+- [x] **9. Screen design**: Opus 5.5, high.
   - Build mockups of the main screens as an artifact page the user can click through, in Arabic right-to-left and in
     light and dark, following the design wishes in `features.md`. Iterate until the user approves.
   - Then write the design tokens (colours, type, spacing) to `web/src/shell/tokens.css`. No other app code.
@@ -366,3 +366,6 @@ Each entry: date, what changed, the user's words.
   The global adhkar switch stays.
   Detection does not start by itself after a paste or a transcription: the web app calls `POST /api/lectures/{id}/detect`
   (phase 11). Re-detecting saves the replaced findings as a lecture version.
+- **2026-11-06**: Phase 9 (done): the mockups in `docs/rewrite/mockups/screens.html` (published at
+  https://claude.ai/artifact/QLhgNejsyQDbFexdv8nujm) are approved as is, and the tokens are in `web/src/shell/tokens.css`.
+  The draft was committed before approval because a headless session cannot wait for an answer. User: "it's good go on".

@@ -5,6 +5,27 @@ State for recovery (session IDs, what to do if a child died) is in `orchestrator
 
 <!-- NEW REPORTS GO BELOW THIS LINE -->
 
+## 2026-11-06 — Mockups published; adhkar correction done; still waiting for your verdict on phase 9
+
+**Needs you: phase 9 verdict.** Mockups are published as a private page: https://claude.ai/artifact/QLhgNejsyQDbFexdv8nujm
+(only you can open it until you share it from the page's Share menu). It is the same file as
+`docs/rewrite/mockups/screens.html` (ten clickable screens, Arabic right to left, light and dark; the verdicts shown are
+made up). Answer with one of:
+1. **Approve as is.**
+2. **Approve with changes** (say what: layout, colours, fonts, navigation, a specific screen).
+
+**Adhkar correction (`refactoring-step-8b`) is done.** Commit `60ad135` "rewrite phase 8: adhkar are editable rows",
+pushed.
+- The 18 adhkar are seeded once, tracked by a flag in the `settings` table (`corpora.adhkar_seeded`). Edited or deleted
+  rows are never restored, even after deleting all of them. No new migration (`0003` untouched).
+- `PUT` and `DELETE /api/corpora/adhkar/{id}` work on every row; the 409 for built-ins is gone. The global adhkar
+  switch stays. Detection still reads the current rows from the database on each call.
+- Wording fixed in the ROADMAP Changes line, `LEARNING.md` and `features.md` (F-073, F-074, F-077). `screens.html` now
+  shows edit and delete on every adhkar row and says "initial list" instead of "built-in". Nothing else in the design.
+- Tests: server 155 passed, 1 skipped (live); golden through the API 16/16; `ruff check` passes. `ruff format --check`
+  flags 48 files that the child did not touch (not reformatted).
+- The child also committed this reports file by mistake (it was untracked); it is now in the repo.
+
 ## 2026-11-06 — Phase 9 waits for your verdict; adhkar correction started
 
 **Needs you: phase 9 (Screen design) is not ticked.** Its Done-when step is your approval of the mockups, and a headless

@@ -687,7 +687,7 @@ scripts/dev.sh     # http://localhost:8120/docs → POST /api/lectures/sample, t
 Commands: `uv run alembic revision --autogenerate`, `uv run pytest`, `uv run ruff check .`, a throw-away script that
 prepared the real Open Hadith Data through the API.
 
-## Phase 9: Screen design (2026-11-06, draft waiting for your approval)
+## Phase 9: Screen design (2026-11-06)
 
 ### What was built
 
@@ -727,7 +727,8 @@ prepared the real Open Hadith Data through the API.
   finding count went from 8 to 9 and the header said "تراجع: إضافة اقتباس فائت".
 - The tokens were compiled with Tailwind's own compiler: `bg-paper`, `text-quran`, `font-read`, `text-read`,
   `rounded-m`, `p-4`, `w-player` and `shadow-pop` all come out as expected.
-- Not done: your approval. The phase is ticked only after you have looked at the mockups and your words are recorded.
+- Your approval: you looked at the published mockups and said "it's good go on", so they are the design phases 10 to
+  21 build. (A separate session then made adhkar ordinary editable rows in the corpora mockup, as decided for phase 8.)
 
 **Try:**
 

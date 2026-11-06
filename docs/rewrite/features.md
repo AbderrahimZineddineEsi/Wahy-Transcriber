@@ -871,8 +871,8 @@ Claimed code that is not a feature of its own, so the coverage counts it as gene
 - The transcript sits beside the video with word-by-word sync (F-032); this is the main screen.
 - The old look need not survive: the new screens follow the phase 9 mockups.
 - (More from the user during the walkthrough and phase 9.)
-- **Phase 9 draft (2026-11-06), waiting for the user's approval.** Clickable mockups in
-  `docs/rewrite/mockups/screens.html`, with tokens in `web/src/shell/tokens.css`. What the draft proposes:
+- **Phase 9 mockups (2026-11-06), approved.** Clickable mockups in `docs/rewrite/mockups/screens.html` (published at
+  https://claude.ai/artifact/QLhgNejsyQDbFexdv8nujm), with tokens in `web/src/shell/tokens.css`. The screens follow them:
   - A rail for the app's places (lectures, the open lecture, corpora, training data, request log, settings) with live
     count badges (F-001); the open lecture has its own tabs: view, edit, verify, Tafrigh, export (replaces the old
     quick-jump buttons, F-042).
@@ -884,7 +884,7 @@ Claimed code that is not a feature of its own, so the coverage counts it as gene
     Arabic, the interface in IBM Plex Sans Arabic, times and counts in IBM Plex Mono. Western digits.
   - Editor (F-047): three modes (quotes on a word board with an inspector, full text, caption timing); a missed
     quote is two clicks on the board; the header's undo button names the last edit.
-  - The user's words on the mockups go here once they have seen them.
+  - User, after looking at the mockups: "it's good go on" (approved as is).
 
 ## New features (proposed)
 
