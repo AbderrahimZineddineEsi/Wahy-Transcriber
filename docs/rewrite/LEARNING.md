@@ -467,3 +467,142 @@ cd server && uv run pytest -q tests/test_jobs.py -k "restart or stream"     # th
 cd server && uv run alembic current && sqlite3 ../data/wahy.db .tables   # the migration level and the tables
 scripts/dev.sh        # then open http://localhost:8120/docs: the jobs routes, with the stream described
 ```
+
+## Phase 7: Lectures and transcription (2026-11-06)
+
+**What was built.** Two server features, and the first routes a web app can really use:
+
+| Route | What it does |
+|---|---|
+| `POST /api/lectures` | pasted text or the content of an `.srt` / `.vtt`: timed words, saved as a lecture |
+| `POST /api/lectures/import`, `POST /api/lectures/sample` | an uploaded `.txt/.srt/.vtt` file; the fixed sample lecture |
+| `GET/PATCH/DELETE /api/lectures/{id}`, `GET /api/lectures` | open (with its words), rename, delete, the saved list |
+| `GET/PUT /api/lectures/{id}/media` | the player's video (with Range, so seeking works); attach a local file |
+| `…/versions` | save, open, rename, delete a lecture version (never the last one) |
+| `POST /api/transcriptions/youtube`, `…/upload` | make a lecture from a link or a file, and start the transcription **job** |
+| `POST /api/lectures/{id}/transcribe` | transcribe again (a lecture with media) |
+| `GET /api/transcription/models` | the four models, which ones work on this machine, the default |
+
+A transcription is the job from phase 6: stages `download → audio → transcribe → save`, one progress stream, pause
+and cancel (even while ffmpeg runs or while waiting for the GPU), and a result that says which model really ran.
+
+### Router, service, model: who does what
+
+Each feature is split the way a NestJS module is: `router.py` is the controller (it turns HTTP into one call and one
+HTTP answer), `service.py` is the provider (the rules: "deleting a lecture also deletes its media unless another
+lecture uses it"), `schemas.py` holds the DTOs (Pydantic classes, which FastAPI also turns into the OpenAPI schema the
+web app's types will be generated from), `models.py` is the entity. The service is plain Python with no HTTP in it, so
+a test can call it directly; the router test goes through the real app.
+
+```python
+# router.py: nothing but translation                    # service.py: the rules
+@router.post("/{lecture_id}/versions", status_code=201)   def delete_version(self, lecture_id, version_id):
+def save_version(lecture_id: int, body: CreateVersion,        ...
+                 lectures: Lectures):                         if count <= 1:
+    with lecture_errors():       # error → 404/409/422             raise LectureError("the last version ... stays")
+        return lectures.save_version(lecture_id, body.name, body.snapshot)
+```
+
+`Lectures = Annotated[LectureService, Depends(get_lectures)]` is dependency injection: FastAPI calls `get_lectures`
+for each request and passes the result in (in NestJS the container does this through the constructor). The service
+lives in `app.state`, built once at startup, which is also where a test swaps in a fake.
+
+One direction only: `transcription` imports `lectures` (it needs to save words and media), never the reverse. That
+is why a YouTube link starts at `/api/transcriptions/youtube` and not at `/api/lectures`: the lectures feature must
+not know that transcription exists.
+
+### Running other programs: ffmpeg and yt-dlp
+
+ffmpeg is a command-line program, so Python starts it as a **child process** (`subprocess.Popen`) and reads what it
+says. The old code used `subprocess.run`, which waits until the child ends: cancelling a job during a 5-minute
+extraction did nothing. Here `_run()` polls every quarter second, calls `ctx.check()`, and **kills the child** when
+the job is cancelled (a test starts `sleep 30` and cancels it). yt-dlp is a Python library, so it runs in-process and
+calls a *progress hook* we give it; the hook calls `ctx.check()` too.
+
+### Why the Whisper input is an array, not a file
+
+faster-whisper decodes a file path with PyAV and passes it an argument (`metadata_errors=`) that PyAV 19 removed, so
+passing a path crashed every local transcription (the old app broke on 2026-11-06). ffmpeg already gives us a 16 kHz
+mono WAV, so we read its samples with Python's `wave` module into a float32 **numpy array** and pass that. Decoding
+by ourselves is also faster and is the one place that decides the format. A test checks the model really receives an
+array.
+
+### Fallback chain, and fakes
+
+When a model fails and `auto_fallback` is on, the next one is tried: Groq → local turbo → local small (the specialized
+model → Groq → local small). Every recogniser raises the same `AsrError`, so the chain is a loop over a list:
+
+```python
+for model_id in [model, *FALLBACKS[model]]:
+    try:    raw = self.backends[model_id].transcribe(audio, ...)
+    except AsrError as e:    first_error = first_error or e; continue
+    return backend.label, raw, ({"reason": str(first_error)} if first_error else None)
+```
+
+One thing must **not** be caught: `JobCancelled`. It is an ordinary exception class, so a careless `except Exception`
+would turn "the user pressed cancel" into "Groq failed, try the next model". `_translating()` lets it through.
+
+This is the **ports and adapters** idea in its smallest form: the service knows one interface (`transcribe(audio) →
+words`) and four adapters stand behind it. Tests use a `FakeAsr` with the same shape, a fake Groq server
+(`httpx.MockTransport`: you write the function that answers requests), a fake YouTube downloader, and *real* ffmpeg on
+sine-wave files, so the audio code is tested for real and everything slow or external is faked.
+
+### Small things worth knowing
+
+- **Cache by hash.** The media cache name is `yt_<first 16 hex chars of sha256(link)>.mp4`, plus a `.json` with the
+  title; the `.json` is written last, so a half-finished download is never mistaken for a complete one.
+- **Port the arithmetic, then prove it.** The text and subtitle parsers are ports of two JavaScript functions. JS
+  `toFixed(2)` rounds halves up, Python's `round` rounds halves to even, so `round2()` uses `Decimal` with `ROUND_HALF_UP`.
+  A script runs the *old* functions on 9 inputs (a whole lecture, SRT, VTT with hours, CRLF, tags...) and the Python
+  output equals it, word for word.
+- **Safe by default:** only `http(s)` links are accepted (yt-dlp would also read local paths), uploads get a fresh
+  random name and only media suffixes, a media path can never leave `data/media/`, and the Groq key is never logged.
+- **Alembic again:** a new column (`lectures.transcription_model`) is migration `0002`, written by `--autogenerate`.
+- **`--extra local-asr`:** `faster-whisper` and the NVIDIA libraries it needs (cuBLAS, cuDNN, about 1 GB) are an
+  optional install, so the server runs without them (Groq only). The old app got those libraries for free through
+  torch; here `_preload_cuda_libraries()` loads them by hand. If CUDA still fails, `small` runs on the CPU and the
+  bigger model fails over to `small`.
+- **ASR warnings (N-009):** after a transcription, a run of 4+ Latin words ("Thank you for watching") or a word
+  repeated 6+ times (a phrase 4+ times) is reported in the job result. Only flagged, never changed.
+
+### How it was tested
+
+- **111 server tests** pass (65 new: 12 parsing, 16 lectures, 37 transcription), 1 live test is skipped (`--live` runs it).
+- **Parity with the old app:** `tests/fixtures/parsing_golden.json` is what the old JavaScript returns for 9 inputs.
+- **Fakes where it is outside, real where it is ours:** real ffmpeg and real SQLite and the real GPU owner (with a fake
+  Whisper model that raises `CUDA out of memory`); fake Groq, fake downloader, fake recogniser.
+- **Do they have teeth?** Six deliberate bugs, each caught by a different test: a changed pause length, fallback
+  ignoring `auto_fallback`, a cache that never hits, a file path instead of an array, deleting the last version,
+  and a media path that could escape the folder. (A first attempt looked wrong: all six showed the *same*
+  failure. Python had cached the first broken file's bytecode because the broken and the restored files had the
+  same size and were written within a second. Lesson: clear `__pycache__` when you mutate files.)
+- **Real run, through the API** (a 61-second khutba by sheikh Mohammed Meziane, `KZ_thZtA2kU`):
+  an `.srt` became a lecture with timed words; the link went through all four stages and ended with 103 timed
+  words with Groq; the same link again skipped the download and ran local small on the GTX 1050 (103 words);
+  with a wrong Groq key the job fell back to local turbo (106 words, fits in 3 GB) and recorded the 401 as the reason;
+  with fallback off it failed with that same message.
+- **Not tested live:** the specialized Arabic Whisper (it needs torch and transformers; its code is exercised only
+  through a fake model) and a lecture longer than Groq's 45-minute chunk (the splitting is tested with ffmpeg on
+  4-second files with a lowered limit).
+
+**Try:**
+
+```bash
+cd server && uv run pytest -q tests/test_transcription.py -k "fallback or cancel"      # the chain and cancelling
+cd server && uv run --extra local-asr pytest -q --live -k live                          # the live YouTube + local small test
+scripts/dev.sh      # http://localhost:8120/docs → POST /api/lectures/sample, then GET /api/lectures/1
+```
+
+### How it was made
+
+1. Read the old `backend/transcriber.py`, `media_processor.py`, the transcribe route in `backend/app.py`, and the JS
+   parsers; kept what worked, dropped the rest (two job systems, `temp_media`, the Groq SDK, global model caches).
+2. Parsers first (smallest, provable): `make_parsing_golden.mjs` runs the old JS → `test_parsing.py`.
+3. Lectures service + router + tests; then audio (ffmpeg), the four recognisers, the chain, the job; then the API tests.
+4. Real feature check with a real khutba. It found the one thing the tests could not: `libcublas.so.12` was missing
+   in the new environment (the old app got it from torch). Fixed with the NVIDIA wheels plus a CPU fallback for `small`,
+   then rechecked on the GPU.
+5. Mutation check (above), `scripts/test.sh`, this section.
+Commands used: `uv add`, `uv run alembic revision --autogenerate`, `uv run pytest`, `uv run ruff check .`, `yt-dlp
+--flat-playlist ytsearch…` (to find the khutba), `curl -N …/events` (the progress stream), `node
+server/tests/fixtures/make_parsing_golden.mjs`.

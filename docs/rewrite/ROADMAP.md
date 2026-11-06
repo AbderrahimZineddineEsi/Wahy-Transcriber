@@ -134,7 +134,7 @@ decisions and why). The problems being fixed are in the friction map: https://cl
     Features: groundwork for F-010, F-023, F-088, F-098.
   - Learn: ORM and migrations, threads vs asyncio, locks, server-sent events.
 
-- [ ] **7. Lectures and transcription**: Sonnet 5.5, high.
+- [x] **7. Lectures and transcription**: Sonnet 5.5, high.
   - `features/lectures`: create, list, open, delete, save a lecture version, serve media. Inputs: pasted text,
     `.txt/.srt/.vtt`, a YouTube link (yt-dlp), an uploaded file (ffmpeg), and the sample lecture. The media cache goes
     in `data/media/`.
@@ -351,3 +351,9 @@ Each entry: date, what changed, the user's words.
 - **2026-11-06**: Sessions now commit and push without asking: the previous phase's leftovers at the start, the new
   phase at the end. User: "before you start push with the commit step 6 done (something like that) and when you finish
   push with step 7 done (or whatever you made done) and make this remembered for future sessions".
+- **2026-11-06**: Phase 7 (done): a YouTube link or an upload starts at `POST /api/transcriptions/youtube|upload`, not
+  at `/api/lectures`, so `lectures` never imports `transcription`. The fallback chain is simpler than the old one: any
+  failure moves to the next model (the old code fell back from local turbo only on out-of-memory). The Groq SDK is
+  dropped (plain HTTP with retries), `numpy` is a core dependency, and `faster-whisper` plus the NVIDIA cuBLAS and cuDNN
+  wheels are the optional `local-asr` extra (`uv sync --extra local-asr`). The specialized Whisper was not run live
+  (no torch in `server/`). Test files may have long lines (ruff E501 off for `tests/*`).

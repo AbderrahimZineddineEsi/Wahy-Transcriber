@@ -5,10 +5,25 @@ from __future__ import annotations
 from collections.abc import Iterator
 
 import pytest
+from fastapi.testclient import TestClient
 
 from wahy.core.db import Database
 from wahy.core.jobs import JobRunner
 from wahy.core.settings import KEY_FIELDS, Settings
+from wahy.main import create_app
+
+
+def pytest_addoption(parser: pytest.Parser) -> None:
+    parser.addoption("--live", action="store_true", help="also run the tests marked `live` (network, real models)")
+
+
+def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item]) -> None:
+    if config.getoption("--live"):
+        return
+    skip = pytest.mark.skip(reason="live test: run with --live")
+    for item in items:
+        if "live" in item.keywords:
+            item.add_marker(skip)
 
 
 @pytest.fixture(autouse=True)
@@ -37,3 +52,11 @@ def runner(db: Database) -> Iterator[JobRunner]:
     jobs = JobRunner(db, progress_save_interval=0.0)
     yield jobs
     jobs.shutdown(timeout=2)
+
+
+@pytest.fixture
+def client(settings: Settings) -> Iterator[TestClient]:
+    """The whole app on a temporary data folder. `client.app.state` holds the services, so a test can swap in
+    fakes (for example `client.app.state.transcription.backends`)."""
+    with TestClient(create_app(settings)) as c:
+        yield c

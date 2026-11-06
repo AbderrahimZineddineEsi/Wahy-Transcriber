@@ -20,6 +20,16 @@ _Avoid_: text, captions
 **Word**:
 One transcript token with its start and end time.
 
+**ASR** (automatic speech recognition):
+Turning a lecture's audio into timed words. Four models do it: Groq's Whisper, local Whisper turbo, local Whisper
+small, and the specialized Arabic Whisper. A failed model can fall back to the next one.
+_Avoid_: STT, dictation
+
+**Media**:
+A lecture's video or audio file in `data/media/`, downloaded from a link, uploaded, or attached later. Downloads
+are cached by link, so the same link is never fetched twice.
+_Avoid_: asset, recording
+
 **Caption**:
 One timed block of transcript text in an exported subtitle file. A caption never splits a quote.
 _Avoid_: subtitle, segment

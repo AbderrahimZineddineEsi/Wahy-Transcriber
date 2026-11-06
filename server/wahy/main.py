@@ -7,6 +7,7 @@ unfinished as interrupted, and create the shared machinery that routes reach thr
     jobs    core/jobs.py     the job runner
     gpu     core/gpu.py      the GPU owner
     engine  core/engine.py   the engine worker client (the worker itself starts on the first call)
+    lectures, transcription   the feature services (features/lectures, features/transcription)
 
 Shutdown: running jobs stop at their next check (they show as interrupted), the GPU is freed and the engine
 worker is stopped.
@@ -26,6 +27,10 @@ from wahy.core.gpu import GpuOwner
 from wahy.core.jobs import JobRunner
 from wahy.core.settings import Settings, get_settings
 from wahy.features.jobs.router import router as jobs_router
+from wahy.features.lectures.router import router as lectures_router
+from wahy.features.lectures.service import LectureService
+from wahy.features.transcription.router import router as transcription_router
+from wahy.features.transcription.service import TranscriptionService
 
 log = logging.getLogger("wahy")
 
@@ -43,6 +48,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         app.state.settings, app.state.db, app.state.jobs = s, db, jobs
         app.state.gpu = GpuOwner()
         app.state.engine = EngineClient.from_settings(s)
+        app.state.lectures = LectureService(db, s)
+        app.state.transcription = TranscriptionService(db, s, app.state.gpu, jobs, app.state.lectures)
         try:
             yield
         finally:
@@ -58,6 +65,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         return {"status": "ok"}
 
     app.include_router(jobs_router)
+    app.include_router(lectures_router)
+    app.include_router(transcription_router)
     return app
 
 

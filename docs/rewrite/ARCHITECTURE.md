@@ -58,8 +58,8 @@ below hides one hard problem.
 
 ## One lecture through the new system (the example)
 
-1. You paste a YouTube link. The web app sends `POST /api/lectures {url}`.
-2. `lectures/service.py` saves a lecture row and submits a **transcribe** job. The answer comes back at once with a
+1. You paste a YouTube link. The web app sends `POST /api/transcriptions/youtube {url}`.
+2. `transcription/service.py` has `lectures/service.py` save an empty lecture row, and submits a **transcribe** job. The answer comes back at once with a
    job id, and the web app shows the job's progress stream.
 3. The job downloads the media (yt-dlp, ffmpeg), asks the GPU owner for Whisper, and saves the timed words.
 4. A **detect** job sends the words to the engine worker and saves the findings. The lecture screen shows the

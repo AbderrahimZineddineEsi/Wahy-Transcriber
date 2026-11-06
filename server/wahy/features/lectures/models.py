@@ -23,6 +23,8 @@ class Lecture(Base):
     media_path: Mapped[str | None]                 # relative to settings.media_dir
     duration_s: Mapped[float | None]
     language: Mapped[str] = mapped_column(String(8), default="ar")
+    # which model produced the words, for example "groq:whisper-large-v3-turbo"; None for text lectures
+    transcription_model: Mapped[str | None]
     created_at: Mapped[datetime] = mapped_column(default=utcnow)
     updated_at: Mapped[datetime] = mapped_column(default=utcnow, onupdate=utcnow)
 
