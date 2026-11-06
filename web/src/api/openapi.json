@@ -14,6 +14,89 @@
         "title": "ActivateRequest",
         "type": "object"
       },
+      "AddCandidate": {
+        "properties": {
+          "op": {
+            "const": "add_candidate",
+            "title": "Op",
+            "type": "string"
+          },
+          "ref": {
+            "default": "",
+            "title": "Ref",
+            "type": "string"
+          },
+          "unit_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unit Id"
+          }
+        },
+        "required": [
+          "op"
+        ],
+        "title": "AddCandidate",
+        "type": "object"
+      },
+      "AddQuote": {
+        "description": "A missed quote over words `start..end` (inclusive) (F-053): with a corpus unit, or outside the corpus\nwith\na typed reference (`unit_id` empty or \"OUTSIDE_CORPUS\").",
+        "properties": {
+          "end": {
+            "minimum": 0.0,
+            "title": "End",
+            "type": "integer"
+          },
+          "qiraah": {
+            "default": "hafs",
+            "title": "Qiraah",
+            "type": "string"
+          },
+          "ref": {
+            "default": "",
+            "description": "the reference to show, for a quote outside the corpus",
+            "title": "Ref",
+            "type": "string"
+          },
+          "source_type": {
+            "default": "QURAN",
+            "enum": [
+              "QURAN",
+              "HADITH",
+              "ADHKAR"
+            ],
+            "title": "Source Type",
+            "type": "string"
+          },
+          "start": {
+            "minimum": 0.0,
+            "title": "Start",
+            "type": "integer"
+          },
+          "unit_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unit Id"
+          }
+        },
+        "required": [
+          "start",
+          "end"
+        ],
+        "title": "AddQuote",
+        "type": "object"
+      },
       "Approved": {
         "properties": {
           "approved": {
@@ -125,6 +208,159 @@
           "file"
         ],
         "title": "Body_upload_source_api_corpora_sources__source_id__upload_post",
+        "type": "object"
+      },
+      "CanonicalWords": {
+        "properties": {
+          "full": {
+            "default": false,
+            "description": "the positions count the whole hadith (chain and takhrij too)",
+            "title": "Full",
+            "type": "boolean"
+          },
+          "indices": {
+            "description": "positions of the picked words in the reference",
+            "items": {
+              "type": "integer"
+            },
+            "minItems": 1,
+            "title": "Indices",
+            "type": "array"
+          },
+          "op": {
+            "const": "canonical_words",
+            "title": "Op",
+            "type": "string"
+          }
+        },
+        "required": [
+          "op",
+          "indices"
+        ],
+        "title": "CanonicalWords",
+        "type": "object"
+      },
+      "CaptionEdit": {
+        "description": "One edit of the caption timing editor (F-068), anchored on a word: `split` the speech caption holding\n`word` so the second part starts there; `merge` the speech caption starting at `word` into the one before;\n`time` sets the start and/or end (seconds) of the caption starting at `word`. Quotes are locked units.",
+        "properties": {
+          "end": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "End"
+          },
+          "op": {
+            "enum": [
+              "split",
+              "merge",
+              "time"
+            ],
+            "title": "Op",
+            "type": "string"
+          },
+          "start": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Start"
+          },
+          "word": {
+            "minimum": 0.0,
+            "title": "Word",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "op",
+          "word"
+        ],
+        "title": "CaptionEdit",
+        "type": "object"
+      },
+      "CaptionOut": {
+        "properties": {
+          "displayText": {
+            "title": "Displaytext",
+            "type": "string"
+          },
+          "end": {
+            "title": "End",
+            "type": "number"
+          },
+          "findingId": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Findingid"
+          },
+          "index": {
+            "title": "Index",
+            "type": "integer"
+          },
+          "isAtomicCitation": {
+            "title": "Isatomiccitation",
+            "type": "boolean"
+          },
+          "reference": {
+            "title": "Reference",
+            "type": "string"
+          },
+          "start": {
+            "title": "Start",
+            "type": "number"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          },
+          "type": {
+            "description": "normal | ayah | hadith | dhikr",
+            "title": "Type",
+            "type": "string"
+          },
+          "wordEndIdx": {
+            "title": "Wordendidx",
+            "type": "integer"
+          },
+          "wordStartIdx": {
+            "title": "Wordstartidx",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "index",
+          "start",
+          "end",
+          "text",
+          "displayText",
+          "type",
+          "findingId",
+          "reference",
+          "wordStartIdx",
+          "wordEndIdx",
+          "isAtomicCitation"
+        ],
+        "title": "CaptionOut",
         "type": "object"
       },
       "Cleared": {
@@ -431,6 +667,81 @@
         "title": "DhikrOut",
         "type": "object"
       },
+      "DismissMerge": {
+        "properties": {
+          "direction": {
+            "enum": [
+              "previous",
+              "next"
+            ],
+            "title": "Direction",
+            "type": "string"
+          },
+          "op": {
+            "const": "dismiss_merge",
+            "title": "Op",
+            "type": "string"
+          }
+        },
+        "required": [
+          "op",
+          "direction"
+        ],
+        "title": "DismissMerge",
+        "type": "object"
+      },
+      "EditDone": {
+        "description": "What an edit did. The web app reads the lecture again; these are for messages and tests.",
+        "properties": {
+          "added": {
+            "description": "findings the edit added",
+            "items": {
+              "type": "integer"
+            },
+            "title": "Added",
+            "type": "array"
+          },
+          "finding_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "the finding the edit made or changed, when there is one",
+            "title": "Finding Id"
+          },
+          "findings_changed": {
+            "default": 0,
+            "description": "findings changed, added or removed",
+            "title": "Findings Changed",
+            "type": "integer"
+          },
+          "op": {
+            "$ref": "#/components/schemas/OpOut"
+          },
+          "removed": {
+            "description": "findings the edit removed",
+            "items": {
+              "type": "integer"
+            },
+            "title": "Removed",
+            "type": "array"
+          },
+          "words_changed": {
+            "default": false,
+            "title": "Words Changed",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "op"
+        ],
+        "title": "EditDone",
+        "type": "object"
+      },
       "EngineHealth": {
         "properties": {
           "calls": {
@@ -591,6 +902,210 @@
           "data"
         ],
         "title": "Expanded",
+        "type": "object"
+      },
+      "ExportStyle": {
+        "description": "How quotes are written in the exports and the captions (F-071), remembered between sessions. The names\nare the old app's output preferences, so the engine reads them as they are.",
+        "properties": {
+          "adhkarBracketClose": {
+            "default": "〗",
+            "maxLength": 8,
+            "title": "Adhkarbracketclose",
+            "type": "string"
+          },
+          "adhkarBracketOpen": {
+            "default": "〖",
+            "maxLength": 8,
+            "title": "Adhkarbracketopen",
+            "type": "string"
+          },
+          "groupContiguousAyat": {
+            "default": true,
+            "description": "write a run of consecutive ayat once: البقرة: 1-5",
+            "title": "Groupcontiguousayat",
+            "type": "boolean"
+          },
+          "hadithBracketClose": {
+            "default": "»",
+            "maxLength": 8,
+            "title": "Hadithbracketclose",
+            "type": "string"
+          },
+          "hadithBracketOpen": {
+            "default": "«",
+            "maxLength": 8,
+            "title": "Hadithbracketopen",
+            "type": "string"
+          },
+          "quranBracketClose": {
+            "default": "﴾",
+            "maxLength": 8,
+            "title": "Quranbracketclose",
+            "type": "string"
+          },
+          "quranBracketOpen": {
+            "default": "﴿",
+            "maxLength": 8,
+            "title": "Quranbracketopen",
+            "type": "string"
+          },
+          "showAdhkarTag": {
+            "default": true,
+            "title": "Showadhkartag",
+            "type": "boolean"
+          },
+          "showHadithSource": {
+            "default": true,
+            "title": "Showhadithsource",
+            "type": "boolean"
+          },
+          "showQuranSource": {
+            "default": true,
+            "description": "for the screen; the exports always write references, as the old app did",
+            "title": "Showquransource",
+            "type": "boolean"
+          },
+          "splitCommentary": {
+            "default": true,
+            "description": "put a quote's commentary gaps outside its brackets: «part one» [commentary] «part two» [ref]",
+            "title": "Splitcommentary",
+            "type": "boolean"
+          }
+        },
+        "title": "ExportStyle",
+        "type": "object"
+      },
+      "ExportStylePatch": {
+        "properties": {
+          "adhkarBracketClose": {
+            "anyOf": [
+              {
+                "maxLength": 8,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Adhkarbracketclose"
+          },
+          "adhkarBracketOpen": {
+            "anyOf": [
+              {
+                "maxLength": 8,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Adhkarbracketopen"
+          },
+          "groupContiguousAyat": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Groupcontiguousayat"
+          },
+          "hadithBracketClose": {
+            "anyOf": [
+              {
+                "maxLength": 8,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hadithbracketclose"
+          },
+          "hadithBracketOpen": {
+            "anyOf": [
+              {
+                "maxLength": 8,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hadithbracketopen"
+          },
+          "quranBracketClose": {
+            "anyOf": [
+              {
+                "maxLength": 8,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Quranbracketclose"
+          },
+          "quranBracketOpen": {
+            "anyOf": [
+              {
+                "maxLength": 8,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Quranbracketopen"
+          },
+          "showAdhkarTag": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Showadhkartag"
+          },
+          "showHadithSource": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Showhadithsource"
+          },
+          "showQuranSource": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Showquransource"
+          },
+          "splitCommentary": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Splitcommentary"
+          }
+        },
+        "title": "ExportStylePatch",
         "type": "object"
       },
       "FindingOut": {
@@ -1333,6 +1848,71 @@
         "title": "LectureSummary",
         "type": "object"
       },
+      "LinkReference": {
+        "properties": {
+          "op": {
+            "const": "link_reference",
+            "title": "Op",
+            "type": "string"
+          },
+          "ref": {
+            "default": "",
+            "description": "a typed reference, when there is no unit",
+            "title": "Ref",
+            "type": "string"
+          },
+          "unit_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "a corpus unit (a candidate, or one found by the search)",
+            "title": "Unit Id"
+          }
+        },
+        "required": [
+          "op"
+        ],
+        "title": "LinkReference",
+        "type": "object"
+      },
+      "Merge": {
+        "properties": {
+          "direction": {
+            "enum": [
+              "previous",
+              "next"
+            ],
+            "title": "Direction",
+            "type": "string"
+          },
+          "gap_type": {
+            "default": "PART_OF_QUOTE",
+            "description": "the words between them: part of the quote, or a commentary kept out of it",
+            "enum": [
+              "PART_OF_QUOTE",
+              "COMMENTARY"
+            ],
+            "title": "Gap Type",
+            "type": "string"
+          },
+          "op": {
+            "const": "merge",
+            "title": "Op",
+            "type": "string"
+          }
+        },
+        "required": [
+          "op",
+          "direction"
+        ],
+        "title": "Merge",
+        "type": "object"
+      },
       "ModelInfo": {
         "properties": {
           "available": {
@@ -1375,6 +1955,76 @@
           "available"
         ],
         "title": "ModelInfo",
+        "type": "object"
+      },
+      "MoveEdge": {
+        "properties": {
+          "delta": {
+            "description": "words: negative moves left (earlier), positive right",
+            "title": "Delta",
+            "type": "integer"
+          },
+          "edge": {
+            "enum": [
+              "start",
+              "end"
+            ],
+            "title": "Edge",
+            "type": "string"
+          },
+          "op": {
+            "const": "move_edge",
+            "title": "Op",
+            "type": "string"
+          }
+        },
+        "required": [
+          "op",
+          "edge",
+          "delta"
+        ],
+        "title": "MoveEdge",
+        "type": "object"
+      },
+      "OpOut": {
+        "description": "One edit in the lecture's log. `kind` is a key the web app translates; `label` is a plain English\nname.",
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "params": {
+            "additionalProperties": true,
+            "title": "Params",
+            "type": "object"
+          },
+          "undone": {
+            "title": "Undone",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "label",
+          "params",
+          "created_at",
+          "undone"
+        ],
+        "title": "OpOut",
         "type": "object"
       },
       "OpenRouterModel": {
@@ -2183,6 +2833,25 @@
         "title": "QuoteOut",
         "type": "object"
       },
+      "RemoveCandidate": {
+        "properties": {
+          "op": {
+            "const": "remove_candidate",
+            "title": "Op",
+            "type": "string"
+          },
+          "unit_id": {
+            "title": "Unit Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "op",
+          "unit_id"
+        ],
+        "title": "RemoveCandidate",
+        "type": "object"
+      },
       "RenameLecture": {
         "properties": {
           "title": {
@@ -2209,6 +2878,47 @@
           "name"
         ],
         "title": "RenameVersion",
+        "type": "object"
+      },
+      "ReplaceText": {
+        "description": "The whole lecture text after the full-text editor (F-067). Words are separated by spaces.",
+        "properties": {
+          "text": {
+            "minLength": 1,
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "title": "ReplaceText",
+        "type": "object"
+      },
+      "ReplaceWords": {
+        "description": "Rewrite words `start..end` (inclusive) as `text` (F-056). `end = start - 1` inserts before `start`;\nan empty `text` deletes the words. Words that stay keep their times; new ones share the replaced words'\ntime.",
+        "properties": {
+          "end": {
+            "minimum": -1.0,
+            "title": "End",
+            "type": "integer"
+          },
+          "start": {
+            "minimum": 0.0,
+            "title": "Start",
+            "type": "integer"
+          },
+          "text": {
+            "default": "",
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "start",
+          "end"
+        ],
+        "title": "ReplaceWords",
         "type": "object"
       },
       "RequestDetail": {
@@ -2653,6 +3363,50 @@
         "title": "SearchHit",
         "type": "object"
       },
+      "SetKind": {
+        "properties": {
+          "kind": {
+            "enum": [
+              "ayah",
+              "hadith",
+              "dhikr"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "op": {
+            "const": "set_kind",
+            "title": "Op",
+            "type": "string"
+          }
+        },
+        "required": [
+          "op",
+          "kind"
+        ],
+        "title": "SetKind",
+        "type": "object"
+      },
+      "Snap": {
+        "properties": {
+          "on": {
+            "description": "show the source text instead of the spoken words",
+            "title": "On",
+            "type": "boolean"
+          },
+          "op": {
+            "const": "snap",
+            "title": "Op",
+            "type": "string"
+          }
+        },
+        "required": [
+          "op",
+          "on"
+        ],
+        "title": "Snap",
+        "type": "object"
+      },
       "SourceOut": {
         "description": "A hadith corpus source. `status`: ready | preparing | missing.",
         "properties": {
@@ -2806,6 +3560,18 @@
           }
         },
         "title": "TranscribeOptions",
+        "type": "object"
+      },
+      "Undone": {
+        "properties": {
+          "op": {
+            "$ref": "#/components/schemas/OpOut"
+          }
+        },
+        "required": [
+          "op"
+        ],
+        "title": "Undone",
         "type": "object"
       },
       "ValidationError": {
@@ -3830,9 +4596,223 @@
         ]
       }
     },
+    "/api/export/style": {
+      "get": {
+        "description": "Brackets and references (F-071).",
+        "operationId": "get_style_api_export_style_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExportStyle"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Get Style",
+        "tags": [
+          "export"
+        ]
+      },
+      "patch": {
+        "operationId": "update_style_api_export_style_patch",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExportStylePatch"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExportStyle"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Update Style",
+        "tags": [
+          "export"
+        ]
+      }
+    },
+    "/api/findings/{finding_id}": {
+      "delete": {
+        "description": "Delete a finding, saying why (F-064): `ordinary_speech` saves a gold label \"false\".",
+        "operationId": "delete_finding_api_findings__finding_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "finding_id",
+            "required": true,
+            "schema": {
+              "title": "Finding Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "intent",
+            "required": true,
+            "schema": {
+              "enum": [
+                "ordinary_speech",
+                "highlight_mistake",
+                "testing"
+              ],
+              "title": "Intent",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EditDone"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Delete Finding",
+        "tags": [
+          "editing"
+        ]
+      }
+    },
+    "/api/findings/{finding_id}/edit": {
+      "post": {
+        "description": "One change to a finding: move an edge, change its kind, the source text or the reference's words,\nits references, merge with a neighbour (F-058 to F-063).",
+        "operationId": "edit_finding_api_findings__finding_id__edit_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "finding_id",
+            "required": true,
+            "schema": {
+              "title": "Finding Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "discriminator": {
+                  "mapping": {
+                    "add_candidate": "#/components/schemas/AddCandidate",
+                    "canonical_words": "#/components/schemas/CanonicalWords",
+                    "dismiss_merge": "#/components/schemas/DismissMerge",
+                    "link_reference": "#/components/schemas/LinkReference",
+                    "merge": "#/components/schemas/Merge",
+                    "move_edge": "#/components/schemas/MoveEdge",
+                    "remove_candidate": "#/components/schemas/RemoveCandidate",
+                    "set_kind": "#/components/schemas/SetKind",
+                    "snap": "#/components/schemas/Snap"
+                  },
+                  "propertyName": "op"
+                },
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/MoveEdge"
+                  },
+                  {
+                    "$ref": "#/components/schemas/SetKind"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Snap"
+                  },
+                  {
+                    "$ref": "#/components/schemas/CanonicalWords"
+                  },
+                  {
+                    "$ref": "#/components/schemas/LinkReference"
+                  },
+                  {
+                    "$ref": "#/components/schemas/AddCandidate"
+                  },
+                  {
+                    "$ref": "#/components/schemas/RemoveCandidate"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Merge"
+                  },
+                  {
+                    "$ref": "#/components/schemas/DismissMerge"
+                  }
+                ],
+                "title": "Body"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EditDone"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Edit Finding",
+        "tags": [
+          "editing"
+        ]
+      }
+    },
     "/api/findings/{finding_id}/expand": {
       "post": {
-        "description": "Grow a finding over the words its start or end is missing (the old editor's auto-heal).",
+        "description": "Grow a finding over the words its start or end is missing (the old editor's auto-heal). It is an edit:\nfeatures/editing does it, so undo can shrink it back.",
         "operationId": "expand_finding_api_findings__finding_id__expand_post",
         "parameters": [
           {
@@ -4550,6 +5530,110 @@
         ]
       }
     },
+    "/api/lectures/{lecture_id}/captions": {
+      "get": {
+        "description": "The captions as the caption files write them, with the timing editor's edits (F-068).",
+        "operationId": "lecture_captions_api_lectures__lecture_id__captions_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "lecture_id",
+            "required": true,
+            "schema": {
+              "title": "Lecture Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "script",
+            "required": false,
+            "schema": {
+              "default": "spoken",
+              "enum": [
+                "spoken",
+                "standard"
+              ],
+              "title": "Script",
+              "type": "string"
+            }
+          },
+          {
+            "description": "the verdicts shown as quotes (NONE = unverified); empty: all",
+            "in": "query",
+            "name": "show",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "enum": [
+                      "CORRECT",
+                      "NOT_SURE",
+                      "FALSE",
+                      "NONE"
+                    ],
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "the verdicts shown as quotes (NONE = unverified); empty: all",
+              "title": "Show"
+            }
+          },
+          {
+            "in": "query",
+            "name": "kind",
+            "required": false,
+            "schema": {
+              "default": "all",
+              "enum": [
+                "all",
+                "quran",
+                "hadith",
+                "dhikr"
+              ],
+              "title": "Kind",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/CaptionOut"
+                  },
+                  "title": "Response Lecture Captions Api Lectures  Lecture Id  Captions Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Lecture Captions",
+        "tags": [
+          "export"
+        ]
+      }
+    },
     "/api/lectures/{lecture_id}/detect": {
       "post": {
         "description": "Find the quotes in a lecture (replacing its findings; earlier ones are kept as a lecture version).\nReturns the job; follow it at GET /api/jobs/{id}/events.",
@@ -4607,6 +5691,425 @@
         "summary": "Detect",
         "tags": [
           "detection"
+        ]
+      }
+    },
+    "/api/lectures/{lecture_id}/edits": {
+      "get": {
+        "description": "The lecture's edits, newest first.",
+        "operationId": "edit_log_api_lectures__lecture_id__edits_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "lecture_id",
+            "required": true,
+            "schema": {
+              "title": "Lecture Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/OpOut"
+                  },
+                  "title": "Response Edit Log Api Lectures  Lecture Id  Edits Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Edit Log",
+        "tags": [
+          "editing"
+        ]
+      }
+    },
+    "/api/lectures/{lecture_id}/edits/captions": {
+      "post": {
+        "description": "Split, merge or re-time a caption (F-068). Quotes are locked units (409).",
+        "operationId": "edit_caption_api_lectures__lecture_id__edits_captions_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "lecture_id",
+            "required": true,
+            "schema": {
+              "title": "Lecture Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CaptionEdit"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EditDone"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Edit Caption",
+        "tags": [
+          "editing"
+        ]
+      }
+    },
+    "/api/lectures/{lecture_id}/edits/quote": {
+      "post": {
+        "description": "Insert a missed quote (F-053).",
+        "operationId": "add_quote_api_lectures__lecture_id__edits_quote_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "lecture_id",
+            "required": true,
+            "schema": {
+              "title": "Lecture Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddQuote"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EditDone"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Add Quote",
+        "tags": [
+          "editing"
+        ]
+      }
+    },
+    "/api/lectures/{lecture_id}/edits/text": {
+      "put": {
+        "description": "Save the full-text editor (F-067).",
+        "operationId": "replace_text_api_lectures__lecture_id__edits_text_put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "lecture_id",
+            "required": true,
+            "schema": {
+              "title": "Lecture Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReplaceText"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EditDone"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Replace Text",
+        "tags": [
+          "editing"
+        ]
+      }
+    },
+    "/api/lectures/{lecture_id}/edits/undo": {
+      "post": {
+        "description": "Undo the newest edit (F-003); the answer names it.",
+        "operationId": "undo_api_lectures__lecture_id__edits_undo_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "lecture_id",
+            "required": true,
+            "schema": {
+              "title": "Lecture Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Undone"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Undo",
+        "tags": [
+          "editing"
+        ]
+      }
+    },
+    "/api/lectures/{lecture_id}/edits/words": {
+      "post": {
+        "description": "Rewrite or delete some words (F-056).",
+        "operationId": "replace_words_api_lectures__lecture_id__edits_words_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "lecture_id",
+            "required": true,
+            "schema": {
+              "title": "Lecture Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReplaceWords"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EditDone"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Replace Words",
+        "tags": [
+          "editing"
+        ]
+      }
+    },
+    "/api/lectures/{lecture_id}/export/{fmt}": {
+      "get": {
+        "description": "One export file (F-069, F-070), as a download.",
+        "operationId": "export_file_api_lectures__lecture_id__export__fmt__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "lecture_id",
+            "required": true,
+            "schema": {
+              "title": "Lecture Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "path",
+            "name": "fmt",
+            "required": true,
+            "schema": {
+              "enum": [
+                "srt",
+                "vtt",
+                "ass",
+                "md",
+                "txt",
+                "json",
+                "html"
+              ],
+              "title": "Fmt",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "script",
+            "required": false,
+            "schema": {
+              "default": "spoken",
+              "enum": [
+                "spoken",
+                "standard"
+              ],
+              "title": "Script",
+              "type": "string"
+            }
+          },
+          {
+            "description": "the verdicts shown as quotes (NONE = unverified); empty: all",
+            "in": "query",
+            "name": "show",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "enum": [
+                      "CORRECT",
+                      "NOT_SURE",
+                      "FALSE",
+                      "NONE"
+                    ],
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "the verdicts shown as quotes (NONE = unverified); empty: all",
+              "title": "Show"
+            }
+          },
+          {
+            "in": "query",
+            "name": "kind",
+            "required": false,
+            "schema": {
+              "default": "all",
+              "enum": [
+                "all",
+                "quran",
+                "hadith",
+                "dhikr"
+              ],
+              "title": "Kind",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              },
+              "text/plain": {}
+            },
+            "description": "the file"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Export File",
+        "tags": [
+          "export"
         ]
       }
     },
@@ -5263,7 +6766,7 @@
     },
     "/api/lectures/{lecture_id}/words/{idx}": {
       "patch": {
-        "description": "Correct one word's text; its timing and the findings stay as they are.",
+        "description": "Correct one word's text (F-041); its timing and the findings stay. Undo puts it back.",
         "operationId": "edit_word_api_lectures__lecture_id__words__idx__patch",
         "parameters": [
           {
@@ -5319,7 +6822,7 @@
         },
         "summary": "Edit Word",
         "tags": [
-          "lectures"
+          "editing"
         ]
       }
     },

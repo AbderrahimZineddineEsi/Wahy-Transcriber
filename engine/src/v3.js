@@ -2032,6 +2032,6 @@ export {
   WORD_TOKEN_RE, MUQATTAAT_WORDS, QUARANTINED_FORMULAS, QIRAAT_AR_NAME, QIRAAT_PRIORITY_RANK, QIRAAT_FARSH_VARIANTS,
   expandHonorificLigatures, normalizeArabic, isFusedTwoToOneMatch, stripProclitic, isLowSpecWord, tokenizeText,
   levenshteinLe1, matchWordWithQiraat, stripIsnad,
-  // used by expand.ts (the old editor's boundary heal)
-  wordMatchQuality, isCitationOrIsnadWord, recomputeCanonicalForDetection,
+  // used by expand.ts (the old editor's boundary heal) and edit.ts (the old editor's finding edits)
+  wordMatchQuality, isCitationOrIsnadWord, recomputeCanonicalForDetection, getUnitFullWordView,
 };

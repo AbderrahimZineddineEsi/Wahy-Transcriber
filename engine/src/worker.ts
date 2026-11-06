@@ -15,7 +15,12 @@
 //   search     {text, options}           corpus units; options also: kind, limit
 //   expand     {finding, words, boundary, options}   the finding grown over its missing start or end (expand.ts)
 //   rule_boundary {states}               the no-model boundary {start, end} of each v2 / v3 state (envelopes.ts)
-//   units      {ids, options}            {id: {ref, words, norms}}: a unit's vocalised words and the engine's norms
+//   edit       {request, words, options} a finding after an editor change (edit.ts: add_quote, move_edge, merge, ...)
+//   captions   {words, findings, prefs, visibleIds, standardScript, captionEdits}   the captions (export.ts)
+//   export     {format, words, findings, title, prefs, visibleIds, standardScript, captionEdits, exportedAt}
+//                                        one export file {filename, mime, content} (export.ts)
+//   units      {ids, options}            {id: {ref, words, norms, full}}: a unit's vocalised words, the engine's
+//                                        norms, and for a hadith its whole text {words, matnStart, matnEnd} or null
 //   tokenize   {text}                    the engine's normalised tokens
 //   tokenize_words {words}               the same per word (a word can give 0, 1 or more tokens)
 //   surah_names                          {"1": "الفاتحة", ...}
@@ -29,7 +34,9 @@ import readline from "node:readline";
 import { fileURLToPath } from "node:url";
 import { detect, matcherFor } from "./detect.ts";
 import { envelopes, ruleBoundary } from "./envelopes.ts";
+import { edit, referenceWords } from "./edit.ts";
 import { expand } from "./expand.ts";
+import { exportLecture, lectureCaptions } from "./export.ts";
 import { search } from "./search.ts";
 import { SURAH_NAMES_AR } from "./shared.js";
 import { tokenizeText } from "./v3.js";
@@ -74,13 +81,16 @@ const handlers: Record<string, (req: any) => unknown> = {
   envelopes: ({ findings, words, version, options }) => envelopes(findings, words, version, withCorpus(options)),
   search: ({ text, options }) => search(text, withCorpus(options)),
   expand: ({ finding, words, boundary, options }) => expand(finding, words, boundary, withCorpus(options)),
+  edit: ({ request, words, options }) => edit(request, words, withCorpus(options)),
+  captions: (req) => lectureCaptions(req),
+  export: (req) => exportLecture(req),
   rule_boundary: ({ states }) => states.map(ruleBoundary),
   units: ({ ids, options }) => {
     const units = matcherFor(withCorpus(options)).units;
     const out: Record<string, unknown> = {};
     for (const id of ids) {
       const u = units.get(id);
-      if (u) out[id] = { ref: u.displayRef, words: u.vocalizedWords ?? null, norms: u.normWords ?? null };
+      if (u) out[id] = { ref: u.displayRef, words: u.vocalizedWords ?? null, norms: u.normWords ?? null, full: referenceWords(u).full };
     }
     return out;
   },

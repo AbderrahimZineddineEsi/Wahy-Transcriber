@@ -62,10 +62,26 @@ describe("worker", () => {
     const units = (await call("units", { ids: ["112:2", "nope"], options: { engine: "v4" } })).result;
     expect(Object.keys(units)).toEqual(["112:2"]);
     const samad = corpus.ayat.find((x) => x.s === 112 && x.a === 2)!.t;   // vocalised: «اللَّهُ الصَّمَدُ»
-    expect(units["112:2"]).toEqual({ ref: "الإخلاص: 2", words: samad.split(" "), norms: ["الله", "الصمد"] });
+    expect(units["112:2"]).toEqual({ ref: "الإخلاص: 2", words: samad.split(" "), norms: ["الله", "الصمد"], full: null });
     expect((await call("tokenize", { text: "قالَ اللهُ تعالى" })).result).toEqual(["قال", "الله", "تعالي"]);
     expect((await call("tokenize_words", { words: ["قال", "،", "إنَّ"] })).result).toEqual([["قال"], [], ["ان"]]);
     expect((await call("surah_names")).result["112"]).toBe("الإخلاص");
+  });
+
+  test("edit, captions and export", async () => {
+    const options = { engine: "v3" };
+    const found = (await call("detect", { words, options })).result;
+    const verse = found.find((f: any) => f.sourceType === "QURAN");
+    const moved = await call("edit", { request: { op: "move_edge", finding: verse, edge: "end", delta: -1 }, words, options });
+    expect(moved.ok).toBe(true);
+    expect(moved.result.finding.wordEndIdx).toBe(verse.wordEndIdx - 1);
+    const caps = (await call("captions", { words, findings: found })).result;
+    expect(caps.some((c: any) => c.type === "ayah")).toBe(true);
+    const srt = (await call("export", { format: "srt", words, findings: found })).result;
+    expect(srt.filename).toBe("wahy-captions.srt");
+    expect(srt.content.startsWith("1\n")).toBe(true);
+    const bad = await call("edit", { request: { op: "move_edge", finding: verse, edge: "middle", delta: 1 }, words, options });
+    expect(bad.ok).toBe(false);
   });
 
   test("errors come back as a response, and the worker keeps going", async () => {

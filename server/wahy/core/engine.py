@@ -107,6 +107,24 @@ class EngineClient:
         the finding."""
         return self.call("expand", finding=finding, words=words, boundary=boundary, options=options or {})
 
+    def edit(self, request: dict[str, Any], words: list[dict[str, Any]],
+             options: dict[str, Any] | None = None) -> dict[str, Any]:
+        """A finding after an editor change (engine/src/edit.ts): `request` is {op, ...}; the answer is
+        {finding, kept?}. A change that can't be made comes back as EngineError with the reason."""
+        return self.call("edit", request=request, words=words, options=options or {})
+
+    def captions(self, words: list[dict[str, Any]], findings: list[dict[str, Any]],
+                 **options: Any) -> list[dict[str, Any]]:
+        """The lecture's captions (engine/src/export.ts lectureCaptions). Options: prefs, visibleIds,
+        standardScript, captionEdits."""
+        return self.call("captions", words=words, findings=findings, **options)
+
+    def export(self, fmt: str, words: list[dict[str, Any]], findings: list[dict[str, Any]],
+               **options: Any) -> dict[str, str]:
+        """One export file {filename, mime, content} (engine/src/export.ts exportLecture). Options: title,
+        prefs, visibleIds, standardScript, captionEdits, exportedAt."""
+        return self.call("export", format=fmt, words=words, findings=findings, **options)
+
     def rule_boundary(self, states: list[dict[str, Any]]) -> list[dict[str, int]]:
         """The no-model boundary of each v2 / v3 state: [{start: 0 | 1, end: 0 | 1}] (1 = that side was cut
         off), for Laya checkpoints not trained on the boundary."""

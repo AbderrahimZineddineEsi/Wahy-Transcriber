@@ -5,7 +5,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any
 
-from sqlalchemy import JSON, ForeignKey, String, UniqueConstraint
+from sqlalchemy import JSON, ForeignKey, String, UniqueConstraint, false
 from sqlalchemy.orm import Mapped, mapped_column
 
 from wahy.core.db import Base, utcnow
@@ -29,4 +29,7 @@ class Finding(Base):
     word_start: Mapped[int]                             # first and last word idx, inclusive
     word_end: Mapped[int]
     data: Mapped[dict[str, Any]] = mapped_column(JSON)
+    # deleted in the editor (features/editing). The row stays, so undo brings it back with its verdicts and
+    # labels.
+    deleted: Mapped[bool] = mapped_column(default=False, server_default=false())
     created_at: Mapped[datetime] = mapped_column(default=utcnow)

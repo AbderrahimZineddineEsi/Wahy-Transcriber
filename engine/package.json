@@ -4,7 +4,8 @@
   "private": true,
   "type": "module",
   "exports": {
-    "./captions": "./src/captions.ts"
+    "./captions": "./src/captions.ts",
+    "./export": "./src/export.ts"
   },
   "scripts": {
     "test": "vitest run",

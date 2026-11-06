@@ -239,7 +239,7 @@ decisions and why). The problems being fixed are in the friction map: https://cl
 
 ### Editing and export
 
-- [ ] **16. Editing and export (server)**: Opus 5.5, high.
+- [x] **16. Editing and export (server)**: Opus 5.5, high.
   - Edits, each one an operation in a per-lecture log so undo works: add a missed quote (a word range plus a
     reference), swap in canonical words, choose a candidate reference, edit the full text while keeping word timings,
     edit caption timing.
@@ -256,6 +256,11 @@ decisions and why). The problems being fixed are in the friction map: https://cl
     timings survive a text edit.
   - Feature check: export the sample lecture's captions; they match the old app's.
     Features: F-003, F-053, F-056, F-058 to F-064, F-067 to F-071.
+  - Feature check result (2026-11-06): a running server on a scratch data folder, the sample lecture detected with
+    v5, then `GET /api/lectures/{id}/export/{srt,vtt,ass,md,txt}`: all five byte-identical to the old app's files
+    (`make_golden.mjs --check` confirmed the old app still writes them). Adding a missed quote showed it in the SRT and
+    undo removed it.
+  - Notes: see the 2026-11-06 phase 16 entry under **Changes**.
   - Learn: the command pattern for undo; LCS alignment.
 
 - [ ] **17. Web: editor and export**: Opus 5.5, high.
@@ -422,3 +427,27 @@ Each entry: date, what changed, the user's words.
   whose card holds the finding and its v1 envelope for phase 20's export. A pass does not save a lecture version:
   every pass adds verdict rows, and the newest one is shown. One pass at a time per lecture (409). F-085's "one
   request with all questions" is how every request already works: verdict, boundary and merge go in one request.
+- **2026-11-06**: Phase 16 (done). Choices made inside the phase:
+  - The export formats and the old editor's finding edits moved into the engine package (`engine/src/export.ts`,
+    `engine/src/edit.ts`; worker commands `export`, `captions`, `edit`; `units` also returns a hadith's whole text), so
+    the server and the web app (phase 17, `@wahy/engine/export`) write the same files.
+  - Undo only, newest first (no redo). Every edit is a row in `edit_ops` holding only what it replaced; a deleted
+    finding is marked `deleted` (migration `0005`), so undo brings it back with its verdicts and label. A new detection
+    starts the log and the caption edits again.
+  - `PATCH /api/lectures/{id}/words/{idx}` moved into `features/editing` (same path and answer) and is logged; one fixed
+    word keeps the findings and does not re-scan. Rewriting words or saving the full text re-scans the edited span
+    (3 words around it) and adds new findings there, as the old editor did; a quote that only partly overlapped a span
+    whose word count changed is removed, a quote around the edit is kept and moved. Expand (phase 14) also moved into
+    `features/editing` (same route), so it can be undone.
+  - Caption edits (split, merge, new times) are stored per lecture, anchored on words, and applied after the captions
+    are built; only speech captions can be split or merged (quotes are locked units, 409).
+  - The export style (`GET/PATCH /api/export/style`) keeps the old preference names. As in the old app (and the golden
+    alt-style files), the exports always write references: the "show source" switches are saved for the screen only.
+    "Standard script" (F-038) reaches the exports as `?script=standard`; the verdict and kind filters as `?show=` and
+    `?kind=`. The HTML export is built from the captions, not the page; print / PDF stays in the web app (phase 17).
+  - Commentary gaps: the split applies to findings that have gaps. A hadith with a verse inside it but no gap is
+    written as the old app wrote it (the roadmap allows only the gap split to differ from the golden files); the
+    engines set `embeddedQuran` only on one-part findings, so the verse's own brackets show after a "commentary" merge.
+    Open point for the user: bracket such verses in gapless hadiths too?
+  - An outside-corpus quote is not added to the adhkar or custom-quote lists here (the old "save as dhikr" belongs to
+    the adhkar editor).

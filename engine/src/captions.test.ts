@@ -13,7 +13,7 @@ const manifest = JSON.parse(fs.readFileSync(path.join(EXPECTED, "manifest.json")
 const read = (rel: string) => fs.readFileSync(path.join(EXPECTED, rel), "utf8");
 const ALT_STYLE: CaptionPrefs = {
   quranBracketOpen: "(", quranBracketClose: ")", hadithBracketOpen: '"', hadithBracketClose: '"',
-  adhkarBracketOpen: "[", adhkarBracketClose: "]", groupContiguousAyat: false,
+  adhkarBracketOpen: "[", adhkarBracketClose: "]", groupContiguousAyat: false, splitCommentary: false,
 };
 
 function stamp(sec: number): string {
@@ -31,7 +31,7 @@ describe("golden captions", () => {
       const dir = `${name}/${engine.replace(":", "-")}`;
       const findings: CaptionFinding[] = JSON.parse(read(`${dir}/findings.json`));
       test(`${dir}: the old app's SRT`, () => {
-        expect(srt(buildCaptions(words, findings))).toBe(read(`${dir}/wahy-captions.srt`));
+        expect(srt(buildCaptions(words, findings, { prefs: { splitCommentary: false } }))).toBe(read(`${dir}/wahy-captions.srt`));
       });
       if (engine === "v5") {
         test(`${dir}: the old app's SRT in the alternative style`, () => {

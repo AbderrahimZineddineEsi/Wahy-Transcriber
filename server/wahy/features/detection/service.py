@@ -12,7 +12,9 @@ the first run: the worker builds its matcher), `save`. Its result:
      "hadith_source": "wahy_default"}
 
 Running again replaces the findings; when there were some, they are first kept as a lecture version, so two
-detections can be compared (F-044).
+detections can be compared (F-044). It also starts the lecture's edit log and caption edits again: they point
+at
+the findings it replaced (features/editing). Findings deleted in the editor are not listed.
 
 Search and detection build the engine with the same options on purpose: the worker keeps one matcher per
 option set (hundreds of MB), and a search with other options would build a second one.
@@ -33,6 +35,7 @@ from wahy.core.settings import Settings
 from wahy.features.corpora.service import CorporaService
 from wahy.features.detection.models import Finding
 from wahy.features.detection.schemas import DetectionSettings, FindingOut, FindingsOut, SearchHit, VerdictOut
+from wahy.features.editing.models import CaptionEdits, EditOp
 from wahy.features.lectures.models import Word
 from wahy.features.lectures.service import LectureService
 from wahy.features.settings.store import SettingsStore
@@ -137,6 +140,9 @@ class DetectionService:
                 for i, f in enumerate(findings)]
         with self.db.session() as s:
             s.execute(delete(Finding).where(Finding.lecture_id == lecture_id))
+            # the edit log points at the findings just replaced: it starts again (features/editing)
+            s.execute(delete(EditOp).where(EditOp.lecture_id == lecture_id))
+            s.execute(delete(CaptionEdits).where(CaptionEdits.lecture_id == lecture_id))
             for i in range(0, len(rows), 500):
                 s.execute(insert(Finding), rows[i:i + 500])
 
@@ -145,7 +151,8 @@ class DetectionService:
     def findings(self, lecture_id: int) -> FindingsOut:
         self.lectures.list_one(lecture_id)                      # LectureNotFound
         with self.db.session() as s:
-            rows = s.scalars(select(Finding).where(Finding.lecture_id == lecture_id).order_by(Finding.idx))
+            live = select(Finding).where(Finding.lecture_id == lecture_id, Finding.deleted.is_(False))
+            rows = s.scalars(live.order_by(Finding.idx))
             newest = self._newest_verdicts(s, lecture_id)
             items = [FindingOut.model_validate(r).model_copy(update={"verdict": newest.get(r.id)})
                      for r in list(rows)]

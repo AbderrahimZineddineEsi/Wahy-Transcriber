@@ -133,7 +133,10 @@ def approve_all(lecture_id: int, service: Verification) -> Approved:
 
 
 @router.post("/api/findings/{finding_id}/expand")
-def expand_finding(finding_id: int, service: Verification, body: ExpandIn | None = None) -> Expanded:
-    """Grow a finding over the words its start or end is missing (the old editor's auto-heal)."""
-    with verification_errors():
-        return service.expand(finding_id, body or ExpandIn())
+def expand_finding(finding_id: int, request: Request, body: ExpandIn | None = None) -> Expanded:
+    """Grow a finding over the words its start or end is missing (the old editor's auto-heal). It is an edit:
+    features/editing does it, so undo can shrink it back."""
+    from wahy.features.editing.router import editing_errors
+
+    with editing_errors():
+        return request.app.state.editing.expand(finding_id, body or ExpandIn())

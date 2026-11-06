@@ -9,6 +9,14 @@
 // Rules (from the old file): normal speech is cut at 12 words, 5 s, a pause over 0.4 s or a sentence end; a
 // quote always starts a new caption and ends one; a quote of at most 22 words or 9 s is one caption with its
 // reference; a longer one is cut only at pauses or waqf marks into chunks of 12-18 words.
+//
+// New in phase 16 (not in the old app): commentary gaps. When a finding has `commentaryGaps` (the speaker's own
+// words between two parts of the quote), those words go outside the brackets: «part one» [commentary] «part two»
+// [ref], for Quran, Hadith and Adhkar alike, and a verse inside a hadith (`embeddedQuran`) gets its own ﴿…﴾ inside
+// the part it is in. `prefs.splitCommentary: false` turns this off and gives the old app's captions exactly.
+// Findings without gaps are unchanged either way.
+//
+// `applyCaptionEdits` applies the caption timing editor's edits (split, merge, new times) to built captions.
 
 export type CaptionWord = { word: string; start: number; end: number };
 
@@ -28,6 +36,11 @@ export type CaptionFinding = {
   candidateRefs?: string[];
   canonicalText?: string;
   snappedToCanonical?: boolean;
+  /** token ranges [start, end) of the quote's parts, and of the speaker's words between them */
+  segments?: number[][];
+  commentaryGaps?: number[][];
+  canonicalSegments?: string[];
+  embeddedQuran?: { tStart: number; tEnd: number }[];
 };
 
 export type CaptionType = "normal" | "ayah" | "hadith" | "dhikr";
@@ -59,12 +72,16 @@ export type CaptionPrefs = {
   adhkarBracketClose?: string;
   /** write a run of consecutive ayat once, as "البقرة: 1-5" (default true) */
   groupContiguousAyat?: boolean;
+  /** put a finding's commentary gaps outside its brackets (default true; false = the old app) */
+  splitCommentary?: boolean;
 };
 
 export type CaptionOptions<F extends CaptionFinding = CaptionFinding> = {
   prefs?: CaptionPrefs;
   /** which findings become quote captions; the others are read as normal speech. Default: all. */
   visible?: (finding: F) => boolean;
+  /** show every quote in its source text (F-038 "standard script"), as if each finding were snapped */
+  standardScript?: boolean;
 };
 
 const WAQF_OR_PUNCT_RE = /[،؛:.؟!۝ۖۗۚۛۜ]/;
@@ -199,6 +216,95 @@ export function buildAyahGroupRefMap<F extends CaptionFinding>(detections: F[], 
   return out;
 }
 
+
+// ---- commentary gaps (phase 16) --------------------------------------------------------------------------------
+
+// The engine's token regex and the marks its normaliser removes (engine/src/v3.js WORD_TOKEN_RE, TASHKEEL_RE): a
+// finding's segments and gaps count tokens, and a word can hold 0, 1 or more of them.
+const TOKEN_RE = /[ؐ-ؚء-ٰٟٱ-ۓەۖ-ۭ]+/g;
+const ONLY_MARKS_RE = /^[ؐ-ًؚ-ٰٟۖ-ۭ]+$/;
+
+/** token index → word index, for the words joined by single spaces (as the engine reads them). */
+export function tokenWordMap(words: CaptionWord[]): number[] {
+  const out: number[] = [];
+  words.forEach((w, i) => {
+    for (const m of String(w.word ?? "").trim().matchAll(TOKEN_RE)) if (!ONLY_MARKS_RE.test(m[0])) out.push(i);
+  });
+  return out;
+}
+
+/** One run of a quote as it is written: part of the quote, or the speaker's commentary between two parts. */
+export type QuotePiece = { gap: boolean; text: string };
+
+export const hasCommentaryGaps = (f: CaptionFinding) => Array.isArray(f.commentaryGaps) && f.commentaryGaps.length > 0;
+
+/** The pieces of a finding's words `a..b` (inclusive): commentary gaps apart, a verse inside a hadith in its own
+ *  Quran brackets, and in canonical mode each part's source words (spread over the part's words in proportion,
+ *  so a quote cut into several captions shares them out). */
+export function quotePieces(
+  words: CaptionWord[], f: CaptionFinding, a: number, b: number, useCanonical: boolean, tokWord: number[], prefs: CaptionPrefs = {},
+): QuotePiece[] {
+  const w = (t: number) => tokWord[t] ?? t;
+  const range = (r: number[]) => [w(r[0]), w(Math.max(r[0], r[1] - 1))];
+  const gaps = (f.commentaryGaps ?? []).filter((g) => Array.isArray(g) && g[1] > g[0]).map(range);
+  const segs = (f.segments ?? []).filter((g) => Array.isArray(g) && g[1] > g[0]).map(range);
+  const verses = useCanonical ? [] : (f.embeddedQuran ?? []).filter((r) => r && r.tEnd > r.tStart).map((r) => range([r.tStart, r.tEnd]));
+  const inGap = (k: number) => gaps.some(([s, e]) => s <= k && k <= e);
+  const q = bracketsFor("ayah", prefs);
+
+  const partText = (x: number, y: number): string => {
+    const canon = useCanonical && Array.isArray(f.canonicalSegments) ? f.canonicalSegments : null;
+    if (canon) {
+      const out: string[] = [];
+      segs.forEach(([s, e], idx) => {
+        const lo = Math.max(s, x), hi = Math.min(e, y);
+        if (lo > hi || typeof canon[idx] !== "string") return;
+        const cw = canon[idx].split(/\s+/).filter(Boolean);
+        const n = e - s + 1;
+        out.push(cw.slice(Math.round(((lo - s) / n) * cw.length), Math.round(((hi - s + 1) / n) * cw.length)).join(" "));
+      });
+      const text = out.filter(Boolean).join(" ");
+      if (text) return text;
+    }
+    const out: string[] = [];
+    let k = x;
+    while (k <= y) {
+      const v = verses.find(([s, e]) => s <= k && k <= e);
+      if (v) {
+        const end = Math.min(v[1], y);
+        out.push(`${q.open}${words.slice(k, end + 1).map((x) => x.word).join(" ")}${q.close}`);
+        k = end + 1;
+      } else {
+        out.push(words[k].word);
+        k++;
+      }
+    }
+    return out.join(" ");
+  };
+
+  const pieces: QuotePiece[] = [];
+  let k = a;
+  while (k <= b) {
+    const gap = inGap(k);
+    let end = k;
+    while (end + 1 <= b && inGap(end + 1) === gap) end++;
+    pieces.push({ gap, text: gap ? words.slice(k, end + 1).map((x) => x.word).join(" ") : partText(k, end) });
+    k = end + 1;
+  }
+  return pieces;
+}
+
+/** Pieces written out: «part» [commentary] «part». A caption that continues a quote opens with «… and one that
+ *  is continued closes with …». */
+export function writePieces(pieces: QuotePiece[], brackets: { open: string; close: string }, isFirst = true, isLast = true): string {
+  return pieces.map((p, k) => {
+    if (p.gap) return `[${p.text}]`;
+    const open = k === 0 && !isFirst ? `${brackets.open}… ` : brackets.open;
+    const close = k === pieces.length - 1 && !isLast ? ` …${brackets.close}` : brackets.close;
+    return `${open}${p.text}${close}`;
+  }).join(" ");
+}
+
 const round2 = (x: number) => Number(x.toFixed(2));
 
 function captionType(f: CaptionFinding): CaptionType {
@@ -213,6 +319,9 @@ export function buildCaptions<F extends CaptionFinding>(words: CaptionWord[], de
   if (!Array.isArray(words) || !words.length) return [];
   const prefs = options.prefs ?? {};
   const visible = options.visible ?? (() => true);
+  const splitOn = prefs.splitCommentary !== false;
+  let tokWord: number[] | null = null;
+  const tokens = () => (tokWord ??= tokenWordMap(words));
 
   const sortedFindings = (Array.isArray(detections) ? detections : [])
     .slice()
@@ -266,9 +375,27 @@ export function buildCaptions<F extends CaptionFinding>(words: CaptionWord[], de
       const fType = captionType(finding);
       const brackets = bracketsFor(fType, prefs);
       const refBadge = groupRefMap.has(finding) ? groupRefMap.get(finding)! : finding.displayRef || finding.reference || "";
-      const useCanonical = Boolean(finding.snappedToCanonical && finding.canonicalText);
+      const useCanonical = Boolean((finding.snappedToCanonical || options.standardScript) && finding.canonicalText);
+      const split = splitOn && hasCommentaryGaps(finding);
+      const pieces = (a: number, b: number) => quotePieces(words, finding, a, b, useCanonical, tokens(), prefs);
 
-      if (wordCount <= 22 || duration <= 9.0) {
+      if (split && (wordCount <= 22 || duration <= 9.0)) {
+        const ps = pieces(i, endIdx);
+        captions.push({
+          index: captions.length + 1,
+          start: round2(citationWords[0].start),
+          end: round2(citationWords[wordCount - 1].end),
+          text: ps.map((p) => p.text).join(" "),
+          displayText: `${writePieces(ps, brackets)}${refBadge ? ` [${refBadge}]` : ""}`,
+          type: fType,
+          findingId: finding.id ?? null,
+          findingIdx,
+          reference: refBadge,
+          wordStartIdx: i,
+          wordEndIdx: endIdx,
+          isAtomicCitation: true,
+        });
+      } else if (wordCount <= 22 || duration <= 9.0) {
         // one caption for the whole quote, even across pauses
         const baseText = useCanonical ? finding.canonicalText! : citationWords.map((w) => w.word).join(" ");
         captions.push({
@@ -295,6 +422,25 @@ export function buildCaptions<F extends CaptionFinding>(words: CaptionWord[], de
           const last = chunk[chunk.length - 1];
           const isFirst = cIdx === 0;
           const isLast = cIdx === chunks.length - 1;
+          const badge = isLast && refBadge ? ` [${refBadge}]` : "";
+          if (split) {
+            const ps = pieces(first.k, last.k);
+            captions.push({
+              index: captions.length + 1,
+              start: round2(first.start),
+              end: round2(last.end),
+              text: ps.map((p) => p.text).join(" "),
+              displayText: `${writePieces(ps, brackets, isFirst, isLast)}${badge}`,
+              type: fType,
+              findingId: finding.id ?? null,
+              findingIdx,
+              reference: isLast ? refBadge : `${refBadge} (تتمة)`,
+              wordStartIdx: first.k,
+              wordEndIdx: last.k,
+              isAtomicCitation: false,
+            });
+            return;
+          }
           let chunkText = chunk.map((w) => w.word).join(" ");
           if (canonWords && canonWords.length) {
             const ratioCount = isLast
@@ -305,7 +451,6 @@ export function buildCaptions<F extends CaptionFinding>(words: CaptionWord[], de
           }
           const openB = isFirst ? brackets.open : `${brackets.open}… `;
           const closeB = isLast ? brackets.close : ` …${brackets.close}`;
-          const badge = isLast && refBadge ? ` [${refBadge}]` : "";
           captions.push({
             index: captions.length + 1,
             start: round2(first.start),
@@ -345,4 +490,66 @@ export function buildCaptions<F extends CaptionFinding>(words: CaptionWord[], de
     c.index = idx + 1;
   });
   return captions;
+}
+
+// ---- the caption timing editor (F-068, phase 16) ---------------------------------------------------------------
+
+/** One edit of the caption timing editor, anchored on a word so it survives a rebuild of the captions:
+ *  split  the speech caption holding `word` into two, the second starting at `word`;
+ *  merge  the speech caption starting at `word` into the one before it;
+ *  time   new start and/or end (seconds) for the caption starting at `word`.
+ *  Quotes are locked units: an edit that would split or merge a quote caption is skipped. */
+export type CaptionEdit =
+  | { op: "split"; word: number }
+  | { op: "merge"; word: number }
+  | { op: "time"; word: number; start?: number | null; end?: number | null };
+
+/** What an edit would do to these captions, or why it can't be done ("locked" for a quote, "none" when no caption
+ *  fits). */
+export function checkCaptionEdit(captions: Caption[], edit: CaptionEdit): "ok" | "locked" | "none" {
+  if (edit.op === "split") {
+    const c = captions.find((x) => x.wordStartIdx <= edit.word && edit.word <= x.wordEndIdx);
+    if (!c) return "none";
+    if (c.type !== "normal") return "locked";
+    return c.wordStartIdx < edit.word ? "ok" : "none";
+  }
+  const k = captions.findIndex((x) => x.wordStartIdx === edit.word);
+  if (k < 0) return "none";
+  if (edit.op === "merge") {
+    if (k === 0) return "none";
+    return captions[k].type === "normal" && captions[k - 1].type === "normal" ? "ok" : "locked";
+  }
+  return "ok";
+}
+
+/** The captions with the timing editor's edits applied in order (a new list; the input is not changed). */
+export function applyCaptionEdits(captions: Caption[], words: CaptionWord[], edits: CaptionEdit[] = []): Caption[] {
+  let out = captions.map((c) => ({ ...c }));
+  const speech = (s: number, e: number, start: number, end: number): Caption => {
+    const text = words.slice(s, e + 1).map((w) => w.word).join(" ");
+    return { index: 0, start, end, text, displayText: text, type: "normal", findingId: null, findingIdx: -1, reference: "",
+      wordStartIdx: s, wordEndIdx: e, isAtomicCitation: false };
+  };
+  for (const edit of edits) {
+    if (checkCaptionEdit(out, edit) !== "ok") continue;
+    if (edit.op === "split") {
+      const k = out.findIndex((x) => x.wordStartIdx < edit.word && edit.word <= x.wordEndIdx);
+      const c = out[k];
+      const left = speech(c.wordStartIdx, edit.word - 1, c.start, round2(Math.max(c.start, words[edit.word - 1].end)));
+      const right = speech(edit.word, c.wordEndIdx, round2(Math.min(c.end, words[edit.word].start)), c.end);
+      out.splice(k, 1, left, right);
+    } else if (edit.op === "merge") {
+      const k = out.findIndex((x) => x.wordStartIdx === edit.word);
+      const a = out[k - 1], b = out[k];
+      out.splice(k - 1, 2, speech(a.wordStartIdx, b.wordEndIdx, a.start, b.end));
+    } else {
+      const c = out.find((x) => x.wordStartIdx === edit.word)!;
+      const start = typeof edit.start === "number" ? round2(Math.max(0, edit.start)) : c.start;
+      const end = typeof edit.end === "number" ? round2(edit.end) : c.end;
+      c.start = Math.min(start, end);
+      c.end = Math.max(start, end);
+    }
+  }
+  out = out.map((c, i) => ({ ...c, index: i + 1 }));
+  return out;
 }

@@ -234,6 +234,68 @@ export interface paths {
         patch: operations["update_detection_settings_api_detection_settings_patch"];
         trace?: never;
     };
+    "/api/export/style": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Style
+         * @description Brackets and references (F-071).
+         */
+        get: operations["get_style_api_export_style_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update Style */
+        patch: operations["update_style_api_export_style_patch"];
+        trace?: never;
+    };
+    "/api/findings/{finding_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Delete Finding
+         * @description Delete a finding, saying why (F-064): `ordinary_speech` saves a gold label "false".
+         */
+        delete: operations["delete_finding_api_findings__finding_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/findings/{finding_id}/edit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Edit Finding
+         * @description One change to a finding: move an edge, change its kind, the source text or the reference's words,
+         *     its references, merge with a neighbour (F-058 to F-063).
+         */
+        post: operations["edit_finding_api_findings__finding_id__edit_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/findings/{finding_id}/expand": {
         parameters: {
             query?: never;
@@ -245,7 +307,8 @@ export interface paths {
         put?: never;
         /**
          * Expand Finding
-         * @description Grow a finding over the words its start or end is missing (the old editor's auto-heal).
+         * @description Grow a finding over the words its start or end is missing (the old editor's auto-heal). It is an edit:
+         *     features/editing does it, so undo can shrink it back.
          */
         post: operations["expand_finding_api_findings__finding_id__expand_post"];
         delete?: never;
@@ -480,6 +543,26 @@ export interface paths {
         patch: operations["rename_lecture_api_lectures__lecture_id__patch"];
         trace?: never;
     };
+    "/api/lectures/{lecture_id}/captions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Lecture Captions
+         * @description The captions as the caption files write them, with the timing editor's edits (F-068).
+         */
+        get: operations["lecture_captions_api_lectures__lecture_id__captions_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/lectures/{lecture_id}/detect": {
         parameters: {
             query?: never;
@@ -495,6 +578,146 @@ export interface paths {
          *     Returns the job; follow it at GET /api/jobs/{id}/events.
          */
         post: operations["detect_api_lectures__lecture_id__detect_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/lectures/{lecture_id}/edits": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Edit Log
+         * @description The lecture's edits, newest first.
+         */
+        get: operations["edit_log_api_lectures__lecture_id__edits_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/lectures/{lecture_id}/edits/captions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Edit Caption
+         * @description Split, merge or re-time a caption (F-068). Quotes are locked units (409).
+         */
+        post: operations["edit_caption_api_lectures__lecture_id__edits_captions_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/lectures/{lecture_id}/edits/quote": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Add Quote
+         * @description Insert a missed quote (F-053).
+         */
+        post: operations["add_quote_api_lectures__lecture_id__edits_quote_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/lectures/{lecture_id}/edits/text": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Replace Text
+         * @description Save the full-text editor (F-067).
+         */
+        put: operations["replace_text_api_lectures__lecture_id__edits_text_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/lectures/{lecture_id}/edits/undo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Undo
+         * @description Undo the newest edit (F-003); the answer names it.
+         */
+        post: operations["undo_api_lectures__lecture_id__edits_undo_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/lectures/{lecture_id}/edits/words": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Replace Words
+         * @description Rewrite or delete some words (F-056).
+         */
+        post: operations["replace_words_api_lectures__lecture_id__edits_words_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/lectures/{lecture_id}/export/{fmt}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Export File
+         * @description One export file (F-069, F-070), as a download.
+         */
+        get: operations["export_file_api_lectures__lecture_id__export__fmt__get"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -696,7 +919,7 @@ export interface paths {
         head?: never;
         /**
          * Edit Word
-         * @description Correct one word's text; its timing and the findings stay as they are.
+         * @description Correct one word's text (F-041); its timing and the findings stay. Undo puts it back.
          */
         patch: operations["edit_word_api_lectures__lecture_id__words__idx__patch"];
         trace?: never;
@@ -994,6 +1217,52 @@ export interface components {
             /** Source Id */
             source_id: string;
         };
+        /** AddCandidate */
+        AddCandidate: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            op: "add_candidate";
+            /**
+             * Ref
+             * @default
+             */
+            ref: string;
+            /** Unit Id */
+            unit_id?: string | null;
+        };
+        /**
+         * AddQuote
+         * @description A missed quote over words `start..end` (inclusive) (F-053): with a corpus unit, or outside the corpus
+         *     with
+         *     a typed reference (`unit_id` empty or "OUTSIDE_CORPUS").
+         */
+        AddQuote: {
+            /** End */
+            end: number;
+            /**
+             * Qiraah
+             * @default hafs
+             */
+            qiraah: string;
+            /**
+             * Ref
+             * @description the reference to show, for a quote outside the corpus
+             * @default
+             */
+            ref: string;
+            /**
+             * Source Type
+             * @default QURAN
+             * @enum {string}
+             */
+            source_type: "QURAN" | "HADITH" | "ADHKAR";
+            /** Start */
+            start: number;
+            /** Unit Id */
+            unit_id?: string | null;
+        };
         /** Approved */
         Approved: {
             /**
@@ -1034,6 +1303,72 @@ export interface components {
         Body_upload_source_api_corpora_sources__source_id__upload_post: {
             /** File */
             file: string;
+        };
+        /** CanonicalWords */
+        CanonicalWords: {
+            /**
+             * Full
+             * @description the positions count the whole hadith (chain and takhrij too)
+             * @default false
+             */
+            full: boolean;
+            /**
+             * Indices
+             * @description positions of the picked words in the reference
+             */
+            indices: number[];
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            op: "canonical_words";
+        };
+        /**
+         * CaptionEdit
+         * @description One edit of the caption timing editor (F-068), anchored on a word: `split` the speech caption holding
+         *     `word` so the second part starts there; `merge` the speech caption starting at `word` into the one before;
+         *     `time` sets the start and/or end (seconds) of the caption starting at `word`. Quotes are locked units.
+         */
+        CaptionEdit: {
+            /** End */
+            end?: number | null;
+            /**
+             * Op
+             * @enum {string}
+             */
+            op: "split" | "merge" | "time";
+            /** Start */
+            start?: number | null;
+            /** Word */
+            word: number;
+        };
+        /** CaptionOut */
+        CaptionOut: {
+            /** Displaytext */
+            displayText: string;
+            /** End */
+            end: number;
+            /** Findingid */
+            findingId: number | string | null;
+            /** Index */
+            index: number;
+            /** Isatomiccitation */
+            isAtomicCitation: boolean;
+            /** Reference */
+            reference: string;
+            /** Start */
+            start: number;
+            /** Text */
+            text: string;
+            /**
+             * Type
+             * @description normal | ayah | hadith | dhikr
+             */
+            type: string;
+            /** Wordendidx */
+            wordEndIdx: number;
+            /** Wordstartidx */
+            wordStartIdx: number;
         };
         /** Cleared */
         Cleared: {
@@ -1172,6 +1507,52 @@ export interface components {
             /** T */
             t: string;
         };
+        /** DismissMerge */
+        DismissMerge: {
+            /**
+             * Direction
+             * @enum {string}
+             */
+            direction: "previous" | "next";
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            op: "dismiss_merge";
+        };
+        /**
+         * EditDone
+         * @description What an edit did. The web app reads the lecture again; these are for messages and tests.
+         */
+        EditDone: {
+            /**
+             * Added
+             * @description findings the edit added
+             */
+            added?: number[];
+            /**
+             * Finding Id
+             * @description the finding the edit made or changed, when there is one
+             */
+            finding_id?: number | null;
+            /**
+             * Findings Changed
+             * @description findings changed, added or removed
+             * @default 0
+             */
+            findings_changed: number;
+            op: components["schemas"]["OpOut"];
+            /**
+             * Removed
+             * @description findings the edit removed
+             */
+            removed?: number[];
+            /**
+             * Words Changed
+             * @default false
+             */
+            words_changed: boolean;
+        };
         /** EngineHealth */
         EngineHealth: {
             /** Calls */
@@ -1248,6 +1629,96 @@ export interface components {
             word_end: number;
             /** Word Start */
             word_start: number;
+        };
+        /**
+         * ExportStyle
+         * @description How quotes are written in the exports and the captions (F-071), remembered between sessions. The names
+         *     are the old app's output preferences, so the engine reads them as they are.
+         */
+        ExportStyle: {
+            /**
+             * Adhkarbracketclose
+             * @default 〗
+             */
+            adhkarBracketClose: string;
+            /**
+             * Adhkarbracketopen
+             * @default 〖
+             */
+            adhkarBracketOpen: string;
+            /**
+             * Groupcontiguousayat
+             * @description write a run of consecutive ayat once: البقرة: 1-5
+             * @default true
+             */
+            groupContiguousAyat: boolean;
+            /**
+             * Hadithbracketclose
+             * @default »
+             */
+            hadithBracketClose: string;
+            /**
+             * Hadithbracketopen
+             * @default «
+             */
+            hadithBracketOpen: string;
+            /**
+             * Quranbracketclose
+             * @default ﴾
+             */
+            quranBracketClose: string;
+            /**
+             * Quranbracketopen
+             * @default ﴿
+             */
+            quranBracketOpen: string;
+            /**
+             * Showadhkartag
+             * @default true
+             */
+            showAdhkarTag: boolean;
+            /**
+             * Showhadithsource
+             * @default true
+             */
+            showHadithSource: boolean;
+            /**
+             * Showquransource
+             * @description for the screen; the exports always write references, as the old app did
+             * @default true
+             */
+            showQuranSource: boolean;
+            /**
+             * Splitcommentary
+             * @description put a quote's commentary gaps outside its brackets: «part one» [commentary] «part two» [ref]
+             * @default true
+             */
+            splitCommentary: boolean;
+        };
+        /** ExportStylePatch */
+        ExportStylePatch: {
+            /** Adhkarbracketclose */
+            adhkarBracketClose?: string | null;
+            /** Adhkarbracketopen */
+            adhkarBracketOpen?: string | null;
+            /** Groupcontiguousayat */
+            groupContiguousAyat?: boolean | null;
+            /** Hadithbracketclose */
+            hadithBracketClose?: string | null;
+            /** Hadithbracketopen */
+            hadithBracketOpen?: string | null;
+            /** Quranbracketclose */
+            quranBracketClose?: string | null;
+            /** Quranbracketopen */
+            quranBracketOpen?: string | null;
+            /** Showadhkartag */
+            showAdhkarTag?: boolean | null;
+            /** Showhadithsource */
+            showHadithSource?: boolean | null;
+            /** Showquransource */
+            showQuranSource?: boolean | null;
+            /** Splitcommentary */
+            splitCommentary?: boolean | null;
         };
         /** FindingOut */
         FindingOut: {
@@ -1522,6 +1993,45 @@ export interface components {
             /** Word Count */
             word_count: number;
         };
+        /** LinkReference */
+        LinkReference: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            op: "link_reference";
+            /**
+             * Ref
+             * @description a typed reference, when there is no unit
+             * @default
+             */
+            ref: string;
+            /**
+             * Unit Id
+             * @description a corpus unit (a candidate, or one found by the search)
+             */
+            unit_id?: string | null;
+        };
+        /** Merge */
+        Merge: {
+            /**
+             * Direction
+             * @enum {string}
+             */
+            direction: "previous" | "next";
+            /**
+             * Gap Type
+             * @description the words between them: part of the quote, or a commentary kept out of it
+             * @default PART_OF_QUOTE
+             * @enum {string}
+             */
+            gap_type: "PART_OF_QUOTE" | "COMMENTARY";
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            op: "merge";
+        };
         /** ModelInfo */
         ModelInfo: {
             /** Available */
@@ -1539,6 +2049,48 @@ export interface components {
             label: string;
             /** Reason */
             reason?: string | null;
+        };
+        /** MoveEdge */
+        MoveEdge: {
+            /**
+             * Delta
+             * @description words: negative moves left (earlier), positive right
+             */
+            delta: number;
+            /**
+             * Edge
+             * @enum {string}
+             */
+            edge: "start" | "end";
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            op: "move_edge";
+        };
+        /**
+         * OpOut
+         * @description One edit in the lecture's log. `kind` is a key the web app translates; `label` is a plain English
+         *     name.
+         */
+        OpOut: {
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Id */
+            id: number;
+            /** Kind */
+            kind: string;
+            /** Label */
+            label: string;
+            /** Params */
+            params: {
+                [key: string]: unknown;
+            };
+            /** Undone */
+            undone: boolean;
         };
         /**
          * OpenRouterModel
@@ -1940,6 +2492,16 @@ export interface components {
             /** T */
             t: string;
         };
+        /** RemoveCandidate */
+        RemoveCandidate: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            op: "remove_candidate";
+            /** Unit Id */
+            unit_id: string;
+        };
         /** RenameLecture */
         RenameLecture: {
             /** Title */
@@ -1949,6 +2511,31 @@ export interface components {
         RenameVersion: {
             /** Name */
             name: string;
+        };
+        /**
+         * ReplaceText
+         * @description The whole lecture text after the full-text editor (F-067). Words are separated by spaces.
+         */
+        ReplaceText: {
+            /** Text */
+            text: string;
+        };
+        /**
+         * ReplaceWords
+         * @description Rewrite words `start..end` (inclusive) as `text` (F-056). `end = start - 1` inserts before `start`;
+         *     an empty `text` deletes the words. Words that stay keep their times; new ones share the replaced words'
+         *     time.
+         */
+        ReplaceWords: {
+            /** End */
+            end: number;
+            /** Start */
+            start: number;
+            /**
+             * Text
+             * @default
+             */
+            text: string;
         };
         /** RequestDetail */
         RequestDetail: {
@@ -2089,6 +2676,32 @@ export interface components {
             /** Unitid */
             unitId: string;
         };
+        /** SetKind */
+        SetKind: {
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "ayah" | "hadith" | "dhikr";
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            op: "set_kind";
+        };
+        /** Snap */
+        Snap: {
+            /**
+             * On
+             * @description show the source text instead of the spoken words
+             */
+            on: boolean;
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            op: "snap";
+        };
         /**
          * SourceOut
          * @description A hadith corpus source. `status`: ready | preparing | missing.
@@ -2138,6 +2751,10 @@ export interface components {
              * @description a model id from /api/transcription/models; default: Groq when its key is set, else local small
              */
             model?: string | null;
+        };
+        /** Undone */
+        Undone: {
+            op: components["schemas"]["OpOut"];
         };
         /** ValidationError */
         ValidationError: {
@@ -2786,6 +3403,127 @@ export interface operations {
             };
         };
     };
+    get_style_api_export_style_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExportStyle"];
+                };
+            };
+        };
+    };
+    update_style_api_export_style_patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ExportStylePatch"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExportStyle"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_finding_api_findings__finding_id__delete: {
+        parameters: {
+            query: {
+                intent: "ordinary_speech" | "highlight_mistake" | "testing";
+            };
+            header?: never;
+            path: {
+                finding_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EditDone"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    edit_finding_api_findings__finding_id__edit_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                finding_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MoveEdge"] | components["schemas"]["SetKind"] | components["schemas"]["Snap"] | components["schemas"]["CanonicalWords"] | components["schemas"]["LinkReference"] | components["schemas"]["AddCandidate"] | components["schemas"]["RemoveCandidate"] | components["schemas"]["Merge"] | components["schemas"]["DismissMerge"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EditDone"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     expand_finding_api_findings__finding_id__expand_post: {
         parameters: {
             query?: never;
@@ -3298,6 +4036,42 @@ export interface operations {
             };
         };
     };
+    lecture_captions_api_lectures__lecture_id__captions_get: {
+        parameters: {
+            query?: {
+                script?: "spoken" | "standard";
+                /** @description the verdicts shown as quotes (NONE = unverified); empty: all */
+                show?: ("CORRECT" | "NOT_SURE" | "FALSE" | "NONE")[] | null;
+                kind?: "all" | "quran" | "hadith" | "dhikr";
+            };
+            header?: never;
+            path: {
+                lecture_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CaptionOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     detect_api_lectures__lecture_id__detect_post: {
         parameters: {
             query?: never;
@@ -3320,6 +4094,246 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["DetectStarted"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    edit_log_api_lectures__lecture_id__edits_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                lecture_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OpOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    edit_caption_api_lectures__lecture_id__edits_captions_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                lecture_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CaptionEdit"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EditDone"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    add_quote_api_lectures__lecture_id__edits_quote_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                lecture_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AddQuote"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EditDone"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    replace_text_api_lectures__lecture_id__edits_text_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                lecture_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReplaceText"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EditDone"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    undo_api_lectures__lecture_id__edits_undo_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                lecture_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Undone"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    replace_words_api_lectures__lecture_id__edits_words_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                lecture_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReplaceWords"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EditDone"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    export_file_api_lectures__lecture_id__export__fmt__get: {
+        parameters: {
+            query?: {
+                script?: "spoken" | "standard";
+                /** @description the verdicts shown as quotes (NONE = unverified); empty: all */
+                show?: ("CORRECT" | "NOT_SURE" | "FALSE" | "NONE")[] | null;
+                kind?: "all" | "quran" | "hadith" | "dhikr";
+            };
+            header?: never;
+            path: {
+                lecture_id: number;
+                fmt: "srt" | "vtt" | "ass" | "md" | "txt" | "json" | "html";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description the file */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                    "text/plain": unknown;
                 };
             };
             /** @description Validation Error */

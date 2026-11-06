@@ -1179,3 +1179,84 @@ cd web && npx vitest run src/features/verification          # selection rules + 
 cd web && npx playwright test e2e/verification.spec.ts       # a whole pass in the real app, fake verifier
 cd web && WAHY_E2E_LIVE=1 npx playwright test e2e/live-laya.spec.ts   # the same with the real Laya (GPU)
 ```
+
+## Phase 16 — Editing and export (server)
+
+### What was built
+
+- **Editing** (`server/wahy/features/editing/`): every change the editor can make, each one saved as an operation in
+  the lecture's **edit log**, so undo works and survives a reload: fix one word, rewrite some words, save the full text,
+  add a missed quote, move a quote's edge, change its kind, use the source text or picked reference words, link or add
+  references, merge with a neighbour, delete "as ordinary speech" (a gold "false" label) or as a mistake, expand a
+  clipped quote, and split, merge or re-time captions. `POST /api/lectures/{id}/edits/undo` undoes the newest one and
+  names it.
+- **Export** (`server/wahy/features/export/`): SRT, VTT, ASS, Markdown, plain text, HTML and JSON, with the saved
+  bracket and reference style. An export shows what the screen shows: the verdict and kind filters, and "as spoken" or
+  "standard script".
+- **In the engine package**: `engine/src/export.ts` writes the files and `engine/src/edit.ts` holds the old editor's
+  finding edits (they need the corpus). The web app will import the same `export.ts` for its preview (phase 17).
+- **Commentary gaps** (new): when the speaker comments in the middle of a quote, the comment now goes outside the
+  brackets: `«part one» [commentary] «part two» [ref]`. A setting (`splitCommentary`) turns it off.
+
+### New ideas
+
+**The command pattern for undo.** An edit is an object that knows how to do itself and how to be undone. The old app
+saved a full copy of everything before each edit (a snapshot) and kept the copies in browser memory, so a reload lost
+them. Here every edit writes one row to `edit_ops` with only what it replaced:
+
+```python
+# delete a finding "as ordinary speech" saves:
+undo = {"findings": [{"id": 42, "before": {..., "deleted": False}}],   # how the finding was
+        "verdicts": [131], "labels": [{"id": 7, "before": None}]}      # what it created (None: remove on undo)
+```
+
+Undo reads the newest row that is not undone and writes `before` back. It only ever undoes the newest one, which is
+what makes "write back what was there" always correct: nothing else changed those words or findings since. (A new
+detection replaces all findings, so it starts the log again.) A deleted finding is only *marked* deleted, so undo
+brings it back with its verdicts and label. In NestJS terms: each service method builds a `Change` (a small DTO) and
+one private method, `_apply`, saves it and its undo in one database transaction.
+
+**LCS alignment: keeping word times through a text edit.** ASR gives each word a start and an end. When you fix the
+text, the unchanged words must keep their times. The *longest common subsequence* of the old and new word lists says
+which words stayed:
+
+```
+old:  قال  الله  تعالي   قل   هو      (times 0.0, 0.5, 1.0, 1.5, 2.0)
+new:  قال  الله  تعالى   قل   هو
+LCS:  قال  الله          قل   هو      → those four keep their own times
+gap:             تعالي → تعالى         → one word for one word: the new word takes 1.0
+```
+
+When the counts differ (two words become three), the new words share the time of the words they replaced. It is a
+small dynamic-programming table, the same idea as `diff` and as edit distance in NLP. Only the changed middle of the
+text is aligned (common words at both ends are stripped first), so an edit in a 2-hour lecture stays cheap.
+
+**Positions move after an edit.** A finding says "words 16 to 23". Insert two words before it and it must say 18 to
+25, and its engine positions too (`segments` count engine *tokens*, and a word can hold 0, 1 or more tokens: «،» has
+none, «ابن-عمر» has two). `align.py` `Shift` moves word, token and character positions.
+
+**Golden files decide, and a setting keeps them reachable.** Commentary gaps change the output, which would break the
+golden test. So the new behaviour is a setting: with it off, every export of every golden input equals the old app's
+file (100 engine tests); with it on, a test checks that the *only* captions that change are those of findings with gaps.
+
+### How it was tested
+
+- Engine (Vitest, 248 tests; 137 new): every golden export (SRT, VTT, ASS, Markdown, text) of the 4 inputs × 4 engine
+  choices, plus the alternative style, equal to the old app's files; the three commentary cases (a hadith with a gap; a
+  hadith with a gap and a verse inside it; a verse with a gap, also in the source text); the caption editor; each
+  finding edit on the tiny corpus.
+- Server (pytest, 303 tests; 31 new): `test_editing.py` with the real engine worker: **word timings survive a text
+  edit** (three words fixed, every other word keeps its exact start and end; two words inserted, the hadith after them
+  moves from 16-23 to 18-25 with its tokens and characters); each edit is logged and undo restores words, findings and
+  captions exactly; a gold "false" label appears and disappears with undo. `test_export.py`: the sample lecture and a
+  lecture with gaps detected with the full corpus, exported through the API, equal to the old app's files.
+- **Feature check**: a running server, the sample lecture detected with v5, its SRT, VTT, ASS, Markdown and text
+  downloaded: all five byte-identical to the old app's. Adding a missed quote showed it in the SRT; undo removed it.
+
+**Try:**
+
+```bash
+cd engine && npx vitest run src/export.test.ts            # golden exports + commentary gaps
+cd server && uv run pytest tests/test_editing.py -q        # edits, undo, timings through a text edit
+cd server && uv run pytest tests/test_export.py -q         # exports, filters, golden through the API
+```

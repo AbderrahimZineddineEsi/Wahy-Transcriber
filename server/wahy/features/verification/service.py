@@ -60,8 +60,6 @@ from wahy.features.verification.models import Verdict
 from wahy.features.verification.schemas import (
     Approved,
     Estimate,
-    Expanded,
-    ExpandIn,
     OptionsPatch,
     PassMetrics,
     PassOptions,
@@ -216,7 +214,11 @@ class VerificationService:
         self.lectures.list_one(lecture_id)  # LectureNotFound
         with self.db.session() as s:
             rows = list(
-                s.scalars(select(Finding).where(Finding.lecture_id == lecture_id).order_by(Finding.idx))
+                s.scalars(
+                    select(Finding)
+                    .where(Finding.lecture_id == lecture_id, Finding.deleted.is_(False))
+                    .order_by(Finding.idx)
+                )
             )
             s.expunge_all()
         return rows
@@ -863,60 +865,6 @@ class VerificationService:
                     )
                 )
         return out
-
-    # ---- expand a clipped finding --------------------------------------------------------------------------
-
-    def expand(self, finding_id: int, body: ExpandIn) -> Expanded:
-        """Grow a finding over the words its start or end is missing (the old editor's auto-heal). The
-        finding's
-        words and canonical text change; its newest verdict is kept with a complete boundary, as the
-        user's."""
-        finding = self._finding(finding_id)
-        with self.db.session() as s:
-            prev = self._newest(s, [finding_id]).get(finding_id)
-        boundary = body.boundary or to_model_boundary(prev.boundary if prev else None) or "MISSING_BOTH"
-        words = self.detection._words(finding.lecture_id)
-        out = self.engine.expand(
-            finding.data, words, boundary, self.detection.engine_options(engine=finding.engine)
-        )
-        new = out["finding"]
-        if out["changed"]:
-            with self.db.session() as s:
-                row = s.get(Finding, finding_id)
-                assert row is not None
-                row.data = new
-                row.word_start, row.word_end = int(new["wordStartIdx"]), int(new["wordEndIdx"])
-                if prev is not None:
-                    s.add(
-                        Verdict(
-                            finding_id=finding_id,
-                            verifier="human",
-                            model=None,
-                            verdict=prev.verdict,
-                            boundary="COMPLETE",
-                            confidence=prev.confidence,
-                            reason=prev.reason,
-                            details={
-                                **(prev.details or {}),
-                                "based_on": prev.id,
-                                "user_action": "EXPAND",
-                                "expanded": {
-                                    "from": [finding.word_start, finding.word_end],
-                                    "to": [row.word_start, row.word_end],
-                                    "boundary": boundary,
-                                },
-                            },
-                        )
-                    )
-        return Expanded(
-            finding_id=finding_id,
-            changed=bool(out["changed"]),
-            reason=out.get("reason"),
-            added=out["added"],
-            word_start=int(new["wordStartIdx"]),
-            word_end=int(new["wordEndIdx"]),
-            data=new,
-        )
 
 
 __all__ = [

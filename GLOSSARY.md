@@ -68,11 +68,21 @@ The chain of narrators in front of a hadith's matn.
 **Takhrij**:
 The speaker's statement of where a hadith is recorded, such as «رواه البخاري» or «متفق عليه».
 
+**Commentary gap**:
+The speaker's own words in the middle of a quote, between two of its parts. Exports write them outside the brackets:
+«part one» [commentary] «part two».
+_Avoid_: sharh brackets, interruption
+
 **Dhikr** (plural **adhkar**):
 A fixed formula of remembrance, such as «سبحان الله», kept in an editable list.
 
 **Custom quote**:
 A text the user adds to the corpus so the engine finds it like any other reference.
+
+**Edit log**:
+The ordered list of a lecture's edits (a word fixed, a missed quote added, a caption split...), kept so the newest one
+can be undone, also after a reload.
+_Avoid_: history, undo stack
 
 ## Verification
 

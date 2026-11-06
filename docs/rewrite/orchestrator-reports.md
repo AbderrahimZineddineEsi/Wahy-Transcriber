@@ -5,6 +5,29 @@ State for recovery (session IDs, what to do if a child died) is in `orchestrator
 
 <!-- NEW REPORTS GO BELOW THIS LINE -->
 
+## 2026-11-06 20:20 — Phase 15 (Web: verification and telemetry) done; phase 16 started
+
+Gate passed. Commit `6880e2e` "rewrite phase 15: Web: verification and telemetry" pushed, phase ticked.
+- Built in `web/src/features/verification/`: the Verify tab (choose quotes by scope or by hand with search, kind and verdict
+  filters, none/invert; verifier panel with Laya, Gemini, JEV or an OpenRouter chat model from the catalog search with live
+  prices; prompt tuning; estimate; Start; progress with pause, resume, cancel; end numbers; "Approve all" that asks twice
+  before saving gold labels; preview of the exact request). Request log at `/requests` (one row per request with verdict,
+  your correction, tokens, cost, time; inspector with exact JSON sent and received, readable or raw, copy buttons; clearing
+  asks first). Quote card has your own verdict buttons (optimistic update, rolled back if the server refuses) and a
+  "Complete the quote" button; the transcript draws a ✂ at the missing edge.
+- Tests: web Vitest 80 (21 new), typecheck, lint clean; Playwright 6 (2 new: fake-provider pass with log and inspector;
+  "ordinary speech" filter); full `scripts/test.sh` green (old backend 152, server 272 + 6 live skipped, engine 111).
+- **Feature check passed with real Laya** (`web/e2e/live-laya.spec.ts`, only with `WAHY_E2E_LIVE=1` and the GPU): sample
+  lecture in 27 s, every ticked quote got a verdict, the log showed Laya requests with the v3 envelope, and hiding
+  "ordinary speech" hid the false finding (Muslim 2149) in the transcript while keeping all its words.
+- **Deviations the child recorded in the roadmap under phase 15:**
+  1. The estimate is a panel beside the quote list (as in the approved mockup), not a separate dialog as the roadmap says.
+  2. A quote in a running pass shows "Queued", not "checking", because the server does not say which finding is being judged.
+  3. The view now understands the "start and end missing" boundary.
+  4. Laya's load and unload buttons (F-097, F-098) are not in this phase; they belong to the later phase that lists them.
+  5. Added without being asked: your verdict buttons on the quote card, and the ✂ marks in the transcript.
+- **Phase 16 (Editing and export (server), Opus 5.5, high)** is running as `refactoring-step-16`.
+
 ## 2026-11-06 19:55 — Phase 14 (Verification pass and telemetry, server) done; phase 15 started
 
 Gate passed. Commit `2ae3607` "rewrite phase 14: Verification pass and telemetry (server)" pushed, phase ticked.
