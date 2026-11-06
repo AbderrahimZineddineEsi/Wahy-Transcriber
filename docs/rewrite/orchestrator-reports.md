@@ -5,6 +5,27 @@ State for recovery (session IDs, what to do if a child died) is in `orchestrator
 
 <!-- NEW REPORTS GO BELOW THIS LINE -->
 
+## 2026-11-06 23:50 — Phase 17 (Web: editor and export) done; correction 16b started
+
+The phase 17 child finished its work and committed it (`5ce8362` "rewrite phase 17: Web: editor and export", pushed, phase
+ticked, tree clean), then the 5-hour usage limit cut off its final message (limit reset at 23:50). So this report is built
+from the commit, the roadmap and `LEARNING.md`, not from the child's own summary.
+- Built: the lecture's edit tab (word board with two-click missed quotes and the reference studio, quote inspector,
+  full-text editor, caption timing editor), undo in the header naming the last edit, the export tab (preview, downloads,
+  print, bracket style).
+- Feature check passed (`web/e2e/editor.spec.ts`, real server and engine, sample lecture): two clicks on three plain words
+  inserted an outside quote; the server had the finding and a quote caption; the transcript and the caption over the video
+  showed it; the header undo removed it from both. The export tab's SRT download was byte-identical to the server's file.
+  The roadmap records `scripts/test.sh` all green.
+- Choices the child recorded under Changes: small server additions (corpus suggestions, a reference's words, caption-edit
+  list, a "reference wrong" flag N-007, confidence/details on each finding's newest verdict); the export "dialog" is the
+  export tab, as in the mockup; print/PDF opens the HTML export and the browser's print dialog; the view now draws the
+  commentary-gap split and the saved brackets, and **dhikr brackets in the view changed from « » to the style's 〖 〗**;
+  standard script applies in view, caption table and exports.
+- **Open point for you:** "Verify this quote" opens the verify tab with that finding picked, but a direct jump to its
+  entry in the request log is not built (the log filters by lecture, pass, provider and status, not by finding).
+- **Now running: `refactoring-step-16b`** (Opus 5.5, high): bracket Quran verses embedded in a hadith, as you chose.
+
 ## 2026-11-06 21:00 — Your answer on embedded Quran verses recorded; correction queued
 
 You said: "i think i want them bracketed, if i didn't like it i'll change it back". A hadith that contains a Quran verse

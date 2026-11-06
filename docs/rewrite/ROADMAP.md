@@ -454,7 +454,7 @@ Each entry: date, what changed, the user's words.
   - Commentary gaps: the split applies to findings that have gaps. A hadith with a verse inside it but no gap is
     written as the old app wrote it (the roadmap allows only the gap split to differ from the golden files); the
     engines set `embeddedQuran` only on one-part findings, so the verse's own brackets show after a "commentary" merge.
-    Open point for the user: bracket such verses in gapless hadiths too?
+    Open point for the user: bracket such verses in gapless hadiths too? (Answered: yes, see the next-but-one entry.)
   - An outside-corpus quote is not added to the adhkar or custom-quote lists here (the old "save as dhikr" belongs to
     the adhkar editor).
 - **2026-11-06**: Phase 17 (done). Choices made inside the phase:
@@ -475,3 +475,13 @@ Each entry: date, what changed, the user's words.
   - "Verify this quote" (F-066) opens the verify tab with that finding picked; a direct jump to its request-log entry
     is not built (the log filters by lecture, pass, provider and status, not by finding). Open point for the user.
   - `web/tsconfig.json` allows `.ts` import paths (the engine's `export.ts` imports `./captions.ts`).
+- **2026-11-06**: Correction to phase 16 (phase 16 stays ticked): a hadith with a Quran verse inside it
+  (`embeddedQuran`) and no commentary gap now also writes the verse in its own `﴿…﴾` inside the hadith's brackets,
+  as the gap case already did, with the commentary split on or off. One switch reverts it:
+  `BRACKET_EMBEDDED_QURAN` in `engine/src/captions.ts` (the rule `bracketsEmbeddedVerses` is used by the captions, the
+  text exports and the web transcript). Not in standard script or a snapped finding (the source text has no verse
+  marks). The golden files are not regenerated: with the split off, exports equal the old app's files except the one
+  golden finding with an embedded verse (Muslim 6889, `yt_iG2F8nymm1A` v3, in its SRT, VTT, ASS, Markdown and text
+  files), listed by hand in `engine/src/golden-differences.ts` and asserted. The web transcript did not draw embedded
+  verses at all before (not even in the gap case); it now does, through the same rule. User: "i think i want them
+  bracketed, if i didn't like it i'll change it back".

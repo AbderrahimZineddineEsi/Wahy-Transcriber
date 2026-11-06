@@ -73,6 +73,11 @@ The speaker's own words in the middle of a quote, between two of its parts. Expo
 «part one» [commentary] «part two».
 _Avoid_: sharh brackets, interruption
 
+**Embedded verse**:
+A Quran verse quoted inside a hadith (the finding's `embeddedQuran`). Exports and the transcript write it in its own
+Quran brackets inside the hadith's: «ثم قرأ ﴿وما خلقت الجن والإنس إلا ليعبدون﴾».
+_Avoid_: nested verse, inner ayah
+
 **Dhikr** (plural **adhkar**):
 A fixed formula of remembrance, such as «سبحان الله», kept in an editable list.
 

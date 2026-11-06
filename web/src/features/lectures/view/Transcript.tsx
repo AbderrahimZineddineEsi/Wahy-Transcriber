@@ -1,3 +1,4 @@
+import { bracketsEmbeddedVerses } from "@wahy/engine/captions";
 import { memo, useEffect, useLayoutEffect, useRef, type MouseEvent, type RefObject } from "react";
 import { useI18n } from "../../../shell/i18n";
 import type { Clock } from "./clock";
@@ -79,6 +80,9 @@ const ParagraphView = memo(function ParagraphView({ p, words, brackets, split, s
         }
         const f = piece.f;
         const [open, close] = brackets[f.kind];
+        // a verse inside a hadith in its own Quran brackets: the engine's rule, so the screen matches the exports
+        const [vOpen, vClose] = brackets.quran;
+        const verses = bracketsEmbeddedVerses(f.data, split);
         const parts = runs(piece.tokens, split);
         const lastQuote = parts.map((r) => r.gap).lastIndexOf(false);
         return (
@@ -93,14 +97,21 @@ const ParagraphView = memo(function ParagraphView({ p, words, brackets, split, s
                       ✂
                     </span>
                   )}
-                  {run.tokens.map((tok, k) => (
-                    <span key={k}>
-                      <span className="w" data-i={tok.i}>
-                        {tok.text}
+                  {run.tokens.map((tok, k) => {
+                    const verse = verses && !run.gap && tok.verse !== undefined;
+                    const opens = verse && run.tokens[k - 1]?.verse !== tok.verse;
+                    const closes = verse && run.tokens[k + 1]?.verse !== tok.verse;
+                    return (
+                      <span key={k}>
+                        {opens && <span className="br" data-verse="open">{vOpen}</span>}
+                        <span className="w" data-i={tok.i}>
+                          {tok.text}
+                        </span>
+                        {closes && <span className="br" data-verse="close">{vClose}</span>}
+                        {k < run.tokens.length - 1 ? " " : ""}
                       </span>
-                      {k < run.tokens.length - 1 ? " " : ""}
-                    </span>
-                  ))}
+                    );
+                  })}
                   {!run.gap && r === lastQuote && cutAt(f, "end") && (
                     <span className="cut" title={t("boundary.missEnd")} data-cut="end">
                       ✂

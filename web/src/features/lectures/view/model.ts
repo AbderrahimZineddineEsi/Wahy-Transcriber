@@ -117,8 +117,9 @@ export function counts(words: readonly Word[], findings: readonly ViewFinding[])
 export type Script = "spoken" | "standard";
 
 /** One piece of text on screen, and the word it follows in time. `gap`: the speaker's own words between two parts
- *  of the quote (a commentary gap), written outside the quote's brackets. */
-export type Token = { text: string; i: number; gap?: boolean };
+ *  of the quote (a commentary gap), written outside the quote's brackets. `verse`: the word is in the finding's
+ *  embedded Quran verse number `verse` (a verse inside a hadith), which the transcript can set in its own ﴿…﴾. */
+export type Token = { text: string; i: number; gap?: boolean; verse?: number };
 export type Piece = { type: "word"; i: number } | { type: "quote"; f: ViewFinding; tokens: Token[] };
 export type Paragraph = { key: string; first: number; last: number; pieces: Piece[] };
 
@@ -146,13 +147,21 @@ function spread(text: string[], a: number, b: number): Token[] {
 export function quoteTokens(words: readonly Word[], f: ViewFinding, script: Script, tokWord: TokenWords = null): Token[] {
   const gaps = wordRanges(f.data.commentaryGaps, tokWord).filter(([s, e]) => e >= f.start && s <= f.end);
   const inGap = (i: number) => gaps.some(([s, e]) => s <= i && i <= e);
-  const spoken = (a: number, b: number): Token[] => {
-    const out: Token[] = [];
-    for (let i = a; i <= b; i++) out.push(inGap(i) ? { text: words[i]?.text ?? "", i, gap: true } : { text: words[i]?.text ?? "", i });
-    return out;
-  };
   const canonical = script === "standard" || f.data.snappedToCanonical === true;
   const canon = canonical ? f.canonicalText.split(/\s+/).filter(Boolean) : [];
+  // embedded verses are marked in the spoken words only (the source text has no verse marks), as in the exports
+  const verses = canon.length ? [] : wordRanges((f.data.embeddedQuran ?? []).map((r) => (r ? [r.tStart, r.tEnd] : [])), tokWord);
+  const spoken = (a: number, b: number): Token[] => {
+    const out: Token[] = [];
+    for (let i = a; i <= b; i++) {
+      const tok: Token = { text: words[i]?.text ?? "", i };
+      if (inGap(i)) tok.gap = true;
+      const v = verses.findIndex(([s, e]) => s <= i && i <= e);
+      if (v >= 0) tok.verse = v;
+      out.push(tok);
+    }
+    return out;
+  };
   if (!canon.length) return spoken(f.start, f.end);
   if (!gaps.length) return spread(canon, f.start, f.end);
   // a quote in parts: each part shows its own source words, the gaps between them the speaker's

@@ -141,6 +141,19 @@ describe("paragraphs", () => {
     const toks = quoteTokens(words, { ...parted, data: { ...parted.data, commentaryGaps: [[5, 8]] } }, "spoken", tokWord);
     expect(toks.filter((t) => t.gap).map((t) => t.i)).toEqual([5, 6]);
   });
+
+  // a hadith with a verse inside it and no gap (user decision after phase 17: the verse gets its own ﴿…﴾)
+  const withVerse: ViewFinding = {
+    ...parted,
+    start: 2,
+    end: 7,
+    data: { ...parted.data, segments: [[2, 8]], commentaryGaps: [], canonicalSegments: [], embeddedQuran: [{ tStart: 4, tEnd: 7 }] },
+  };
+
+  test("the words of a verse inside a hadith are marked, in the spoken words only", () => {
+    expect(quoteTokens(words, withVerse, "spoken").map((t) => t.verse ?? null)).toEqual([null, null, 0, 0, 0, null]);
+    expect(quoteTokens(words, withVerse, "standard").some((t) => t.verse !== undefined)).toBe(false);
+  });
 });
 
 describe("search", () => {

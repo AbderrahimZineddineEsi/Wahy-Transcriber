@@ -13,8 +13,9 @@
 // New in phase 16 (not in the old app): commentary gaps. When a finding has `commentaryGaps` (the speaker's own
 // words between two parts of the quote), those words go outside the brackets: «part one» [commentary] «part two»
 // [ref], for Quran, Hadith and Adhkar alike, and a verse inside a hadith (`embeddedQuran`) gets its own ﴿…﴾ inside
-// the part it is in. `prefs.splitCommentary: false` turns this off and gives the old app's captions exactly.
-// Findings without gaps are unchanged either way.
+// the part it is in. `prefs.splitCommentary: false` turns this off.
+// Changed after phase 17 (user decision): a verse inside a hadith with NO gap gets its own ﴿…﴾ too, split on or off
+// (`BRACKET_EMBEDDED_QURAN` below, the one switch to revert it). Every other finding is written as the old app did.
 //
 // `applyCaptionEdits` applies the caption timing editor's edits (split, merge, new times) to built captions.
 
@@ -238,6 +239,35 @@ export type QuotePiece = { gap: boolean; text: string };
 
 export const hasCommentaryGaps = (f: CaptionFinding) => Array.isArray(f.commentaryGaps) && f.commentaryGaps.length > 0;
 
+// ---- verses inside a hadith (user decision, 2026-11-06) --------------------------------------------------------
+
+/** A Quran verse inside a hadith (`embeddedQuran`) is written in its own ﴿…﴾ inside the hadith's brackets, also when
+ *  the hadith has no commentary gap: «ثم قرأ ﴿وما خلقت الجن والإنس إلا ليعبدون﴾» [ref]. The old app wrote a gapless
+ *  hadith as one run with the verse unmarked. The user chose the brackets: "i think i want them bracketed, if i
+ *  didn't like it i'll change it back".
+ *  TO REVERT: set this to false. Gapless hadiths are then written as the old app wrote them (a hadith with a gap,
+ *  split on, keeps its verse brackets either way, as in phase 16), and the list in golden-differences.ts must be
+ *  emptied, since the golden files are then matched exactly again. */
+export const BRACKET_EMBEDDED_QURAN = true;
+
+const hasEmbeddedQuran = (f: CaptionFinding) =>
+  Array.isArray(f.embeddedQuran) && f.embeddedQuran.some((r) => r && r.tEnd > r.tStart);
+
+/** Whether a finding's embedded verses get their own Quran brackets (in the spoken words; the source text has no
+ *  verse marks). The one rule the captions, the text exports and the web transcript all follow. */
+export function bracketsEmbeddedVerses(f: CaptionFinding, splitCommentary = true): boolean {
+  if (!hasEmbeddedQuran(f)) return false;
+  return BRACKET_EMBEDDED_QURAN || (splitCommentary && hasCommentaryGaps(f));
+}
+
+/** How a quote is written: `null` for one plain bracketed run (the old app), or the finding to cut into pieces with
+ *  `quotePieces` (its gaps dropped when the commentary split is off, so only its verses are set apart). */
+export function piecesFinding<F extends CaptionFinding>(f: F, splitCommentary: boolean, useCanonical: boolean): CaptionFinding | null {
+  if (splitCommentary && hasCommentaryGaps(f)) return f;
+  if (!useCanonical && bracketsEmbeddedVerses(f, splitCommentary)) return { ...f, commentaryGaps: [] };
+  return null;
+}
+
 /** The pieces of a finding's words `a..b` (inclusive): commentary gaps apart, a verse inside a hadith in its own
  *  Quran brackets, and in canonical mode each part's source words (spread over the part's words in proportion,
  *  so a quote cut into several captions shares them out). */
@@ -376,8 +406,9 @@ export function buildCaptions<F extends CaptionFinding>(words: CaptionWord[], de
       const brackets = bracketsFor(fType, prefs);
       const refBadge = groupRefMap.has(finding) ? groupRefMap.get(finding)! : finding.displayRef || finding.reference || "";
       const useCanonical = Boolean((finding.snappedToCanonical || options.standardScript) && finding.canonicalText);
-      const split = splitOn && hasCommentaryGaps(finding);
-      const pieces = (a: number, b: number) => quotePieces(words, finding, a, b, useCanonical, tokens(), prefs);
+      const piecesOf = piecesFinding(finding, splitOn, useCanonical);
+      const split = piecesOf !== null;
+      const pieces = (a: number, b: number) => quotePieces(words, piecesOf!, a, b, useCanonical, tokens(), prefs);
 
       if (split && (wordCount <= 22 || duration <= 9.0)) {
         const ps = pieces(i, endIdx);

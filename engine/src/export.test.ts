@@ -1,15 +1,19 @@
-// The exports against the old app's golden files (ROADMAP phase 16), and the one expected difference: commentary
-// gaps outside the brackets.
+// The exports against the old app's golden files (ROADMAP phase 16), and the expected differences: commentary gaps
+// outside the brackets, and a verse inside a hadith in its own ﴿…﴾ (user decision after phase 17).
 //
 // With `splitCommentary: false` every export (SRT, VTT, ASS, Markdown, text) of every golden input and engine choice
-// must equal the old app's file, in the default style and the alternative one. With the split on (the default), the
-// only captions allowed to change are those of findings that have commentary gaps.
+// must equal the old app's file, in the default style and the alternative one, except the findings with an embedded
+// verse, whose differences are listed by hand in golden-differences.ts. With the split on (the default), the only
+// captions allowed to change are those of findings that have commentary gaps or embedded verses.
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, test } from "vitest";
-import { buildCaptions, applyCaptionEdits, checkCaptionEdit, type CaptionFinding, type CaptionPrefs } from "./captions.ts";
+import {
+  BRACKET_EMBEDDED_QURAN, bracketsEmbeddedVerses, buildCaptions, applyCaptionEdits, checkCaptionEdit, type CaptionFinding, type CaptionPrefs,
+} from "./captions.ts";
 import { exportLecture, formattedText, type ExportFormat } from "./export.ts";
+import { EMBEDDED_VERSE_DIFFERENCES, expectedGolden } from "./golden-differences.ts";
 
 const GOLDEN = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../golden");
 const EXPECTED = path.join(GOLDEN, "expected");
@@ -31,11 +35,13 @@ describe("golden exports (commentary split off)", () => {
       const findings = JSON.parse(read(`${dir}/findings.json`));
       for (const [format, file] of FILES) {
         test(`${dir}/${file}`, () => {
-          expect(exportLecture({ format, words, findings, title, prefs: OLD }).content).toBe(read(`${dir}/${file}`));
+          const rel = `${dir}/${file}`;
+          expect(exportLecture({ format, words, findings, title, prefs: OLD }).content).toBe(expectedGolden(rel, read(rel)));
         });
         if (engine === "v5") {
           test(`${dir}/alt-style/${file}`, () => {
-            expect(exportLecture({ format, words, findings, title, prefs: ALT_STYLE }).content).toBe(read(`${dir}/alt-style/${file}`));
+            const rel = `${dir}/alt-style/${file}`;
+            expect(exportLecture({ format, words, findings, title, prefs: ALT_STYLE }).content).toBe(expectedGolden(rel, read(rel)));
           });
         }
       }
@@ -49,14 +55,17 @@ describe("golden captions with the commentary split on", () => {
     for (const engine of manifest.engines as string[]) {
       const dir = `${name}/${engine.replace(":", "-")}`;
       const findings: CaptionFinding[] = JSON.parse(read(`${dir}/findings.json`));
-      test(`${dir}: only findings with gaps change`, () => {
+      test(`${dir}: only findings with gaps (or embedded verses) change`, () => {
         const off = buildCaptions(words, findings, { prefs: OLD });
         const on = buildCaptions(words, findings);
         expect(on.length).toBe(off.length);
         const gapIds = new Set(findings.filter((f) => f.commentaryGaps?.length).map((f) => f.id));
+        const verseIds = new Set(findings.filter((f) => bracketsEmbeddedVerses(f, false)).map((f) => f.id));
         on.forEach((c, k) => {
           expect({ ...c, displayText: "", text: "" }).toEqual({ ...off[k], displayText: "", text: "" });
+          // a gapless finding with a verse is already bracketed with the split off: the split changes nothing there
           if (!gapIds.has(c.findingId as string)) expect(c.displayText).toBe(off[k].displayText);
+          if (verseIds.has(c.findingId as string)) expect(c.displayText).toContain("﴿");
         });
         // every finding with a gap that is shown as a quote shows the gap outside the brackets (a finding that
         // starts inside an earlier one has no caption of its own, as in the old app)
@@ -129,6 +138,77 @@ describe("commentary gaps", () => {
       .toBe("قال تعالى ﴿قُلْ هُوَ اللَّهُ﴾ [يعني ربنا] ﴿أَحَدٌ﴾ [الإخلاص: 1] ثم");
     expect(buildCaptions(words, [f], { standardScript: true })[1].displayText)
       .toBe("﴿قُلْ هُوَ اللَّهُ﴾ [يعني ربنا] ﴿أَحَدٌ﴾ [الإخلاص: 1]");
+  });
+});
+
+// ---- a verse inside a gapless hadith (user decision after phase 17) -------------------------------------------------
+
+describe("embedded verses without a gap", () => {
+  // 0   1     2   3   4    5    6    7       8   9       10
+  const words = timed("قال النبي ثم قرأ وما خلقت الجن والإنس إلا ليعبدون صدق");
+  const f = {
+    id: "v", sourceType: "HADITH", type: "hadith", unitId: "Muslim:9", displayRef: "صحيح مسلم (9)",
+    wordStartIdx: 2, wordEndIdx: 9, segments: [[2, 10]], commentaryGaps: [],
+    embeddedQuran: [{ tStart: 4, tEnd: 10, unitId: "51:56", displayRef: "الذاريات: 56" }],
+    canonicalText: "ثُمَّ قَرَأَ وَمَا خَلَقْتُ الْجِنَّ وَالْإِنْسَ إِلَّا لِيَعْبُدُونِ",
+  };
+  const want = "«ثم قرأ ﴿وما خلقت الجن والإنس إلا ليعبدون﴾» [صحيح مسلم (9)]";
+
+  test("the decision is on", () => {
+    expect(BRACKET_EMBEDDED_QURAN).toBe(true);
+  });
+
+  test("the verse gets its own ﴿…﴾ inside the hadith's brackets, split on or off", () => {
+    for (const prefs of [{}, OLD]) {
+      expect(formattedText(words, [f], "plain", { prefs })).toBe(`قال النبي ${want} صدق`);
+      expect(buildCaptions(words, [f], { prefs }).map((c) => c.displayText)).toEqual(["قال النبي", want, "صدق"]);
+      expect(formattedText(words, [f], "markdown", { prefs }))
+        .toBe("قال النبي **«ثم قرأ ﴿وما خلقت الجن والإنس إلا ليعبدون﴾»** * [صحيح مسلم (9)]* صدق");
+    }
+  });
+
+  test("the caption keeps the old caption's times, words and reference", () => {
+    const off = buildCaptions(words, [{ ...f, embeddedQuran: [] }], { prefs: OLD });
+    const on = buildCaptions(words, [f], { prefs: OLD });
+    expect(on.map((c) => ({ ...c, displayText: "", text: "" }))).toEqual(off.map((c) => ({ ...c, displayText: "", text: "" })));
+  });
+
+  test("a long hadith cut into captions brackets the verse in the caption it is in", () => {
+    const long = timed(`قال ${"كلمة ".repeat(24)}وما خلقت الجن والإنس إلا ليعبدون`);
+    const n = long.length; // the hadith is words 1..n-1, the verse its last 6 words
+    const hadith = { ...f, wordStartIdx: 1, wordEndIdx: n - 1, segments: [[1, n]], embeddedQuran: [{ tStart: n - 6, tEnd: n }] };
+    const caps = buildCaptions(long, [hadith], { prefs: OLD });
+    expect(caps.length).toBeGreaterThan(2);
+    expect(caps[1].displayText.startsWith("«كلمة")).toBe(true);
+    expect(caps[1].displayText).toMatch(/ …»$/);
+    expect(caps[caps.length - 1].displayText).toMatch(/^«… .*﴿وما خلقت الجن والإنس إلا ليعبدون﴾» \[صحيح مسلم \(9\)\]$/);
+  });
+
+  test("in the source text (standard script or snapped) there are no verse marks: the old app's output", () => {
+    const source = "«ثُمَّ قَرَأَ وَمَا خَلَقْتُ الْجِنَّ وَالْإِنْسَ إِلَّا لِيَعْبُدُونِ» [صحيح مسلم (9)]";
+    expect(formattedText(words, [f], "plain", { standardScript: true })).toBe(`قال النبي ${source} صدق`);
+    expect(buildCaptions(words, [{ ...f, snappedToCanonical: true }])[1].displayText).toBe(source);
+  });
+
+  test("a real one: Muslim 6889 in yt_iG2F8nymm1A (v3), the golden file's one expected difference", () => {
+    const words = JSON.parse(read("yt_iG2F8nymm1A/words.json"));
+    const findings: CaptionFinding[] = JSON.parse(read("yt_iG2F8nymm1A/v3/findings.json"));
+    const withVerse = findings.filter((x) => bracketsEmbeddedVerses(x, false));
+    expect(withVerse.map((x) => x.unitId)).toEqual(["Muslim:6889"]);
+    const cap = buildCaptions(words, findings, { prefs: OLD }).find((c) => c.findingId === withVerse[0].id)!;
+    expect(cap.displayText).toBe("«﴿رب السماوات ورب الأرض رب﴾ العرش العظيم،» [صحيح مسلم (6889)]");
+  });
+
+  test("the expected-difference list: every entry is a real difference, and the only findings with a verse", () => {
+    // every golden finding with an embedded verse, over all inputs and engines
+    const dirs = Object.keys(manifest.inputs).flatMap((name) => (manifest.engines as string[]).map((e) => `${name}/${e.replace(":", "-")}`));
+    const withVerse = dirs.filter((dir) => (JSON.parse(read(`${dir}/findings.json`)) as CaptionFinding[]).some((x) => bracketsEmbeddedVerses(x, false)));
+    expect(withVerse).toEqual(["yt_iG2F8nymm1A/v3"]);
+    expect(EMBEDDED_VERSE_DIFFERENCES.map((d) => d.file)).toEqual(FILES.map(([, file]) => `yt_iG2F8nymm1A/v3/${file}`));
+    for (const d of EMBEDDED_VERSE_DIFFERENCES) {
+      expect(expectedGolden(d.file, read(d.file))).not.toBe(read(d.file));
+      expect(d.new.replace(/[﴿﴾]/g, "")).toBe(d.old); // the only change: the verse brackets are added
+    }
   });
 });
 

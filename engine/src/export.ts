@@ -3,8 +3,8 @@
 // and the web app write the same files. Like captions.ts it imports nothing heavy (no engine, no corpus).
 //
 // The formats are the old code's, character for character (golden tests pin them). What is new:
-//   - commentary gaps go outside the brackets, as in the captions (captions.ts; `prefs.splitCommentary: false` gives
-//     the old text exactly);
+//   - commentary gaps go outside the brackets, as in the captions (captions.ts; `prefs.splitCommentary: false` turns
+//     it off), and a verse inside a hadith gets its own ﴿…﴾ (captions.ts `BRACKET_EMBEDDED_QURAN`, user decision);
 //   - the verdict filter and "standard script" (F-038) are options, so an export shows what the screen shows;
 //   - JSON and HTML are built from the lecture data instead of the page.
 //
@@ -13,7 +13,7 @@ import {
   applyCaptionEdits,
   bracketsFor,
   buildCaptions,
-  hasCommentaryGaps,
+  piecesFinding,
   quotePieces,
   tokenWordMap,
   writePieces,
@@ -139,8 +139,9 @@ export function formattedText<F extends CaptionFinding>(
     const useCanonical = Boolean((det.snappedToCanonical || options.standardScript) && det.canonicalText);
     const ref = det.displayRef || det.reference;
     const refBadge = ref ? ` [${ref}]` : "";
-    if (splitOn && hasCommentaryGaps(det)) {
-      const pieces = quotePieces(words, det, i, endW, useCanonical, (tokWord ??= tokenWordMap(words)), prefs);
+    const piecesOf = piecesFinding(det, splitOn, useCanonical);
+    if (piecesOf) {
+      const pieces = quotePieces(words, piecesOf, i, endW, useCanonical, (tokWord ??= tokenWordMap(words)), prefs);
       if (format === "markdown") {
         out.push(`${pieces.map((p) => (p.gap ? `[${p.text}]` : `**${brackets.open}${p.text}${brackets.close}**`)).join(" ")} *${refBadge}*`);
       } else {

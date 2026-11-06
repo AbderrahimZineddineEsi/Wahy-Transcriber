@@ -1,12 +1,14 @@
 // The caption builder against the old app's golden captions: for every golden input and engine choice, the
 // captions built from the golden words and findings must give the old app's SRT, line for line (with the
-// default style and with the alternative style). Needs no corpus. The SRT text format itself is phase 16's
-// export; `srt` below only exists to compare.
+// default style and with the alternative style), apart from the hand-listed expected differences
+// (golden-differences.ts: a verse inside a hadith in its own ﴿…﴾). Needs no corpus. The SRT text format itself is
+// phase 16's export; `srt` below only exists to compare.
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, test } from "vitest";
 import { buildCaptions, splitLongCitationWords, type Caption, type CaptionFinding, type CaptionPrefs } from "./captions.ts";
+import { expectedGolden } from "./golden-differences.ts";
 
 const EXPECTED = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../golden/expected");
 const manifest = JSON.parse(fs.readFileSync(path.join(EXPECTED, "manifest.json"), "utf8"));
@@ -31,11 +33,13 @@ describe("golden captions", () => {
       const dir = `${name}/${engine.replace(":", "-")}`;
       const findings: CaptionFinding[] = JSON.parse(read(`${dir}/findings.json`));
       test(`${dir}: the old app's SRT`, () => {
-        expect(srt(buildCaptions(words, findings, { prefs: { splitCommentary: false } }))).toBe(read(`${dir}/wahy-captions.srt`));
+        const rel = `${dir}/wahy-captions.srt`;
+        expect(srt(buildCaptions(words, findings, { prefs: { splitCommentary: false } }))).toBe(expectedGolden(rel, read(rel)));
       });
       if (engine === "v5") {
         test(`${dir}: the old app's SRT in the alternative style`, () => {
-          expect(srt(buildCaptions(words, findings, { prefs: ALT_STYLE }))).toBe(read(`${dir}/alt-style/wahy-captions.srt`));
+          const rel = `${dir}/alt-style/wahy-captions.srt`;
+          expect(srt(buildCaptions(words, findings, { prefs: ALT_STYLE }))).toBe(expectedGolden(rel, read(rel)));
         });
       }
     }

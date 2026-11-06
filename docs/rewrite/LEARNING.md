@@ -1197,6 +1197,12 @@ cd web && WAHY_E2E_LIVE=1 npx playwright test e2e/live-laya.spec.ts   # the same
   finding edits (they need the corpus). The web app will import the same `export.ts` for its preview (phase 17).
 - **Commentary gaps** (new): when the speaker comments in the middle of a quote, the comment now goes outside the
   brackets: `«part one» [commentary] «part two» [ref]`. A setting (`splitCommentary`) turns it off.
+- **Embedded verses** (changed after phase 17, the user's choice): a Quran verse inside a hadith gets its own `﴿…﴾`
+  inside the hadith's brackets also when the hadith has no gap: `«ثم قرأ ﴿وما خلقت الجن والإنس إلا ليعبدون﴾» [ref]`.
+  It lives in ONE place, so it is easy to undo: `engine/src/captions.ts`, the constant `BRACKET_EMBEDDED_QURAN` and
+  the rule `bracketsEmbeddedVerses` under "verses inside a hadith". The captions, the text exports and the web
+  transcript all ask that rule. To go back to the old app's output, set the constant to `false` and empty the list in
+  `engine/src/golden-differences.ts`.
 
 ### New ideas
 
@@ -1239,12 +1245,30 @@ none, «ابن-عمر» has two). `align.py` `Shift` moves word, token and chara
 golden test. So the new behaviour is a setting: with it off, every export of every golden input equals the old app's
 file (100 engine tests); with it on, a test checks that the *only* captions that change are those of findings with gaps.
 
+**Expected differences are written down, not regenerated.** When the user chose brackets for verses inside gapless
+hadiths, one golden finding changed (Muslim 6889 in `yt_iG2F8nymm1A`, found by v3), with the split off too. The easy
+wrong fix is to run the golden script again so the test passes, but then the test no longer proves anything about the
+old app. Instead `golden-differences.ts` lists the change by hand: in these five files, this text becomes that text. The
+test applies exactly those replacements to the old file, then compares byte for byte:
+
+```ts
+// old: «رب السماوات ورب الأرض رب العرش العظيم،»
+// new: «﴿رب السماوات ورب الأرض رب﴾ العرش العظيم،»
+expect(exportLecture({ format, words, findings, prefs: OLD }).content).toBe(expectedGolden(rel, read(rel)));
+```
+
+Each listed text must occur exactly once in its file, so a list that no longer fits fails loudly. A second test checks
+that the list covers the only golden finding with an embedded verse, and that it only adds the two brackets.
+
 ### How it was tested
 
 - Engine (Vitest, 248 tests; 137 new): every golden export (SRT, VTT, ASS, Markdown, text) of the 4 inputs × 4 engine
   choices, plus the alternative style, equal to the old app's files; the three commentary cases (a hadith with a gap; a
   hadith with a gap and a verse inside it; a verse with a gap, also in the source text); the caption editor; each
-  finding edit on the tiny corpus.
+  finding edit on the tiny corpus. Added after phase 17: a verse inside a gapless hadith (split on and off, a long
+  hadith cut into captions, the source text, the real Muslim 6889) and the expected-difference list; on the web side,
+  `model.test.ts` (the verse's words are marked) and `Transcript.test.tsx` (the transcript shows the same `«…﴿…﴾»` as
+  the text export).
 - Server (pytest, 303 tests; 31 new): `test_editing.py` with the real engine worker: **word timings survive a text
   edit** (three words fixed, every other word keeps its exact start and end; two words inserted, the hadith after them
   moves from 16-23 to 18-25 with its tokens and characters); each edit is logged and undo restores words, findings and
@@ -1256,7 +1280,7 @@ file (100 engine tests); with it on, a test checks that the *only* captions that
 **Try:**
 
 ```bash
-cd engine && npx vitest run src/export.test.ts            # golden exports + commentary gaps
+cd engine && npx vitest run src/export.test.ts            # golden exports + commentary gaps + embedded verses
 cd server && uv run pytest tests/test_editing.py -q        # edits, undo, timings through a text edit
 cd server && uv run pytest tests/test_export.py -q         # exports, filters, golden through the API
 ```

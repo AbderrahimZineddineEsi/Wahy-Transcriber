@@ -104,3 +104,6 @@ phase, ADRs and GLOSSARY, and returns a recommendation with reasons. Then resume
 so the user can overrule on return. Still stop and wait for the user for: phase 24 (retire the old app, "only after the
 user says so"), anything that deletes user data or the old app, secrets or keys, and spending more than a few cents.
 Queue: phase 17 running -> 16b (bracket embedded Quran verses) -> 18 -> ... -> 25.
+
+## Running now: 16b bracket embedded Quran verses (Opus 5.5, high). Phase 17 done (5ce8362, final message lost to the usage limit).
+- Child: refactoring-step-16b, session ID e04698c3-9cea-4c30-a3d5-288d2ea8d995, log: /tmp/claude-1000/-home-zeno-Documents-work-new-projects-Wahy-Transcriber/428c450a-c0e2-4fc7-86dc-884ec1da7570/scratchpad/step-16b.json. After it: phase 18.
