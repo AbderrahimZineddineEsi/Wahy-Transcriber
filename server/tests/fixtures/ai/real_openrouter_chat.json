@@ -1,0 +1,73 @@
+{
+  "recorded": "2026-11-06, a live call from tests/test_ai_live.py",
+  "request": {
+    "model": "deepseek/deepseek-chat",
+    "temperature": 0.1,
+    "max_tokens": 1500,
+    "messages": [
+      {
+        "role": "system",
+        "content": "You verify quotations that an automatic detector found in transcripts of Arabic Islamic lectures. The transcripts come from speech recognition: expect misspellings, merged or split words, missing diacritics and wrong hamzas.\nThe detector matched `matched_span_in_lecture` against `canonical_corpus_text` (a Quran ayah, a hadith or a dhikr, see `source_type`). It favours recall, so many of its findings are ordinary speech. Answer the questions in `questions` with their criteria keys exactly.\nVerdict:\n- CORRECT: the speaker actually recites or quotes this text. The span reproduces a run of the corpus words in order (allowing speech-recognition noise), even when only part of a long ayah or hadith is quoted, and even without an introduction such as «قال تعالى» or «قال ﷺ». A recitation in the middle of an explanation is still a quotation, and so is a full formula recited as such (e.g. the opening خطبة الحاجة for a dhikr).\n- FALSE: the shared words are the speaker's own language: a common phrase inside a normal sentence (إن شاء الله، الحمد لله، صلى الله عليه وسلم، رضي الله عنه), a narrator chain or names alone, a few generic words that also occur in the text, or the speaker retelling the meaning in his own words.\n- NOT_SURE: the transcript really does not allow a decision (heavily garbled words, a very short span that fits both readings), or the speaker clearly quotes something but it is a different text than `canonical_corpus_text` (say so in the reason).\nCompare word by word, not by topic: a span about the same subject as the corpus text is not a quote unless the words follow it. Use `context_before` / `context_after` for citation cues and to see whether the recitation continues. `engine_confidence_band` and `engine_score` are the detector's own guess: weigh them, do not copy them.\nBoundaries: compare what was said right before / after the span (`immediate_transcript_before` / `immediate_transcript_after`) with the corpus words just before / after the matched part (`unmatched_corpus_prefix_words` / `unmatched_corpus_suffix_words`). Report a missing start or end only when the speaker really said those corpus words there; when he stopped quoting and went back to his explanation, the span is complete.\nPassages: when `verses_in_passage` is present, the span is that many consecutive ayat found back to back. Judge them together as one recitation; a missing start concerns the first ayah, a missing end the last.\nProbabilities sum to 1, and `confidence` is the probability of the verdict you chose.\n\nWrite the `reason` field in Arabic, one short sentence.\n\nReturn ONLY a valid JSON object with keys: {\"verdict\": \"CORRECT\" | \"FALSE\" | \"NOT_SURE\", \"confidence\": 0.0-1.0, \"probabilities\": {\"CORRECT\": p1, \"FALSE\": p2, \"NOT_SURE\": p3}, \"boundary_status\": \"COMPLETE_SPAN\" | \"MISSING_START\" | \"MISSING_END\" | \"MISSING_BOTH\", \"boundary_confidence\": 0.0-1.0, \"reason\": \"concise explanation\"}. If `questions` contains `merge_suggestion`, also include \"merge_suggestion\" (one of its criteria keys), \"merge_confidence\": 0.0-1.0 and \"merge_gap_type\": \"PART_OF_QUOTE\" | \"COMMENTARY\"."
+      },
+      {
+        "role": "user",
+        "content": "{\"questions\": {\"verdict\": {\"type\": \"choice\", \"criteria\": {\"CORRECT\": \"a quote\", \"FALSE\": \"ordinary speech\", \"NOT_SURE\": \"cannot tell\"}}}, \"state\": {\"matched_span_in_lecture\": \"بسم الله الرحمن الرحيم\", \"canonical_corpus_text\": \"بسم الله الرحمن الرحيم\", \"unmatched_corpus_prefix_words\": \"قال\", \"unmatched_corpus_suffix_words\": \"والله\", \"engine_score\": 12.5, \"engine_confidence_band\": \"HIGH\"}}"
+      }
+    ],
+    "response_format": {
+      "type": "json_object"
+    }
+  },
+  "response": {
+    "id": "gen-1793989249-kgXTmb9hARuISm4KEl30",
+    "object": "chat.completion",
+    "created": 1793989249,
+    "model": "deepseek/deepseek-chat",
+    "provider": "DeepInfra",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "stop",
+        "message": {
+          "role": "assistant",
+          "content": "{\n    \"verdict\": \"CORRECT\",\n    \"confidence\": 0.95,\n    \"probabilities\": {\n        \"CORRECT\": 0.95,\n        \"FALSE\": 0.05,\n        \"NOT_SURE\": 0.0\n    },\n    \"boundary_status\": \"COMPLETE_SPAN\",\n    \"boundary_confidence\": 0.9,\n    \"reason\": \"الفقرة تطابق النص القرآني تمامًا.\"\n}",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 924,
+      "completion_tokens": 104,
+      "total_tokens": 1028,
+      "cost": 0.00038824,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00038824,
+        "upstream_inference_prompt_cost": 0.00029568,
+        "upstream_inference_completions_cost": 9.256e-05
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "tokens": [
+    924,
+    104
+  ],
+  "cost_usd": 0.00038824,
+  "latency_ms": 5397
+}

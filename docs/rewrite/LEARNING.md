@@ -925,7 +925,7 @@ cd web && npx playwright test e2e/lecture-view.spec.ts                       # c
 cd web && WAHY_E2E_PERF=1 npx playwright test e2e/perf-long-lecture.spec.ts  # the 2-hour measurement
 ```
 
-## Phase 13 — AI provider layer (draft: the live check waits for your permission)
+## Phase 13 — AI provider layer
 
 Every model call now goes through one folder, `server/wahy/core/ai/` (ADR 0004). Five verifiers answer the same call,
 `ai.verify(name, items, call=..., options=...)` → one `Answer` per item: **gemini** (batches of 5 to 10, free-tier
@@ -971,10 +971,22 @@ call, and Laya status, load and unload.
   put more than 5 in any minute (F-081); "deepseek" lists DeepSeek models with prices (F-083); JEV returns calibrated
   probabilities (F-082); loading Whisper unloads Laya and Laya loads again when needed (F-098, with a fake Laya model
   and the real GPU owner); the status shows the device and envelope 3 (F-097, F-093).
-- 5 live tests (`test_ai_live.py`, marked `live`), one per provider. They were **not run**: they need your
-  permission. When run, they save the real replies in `data/ai_live_replies/`, which can replace the hand-written
-  fixtures.
-- `scripts/test.sh` all green: old backend 152, server 213 (+6 live skipped), engine 106, web 59, Playwright 4.
+- 5 live tests (`test_ai_live.py`, marked `live`), one tiny request per provider, run once with your permission. All
+  passed:
+
+  | Provider | Model | Answer | Tokens in + out | Cost | Time |
+  |---|---|---|---|---|---|
+  | Gemini | gemini-3.5-flash-lite | CORRECT 0.99, complete | 852 + 119 | $0 (free tier) | 3.7 s |
+  | JEV | typesafe/jev-1.14-20261014 | CORRECT 0.80 | 413 + 43 | $0.000017 | 0.9 s |
+  | OpenRouter chat | deepseek/deepseek-chat | CORRECT 0.95, complete | 924 + 104 | $0.00039 | 5.4 s |
+  | Groq | whisper-large-v3-turbo | 2 s of tone transcribed | (audio) | ~$0.0001 (10 s billed) | — |
+  | Laya (CUDA) | laya-wahy-r6-v3_mixed, envelope 3 | CORRECT 0.51 on a golden finding | — | $0 | 4.5 s |
+
+  Two things the real replies taught: JEV's and Laya's `confidence` is not the chosen verdict's probability (JEV 0.70
+  vs 0.80; Laya 0.147 vs 0.506), so read `probabilities` when you want "how sure". And Laya answered the v3 yes/no
+  questions too (start cut off 0.74, end cut off 0.70). The real replies are kept as `real_*.json` fixtures with 4
+  replay tests, beside the hand-written ones.
+- `scripts/test.sh` all green: old backend 152, server 217 (+6 live skipped), engine 106, web 59, Playwright 4.
 
 **Try:**
 

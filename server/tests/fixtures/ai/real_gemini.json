@@ -1,0 +1,147 @@
+{
+  "recorded": "2026-11-06, a live call from tests/test_ai_live.py",
+  "request": {
+    "model": "gemini-3.5-flash-lite",
+    "systemInstruction": {
+      "parts": [
+        {
+          "text": "You verify quotations that an automatic detector found in transcripts of Arabic Islamic lectures. The transcripts come from speech recognition: expect misspellings, merged or split words, missing diacritics and wrong hamzas.\nThe detector matched `matched_span_in_lecture` against `canonical_corpus_text` (a Quran ayah, a hadith or a dhikr, see `source_type`). It favours recall, so many of its findings are ordinary speech. Answer the questions in `questions` with their criteria keys exactly.\nVerdict:\n- CORRECT: the speaker actually recites or quotes this text. The span reproduces a run of the corpus words in order (allowing speech-recognition noise), even when only part of a long ayah or hadith is quoted, and even without an introduction such as «قال تعالى» or «قال ﷺ». A recitation in the middle of an explanation is still a quotation, and so is a full formula recited as such (e.g. the opening خطبة الحاجة for a dhikr).\n- FALSE: the shared words are the speaker's own language: a common phrase inside a normal sentence (إن شاء الله، الحمد لله، صلى الله عليه وسلم، رضي الله عنه), a narrator chain or names alone, a few generic words that also occur in the text, or the speaker retelling the meaning in his own words.\n- NOT_SURE: the transcript really does not allow a decision (heavily garbled words, a very short span that fits both readings), or the speaker clearly quotes something but it is a different text than `canonical_corpus_text` (say so in the reason).\nCompare word by word, not by topic: a span about the same subject as the corpus text is not a quote unless the words follow it. Use `context_before` / `context_after` for citation cues and to see whether the recitation continues. `engine_confidence_band` and `engine_score` are the detector's own guess: weigh them, do not copy them.\nBoundaries: compare what was said right before / after the span (`immediate_transcript_before` / `immediate_transcript_after`) with the corpus words just before / after the matched part (`unmatched_corpus_prefix_words` / `unmatched_corpus_suffix_words`). Report a missing start or end only when the speaker really said those corpus words there; when he stopped quoting and went back to his explanation, the span is complete.\nPassages: when `verses_in_passage` is present, the span is that many consecutive ayat found back to back. Judge them together as one recitation; a missing start concerns the first ayah, a missing end the last.\nProbabilities sum to 1, and `confidence` is the probability of the verdict you chose.\n\nWrite the `reason` field in Arabic, one short sentence."
+        }
+      ]
+    },
+    "contents": [
+      {
+        "role": "user",
+        "parts": [
+          {
+            "text": "Given the following candidate citations extracted by the transcription engine, evaluate each item against the instructions and criteria in `questions`. Return ONLY a JSON array of evaluations corresponding to the input items. Answer `merge_suggestion` / `merge_gap_type` only for items whose `questions` contain them (otherwise use NO_MERGE).\n\n[\n  {\n    \"finding_id\": \"live-1\",\n    \"state\": {\n      \"matched_span_in_lecture\": \"بسم الله الرحمن الرحيم\",\n      \"canonical_corpus_text\": \"بسم الله الرحمن الرحيم\",\n      \"unmatched_corpus_prefix_words\": \"قال\",\n      \"unmatched_corpus_suffix_words\": \"والله\",\n      \"engine_score\": 12.5,\n      \"engine_confidence_band\": \"HIGH\"\n    },\n    \"questions\": {\n      \"verdict\": {\n        \"type\": \"choice\",\n        \"criteria\": {\n          \"CORRECT\": \"a quote\",\n          \"FALSE\": \"ordinary speech\",\n          \"NOT_SURE\": \"cannot tell\"\n        }\n      }\n    }\n  }\n]"
+          }
+        ]
+      }
+    ],
+    "generationConfig": {
+      "temperature": 0.1,
+      "responseMimeType": "application/json",
+      "responseSchema": {
+        "type": "ARRAY",
+        "items": {
+          "type": "OBJECT",
+          "properties": {
+            "finding_id": {
+              "type": "STRING"
+            },
+            "verdict": {
+              "type": "STRING",
+              "enum": [
+                "CORRECT",
+                "FALSE",
+                "NOT_SURE"
+              ]
+            },
+            "confidence": {
+              "type": "NUMBER"
+            },
+            "probabilities": {
+              "type": "OBJECT",
+              "properties": {
+                "CORRECT": {
+                  "type": "NUMBER"
+                },
+                "FALSE": {
+                  "type": "NUMBER"
+                },
+                "NOT_SURE": {
+                  "type": "NUMBER"
+                }
+              },
+              "required": [
+                "CORRECT",
+                "FALSE",
+                "NOT_SURE"
+              ]
+            },
+            "boundary_status": {
+              "type": "STRING",
+              "enum": [
+                "COMPLETE_SPAN",
+                "MISSING_START",
+                "MISSING_END",
+                "MISSING_BOTH"
+              ]
+            },
+            "boundary_confidence": {
+              "type": "NUMBER"
+            },
+            "merge_suggestion": {
+              "type": "STRING",
+              "enum": [
+                "NO_MERGE",
+                "MERGE_WITH_PREVIOUS",
+                "MERGE_WITH_NEXT",
+                "MERGE_BOTH"
+              ]
+            },
+            "merge_confidence": {
+              "type": "NUMBER"
+            },
+            "merge_gap_type": {
+              "type": "STRING",
+              "enum": [
+                "PART_OF_QUOTE",
+                "COMMENTARY"
+              ]
+            },
+            "reason": {
+              "type": "STRING"
+            }
+          },
+          "required": [
+            "finding_id",
+            "verdict",
+            "confidence",
+            "probabilities",
+            "boundary_status",
+            "reason"
+          ]
+        }
+      }
+    }
+  },
+  "response": {
+    "candidates": [
+      {
+        "content": {
+          "parts": [
+            {
+              "text": "[\n  {\n    \"finding_id\": \"live-1\",\n    \"verdict\": \"CORRECT\",\n    \"confidence\": 0.99,\n    \"probabilities\": {\n      \"CORRECT\": 0.99,\n      \"FALSE\": 0.01,\n      \"NOT_SURE\": 0.0\n    },\n    \"boundary_status\": \"COMPLETE_SPAN\",\n    \"reason\": \"المتكلم قرأ البسملة كاملة وصحيحة.\"\n  }\n]",
+              "thoughtSignature": "EmAKXgFpFH0Tsnr94jTk77+YiGFVfgb5OnPPli+BU9m4Cba/avny2jfsFFweZFuGXyrml9WdGic8rSd8AdVh0vMBS0Bc07Oc3RbRK/R0QgG+iDwK10IbI5esbDpeVS+r8Vc="
+            }
+          ],
+          "role": "model"
+        },
+        "finishReason": "STOP",
+        "index": 0
+      }
+    ],
+    "usageMetadata": {
+      "promptTokenCount": 852,
+      "candidatesTokenCount": 119,
+      "totalTokenCount": 971,
+      "promptTokensDetails": [
+        {
+          "modality": "TEXT",
+          "tokenCount": 852
+        }
+      ],
+      "serviceTier": "standard"
+    },
+    "modelVersion": "gemini-3.5-flash-lite",
+    "responseId": "dRruatWvK72txN8PksvlgQM"
+  },
+  "tokens": [
+    852,
+    119
+  ],
+  "cost_usd": 0.0,
+  "latency_ms": 3719
+}

@@ -68,3 +68,5 @@ anything new; phase 8 is already ticked.
 
 ## STOPPED 2026-11-06 18:50: usage limit hit during phase 13 (resets 18:50 Algiers). Phase 13 child died with uncommitted work.
 - Resume: `claude -p --resume 43054219-e576-4766-a945-dc8c87c3d9b6 "Continue phase 13 from where you stopped; the usage limit cut you off. Check git status for your uncommitted work, finish, test, tick, commit and push."` via a run like /tmp/claude-1000/-home-zeno-Documents-work-new-projects-Wahy-Transcriber/428c450a-c0e2-4fc7-86dc-884ec1da7570/scratchpad/run_phase.sh (use --resume instead of --session-id).
+
+## 2026-11-06 19:15: user answered the phase 13 live-test question: "go do whatever you want, and then launch the next phases as usual" (they also pasted an OpenRouter key in chat; NOT stored anywhere, the .env key is used). Read as permission for option 1 (all five live tests). Resuming the phase 13 child to run them, tick, commit and push. Log: step-13c.json. Next: phase 14.

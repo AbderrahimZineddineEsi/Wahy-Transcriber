@@ -197,7 +197,7 @@ decisions and why). The problems being fixed are in the friction map: https://cl
 
 ### Verification
 
-- [ ] **13. AI provider layer**: Opus 5.5, high. ADRs 0004, 0006.
+- [x] **13. AI provider layer**: Opus 5.5, high. ADRs 0004, 0006.
   - `core/ai/`: Gemini (free-tier pacer, `Retry-After`, batches of 5 to 10), OpenRouter JEV decisions, OpenRouter chat
     (model catalog with live prices, JSON mode), Groq (moved here from transcription), local Laya (through the GPU
     owner; the envelope version comes from the checkpoint), and a fake. Every call is saved as an AI request with its
@@ -205,6 +205,11 @@ decisions and why). The problems being fixed are in the friction map: https://cl
   - Done when: tests with recorded responses pass for each provider; live tests are marked and only run on request.
   - Feature check: one live call per provider, run only with the user's permission.
     Features: F-080 to F-083, F-094, F-097, F-098.
+  - Feature check result (2026-11-06, with the user's permission; one tiny request each, all passed): Gemini
+    `gemini-3.5-flash-lite` CORRECT 0.99, 852 + 119 tokens, $0 (free tier), 3.7 s; JEV `typesafe/jev-1.14-20261014`
+    CORRECT 0.80, 413 + 43 tokens, $0.000017, 0.9 s; OpenRouter `deepseek/deepseek-chat` CORRECT 0.95, 924 + 104
+    tokens, $0.00039, 5.4 s (catalog search for "deepseek" also live); Groq 2 s of tone transcribed (billed as 10 s,
+    about $0.0001); Laya `laya-wahy-r6-v3_mixed` on CUDA, envelope 3, golden sample finding CORRECT 0.51, 4.5 s.
   - Learn: ports and adapters; rate limiting, retries and backoff.
 
 - [ ] **14. Verification pass and telemetry (server)**: Opus 5.5, high.
@@ -383,14 +388,16 @@ Each entry: date, what changed, the user's words.
   Versions: a saved version opens read only; switching back to it as the current findings is not built. The other
   lecture tabs (edit, verify, Tafrigh, export) are placeholders until their phases. The 2-hour check is
   `WAHY_E2E_PERF=1 npx playwright test e2e/perf-long-lecture.spec.ts`, not part of `scripts/test.sh`.
-- **2026-11-06**: Phase 13 (draft, waiting for permission to run the live Feature check): `core/ai/` is built. Groq's
+- **2026-11-06**: Phase 13 (done; the live Feature check ran on the user's go-ahead: "go do whatever you want, and
+  then launch the next phases as usual"): `core/ai/` is built. Groq's
   HTTP call moved from `features/transcription/backends.py` to `core/ai/groq.py` (the transcription backend keeps the
   audio chunking). Every attempt is logged, failed ones (429s, dropped connections) included. JEV uses `JEV_API_KEY`
   if set, else the OpenRouter key. The old app's boundary clean-up (`normalizeBoundaryVerdict`) runs in `core/ai` for
   every provider. Prompt presets and rules (F-086) are left to phase 14: `core/ai` takes a system prompt, temperature
   and "thinking off" as options. The recorded-response fixtures (`server/tests/fixtures/ai/`) are written in each
-  provider's documented reply shape (no real replies were saved before); the live tests save real replies in
-  `data/ai_live_replies/` when run. Small additions the features needed: `GET /api/settings/ai/openrouter/models`,
+  provider's documented reply shape (no real replies were saved before). The live run's real replies are added
+  as `real_*.json` beside them, with their own replay tests; they did not replace the hand-written ones, because the
+  tests assert the hand-written cases (a 2-item batch, a boundary answer, fenced JSON) and 8 failed with the swap. Small additions the features needed: `GET /api/settings/ai/openrouter/models`,
   `GET /api/settings/ai/gemini/models`, `GET /api/settings/laya`, `POST /api/settings/laya/load|unload`. New optional
   extra `laya` (laya, torch 2.14.1+cu126 from PyTorch's CUDA 12.6 index, huggingface-hub); to fit it with
   `local-asr`, that extra's cuBLAS pin went from `>=12.9.3.13` to `>=12.6` (faster-whisper checked on CUDA after the

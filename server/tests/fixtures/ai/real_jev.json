@@ -1,0 +1,58 @@
+{
+  "recorded": "2026-11-06, a live call from tests/test_ai_live.py",
+  "request": {
+    "model": "typesafe/jev-1.14",
+    "state": {
+      "matched_span_in_lecture": "بسم الله الرحمن الرحيم",
+      "canonical_corpus_text": "بسم الله الرحمن الرحيم",
+      "unmatched_corpus_prefix_words": "قال",
+      "unmatched_corpus_suffix_words": "والله",
+      "engine_score": 12.5,
+      "engine_confidence_band": "HIGH"
+    },
+    "questions": {
+      "verdict": {
+        "type": "choice",
+        "criteria": {
+          "CORRECT": "a quote",
+          "FALSE": "ordinary speech",
+          "NOT_SURE": "cannot tell"
+        }
+      }
+    }
+  },
+  "response": {
+    "model": "typesafe/jev-1.14-20261014",
+    "answers": {
+      "verdict": {
+        "type": "choice",
+        "choice": "CORRECT",
+        "probabilities": {
+          "CORRECT": 0.8,
+          "FALSE": 0.14,
+          "NOT_SURE": 0.06
+        },
+        "confidence": 0.7
+      }
+    },
+    "usage": {
+      "input_tokens": 413,
+      "output_tokens": 43,
+      "cost": 1.7346e-05,
+      "is_byok": false,
+      "cost_details": {
+        "upstream_inference_cost": 1.7346e-05,
+        "upstream_inference_prompt_cost": 1.7346e-05,
+        "upstream_inference_completions_cost": 0
+      }
+    },
+    "id": "gen-dec-1793989244-qX2mcOHCredjalhNzLvZ",
+    "provider": "TypeSafe"
+  },
+  "tokens": [
+    413,
+    43
+  ],
+  "cost_usd": 1.7346e-05,
+  "latency_ms": 857
+}

@@ -5,6 +5,39 @@ State for recovery (session IDs, what to do if a child died) is in `orchestrator
 
 <!-- NEW REPORTS GO BELOW THIS LINE -->
 
+## 2026-11-06 19:10 — Phase 13 (AI provider layer) built as a draft; needs your permission for live calls
+
+Draft pushed as `8eb3f4e` "rewrite phase 13 (draft): AI provider layer". The phase is **not ticked**: its Feature check
+(one live call per provider) needs your permission.
+- Built in `server/wahy/core/ai/`: one common call for Gemini, JEV, OpenRouter chat, local Laya and a fake. Gemini sends
+  5 to 10 findings per request, never exceeds your per-minute limit on the free tier, waits as long as Google asks on a
+  429 and stops with a clear message after 5 attempts; the key goes in a header so it never reaches the request log.
+  OpenRouter model search shows live prices and context size; JEV gives calibrated probabilities; chat models use JSON mode
+  where available, retry once with more room if cut off, and stop at once on a bad key, no credit or unknown model. Groq
+  moved here from transcription. Laya runs through the GPU owner and reads its envelope version from the checkpoint
+  (v3 for `laya-wahy-r6-v3_mixed`). Every request (failed attempts too) is saved with tokens, cost, latency and raw payload.
+- Tests (`scripts/test.sh`, all passed): old backend 152; new server 213 (46 new; 6 live skipped); engine 106; web 59;
+  Playwright 4. Includes the `features.md` checks (429 wait then success; 20 requests at 5/min never more than 5 in a
+  minute; "deepseek" search lists models with prices; loading Whisper unloads Laya and vice versa).
+- **Decisions the child made on its own (recorded under Changes):**
+  1. Prompt presets and rules (F-086) are left to phase 14.
+  2. The provider responses the tests replay are **hand-written** in each provider's documented format (none had ever been
+     saved). The live tests save real ones to `data/ai_live_replies/` and those can replace the hand-written files.
+  3. New `laya` install option (laya + torch 2.14.1 for CUDA 12.6). To install it next to local Whisper, **Whisper's cuBLAS
+     requirement was lowered from 12.9 to 12.6**. The child checked faster-whisper still runs on the GPU. The server's
+     environment now has both.
+  4. Extra settings routes: OpenRouter model search, Gemini models for your key, Laya status/load/unload; web API types
+     regenerated.
+
+**Needs you: may the child run the 5 live tests?** (`cd server && uv run pytest tests/test_ai_live.py --live -v`, one
+tiny request each.) Keys set in `.env`: GEMINI_API_KEY, OPENROUTER_API_KEY, GROQ_API_KEY (no JEV key, so JEV uses the
+OpenRouter key). Rough cost: Gemini $0 on the free tier (about $0.001 if billed); JEV about $0.00003; OpenRouter chat
+(`deepseek/deepseek-chat`) about $0.0005; Groq (2 s of tone, billed as 10 s) about $0.0001; Laya free but loads the model
+on your GPU for about a minute. Total under $0.01.
+1. Run all five, then tick phase 13.
+2. Run only some (say which).
+3. Skip the live check and tick phase 13 as is.
+
 ## 2026-11-06 — Stopped: the 5-hour usage limit hit during phase 13 (resets 6:50pm Algiers time)
 
 Not a code failure. The phase 13 child (`refactoring-step-13`, session `43054219-e576-4766-a945-dc8c87c3d9b6`) ran 72 turns and was cut off
