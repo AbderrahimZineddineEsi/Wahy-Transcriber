@@ -2,6 +2,7 @@ import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tansta
 import { api, data } from "../../api/client";
 import type { components } from "../../api/schema";
 import type { Findings, Job } from "../lectures/api";
+import { refreshLecture } from "../editing/api";
 
 export type PassOptions = components["schemas"]["PassOptions"];
 export type OptionsPatch = components["schemas"]["OptionsPatch"];
@@ -160,12 +161,13 @@ export function withHumanVerdict(f: FindingRow, verdict: Verdict, boundary?: str
   return { ...f, verdict: { verdict, boundary: boundary ?? f.verdict?.boundary ?? null, verifier: "human", model: null } };
 }
 
-/** Grow a finding over the words its start or end is missing. */
+/** Grow a finding over the words its start or end is missing. It is an edit in the lecture's log (undo takes it
+ *  back), so the log and the captions are read again too. */
 export function useExpand(lectureId: number) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (findingId: number) => data(api.POST("/api/findings/{finding_id}/expand", { params: { path: { finding_id: findingId } } })),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["findings", lectureId] }),
+    onSuccess: () => refreshLecture(queryClient, lectureId),
   });
 }
 

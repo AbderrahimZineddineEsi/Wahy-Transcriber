@@ -14,6 +14,7 @@ from wahy.core.engine import EngineError
 from wahy.features.editing.schemas import (
     AddQuote,
     CaptionEdit,
+    CaptionEditOut,
     DeleteIntent,
     EditDone,
     FindingEdit,
@@ -126,6 +127,14 @@ def delete_finding(finding_id: int, intent: DeleteIntent, service: Editing) -> E
 
 # ---- captions
 # ------------------------------------------------------------------------------------------------------
+
+
+@router.get("/api/lectures/{lecture_id}/edits/captions")
+def caption_edits(lecture_id: int, service: Editing) -> list[CaptionEditOut]:
+    """The caption timing editor's saved edits, in the order they apply (the web app's caption preview applies
+    them too)."""
+    with editing_errors():
+        return [CaptionEditOut.model_validate(e) for e in service.caption_edits(lecture_id)]
 
 
 @router.post("/api/lectures/{lecture_id}/edits/captions")

@@ -254,6 +254,27 @@ def test_dismissing_a_merge_suggestion_is_remembered_on_the_finding(app):
     assert by_unit(app, lecture_id, "112:1")["data"]["mergeDismissed"] == ["next"]
 
 
+def test_flagging_the_reference_as_wrong_is_an_edit_that_undo_takes_back(app):
+    """N-007: the "reference wrong or incomplete" flag is kept on the finding."""
+    lecture_id = new_lecture(app)
+    verse = by_unit(app, lecture_id, "112:1")
+    r = app.post(f"/api/findings/{verse['id']}/edit", json={"op": "flag_reference", "wrong": True})
+    assert r.status_code == 200 and r.json()["op"]["kind"] == "flag_reference"
+    assert by_unit(app, lecture_id, "112:1")["data"]["referenceWrong"] is True
+    again = app.post(f"/api/findings/{verse['id']}/edit", json={"op": "flag_reference", "wrong": True})
+    assert again.status_code == 409
+    undo(app, lecture_id)
+    assert "referenceWrong" not in by_unit(app, lecture_id, "112:1")["data"]
+
+
+def test_the_newest_verdict_carries_its_confidence_and_details(app):
+    lecture_id = new_lecture(app)
+    verse = by_unit(app, lecture_id, "112:1")
+    app.put(f"/api/findings/{verse['id']}/verdict", json={"verdict": "CORRECT"})
+    v = by_unit(app, lecture_id, "112:1")["verdict"]
+    assert v["verifier"] == "human" and "confidence" in v and "details" in v
+
+
 def test_deleting_as_ordinary_speech_saves_a_gold_false_label_and_undo_removes_both(app):
     lecture_id = new_lecture(app)
     before = snapshot(app, lecture_id)
@@ -325,6 +346,14 @@ def test_caption_edits_split_merge_and_time_and_quotes_are_locked(app):
     undo(app, lecture_id)
     undo(app, lecture_id)
     assert app.get(f"/api/lectures/{lecture_id}/captions").json() == caps
+
+
+def test_the_saved_caption_edits_are_listed_in_order(app):
+    lecture_id = new_lecture(app)
+    assert app.get(f"/api/lectures/{lecture_id}/edits/captions").json() == []
+    app.post(f"/api/lectures/{lecture_id}/edits/captions", json={"op": "split", "word": 26})
+    assert app.get(f"/api/lectures/{lecture_id}/edits/captions").json() == [
+        {"op": "split", "word": 26, "start": None, "end": None}]
 
 
 def test_a_text_edit_moves_the_caption_edits_after_it(app):

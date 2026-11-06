@@ -1,9 +1,13 @@
-import { buildCaptions } from "@wahy/engine/captions";
-import { useCallback, useDeferredValue, useMemo, useRef, useState, type CSSProperties } from "react";
+import { tokenWordMap } from "@wahy/engine/captions";
+import { lectureCaptions } from "@wahy/engine/export";
+import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useI18n, type MessageKey } from "../../../shell/i18n";
 import { useStoredState } from "../../../shell/storage";
 import { useToasts } from "../../../shell/toasts";
 import { useAttachMedia, useEditWord, type LectureDetail } from "../api";
+import { useCaptionEdits } from "../../editing/api";
+import { bracketsOf, DEFAULT_STYLE, useExportStyle } from "../../export/api";
 import { useClock, type Clock } from "./clock";
 import { FindingCard, placeUnder, WordEditor } from "./FindingCard";
 import {
@@ -54,19 +58,33 @@ export function LectureView({ lecture, findings, readOnly }: Props) {
   const editWord = useEditWord(lecture.id);
 
   // ---- derived data: each is recomputed only when its own inputs change ----
+  const style = useExportStyle().data ?? DEFAULT_STYLE;
+  const captionEdits = useCaptionEdits(lecture.id).data;
+  const brackets = useMemo(() => bracketsOf(style), [style]);
+  const showRef = useMemo(
+    () => ({ quran: style.showQuranSource, hadith: style.showHadithSource, dhikr: style.showAdhkarTag }),
+    [style.showQuranSource, style.showHadithSource, style.showAdhkarTag],
+  );
   const starts = useMemo(() => startTimes(words), [words]);
+  const captionWords = useMemo(() => words.map((w) => ({ word: w.text, start: w.start, end: w.end })), [words]);
+  const tokWord = useMemo(() => tokenWordMap(captionWords), [captionWords]);
   const shown = useMemo(() => findings.filter((f) => isShown(f, filter)), [findings, filter]);
-  const paragraphs = useMemo(() => buildParagraphs(words, shown, script), [words, shown, script]);
+  const paragraphs = useMemo(() => buildParagraphs(words, shown, script, tokWord), [words, shown, script, tokWord]);
   // a filter change re-renders the whole transcript; deferring it keeps the toolbar answering at once while
   // React renders the new transcript in the background (it shows the old one until the new one is ready)
   const shownParagraphs = useDeferredValue(paragraphs);
+  // the captions as the caption files write them: the saved style and the timing editor's edits included (a
+  // saved version is read only, and its old caption edits may not fit it, so it has none)
   const captions = useMemo(
     () =>
-      buildCaptions(
-        words.map((w) => ({ word: w.text, start: w.start, end: w.end })),
-        shown.map((f) => ({ ...f.data, snappedToCanonical: script === "standard" })),
-      ),
-    [words, shown, script],
+      lectureCaptions({
+        words: captionWords,
+        findings: shown.map((f) => ({ ...f.data, id: f.key })),
+        prefs: style,
+        standardScript: script === "standard",
+        captionEdits: readOnly ? [] : (captionEdits ?? []),
+      }),
+    [captionWords, shown, script, style, captionEdits, readOnly],
   );
   const captionStarts = useMemo(() => startTimes(captions), [captions]);
   const findingAtWord = useMemo(() => {
@@ -108,6 +126,20 @@ export function LectureView({ lecture, findings, readOnly }: Props) {
   );
   const closeCard = useCallback(() => setCard(null), []);
   const cardFinding = card ? findings.find((f) => f.key === card.key) : undefined;
+
+  // ?finding=ID (the editor's "show in the view"): scroll to that quote and open its card, once
+  const [params, setParams] = useSearchParams();
+  const wanted = params.get("finding");
+  useEffect(() => {
+    if (!wanted) return;
+    const el = root.current?.querySelector<HTMLElement>(`[data-f="f${wanted}"] .ref`);
+    if (!el) return;
+    el.scrollIntoView?.({ block: "center" });
+    openCard(`f${wanted}`, el);
+    const f = findings.find((x) => x.key === `f${wanted}`);
+    if (f && words[f.start]) controls.seek(words[f.start].start + 0.001);
+    setParams({}, { replace: true });
+  }, [wanted, shownParagraphs, openCard, findings, words, controls, setParams]);
 
   const hitIndex = useRef(-1);
   const nextHit = () => {
@@ -232,7 +264,16 @@ export function LectureView({ lecture, findings, readOnly }: Props) {
               <p className="text-ink-2">{t("lecture.empty")}</p>
             ) : (
               <div ref={root}>
-                <Transcript paragraphs={shownParagraphs} words={words} onWord={onWord} onRef={openCard} onWordDoubleClick={onWordDoubleClick} />
+                <Transcript
+                  paragraphs={shownParagraphs}
+                  words={words}
+                  onWord={onWord}
+                  onRef={openCard}
+                  onWordDoubleClick={onWordDoubleClick}
+                  brackets={brackets}
+                  split={style.splitCommentary}
+                  showRef={showRef}
+                />
               </div>
             )}
             {card && cardFinding && (

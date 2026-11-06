@@ -263,12 +263,18 @@ decisions and why). The problems being fixed are in the friction map: https://cl
   - Notes: see the 2026-11-06 phase 16 entry under **Changes**.
   - Learn: the command pattern for undo; LCS alignment.
 
-- [ ] **17. Web: editor and export**: Opus 5.5, high.
+- [x] **17. Web: editor and export**: Opus 5.5, high.
   - The word board (add a missed quote with two clicks), the quote inspector, canonical word chips, the reference
     picker with corpus search, the full-text editor, the caption timing editor, undo, and the export dialog.
   - Done when: Vitest and Playwright pass.
   - Feature check: add a missed quote with two clicks; it shows in the transcript and the captions; undo removes it.
     Features: F-038, F-047 to F-071, N-007.
+  - Feature check result (2026-11-06): `e2e/editor.spec.ts` on the real server and engine with the sample lecture: two
+    clicks on three plain words, inserted as an outside quote; the server had the new finding and a quote caption, the
+    view's transcript showed the quote and the caption over the video showed it; the header's undo ("تراجع: إضافة
+    اقتباس فائت") removed it from both. The export tab's SRT download was byte-identical to the server's file, and « »
+    verse brackets reached the transcript after a reload. `scripts/test.sh` all green.
+  - Notes: see the 2026-11-06 phase 17 entry under **Changes**.
   - Learn: managing complex UI state.
 
 ### Tafrigh
@@ -451,3 +457,21 @@ Each entry: date, what changed, the user's words.
     Open point for the user: bracket such verses in gapless hadiths too?
   - An outside-corpus quote is not added to the adhkar or custom-quote lists here (the old "save as dhikr" belongs to
     the adhkar editor).
+- **2026-11-06**: Phase 17 (done). Choices made inside the phase:
+  - Small server additions the screens needed: `GET /api/corpus/suggest` (the old studio's ranking of the closest
+    references, `updateFnStudioSuggestions`, moved into `engine/src/search.ts` as `suggest`, worker command `suggest`),
+    `GET /api/corpus/units` (a reference's words, a hadith's whole text with its matn bounds), `GET
+    /api/lectures/{id}/edits/captions` (the caption edits, so the view's caption preview applies them too), the
+    `flag_reference` finding edit (N-007, kept on the finding as `referenceWrong` for phase 20's gold labels), and
+    `confidence` and `details` on each finding's newest verdict (the inspector's confidence and merge suggestion).
+  - The export "dialog" is the lecture's export tab, as in the approved mockup. Downloads come from the server's export
+    routes; print / PDF opens the HTML export and the browser's print dialog.
+  - The view tab now draws the saved brackets, the commentary-gap split (phase 16) and the screen-only "show source"
+    switches, honours a finding's own "source text" switch, and builds its captions with the caption edits
+    (`@wahy/engine/export` `lectureCaptions`). The dhikr brackets in the view changed from « » to the style's 〖 〗.
+  - The word board shows the spoken words (it is for picking words); standard script (F-038) applies in the view, the
+    caption timing table and the exports. "Save as a dhikr" from a selection also marks those words with it (as the old
+    app did); from an existing quote it only adds it to the adhkar list.
+  - "Verify this quote" (F-066) opens the verify tab with that finding picked; a direct jump to its request-log entry
+    is not built (the log filters by lecture, pass, provider and status, not by finding). Open point for the user.
+  - `web/tsconfig.json` allows `.ts` import paths (the engine's `export.ts` imports `./captions.ts`).

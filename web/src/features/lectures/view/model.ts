@@ -29,6 +29,9 @@ export type ViewFinding = {
   boundary: BoundaryKey | null;
   verifier: string | null;
   model: string | null;
+  /** the verdict's confidence (0 to 1) and the rest of the verifier's answer (merge suggestion...) */
+  confidence: number | null;
+  details: Record<string, unknown> | null;
   canonicalText: string;
   data: EngineFinding;
 };
@@ -55,6 +58,8 @@ function fromEngine(data: EngineFinding, key: string, id: number | null, verdict
     boundary: verdict?.boundary ? (BOUNDARY[verdict.boundary] ?? null) : null,
     verifier: verdict?.verifier ?? null,
     model: verdict?.model ?? null,
+    confidence: verdict?.confidence ?? null,
+    details: (verdict?.details as Record<string, unknown> | null | undefined) ?? null,
     canonicalText: typeof data.canonicalText === "string" ? data.canonicalText : "",
     data,
   };
@@ -111,18 +116,62 @@ export function counts(words: readonly Word[], findings: readonly ViewFinding[])
 
 export type Script = "spoken" | "standard";
 
-/** One piece of text on screen, and the word it follows in time. */
-export type Token = { text: string; i: number };
+/** One piece of text on screen, and the word it follows in time. `gap`: the speaker's own words between two parts
+ *  of the quote (a commentary gap), written outside the quote's brackets. */
+export type Token = { text: string; i: number; gap?: boolean };
 export type Piece = { type: "word"; i: number } | { type: "quote"; f: ViewFinding; tokens: Token[] };
 export type Paragraph = { key: string; first: number; last: number; pieces: Piece[] };
 
-/** The words a quote shows. As spoken: its own words. In standard script (F-038): the source text, each source
- *  word tied to a spoken word in proportion, so the marker still moves through the quote as it is recited. */
-export function quoteTokens(words: readonly Word[], f: ViewFinding, script: Script): Token[] {
-  const n = f.end - f.start + 1;
-  const canon = script === "standard" ? f.canonicalText.split(/\s+/).filter(Boolean) : [];
-  if (!canon.length) return Array.from({ length: n }, (_, k) => ({ text: words[f.start + k]?.text ?? "", i: f.start + k }));
-  return canon.map((text, j) => ({ text, i: f.start + Math.min(n - 1, Math.floor((j * n) / canon.length)) }));
+/** token index → word index (the engine counts tokens, and a word can hold several); `identity` when unknown */
+export type TokenWords = readonly number[] | null;
+
+/** A finding's token ranges [start, end) as word ranges [first, last]. */
+function wordRanges(ranges: unknown, tokWord: TokenWords): [number, number][] {
+  if (!Array.isArray(ranges)) return [];
+  const w = (t: number) => (tokWord ? (tokWord[t] ?? t) : t);
+  return ranges
+    .filter((r): r is number[] => Array.isArray(r) && r[1] > r[0])
+    .map((r) => [w(r[0]), w(Math.max(r[0], r[1] - 1))] as [number, number]);
+}
+
+/** Spread `text`'s words over spoken words a..b, in proportion. */
+function spread(text: string[], a: number, b: number): Token[] {
+  const n = b - a + 1;
+  return text.map((t, j) => ({ text: t, i: a + Math.min(n - 1, Math.floor((j * n) / text.length)) }));
+}
+
+/** The words a quote shows. As spoken: its own words. In standard script (F-038), or when the finding was switched
+ *  to its source text, the source text, each source word tied to a spoken word in proportion, so the marker still
+ *  moves through the quote as it is recited. Commentary gaps keep the speaker's words, marked `gap`. */
+export function quoteTokens(words: readonly Word[], f: ViewFinding, script: Script, tokWord: TokenWords = null): Token[] {
+  const gaps = wordRanges(f.data.commentaryGaps, tokWord).filter(([s, e]) => e >= f.start && s <= f.end);
+  const inGap = (i: number) => gaps.some(([s, e]) => s <= i && i <= e);
+  const spoken = (a: number, b: number): Token[] => {
+    const out: Token[] = [];
+    for (let i = a; i <= b; i++) out.push(inGap(i) ? { text: words[i]?.text ?? "", i, gap: true } : { text: words[i]?.text ?? "", i });
+    return out;
+  };
+  const canonical = script === "standard" || f.data.snappedToCanonical === true;
+  const canon = canonical ? f.canonicalText.split(/\s+/).filter(Boolean) : [];
+  if (!canon.length) return spoken(f.start, f.end);
+  if (!gaps.length) return spread(canon, f.start, f.end);
+  // a quote in parts: each part shows its own source words, the gaps between them the speaker's
+  const segs = wordRanges(f.data.segments, tokWord);
+  const parts = Array.isArray(f.data.canonicalSegments) ? (f.data.canonicalSegments as unknown[]) : [];
+  if (!segs.length || parts.length !== segs.length) return spoken(f.start, f.end);
+  const out: Token[] = [];
+  let at = f.start;
+  segs.forEach(([s, e], k) => {
+    const lo = Math.max(s, f.start);
+    const hi = Math.min(e, f.end);
+    if (lo > hi) return;
+    if (lo > at) out.push(...spoken(at, lo - 1));
+    const cw = String(parts[k] ?? "").split(/\s+/).filter(Boolean);
+    out.push(...(cw.length ? spread(cw, lo, hi) : spoken(lo, hi)));
+    at = hi + 1;
+  });
+  if (at <= f.end) out.push(...spoken(at, f.end));
+  return out;
 }
 
 const SENTENCE_END = /[.؟?!]["»”]?$/;
@@ -133,7 +182,12 @@ const PARA = { minAtSentence: 40, minAtPause: 15, pause: 1.2, max: 160 };
 /** The transcript as paragraphs of words and quotes. `findings` are the shown ones; a finding that starts
  *  inside an earlier one is skipped, and of two that start on the same word the first is kept (the caption
  *  builder does the same, so the transcript and the captions agree). A paragraph never breaks inside a quote. */
-export function buildParagraphs(words: readonly Word[], findings: readonly ViewFinding[], script: Script): Paragraph[] {
+export function buildParagraphs(
+  words: readonly Word[],
+  findings: readonly ViewFinding[],
+  script: Script,
+  tokWord: TokenWords = null,
+): Paragraph[] {
   const byStart = new Map<number, ViewFinding>();
   for (const f of findings) {
     if (f.start < 0 || f.start >= words.length || f.end < f.start) continue;
@@ -156,7 +210,7 @@ export function buildParagraphs(words: readonly Word[], findings: readonly ViewF
     let last: number;
     if (f) {
       last = Math.min(words.length - 1, f.end);
-      pieces.push({ type: "quote", f, tokens: quoteTokens(words, { ...f, end: last }, script) });
+      pieces.push({ type: "quote", f, tokens: quoteTokens(words, { ...f, end: last }, script, tokWord) });
     } else {
       last = i;
       pieces.push({ type: "word", i });

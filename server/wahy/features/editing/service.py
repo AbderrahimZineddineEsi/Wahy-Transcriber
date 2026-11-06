@@ -47,6 +47,7 @@ from wahy.features.editing.schemas import (
     DismissMerge,
     EditDone,
     FindingEdit,
+    FlagReference,
     Merge,
     OpOut,
     ReplaceText,
@@ -404,6 +405,7 @@ class EditingService:
             "remove_candidate": "Remove a matching reference",
             "merge": "Merge with the neighbour",
             "dismiss_merge": "Dismiss the merge suggestion",
+            "flag_reference": "Mark the reference as wrong",
         }
 
         def build(st: State) -> Change:
@@ -413,6 +415,15 @@ class EditingService:
             if isinstance(body, DismissMerge):
                 data = dict(f.data)
                 data["mergeDismissed"] = sorted({*data.get("mergeDismissed", []), body.direction})
+                return Change(update={f.id: data}, finding_id=f.id)
+            if isinstance(body, FlagReference):
+                data = dict(f.data)
+                if bool(data.get("referenceWrong")) == body.wrong:
+                    raise NothingChanged("the reference is already marked like that")
+                if body.wrong:
+                    data["referenceWrong"] = True
+                else:
+                    data.pop("referenceWrong", None)
                 return Change(update={f.id: data}, finding_id=f.id)
             req: dict[str, Any] = {"op": body.op, "finding": f.data}
             extra = body.model_dump(exclude={"op"})

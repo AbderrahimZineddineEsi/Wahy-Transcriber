@@ -1,10 +1,12 @@
 import { memo, useEffect, useLayoutEffect, useRef, type MouseEvent, type RefObject } from "react";
 import { useI18n } from "../../../shell/i18n";
 import type { Clock } from "./clock";
-import type { Paragraph, ViewFinding, Word } from "./model";
+import type { Kind, Paragraph, Token, ViewFinding, Word } from "./model";
 import { wordAt } from "./sync";
 
-const BRACKETS: Record<ViewFinding["kind"], [string, string]> = { quran: ["﴿", "﴾"], hadith: ["«", "»"], dhikr: ["«", "»"] };
+export type Brackets = Record<Kind, [string, string]>;
+const DEFAULT_BRACKETS: Brackets = { quran: ["﴿", "﴾"], hadith: ["«", "»"], dhikr: ["〖", "〗"] };
+const SHOW_ALL: Record<Kind, boolean> = { quran: true, hadith: true, dhikr: true };
 
 type Props = {
   paragraphs: Paragraph[];
@@ -12,12 +14,18 @@ type Props = {
   onWord: (i: number, el: HTMLElement, quoteKey: string | null) => void;
   onRef: (key: string, el: HTMLElement) => void;
   onWordDoubleClick: (i: number, el: HTMLElement) => void;
+  /** the saved export style's brackets (F-071) */
+  brackets?: Brackets;
+  /** write commentary gaps outside the brackets: «part one» commentary «part two» (phase 16) */
+  split?: boolean;
+  /** show each kind's reference beside the quote (the style's screen-only switches); the verdict dot stays */
+  showRef?: Record<Kind, boolean>;
 };
 
 /** The annotated transcript (F-031). It renders once per change of the paragraphs (a filter, the script,
  *  an edited word); playing the media never re-renders it: the marker, the played words, search hits and the
  *  open quote are classes changed by hand (the hooks below). Clicks are handled once, on the container. */
-export const Transcript = memo(function Transcript({ paragraphs, words, onWord, onRef, onWordDoubleClick }: Props) {
+export const Transcript = memo(function Transcript({ paragraphs, words, onWord, onRef, onWordDoubleClick, brackets = DEFAULT_BRACKETS, split = true, showRef = SHOW_ALL }: Props) {
   const handle = (e: MouseEvent<HTMLDivElement>, double: boolean) => {
     const target = e.target as HTMLElement;
     const ref = target.closest<HTMLElement>("[data-ref]");
@@ -31,7 +39,7 @@ export const Transcript = memo(function Transcript({ paragraphs, words, onWord, 
   return (
     <div className="transcript" data-testid="transcript" onClick={(e) => handle(e, false)} onDoubleClick={(e) => handle(e, true)}>
       {paragraphs.map((p) => (
-        <ParagraphView key={p.key} p={p} words={words} />
+        <ParagraphView key={p.key} p={p} words={words} brackets={brackets} split={split} showRef={showRef} />
       ))}
     </div>
   );
@@ -41,7 +49,21 @@ export const Transcript = memo(function Transcript({ paragraphs, words, onWord, 
 const cutAt = (f: ViewFinding, edge: "start" | "end") =>
   f.verdict !== "bad" && (f.boundary === "missBoth" || f.boundary === (edge === "start" ? "missStart" : "missEnd"));
 
-const ParagraphView = memo(function ParagraphView({ p, words }: { p: Paragraph; words: readonly Word[] }) {
+/** A quote's tokens in runs: parts of the quote, and commentary gaps between them. Without the split, one run. */
+function runs(tokens: Token[], split: boolean): { gap: boolean; tokens: Token[] }[] {
+  const out: { gap: boolean; tokens: Token[] }[] = [];
+  for (const tok of tokens) {
+    const gap = split && Boolean(tok.gap);
+    const last = out[out.length - 1];
+    if (last && last.gap === gap) last.tokens.push(tok);
+    else out.push({ gap, tokens: [tok] });
+  }
+  return out;
+}
+
+type ParagraphProps = { p: Paragraph; words: readonly Word[]; brackets: Brackets; split: boolean; showRef: Record<Kind, boolean> };
+
+const ParagraphView = memo(function ParagraphView({ p, words, brackets, split, showRef }: ParagraphProps) {
   const { t } = useI18n();
   return (
     <p data-first={p.first} data-last={p.last} style={{ containIntrinsicSize: `auto ${Math.ceil((p.last - p.first + 1) / 11) * 2.8}em` }}>
@@ -56,34 +78,41 @@ const ParagraphView = memo(function ParagraphView({ p, words }: { p: Paragraph; 
           );
         }
         const f = piece.f;
-        const [open, close] = BRACKETS[f.kind];
+        const [open, close] = brackets[f.kind];
+        const parts = runs(piece.tokens, split);
+        const lastQuote = parts.map((r) => r.gap).lastIndexOf(false);
         return (
           <span key={`q${f.start}`}>
             <span className={`f ${f.kind}${f.verdict === "bad" ? " bad" : ""}`} data-f={f.key} data-kind={f.kind} data-verdict={f.verdict}>
-              <span className="br">{open}</span>
-              {cutAt(f, "start") && (
-                <span className="cut" title={t("boundary.missStart")} data-cut="start">
-                  ✂
-                </span>
-              )}
-              {piece.tokens.map((tok, k) => (
-                <span key={k}>
-                  <span className="w" data-i={tok.i}>
-                    {tok.text}
-                  </span>
-                  {k < piece.tokens.length - 1 ? " " : ""}
+              {parts.map((run, r) => (
+                <span key={r} className={run.gap ? "gap" : undefined} data-gap={run.gap ? "" : undefined}>
+                  {r > 0 ? " " : ""}
+                  {!run.gap && <span className="br">{open}</span>}
+                  {!run.gap && r === 0 && cutAt(f, "start") && (
+                    <span className="cut" title={t("boundary.missStart")} data-cut="start">
+                      ✂
+                    </span>
+                  )}
+                  {run.tokens.map((tok, k) => (
+                    <span key={k}>
+                      <span className="w" data-i={tok.i}>
+                        {tok.text}
+                      </span>
+                      {k < run.tokens.length - 1 ? " " : ""}
+                    </span>
+                  ))}
+                  {!run.gap && r === lastQuote && cutAt(f, "end") && (
+                    <span className="cut" title={t("boundary.missEnd")} data-cut="end">
+                      ✂
+                    </span>
+                  )}
+                  {!run.gap && <span className="br">{close}</span>}
                 </span>
               ))}
-              {cutAt(f, "end") && (
-                <span className="cut" title={t("boundary.missEnd")} data-cut="end">
-                  ✂
-                </span>
-              )}
-              <span className="br">{close}</span>
               <button type="button" className="ref" data-ref={f.key} aria-label={f.ref}>
                 <span className={`vd ${f.verdict}`} />
-                {f.ref}
-                {f.ambiguous ? " ·؟" : ""}
+                {showRef[f.kind] && f.ref}
+                {showRef[f.kind] && f.ambiguous ? " ·؟" : ""}
               </button>
             </span>{" "}
           </span>

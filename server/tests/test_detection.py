@@ -122,7 +122,8 @@ def test_each_finding_carries_its_newest_verdict_or_none(api):
                       boundary="MISSING_END"))
         s.add(Verdict(finding_id=first["id"], verifier="human", verdict="FALSE", boundary="COMPLETE"))
     first, second = api.get(f"/api/lectures/{lecture_id}/findings").json()["findings"]
-    assert first["verdict"] == {"verdict": "FALSE", "boundary": "COMPLETE", "verifier": "human", "model": None}
+    assert first["verdict"] == {"verdict": "FALSE", "boundary": "COMPLETE", "verifier": "human", "model": None,
+                                "confidence": None, "details": None}
     assert second["verdict"] is None
 
 
@@ -201,6 +202,27 @@ def test_search_finds_ayat_by_reference_and_by_words_with_the_real_engine(real):
     assert any(h["unitId"] == "112:2" for h in by_words)
     assert real.get("/api/corpus/search", params={"q": "112:1"}).json()[0]["unitId"] == "112:1"
     assert real.get("/api/corpus/search", params={"q": "", "limit": 3}).json().__len__() == 3
+
+
+def test_suggest_ranks_the_closest_references_for_a_missed_quote(real):
+    """F-052: a verse heard with a typo still gets its ayah first, with the matched words marked."""
+    hits = real.get("/api/corpus/suggest", params={"text": "الحمد لله رب العلمين", "kind": "QURAN"}).json()
+    assert hits[0]["unitId"] == "1:2" and hits[0]["score"] > 0
+    assert hits[0]["matched"] and len(hits[0]["words"]) == 4
+    hadith = real.get("/api/corpus/suggest", params={"text": "إنما الأعمال بالنيات", "kind": "HADITH", "limit": 1})
+    assert [h["unitId"] for h in hadith.json()] == ["Nawawi40:1"]
+    assert real.get("/api/corpus/suggest", params={"text": ""}).json() == []
+    assert real.get("/api/corpus/suggest", params={"text": "x", "kind": "ALL"}).status_code == 422
+
+
+def test_unit_words_give_an_ayah_and_a_hadith_with_its_chain(real):
+    """F-050 and F-062: the words to pick from, and a hadith's whole text with the matn marked."""
+    got = real.get("/api/corpus/units", params={"ids": ["112:1", "Nawawi40:1", "nope", "OUTSIDE_CORPUS"]}).json()
+    assert set(got) == {"112:1", "Nawawi40:1"}
+    assert got["112:1"]["words"][0] == "قُلْ" and got["112:1"]["full"] is None
+    full = got["Nawawi40:1"]["full"]
+    assert 0 < full["matnStart"] < full["matnEnd"] <= len(full["words"])
+    assert full["words"][full["matnStart"]:full["matnEnd"]][:2] == got["Nawawi40:1"]["words"][:2]
 
 
 # ---- golden: the old app's findings, through the API -------------------------------------------------------------

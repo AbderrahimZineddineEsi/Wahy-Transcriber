@@ -2,10 +2,12 @@ import { createContext, useCallback, useContext, useMemo, useState, type ReactNo
 import { useI18n } from "./i18n";
 import { ErrorReportDialog } from "./ErrorReport";
 
-type Toast = { id: number; kind: "success" | "error"; message: string; error?: Error };
+export type ToastAction = { label: string; run: () => void };
+type Toast = { id: number; kind: "success" | "error"; message: string; error?: Error; action?: ToastAction };
 
 type Toasts = {
-  success: (message: string) => void;
+  /** A short message; `action` adds one button (such as "undo") that also closes the toast. */
+  success: (message: string, action?: ToastAction) => void;
   /** Shows the message with a "details" button that opens the error report. */
   error: (error: Error) => void;
 };
@@ -30,7 +32,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
 
   const api = useMemo<Toasts>(
     () => ({
-      success: (message) => push({ kind: "success", message }, 4000),
+      success: (message, action) => push({ kind: "success", message, action }, action ? 6000 : 4000),
       error: (error) => push({ kind: "error", message: error.message, error }, 10000),
     }),
     [push],
@@ -50,6 +52,17 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             className="flex items-center gap-3 rounded-m bg-ink px-4 py-2.5 text-s text-surface shadow-pop"
           >
             <span className={toast.kind === "error" ? "font-medium" : ""}>{toast.message}</span>
+            {toast.action && (
+              <button
+                className="font-semibold text-accent-soft underline"
+                onClick={() => {
+                  dismiss(toast.id);
+                  toast.action!.run();
+                }}
+              >
+                {toast.action.label}
+              </button>
+            )}
             {toast.error && (
               <button className="font-semibold text-accent-soft underline" onClick={() => setReport(toast.error!)}>
                 {t("error.details")}

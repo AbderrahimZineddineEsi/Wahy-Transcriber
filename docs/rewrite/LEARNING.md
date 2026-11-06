@@ -1260,3 +1260,82 @@ cd engine && npx vitest run src/export.test.ts            # golden exports + com
 cd server && uv run pytest tests/test_editing.py -q        # edits, undo, timings through a text edit
 cd server && uv run pytest tests/test_export.py -q         # exports, filters, golden through the API
 ```
+
+## Phase 17 — Web: editor and export
+
+### What was built
+
+The lecture's **edit** and **export** tabs (`web/src/features/editing/`, `web/src/features/export/`), over phase 16's
+server routes:
+
+- **Edit → quotes**: a word board (every word a chip, quotes in their colour). Click the first and the last word of a
+  missed quote (or drag) and the inspector becomes the *studio*: the closest references, ranked by the engine, with the
+  matched words lit in the source text; or "outside the sources" with a typed reference. Click a quote instead and the
+  *inspector* shows it: previous / next, what was said, the source words as chips to pick from, the matching
+  references (link another, add, remove, search the corpus), move an edge by one word, complete a clipped quote, merge
+  with a close neighbour, your verdict (a gold label), "reference wrong" (N-007), change the kind, delete with a reason.
+- **Edit → full text** (saved with LCS alignment, so word times survive) and **edit → caption timing** (re-word, split
+  at a word, merge, nudge or type times, set to the playhead; quotes are locked).
+- **Undo** in the header, naming the edit it would take back ("Undo: Add a missed quote"). The log is on the server, so
+  it also works after a reload.
+- **Export**: a preview of the real file beside its settings (SRT, VTT, ASS, HTML, Markdown, text, JSON; print / PDF;
+  brackets; standard script; hide ordinary speech). The view tab now uses the same brackets, the commentary-gap split
+  and the caption edits, so the screen and the files agree.
+- Small server additions the screens needed: `GET /api/corpus/suggest` (the studio's ranking, moved from the old
+  editor into `engine/src/search.ts`), `GET /api/corpus/units` (a reference's words, a hadith's chain too),
+  `GET /api/lectures/{id}/edits/captions`, the `flag_reference` edit, and each verdict's `confidence` and `details`.
+
+### New ideas
+
+**Two kinds of state.** The editor holds two very different things. *Server state* (words, findings, the edit log,
+captions) lives in TanStack Query: after any edit one function, `refreshLecture`, marks those queries stale and they
+are read again. *UI state* (which words are selected, what the inspector shows) lives only in the browser, and is the
+hard part. Keeping the two apart means an edit never has to patch the screen by hand: it changes the server, and the
+screen follows.
+
+**A reducer for the selection.** The board's clicks have rules (a click on a quote opens it, unless a first word is
+already chosen; a third click starts again; a drag always makes a range). Instead of five `useState`s changed from five
+handlers, one pure function takes the state and an action and returns the next state (`board.ts`):
+
+```ts
+boardReducer({ anchor: 7, range: null, ... }, { type: "click", i: 9, findingId: null })
+// → { anchor: null, range: [7, 9], ... }
+```
+
+`useReducer(boardReducer, EMPTY)` runs it in React. Because it is a plain function, `board.test.ts` tests every rule
+with no browser at all. It is the same idea as a Redux reducer, or a Flutter `Bloc` mapping events to states.
+
+**Derived state instead of copied state.** The studio does not store "the chosen reference" when suggestions arrive;
+it computes it: `chosen = picked ?? (best scores > 0 ? best : OUTSIDE)`. Only what the user did (`picked`) is state.
+Copying derived values into state is the classic source of "the screen shows stale data" bugs.
+
+**`key` resets a component.** The studio is rendered with `key={`${start}-${end}-${kind}`}`. When the selection changes,
+React throws the old studio away and makes a fresh one, so its search box and choice start empty. No "reset" effect is
+needed.
+
+**Re-render only what changed.** A 2-hour lecture has about 20,000 words. Moving the pointer while choosing the last
+word previews the range, which would re-render every chip. The board is cut into chunks (`boardChunks`, never inside a
+quote) wrapped in `memo`, and each chunk gets only the part of the selection inside it, so a mouse move redraws one or
+two chunks. CSS `content-visibility: auto` lets the browser skip drawing chunks that are off screen.
+
+### How it was tested
+
+- Engine (Vitest): `search.test.ts`, the studio's ranking on the tiny corpus (a verse heard as «العلمين» still ranks
+  الفاتحة: 2 first, with its matched words).
+- Server (pytest): suggestions, unit words (a hadith's chain and matn bounds), the "reference wrong" flag and its undo,
+  the verdict's confidence and details, the caption edits list.
+- Web (Vitest, 102 tests): `board.test.ts` (the selection rules, chunks, neighbours, candidates), commentary gaps in
+  the transcript model, and `EditPage.test.tsx` against a fake server (insert a missed quote, undo it from the header,
+  inspector edits, delete with a reason, split a caption, change the brackets).
+- **Feature check** (Playwright, `e2e/editor.spec.ts`, real server and engine, the sample lecture): two clicks on three
+  plain words, insert; the server has the new finding and a quote caption; the view's transcript shows the quote and
+  the caption over the video shows it; the header's undo ("Undo: Add a missed quote") removes it from both. The export
+  tab's download is byte-identical to the server's SRT, and « » verse brackets reach the transcript after a reload.
+
+**Try:**
+
+```bash
+cd web && npx vitest run src/features/editing            # the selection reducer and the editor screens
+cd web && npx playwright test e2e/editor.spec.ts          # the feature check in a real browser
+scripts/dev.sh   # then open a lecture → Edit, click two words, insert, and press undo in the header
+```

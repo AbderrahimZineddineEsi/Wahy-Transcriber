@@ -72,7 +72,8 @@ test("a reference opens the quote's card; its edit button opens the editor on th
   expect(card).toHaveTextContent("laya · v3_mixed");
   expect(quote("hadith")).toHaveClass("sel");
   await userEvent.click(within(card).getByRole("link", { name: "تحرير" }));
-  expect(await screen.findByRole("heading", { name: "التحرير" })).toBeInTheDocument();
+  const inspector = await screen.findByTestId("inspector"); // the editor, open on that finding
+  expect(within(inspector).getByTestId("insp-ref")).toHaveTextContent("البخاري (1)");
 });
 
 test("filters: a hidden quote's words stay, as plain speech, in the transcript and the captions", async () => {

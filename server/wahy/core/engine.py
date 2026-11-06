@@ -135,6 +135,16 @@ class EngineClient:
         limit."""
         return self.call("search", text=text, options=options or {})
 
+    def suggest(self, words: list[str], options: dict[str, Any] | None = None) -> list[dict[str, Any]]:
+        """The closest corpus units for a missed quote's words, best first, each with its words and the
+        positions the given words match. Options also: kind (QURAN, HADITH, ADHKAR), query, limit."""
+        return self.call("suggest", words=words, options=options or {})
+
+    def units(self, ids: list[str], options: dict[str, Any] | None = None) -> dict[str, Any]:
+        """{id: {ref, words, norms, full}} for the corpus units that exist: the vocalised words and, for a
+        hadith, its whole text {words, matnStart, matnEnd} (or None)."""
+        return self.call("units", ids=ids, options=options or {})
+
     @property
     def hadiths_path(self) -> Path | None:
         """The hadith file the worker reads in place of the corpus's own hadiths (None: the corpus's own)."""

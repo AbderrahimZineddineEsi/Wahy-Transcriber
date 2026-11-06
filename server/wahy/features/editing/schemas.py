@@ -129,6 +129,13 @@ class DismissMerge(BaseModel):
     direction: Literal["previous", "next"]
 
 
+class FlagReference(BaseModel):
+    """N-007: the user says the reference is wrong or incomplete (kept for the gold labels, phase 20)."""
+
+    op: Literal["flag_reference"]
+    wrong: bool
+
+
 FindingEdit = Annotated[
     MoveEdge
     | SetKind
@@ -138,7 +145,8 @@ FindingEdit = Annotated[
     | AddCandidate
     | RemoveCandidate
     | Merge
-    | DismissMerge,
+    | DismissMerge
+    | FlagReference,
     Field(discriminator="op"),
 ]
 
@@ -158,6 +166,16 @@ class CaptionEdit(BaseModel):
     word: int = Field(ge=0)
     start: float | None = Field(None, ge=0)
     end: float | None = Field(None, ge=0)
+
+
+class CaptionEditOut(BaseModel):
+    """One saved caption edit, as the caption builder applies it (applyCaptionEdits in
+    `@wahy/engine/captions`)."""
+
+    op: Literal["split", "merge", "time"]
+    word: int
+    start: float | None = None
+    end: float | None = None
 
 
 class CaptionOut(BaseModel):

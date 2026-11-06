@@ -41,6 +41,9 @@ class VerdictOut(BaseModel):
         None, description="COMPLETE | MISSING_START | MISSING_END | EXTRA_START | EXTRA_END")
     verifier: str
     model: str | None = None
+    confidence: float | None = Field(None, description="the verifier's confidence in the verdict, 0 to 1")
+    details: dict[str, Any] | None = Field(
+        None, description="probabilities, boundary source, passage and merge suggestion (verification)")
 
 
 class FindingOut(BaseModel):
@@ -73,3 +76,26 @@ class SearchHit(BaseModel):
     sourceType: str
     displayRef: str
     fullText: str
+
+
+class Suggestion(SearchHit):
+    """A unit ranked for a missed quote's words (F-052)."""
+
+    score: float
+    words: list[str] = Field(description="the unit's words, as the full-text preview shows them")
+    matched: list[int] = Field(description="positions in `words` that the selected words match")
+
+
+class UnitFull(BaseModel):
+    words: list[str]
+    matnStart: int
+    matnEnd: int
+
+
+class UnitWords(BaseModel):
+    """One corpus unit's words (F-050, F-062): its matn (an ayah's words), and for a hadith its whole text
+    with the chain of narrators, where `matnStart..matnEnd` (end exclusive) is the matn."""
+
+    ref: str
+    words: list[str]
+    full: UnitFull | None = None

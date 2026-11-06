@@ -82,3 +82,25 @@ anything new; phase 8 is already ticked.
 ## Running now: phase 16 Editing and export (server) (Opus 5.5, high)
 - Child: refactoring-step-16, session ID 20c54382-e42b-4290-85c1-53d6ac23e3e5, log: /tmp/claude-1000/-home-zeno-Documents-work-new-projects-Wahy-Transcriber/428c450a-c0e2-4fc7-86dc-884ec1da7570/scratchpad/step-16.json. Phase 15 done (6880e2e).
 - If it died: git status/log, then `claude -p --resume 20c54382-e42b-4290-85c1-53d6ac23e3e5 "Continue phase 16 from where you stopped..."`
+
+## Running now: phase 17 Web: editor and export (Opus 5.5, high)
+- Child: refactoring-step-17, session ID b1ef9058-66d4-4e47-9511-a46b7fe23bb0, log: /tmp/claude-1000/-home-zeno-Documents-work-new-projects-Wahy-Transcriber/428c450a-c0e2-4fc7-86dc-884ec1da7570/scratchpad/step-17.json. Phase 16 done (090e09a).
+- Open question to the user (non-blocking): bracket a Quran verse inside a hadith when there is no commentary? Unanswered.
+- If it died: git status/log, then `claude -p --resume b1ef9058-66d4-4e47-9511-a46b7fe23bb0 "Continue phase 17 from where you stopped..."`
+
+## Queued: phase 16 correction (user, 2026-11-06) — run as its own child (refactoring-step-16b, Opus 5.5, high) AFTER phase 17 finishes, BEFORE phase 18
+User: "i think i want them bracketed, if i didn't like it i'll change it back". So a hadith containing a Quran verse
+(`embeddedQuran`) with NO commentary gap also writes the verse in its own ﴿…﴾ inside the hadith's brackets, like the
+commentary-gap case. Do it in one small place so it is easy to revert (note where in LEARNING.md). Update the golden
+exports test: the only expected differences are findings with an embedded verse (give them their own test and a
+documented expected-diff list); everything else stays byte-identical. Check the phase 17 web transcript/export preview
+shows the same (shared engine code). Commit: "rewrite phase 16: bracket embedded Quran verses". Do not tick anything new.
+
+## Standing instruction while the user is away (2026-11-06 ~21:05)
+If a child ends with QUESTION: do not wait for the user. Launch a separate decider session (Opus 5.5, high effort, fresh
+`claude -p`, read-only tools plus Bash for reading; name `decider-N`) that gets the question, the options, the roadmap
+phase, ADRs and GLOSSARY, and returns a recommendation with reasons. Then resume the child with that answer, labelled as
+"decided by the decider session on the user's behalf". Record question, decision and reasons in orchestrator-reports.md
+so the user can overrule on return. Still stop and wait for the user for: phase 24 (retire the old app, "only after the
+user says so"), anything that deletes user data or the old app, secrets or keys, and spending more than a few cents.
+Queue: phase 17 running -> 16b (bracket embedded Quran verses) -> 18 -> ... -> 25.

@@ -105,6 +105,42 @@ describe("paragraphs", () => {
     expect(quoteTokens(sampleWords, short, "standard").map((t) => t.i)).toEqual([3, 5]);
     expect(quoteTokens(sampleWords, { ...verse, canonicalText: "" }, "standard").map((t) => t.text)).toEqual(["قل", "هو", "الله", "أحد"]);
   });
+
+  test("a finding switched to its source text shows it even as spoken (the editor's snap)", () => {
+    const snapped = { ...verse, data: { ...verse.data, snappedToCanonical: true } };
+    expect(quoteTokens(sampleWords, snapped, "spoken").map((t) => t.text)).toEqual(["قُلْ", "هُوَ", "اللَّهُ", "أَحَدٌ"]);
+  });
+
+  // a hadith in two parts (words 10-12 and 16-18) with the speaker's words 13-15 between them; the engine counts
+  // tokens, and here every word is one token
+  const words = "قال النبي إنما الأعمال بالنيات يعني كل عمل وإنما لكل امرئ ما نوى".split(" ").map((w, i) => ({ idx: i, text: w, start: i, end: i + 0.5 }));
+  const parted = {
+    ...verse,
+    kind: "hadith" as const,
+    start: 2,
+    end: 11,
+    canonicalText: "إِنَّمَا الْأَعْمَالُ بِالنِّيَّاتِ وَإِنَّمَا لِكُلِّ امْرِئٍ مَا نَوَى",
+    data: { ...verse.data, segments: [[2, 5], [8, 12]], commentaryGaps: [[5, 8]], canonicalSegments: ["إِنَّمَا الْأَعْمَالُ بِالنِّيَّاتِ", "وَإِنَّمَا لِكُلِّ امْرِئٍ مَا نَوَى"] },
+  };
+
+  test("commentary gaps keep the speaker's words, marked as gaps (phase 16's split)", () => {
+    const toks = quoteTokens(words, parted, "spoken");
+    expect(toks.filter((t) => t.gap).map((t) => t.text)).toEqual(["يعني", "كل", "عمل"]);
+    expect(toks.filter((t) => !t.gap).map((t) => t.i)).toEqual([2, 3, 4, 8, 9, 10, 11]);
+  });
+
+  test("in standard script each part shows its own source words, and the gap stays as spoken", () => {
+    const toks = quoteTokens(words, parted, "standard");
+    expect(toks.map((t) => t.text).join(" ")).toBe("إِنَّمَا الْأَعْمَالُ بِالنِّيَّاتِ يعني كل عمل وَإِنَّمَا لِكُلِّ امْرِئٍ مَا نَوَى");
+    expect(toks.filter((t) => t.gap).map((t) => t.i)).toEqual([5, 6, 7]);
+  });
+
+  test("token ranges are read through the token → word map", () => {
+    // word 5 holds two tokens: tokens 5-6 are word 5, so the gap [5, 8) is words 5-6
+    const tokWord = [0, 1, 2, 3, 4, 5, 5, 6, 7, 8, 9, 10, 11];
+    const toks = quoteTokens(words, { ...parted, data: { ...parted.data, commentaryGaps: [[5, 8]] } }, "spoken", tokWord);
+    expect(toks.filter((t) => t.gap).map((t) => t.i)).toEqual([5, 6]);
+  });
 });
 
 describe("search", () => {

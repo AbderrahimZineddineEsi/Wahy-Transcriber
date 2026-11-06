@@ -213,6 +213,48 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/corpus/suggest": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Suggest References
+         * @description The closest references for a missed quote (F-052): `text` is the selected words, `query` what the user
+         *     typed. Best first; a unit that scores 0 matched nothing.
+         */
+        get: operations["suggest_references_api_corpus_suggest_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/corpus/units": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Unit Words
+         * @description The words of some corpus units: the source words to pick from (F-062) and a hadith's whole text with
+         *     its chain (F-050). Unknown ids are left out.
+         */
+        get: operations["unit_words_api_corpus_units_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/detection/settings": {
         parameters: {
             query?: never;
@@ -611,7 +653,12 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /**
+         * Caption Edits
+         * @description The caption timing editor's saved edits, in the order they apply (the web app's caption preview applies
+         *     them too).
+         */
+        get: operations["caption_edits_api_lectures__lecture_id__edits_captions_get"];
         put?: never;
         /**
          * Edit Caption
@@ -1342,6 +1389,24 @@ export interface components {
             /** Word */
             word: number;
         };
+        /**
+         * CaptionEditOut
+         * @description One saved caption edit, as the caption builder applies it (applyCaptionEdits in
+         *     `@wahy/engine/captions`).
+         */
+        CaptionEditOut: {
+            /** End */
+            end?: number | null;
+            /**
+             * Op
+             * @enum {string}
+             */
+            op: "split" | "merge" | "time";
+            /** Start */
+            start?: number | null;
+            /** Word */
+            word: number;
+        };
         /** CaptionOut */
         CaptionOut: {
             /** Displaytext */
@@ -1756,6 +1821,19 @@ export interface components {
             findings: components["schemas"]["FindingOut"][];
             /** Lecture Id */
             lecture_id: number;
+        };
+        /**
+         * FlagReference
+         * @description N-007: the user says the reference is wrong or incomplete (kept for the gold labels, phase 20).
+         */
+        FlagReference: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            op: "flag_reference";
+            /** Wrong */
+            wrong: boolean;
         };
         /** GeminiModels */
         GeminiModels: {
@@ -2738,6 +2816,32 @@ export interface components {
             /** Zip Cached */
             zip_cached: boolean;
         };
+        /**
+         * Suggestion
+         * @description A unit ranked for a missed quote's words (F-052).
+         */
+        Suggestion: {
+            /** Displayref */
+            displayRef: string;
+            /** Fulltext */
+            fullText: string;
+            /**
+             * Matched
+             * @description positions in `words` that the selected words match
+             */
+            matched: number[];
+            /** Score */
+            score: number;
+            /** Sourcetype */
+            sourceType: string;
+            /** Unitid */
+            unitId: string;
+            /**
+             * Words
+             * @description the unit's words, as the full-text preview shows them
+             */
+            words: string[];
+        };
         /** TranscribeOptions */
         TranscribeOptions: {
             /**
@@ -2755,6 +2859,27 @@ export interface components {
         /** Undone */
         Undone: {
             op: components["schemas"]["OpOut"];
+        };
+        /** UnitFull */
+        UnitFull: {
+            /** Matnend */
+            matnEnd: number;
+            /** Matnstart */
+            matnStart: number;
+            /** Words */
+            words: string[];
+        };
+        /**
+         * UnitWords
+         * @description One corpus unit's words (F-050, F-062): its matn (an ayah's words), and for a hadith its whole text
+         *     with the chain of narrators, where `matnStart..matnEnd` (end exclusive) is the matn.
+         */
+        UnitWords: {
+            full?: components["schemas"]["UnitFull"] | null;
+            /** Ref */
+            ref: string;
+            /** Words */
+            words: string[];
         };
         /** ValidationError */
         ValidationError: {
@@ -2793,6 +2918,18 @@ export interface components {
              * @description COMPLETE | MISSING_START | MISSING_END | EXTRA_START | EXTRA_END
              */
             boundary?: string | null;
+            /**
+             * Confidence
+             * @description the verifier's confidence in the verdict, 0 to 1
+             */
+            confidence?: number | null;
+            /**
+             * Details
+             * @description probabilities, boundary source, passage and merge suggestion (verification)
+             */
+            details?: {
+                [key: string]: unknown;
+            } | null;
             /** Model */
             model?: string | null;
             /**
@@ -3350,6 +3487,73 @@ export interface operations {
             };
         };
     };
+    suggest_references_api_corpus_suggest_get: {
+        parameters: {
+            query?: {
+                text?: string;
+                kind?: string;
+                query?: string;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Suggestion"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    unit_words_api_corpus_units_get: {
+        parameters: {
+            query: {
+                ids: string[];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: components["schemas"]["UnitWords"];
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     get_detection_settings_api_detection_settings_get: {
         parameters: {
             query?: never;
@@ -3500,7 +3704,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["MoveEdge"] | components["schemas"]["SetKind"] | components["schemas"]["Snap"] | components["schemas"]["CanonicalWords"] | components["schemas"]["LinkReference"] | components["schemas"]["AddCandidate"] | components["schemas"]["RemoveCandidate"] | components["schemas"]["Merge"] | components["schemas"]["DismissMerge"];
+                "application/json": components["schemas"]["MoveEdge"] | components["schemas"]["SetKind"] | components["schemas"]["Snap"] | components["schemas"]["CanonicalWords"] | components["schemas"]["LinkReference"] | components["schemas"]["AddCandidate"] | components["schemas"]["RemoveCandidate"] | components["schemas"]["Merge"] | components["schemas"]["DismissMerge"] | components["schemas"]["FlagReference"];
             };
         };
         responses: {
@@ -4125,6 +4329,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["OpOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    caption_edits_api_lectures__lecture_id__edits_captions_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                lecture_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CaptionEditOut"][];
                 };
             };
             /** @description Validation Error */

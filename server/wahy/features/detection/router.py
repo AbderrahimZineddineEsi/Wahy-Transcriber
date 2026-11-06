@@ -17,6 +17,8 @@ from wahy.features.detection.schemas import (
     DetectStarted,
     FindingsOut,
     SearchHit,
+    Suggestion,
+    UnitWords,
 )
 from wahy.features.detection.service import BadSearch, DetectionService
 from wahy.features.lectures.service import LectureNotFound
@@ -77,3 +79,20 @@ def search_corpus(service: Detection, q: str = "", kind: Annotated[str, Query()]
     lists the first units. The first call starts the engine worker, which takes a few seconds."""
     with detection_errors():
         return service.search(q, kind=kind, limit=limit)
+
+
+@router.get("/api/corpus/suggest")
+def suggest_references(service: Detection, text: str = "", kind: str = "QURAN", query: str = "",
+                       limit: int = 30) -> list[Suggestion]:
+    """The closest references for a missed quote (F-052): `text` is the selected words, `query` what the user
+    typed. Best first; a unit that scores 0 matched nothing."""
+    with detection_errors():
+        return service.suggest(text, kind=kind, query=query, limit=limit)
+
+
+@router.get("/api/corpus/units")
+def unit_words(service: Detection, ids: Annotated[list[str], Query()]) -> dict[str, UnitWords]:
+    """The words of some corpus units: the source words to pick from (F-062) and a hadith's whole text with
+    its chain (F-050). Unknown ids are left out."""
+    with detection_errors():
+        return service.units(ids)

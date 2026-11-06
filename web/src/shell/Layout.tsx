@@ -3,6 +3,7 @@ import { Link, NavLink, Outlet, useMatch } from "react-router-dom";
 import { useHealth } from "../api/health";
 import { JobWatcher } from "../features/lectures/JobWatcher";
 import { LAST_LECTURE_KEY } from "../features/lectures/LecturePage";
+import { UndoButton } from "../features/editing/UndoButton";
 import { CorporaIcon, LectureIcon, LecturesIcon, RequestsIcon, SettingsIcon, ThemeIcon, TrainingIcon } from "./icons";
 import { useI18n, type MessageKey } from "./i18n";
 import { readStored } from "./storage";
@@ -64,6 +65,7 @@ function Header() {
           <span className="font-mono">{jobs}</span>
         </span>
       )}
+      <UndoButton />
       <button className="iconbtn" aria-label={t("header.language")} title={t("header.language")} onClick={() => setLang(lang === "ar" ? "en" : "ar")}>
         {t("header.languageSwitchTo")}
       </button>

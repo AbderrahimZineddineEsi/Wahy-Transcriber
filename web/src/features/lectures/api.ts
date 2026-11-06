@@ -264,6 +264,8 @@ export function useEditWord(id: number) {
       queryClient.setQueryData<LectureDetail>(["lecture", id], (old) =>
         old ? { ...old, words: old.words.map((w) => (w.idx === word.idx ? word : w)) } : old,
       );
+      // the fix is an edit in the lecture's log (undo takes it back), and the captions show it
+      for (const key of ["edits", "captions", "export-text"]) void queryClient.invalidateQueries({ queryKey: [key, id] });
     },
   });
 }

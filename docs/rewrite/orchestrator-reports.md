@@ -5,6 +5,40 @@ State for recovery (session IDs, what to do if a child died) is in `orchestrator
 
 <!-- NEW REPORTS GO BELOW THIS LINE -->
 
+## 2026-11-06 21:00 — Your answer on embedded Quran verses recorded; correction queued
+
+You said: "i think i want them bracketed, if i didn't like it i'll change it back". A hadith that contains a Quran verse
+and has no commentary will now also get the verse in its own ﴿…﴾ inside the hadith's brackets. I queued
+`refactoring-step-16b` (Opus 5.5, high) to run right after phase 17 finishes, so it does not collide with the running
+child. It will keep the change in one small place so it is easy to revert, give the findings with an embedded verse their
+own test and an expected-difference list against the golden exports, and check that the web preview shows the same.
+
+## 2026-11-06 20:55 — Phase 16 (Editing and export, server) done; phase 17 started; one question for you (not blocking)
+
+Gate passed. Commit `090e09a` "rewrite phase 16: Editing and export (server)" pushed, phase ticked.
+- Built: every editor change is one entry in a per-lecture edit log and undo reverts the newest one and names it (fix a
+  word, rewrite words, save the full text, add a missed quote, move a quote's edge, change its kind, use source text or
+  picked reference words, link or add references, merge with a neighbour, delete with a reason ("ordinary speech" also saves
+  a gold "false" label), expand a clipped quote, split/merge/re-time captions). Text edits keep word timings (unchanged
+  words keep exact times; later quotes shift). Export: SRT, VTT, ASS, Markdown, plain text, HTML, JSON, with a saved
+  bracket and reference style and optional verdict/kind filters and "standard script". Commentary split:
+  `«part one» [commentary] «part two» [ref]`, with a setting to turn it off. The export formats and the old editor's quote
+  edits now live in the engine package (the web preview in phase 17 uses the same code).
+- Tests (`scripts/test.sh` all green): old backend 152; server 303 (+6 live skipped, 31 new); engine 248 (137 new); web 80;
+  Playwright 6. With the commentary split off, all 100 golden exports match the old app exactly; with it on, only captions
+  of quotes with commentary change; the three roadmap commentary cases each have a test; the timing test passes (three
+  words fixed, every other word keeps its times).
+- **Feature check passed**: on a running server, the sample lecture's SRT, VTT, ASS, Markdown and text are byte-identical
+  to the old app's; the old golden generator in check mode still reproduces all 234 files; adding a missed quote showed in
+  the SRT and undo removed it.
+- Decisions recorded by the child: undo is newest-first only (no redo); a new detection clears the edit log; the "show
+  source" switches only affect the screen, exports always write references (as the golden files do).
+- **Question for you (not blocking, phase 17 is already running):** a hadith that contains a Quran verse but has no
+  commentary is still written as before, without separate brackets around the verse. The roadmap only allowed the
+  commentary split to differ from the golden files. Do you want those verses bracketed too? If yes, I will queue a small
+  correction session (like the adhkar one) so it does not wait for the whole run.
+- **Phase 17 (Web: editor and export, Opus 5.5, high)** is running as `refactoring-step-17`.
+
 ## 2026-11-06 20:20 — Phase 15 (Web: verification and telemetry) done; phase 16 started
 
 Gate passed. Commit `6880e2e` "rewrite phase 15: Web: verification and telemetry" pushed, phase ticked.

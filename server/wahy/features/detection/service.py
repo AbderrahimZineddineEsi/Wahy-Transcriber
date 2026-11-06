@@ -34,7 +34,15 @@ from wahy.core.jobs import JobContext, JobRunner, JobSnapshot
 from wahy.core.settings import Settings
 from wahy.features.corpora.service import CorporaService
 from wahy.features.detection.models import Finding
-from wahy.features.detection.schemas import DetectionSettings, FindingOut, FindingsOut, SearchHit, VerdictOut
+from wahy.features.detection.schemas import (
+    DetectionSettings,
+    FindingOut,
+    FindingsOut,
+    SearchHit,
+    Suggestion,
+    UnitWords,
+    VerdictOut,
+)
 from wahy.features.editing.models import CaptionEdits, EditOp
 from wahy.features.lectures.models import Word
 from wahy.features.lectures.service import LectureService
@@ -43,6 +51,7 @@ from wahy.features.verification.models import Verdict
 
 SETTINGS_KEY = "detection"
 SEARCH_KINDS = ("ALL", "QURAN", "HADITH", "ADHKAR")
+SUGGEST_KINDS = ("QURAN", "HADITH", "ADHKAR")
 
 
 class DetectionError(Exception):
@@ -172,3 +181,26 @@ class DetectionService:
             raise BadSearch(f"unknown kind {kind!r} ({', '.join(SEARCH_KINDS)})")
         options = {**self.engine_options(), "kind": kind, "limit": max(1, min(limit, 200))}
         return [SearchHit(**hit) for hit in self.engine.search(text, options)]
+
+    def suggest(
+        self, text: str, *, kind: str = "QURAN", query: str = "", limit: int = 30
+    ) -> list[Suggestion]:
+        """The closest units for a missed quote's words (F-052), best first."""
+        if kind not in SUGGEST_KINDS:
+            raise BadSearch(f"unknown kind {kind!r} ({', '.join(SUGGEST_KINDS)})")
+        words = text.split()
+        if not words and not query.strip():
+            return []
+        options = {**self.engine_options(), "kind": kind, "query": query, "limit": max(1, min(limit, 100))}
+        return [Suggestion(**hit) for hit in self.engine.suggest(words, options)]
+
+    def units(self, ids: list[str]) -> dict[str, UnitWords]:
+        """The words of these corpus units (F-050, F-062); unknown ids are left out."""
+        ids = [i for i in dict.fromkeys(ids) if i and i != "OUTSIDE_CORPUS"][:50]
+        if not ids:
+            return {}
+        found = self.engine.units(ids, self.engine_options())
+        return {
+            uid: UnitWords(ref=u.get("ref") or uid, words=u.get("words") or [], full=u.get("full"))
+            for uid, u in found.items()
+        }

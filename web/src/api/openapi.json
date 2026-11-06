@@ -289,6 +289,52 @@
         "title": "CaptionEdit",
         "type": "object"
       },
+      "CaptionEditOut": {
+        "description": "One saved caption edit, as the caption builder applies it (applyCaptionEdits in\n`@wahy/engine/captions`).",
+        "properties": {
+          "end": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "End"
+          },
+          "op": {
+            "enum": [
+              "split",
+              "merge",
+              "time"
+            ],
+            "title": "Op",
+            "type": "string"
+          },
+          "start": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Start"
+          },
+          "word": {
+            "title": "Word",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "op",
+          "word"
+        ],
+        "title": "CaptionEditOut",
+        "type": "object"
+      },
       "CaptionOut": {
         "properties": {
           "displayText": {
@@ -1212,6 +1258,26 @@
           "findings"
         ],
         "title": "FindingsOut",
+        "type": "object"
+      },
+      "FlagReference": {
+        "description": "N-007: the user says the reference is wrong or incomplete (kept for the gold labels, phase 20).",
+        "properties": {
+          "op": {
+            "const": "flag_reference",
+            "title": "Op",
+            "type": "string"
+          },
+          "wrong": {
+            "title": "Wrong",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "op",
+          "wrong"
+        ],
+        "title": "FlagReference",
         "type": "object"
       },
       "GeminiModels": {
@@ -3538,6 +3604,58 @@
         "title": "SourceOut",
         "type": "object"
       },
+      "Suggestion": {
+        "description": "A unit ranked for a missed quote's words (F-052).",
+        "properties": {
+          "displayRef": {
+            "title": "Displayref",
+            "type": "string"
+          },
+          "fullText": {
+            "title": "Fulltext",
+            "type": "string"
+          },
+          "matched": {
+            "description": "positions in `words` that the selected words match",
+            "items": {
+              "type": "integer"
+            },
+            "title": "Matched",
+            "type": "array"
+          },
+          "score": {
+            "title": "Score",
+            "type": "number"
+          },
+          "sourceType": {
+            "title": "Sourcetype",
+            "type": "string"
+          },
+          "unitId": {
+            "title": "Unitid",
+            "type": "string"
+          },
+          "words": {
+            "description": "the unit's words, as the full-text preview shows them",
+            "items": {
+              "type": "string"
+            },
+            "title": "Words",
+            "type": "array"
+          }
+        },
+        "required": [
+          "unitId",
+          "sourceType",
+          "displayRef",
+          "fullText",
+          "score",
+          "words",
+          "matched"
+        ],
+        "title": "Suggestion",
+        "type": "object"
+      },
       "TranscribeOptions": {
         "properties": {
           "auto_fallback": {
@@ -3572,6 +3690,64 @@
           "op"
         ],
         "title": "Undone",
+        "type": "object"
+      },
+      "UnitFull": {
+        "properties": {
+          "matnEnd": {
+            "title": "Matnend",
+            "type": "integer"
+          },
+          "matnStart": {
+            "title": "Matnstart",
+            "type": "integer"
+          },
+          "words": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Words",
+            "type": "array"
+          }
+        },
+        "required": [
+          "words",
+          "matnStart",
+          "matnEnd"
+        ],
+        "title": "UnitFull",
+        "type": "object"
+      },
+      "UnitWords": {
+        "description": "One corpus unit's words (F-050, F-062): its matn (an ayah's words), and for a hadith its whole text\nwith the chain of narrators, where `matnStart..matnEnd` (end exclusive) is the matn.",
+        "properties": {
+          "full": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/UnitFull"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "ref": {
+            "title": "Ref",
+            "type": "string"
+          },
+          "words": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Words",
+            "type": "array"
+          }
+        },
+        "required": [
+          "ref",
+          "words"
+        ],
+        "title": "UnitWords",
         "type": "object"
       },
       "ValidationError": {
@@ -3666,6 +3842,31 @@
             ],
             "description": "COMPLETE | MISSING_START | MISSING_END | EXTRA_START | EXTRA_END",
             "title": "Boundary"
+          },
+          "confidence": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "the verifier's confidence in the verdict, 0 to 1",
+            "title": "Confidence"
+          },
+          "details": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "probabilities, boundary source, passage and merge suggestion (verification)",
+            "title": "Details"
           },
           "model": {
             "anyOf": [
@@ -4535,6 +4736,134 @@
         ]
       }
     },
+    "/api/corpus/suggest": {
+      "get": {
+        "description": "The closest references for a missed quote (F-052): `text` is the selected words, `query` what the user\ntyped. Best first; a unit that scores 0 matched nothing.",
+        "operationId": "suggest_references_api_corpus_suggest_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "text",
+            "required": false,
+            "schema": {
+              "default": "",
+              "title": "Text",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "kind",
+            "required": false,
+            "schema": {
+              "default": "QURAN",
+              "title": "Kind",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "query",
+            "required": false,
+            "schema": {
+              "default": "",
+              "title": "Query",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 30,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/Suggestion"
+                  },
+                  "title": "Response Suggest References Api Corpus Suggest Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Suggest References",
+        "tags": [
+          "detection"
+        ]
+      }
+    },
+    "/api/corpus/units": {
+      "get": {
+        "description": "The words of some corpus units: the source words to pick from (F-062) and a hadith's whole text with\nits chain (F-050). Unknown ids are left out.",
+        "operationId": "unit_words_api_corpus_units_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "ids",
+            "required": true,
+            "schema": {
+              "items": {
+                "type": "string"
+              },
+              "title": "Ids",
+              "type": "array"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "$ref": "#/components/schemas/UnitWords"
+                  },
+                  "title": "Response Unit Words Api Corpus Units Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Unit Words",
+        "tags": [
+          "detection"
+        ]
+      }
+    },
     "/api/detection/settings": {
       "get": {
         "operationId": "get_detection_settings_api_detection_settings_get",
@@ -4738,6 +5067,7 @@
                     "add_candidate": "#/components/schemas/AddCandidate",
                     "canonical_words": "#/components/schemas/CanonicalWords",
                     "dismiss_merge": "#/components/schemas/DismissMerge",
+                    "flag_reference": "#/components/schemas/FlagReference",
                     "link_reference": "#/components/schemas/LinkReference",
                     "merge": "#/components/schemas/Merge",
                     "move_edge": "#/components/schemas/MoveEdge",
@@ -4774,6 +5104,9 @@
                   },
                   {
                     "$ref": "#/components/schemas/DismissMerge"
+                  },
+                  {
+                    "$ref": "#/components/schemas/FlagReference"
                   }
                 ],
                 "title": "Body"
@@ -5742,6 +6075,51 @@
       }
     },
     "/api/lectures/{lecture_id}/edits/captions": {
+      "get": {
+        "description": "The caption timing editor's saved edits, in the order they apply (the web app's caption preview applies\nthem too).",
+        "operationId": "caption_edits_api_lectures__lecture_id__edits_captions_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "lecture_id",
+            "required": true,
+            "schema": {
+              "title": "Lecture Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/CaptionEditOut"
+                  },
+                  "title": "Response Caption Edits Api Lectures  Lecture Id  Edits Captions Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Caption Edits",
+        "tags": [
+          "editing"
+        ]
+      },
       "post": {
         "description": "Split, merge or re-time a caption (F-068). Quotes are locked units (409).",
         "operationId": "edit_caption_api_lectures__lecture_id__edits_captions_post",
