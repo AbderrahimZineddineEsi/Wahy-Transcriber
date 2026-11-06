@@ -222,6 +222,11 @@ def _jsonable(value: Any) -> Any:
     return value
 
 
+def visible_state(state: dict[str, Any]) -> dict[str, Any]:
+    """The state as Laya reads it: without the engine's own score (it was hidden in training too)."""
+    return {k: v for k, v in state.items() if k not in HIDDEN_STATE_KEYS}
+
+
 def _answers_of(result: Any) -> dict[str, Any]:
     raw = result.get("answers", {}) if isinstance(result, dict) else getattr(result, "answers", {})
     return _jsonable(raw) if isinstance(raw, dict) else {}
@@ -337,6 +342,13 @@ class LayaLocal:
 
     # ---- asking --------------------------------------------------------------------------------------------
 
+    def preview(self, items: list[Item], options: LayaOptions | None = None) -> dict[str, Any]:
+        """What Laya would read for the first of `items` (the engine's score fields are hidden from it)."""
+        o = options or LayaOptions()
+        it = items[0]
+        return {"endpoint": "local", "model": (o.checkpoint or "").strip() or self.checkpoint,
+                "body": {"state": visible_state(it.state), "questions": it.questions}}
+
     def verify(self, items: list[Item], *, call: Call, options: LayaOptions | None = None) -> list[Answer]:
         """Answers for `items` (envelopes of the version `envelope()` gave). Borrows the GPU for the whole
         list, so another job waits until these items are done; a pause or cancel works between items."""
@@ -369,7 +381,7 @@ class LayaLocal:
     def _predict(
         self, model: LoadedLaya, state: dict[str, Any], questions: dict[str, Any], call: Call
     ) -> tuple[dict[str, Any], int | None]:
-        state = {k: v for k, v in state.items() if k not in HIDDEN_STATE_KEYS}
+        state = visible_state(state)
         max_len = int(model.config.get("max_len") or 1024)
         request = {
             "checkpoint": model.checkpoint,

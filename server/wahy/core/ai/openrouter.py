@@ -177,6 +177,11 @@ class Catalog:
             return None
         return next((m for m in models if m.id == model_id), None)
 
+    def cached(self, model_id: str) -> ModelInfo | None:
+        """The model's entry if the catalog was already fetched (never touches the network)."""
+        with self._lock:
+            return next((m for m in self._models if m.id == model_id), None)
+
     def search(self, query: str = "", *, category: str = "all", limit: int = 60) -> list[ModelInfo]:
         """Models whose id or name contains every word of `query`, in `category`, cheapest first."""
         words = [w for w in query.lower().split() if w]
@@ -285,6 +290,14 @@ class JevProvider:
     ):
         self.log, self._key = log, key
         self.http = HttpSender(log, provider=self.name, transport=transport, sleep=sleep)
+
+    def preview(self, items: list[Item], options: JevOptions | None = None) -> dict[str, Any]:
+        """What the request for the first of `items` would send (JEV asks one item per request)."""
+        o = options or JevOptions()
+        model = (o.model or DEFAULT_JEV_MODEL).strip()
+        it = items[0]
+        return {"endpoint": DECISIONS_URL, "model": model,
+                "body": {"model": model, "state": it.state, "questions": it.questions}}
 
     def verify(self, items: list[Item], *, call: Call, options: JevOptions | None = None) -> list[Answer]:
         o = options or JevOptions()
@@ -396,20 +409,46 @@ class OpenRouterChatProvider:
         self.log, self._key, self.catalog, self.jev = log, key, catalog, jev
         self.http = HttpSender(log, provider=self.name, transport=transport, sleep=sleep)
 
+    @staticmethod
+    def messages(item: Item, o: ChatOptions) -> tuple[str, str]:
+        """(system message, user message) of the verification request for one item."""
+        system = (
+            system_prompt(o.system_prompt, reason_lang=o.reason_lang, reason_detail=o.reason_detail)
+            + "\n\n"
+            + CHAT_OUTPUT_CONTRACT
+        )
+        return system, json.dumps({"questions": item.questions, "state": item.state}, ensure_ascii=False)
+
+    def preview(self, items: list[Item], options: ChatOptions | None = None) -> dict[str, Any]:
+        """What the request for the first of `items` would send (one item per request). JSON mode and
+        "thinking off" depend on the model's catalog entry, read only if the catalog is already loaded."""
+        o = options or ChatOptions()
+        model = normalize_model_id(o.model)
+        if is_jev_model(model):
+            return self.jev.preview(items, JevOptions(model=model))
+        system, user = self.messages(items[0], o)
+        meta = self.catalog.cached(model)
+        body: dict[str, Any] = {
+            "model": model,
+            "temperature": o.temperature,
+            "max_tokens": o.max_tokens,
+            "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}],
+        }
+        if meta is None or meta.json_mode:
+            body["response_format"] = {"type": "json_object"}
+        if o.no_thinking and meta is not None and meta.can_disable_reasoning:
+            body["reasoning"] = {"enabled": False}
+        return {"endpoint": CHAT_URL, "model": model, "body": body}
+
     def verify(self, items: list[Item], *, call: Call, options: ChatOptions | None = None) -> list[Answer]:
         o = options or ChatOptions()
         model = normalize_model_id(o.model)
         if is_jev_model(model):
             return self.jev.verify(items, call=call, options=JevOptions(model=model))
         self.catalog.check_exists(model)
-        system = (
-            system_prompt(o.system_prompt, reason_lang=o.reason_lang, reason_detail=o.reason_detail)
-            + "\n\n"
-            + CHAT_OUTPUT_CONTRACT
-        )
         answers = []
         for it in items:
-            user = json.dumps({"questions": it.questions, "state": it.state}, ensure_ascii=False)
+            system, user = self.messages(it, o)
             result = self.complete_json(system=system, user=user, call=call, options=o)
             data = result.data[0] if isinstance(result.data, list) and result.data else result.data
             if not isinstance(data, dict):

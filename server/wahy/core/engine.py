@@ -4,6 +4,7 @@
     engine = EngineClient(settings.corpus_path)
     findings = engine.detect(words, {"engine": "v5", "profile": "normal"})
     envs = engine.envelopes(findings, words, 3, {"engine": "v5", "passages": True})
+    grown = engine.expand(findings[0], words, "MISSING_START", {"engine": "v5"})
     refs = engine.search("البقرة: 255", {"engine": "v5", "kind": "QURAN"})
 
 What it hides:
@@ -98,6 +99,18 @@ class EngineClient:
                   options: dict[str, Any] | None = None) -> list[dict[str, Any]]:
         """Laya envelopes (version 1, 2 or 3) for findings: [{members, state, questions, ...}]."""
         return self.call("envelopes", findings=findings, words=words, version=version, options=options or {})
+
+    def expand(self, finding: dict[str, Any], words: list[dict[str, Any]], boundary: str | None,
+               options: dict[str, Any] | None = None) -> dict[str, Any]:
+        """A finding grown over its missing start or end (`boundary`: MISSING_START, MISSING_END or
+        MISSING_BOTH): {changed, reason, finding, added: {start, end}}. The options are the ones that produced
+        the finding."""
+        return self.call("expand", finding=finding, words=words, boundary=boundary, options=options or {})
+
+    def rule_boundary(self, states: list[dict[str, Any]]) -> list[dict[str, int]]:
+        """The no-model boundary of each v2 / v3 state: [{start: 0 | 1, end: 0 | 1}] (1 = that side was cut
+        off), for Laya checkpoints not trained on the boundary."""
+        return self.call("rule_boundary", states=states)
 
     def search(self, text: str, options: dict[str, Any] | None = None) -> list[dict[str, Any]]:
         """Corpus units matching `text` (a reference such as "البقرة: 255" or words). Options also: kind,

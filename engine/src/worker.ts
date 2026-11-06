@@ -13,6 +13,8 @@
 //   detect     {words, options}          findings; words are [{word, start, end}]
 //   envelopes  {findings, words, version, options}   options also: passages, neighbours, targets, contextWords
 //   search     {text, options}           corpus units; options also: kind, limit
+//   expand     {finding, words, boundary, options}   the finding grown over its missing start or end (expand.ts)
+//   rule_boundary {states}               the no-model boundary {start, end} of each v2 / v3 state (envelopes.ts)
 //   units      {ids, options}            {id: {ref, words, norms}}: a unit's vocalised words and the engine's norms
 //   tokenize   {text}                    the engine's normalised tokens
 //   tokenize_words {words}               the same per word (a word can give 0, 1 or more tokens)
@@ -26,7 +28,8 @@ import path from "node:path";
 import readline from "node:readline";
 import { fileURLToPath } from "node:url";
 import { detect, matcherFor } from "./detect.ts";
-import { envelopes } from "./envelopes.ts";
+import { envelopes, ruleBoundary } from "./envelopes.ts";
+import { expand } from "./expand.ts";
 import { search } from "./search.ts";
 import { SURAH_NAMES_AR } from "./shared.js";
 import { tokenizeText } from "./v3.js";
@@ -70,6 +73,8 @@ const handlers: Record<string, (req: any) => unknown> = {
   detect: ({ words, options }) => detect(words, withCorpus(options)),
   envelopes: ({ findings, words, version, options }) => envelopes(findings, words, version, withCorpus(options)),
   search: ({ text, options }) => search(text, withCorpus(options)),
+  expand: ({ finding, words, boundary, options }) => expand(finding, words, boundary, withCorpus(options)),
+  rule_boundary: ({ states }) => states.map(ruleBoundary),
   units: ({ ids, options }) => {
     const units = matcherFor(withCorpus(options)).units;
     const out: Record<string, unknown> = {};

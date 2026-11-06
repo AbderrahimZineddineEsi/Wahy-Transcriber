@@ -212,7 +212,7 @@ decisions and why). The problems being fixed are in the friction map: https://cl
     about $0.0001); Laya `laya-wahy-r6-v3_mixed` on CUDA, envelope 3, golden sample finding CORRECT 0.51, 4.5 s.
   - Learn: ports and adapters; rate limiting, retries and backoff.
 
-- [ ] **14. Verification pass and telemetry (server)**: Opus 5.5, high.
+- [x] **14. Verification pass and telemetry (server)**: Opus 5.5, high.
   - Estimate (count, tokens, cost, time); a verification pass job with selected findings, scope, pause, resume and
     cancel; verdicts and boundaries saved; expanding a finding with a missing start or end; human override. Telemetry
     routes: the list of requests and one request's payload.
@@ -402,4 +402,16 @@ Each entry: date, what changed, the user's words.
   extra `laya` (laya, torch 2.14.1+cu126 from PyTorch's CUDA 12.6 index, huggingface-hub); to fit it with
   `local-asr`, that extra's cuBLAS pin went from `>=12.9.3.13` to `>=12.6` (faster-whisper checked on CUDA after the
   change). The server venv now has both extras: `uv sync --extra local-asr --extra laya`.
-
+- **2026-11-06**: Phase 14 (done): `features/verification` and `features/telemetry` are built. Choices made inside the
+  phase: a Laya checkpoint reads the envelope version its config names, so a v1 checkpoint now gets v1 envelopes (the
+  old app sent v3 to v1 checkpoints, against ADR 0003). Verdicts save the boundary as `COMPLETE | MISSING_START |
+  MISSING_END | MISSING_BOTH | EXTRA_*` (a model's `COMPLETE_SPAN` is saved as `COMPLETE`, which the web view already
+  reads; `MISSING_BOTH` is new to it, phase 15). Migration `0004` adds `verdicts.confidence` and `verdicts.details`
+  (probabilities, boundary source, passage, merge suggestion) and `ai_requests.finding_ids`, so the request log can
+  name the findings of a failed request too. "Expand" (the old editor's auto-heal) moved into the engine as
+  `engine/src/expand.ts` (worker command `expand`). It now says when no word matched instead of marking the boundary
+  complete anyway, and it saves a `human` verdict with a complete boundary; undoing it belongs to phase 16's edit log.
+  The user's verdict and "approve all" save gold labels (`labels`, source `user`, one per finding, updated in place),
+  whose card holds the finding and its v1 envelope for phase 20's export. A pass does not save a lecture version:
+  every pass adds verdict rows, and the newest one is shown. One pass at a time per lecture (409). F-085's "one
+  request with all questions" is how every request already works: verdict, boundary and merge go in one request.

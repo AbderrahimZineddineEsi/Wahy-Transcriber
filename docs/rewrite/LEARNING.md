@@ -995,3 +995,107 @@ cd server && uv run pytest tests/test_ai_gemini.py -v              # the 429 / p
 cd server && uv run pytest tests/test_ai_live.py --live -v         # the real calls (costs < $0.01; ask first)
 curl 'localhost:8120/api/settings/ai/openrouter/models?q=deepseek' # live prices, once ./scripts/dev.sh runs
 ```
+
+## Phase 14 — Verification pass and telemetry (server)
+
+The server can now run a **verification pass**: the job that asks a verifier about a lecture's findings and saves
+its verdicts. It lives in `server/wahy/features/verification/`. A pass picks findings by scope (hadiths plus the
+findings the engine itself doubts, hadiths only, or all) or by id. It asks the engine for envelopes, sends them
+through `core/ai` (5 to 10 per Gemini request, 1 per request for the others), and saves one verdict per finding,
+each linked to the AI request that produced it. A pass can be paused, resumed and cancelled, and it resumes after
+a server restart. Before a pass you can ask for an **estimate** (findings, requests, tokens, cost, time) and a
+**preview** (the exact body the model would get). Afterwards there are **metrics**.
+
+Other routes: your own verdict on a finding (saved as a **gold label**), "approve all", and **expand**. Expand is the
+old editor's auto-heal, moved into the engine as `engine/src/expand.ts`: a finding whose start or end is missing
+grows over the words that match. The new `features/telemetry/` serves the request log and one request's payloads.
+The two prompt rules from review notes 5 and 29 (N-020) are new optional rules, off by default.
+
+### Concepts
+
+- **Orchestrating a job.** `run_job` in `verification/service.py` is a loop over *chunks* (one chunk is one request).
+  It does four things, in this order:
+  1. Before each chunk, `ctx.check()` waits while the pass is paused and raises if it was cancelled.
+  2. It calls the verifier.
+  3. It saves that chunk's verdicts in one database transaction.
+  4. It writes a checkpoint: `ctx.save_checkpoint({"chunks": 3, ...})`.
+
+  After a restart the job runs again from the top, reads `ctx.checkpoint` and skips the chunks already done. That is
+  why a resumed pass never asks twice about the same finding.
+
+  One thing the test taught: the request that was *running* when the server stopped still finishes and is saved.
+  The stop only takes effect at the next `check()`. So "resume" continues after it, not before it.
+
+- **Choosing the targets before the job starts.** `start()` turns "the default scope" into a fixed list of finding
+  ids and stores it in the job's params. A pass resumed tomorrow judges the same findings, even if you changed the
+  scope setting meanwhile. Compare NestJS: you'd validate the DTO in the controller and hand the service plain ids.
+
+- **The same envelope everywhere (ADR 0003, in practice).** The Laya path asks the checkpoint which envelope it was
+  trained on (`rl_agent_config.json`: `wahy_envelope: 3`, `passages: true`, questions `["verdict"]`). It builds exactly
+  that version with the engine and drops the questions the checkpoint never learned. A checkpoint that knows only
+  the verdict gets its boundary from the **word-overlap rule**: did the speaker say a corpus word right before or
+  after the span? The golden test proves it: on all 4 golden inputs, for v1, v2 (4 option sets) and v3 (2), what Laya
+  read is byte for byte the old app's envelope. One deliberate difference from the old app: it sent v3 envelopes to v1
+  checkpoints too, which is exactly the training/serving skew ADR 0003 forbids. Now a v1 checkpoint reads v1.
+
+- **A passage's boundary is split.** Three verses judged as one passage get one answer. The rule is that "the start
+  is cut off" can only be true of the *first* verse and "the end is cut off" only of the *last*. So the answer is
+  turned into two yes/no probabilities, P(start) and P(end), and each verse gets its share:
+
+  | Verse | P(start) | P(end) | Saved boundary |
+  |---|---|---|---|
+  | first | 0.8 | 0 | MISSING_START |
+  | inner | 0 | 0 | COMPLETE |
+  | last | 0 | 0.8 | MISSING_END |
+
+  `boundary_from_yes_no` treats the two sides as independent, so it turns them into four classes:
+  P(both) = 0.8 × 0.8, P(start only) = 0.8 × 0.2, and so on.
+
+- **Telemetry by joining, not copying.** The request log row knows tokens, cost and payload. The verdict row knows
+  which request made it (`ai_request_id`). The log screen joins the two to show "this request judged these findings,
+  with these verdicts, and you later corrected this one". A failed request makes no verdict, so each request now
+  also stores the ids of the findings it was about (`Call.finding_ids`, migration `0004`).
+
+### How it was tested
+
+- `tests/test_verification.py` has 23 tests at the API. Most use the fake verifier and a fake engine, whose envelopes
+  come from each finding's own fields, so the tests check the pass's own rules. A few use the real worker on the
+  small corpus. The `features.md` checks:
+  - three findings picked by hand are exactly the three sent (F-084);
+  - half the findings gives half the tokens and requests (F-087);
+  - pause half-way, then resume: every finding gets exactly one verdict (F-088);
+  - the pass's cost equals the sum of its logged requests' costs (F-089);
+  - "strict" shows the strict rule in the preview (F-086);
+  - a finding's neighbour goes out with it (F-092);
+  - your verdict shows as `human` and becomes one gold label, updated in place the second time (F-065);
+  - approve all gives one gold label per AI verdict, once (F-091);
+  - one log row per request, and the inspector shows the exact payload (F-095, F-096).
+
+  Also covered: cancel, a failed request vs a fatal one, a second pass on the same lecture (409), passage
+  boundaries, the rule boundary, v1/v2/v3 checkpoints, expand with the real engine, and a pass interrupted by a
+  real restart and then resumed.
+- `tests/test_verification_golden.py` has 32 tests: the golden envelopes, as described above.
+- `engine/src/expand.test.ts` has 5 tests: a hadith cut by 2 words at the start (or 3 at the end) grows back, and only
+  on the side reported missing.
+- Feature check, through the API with the real Laya on your GTX 1050: the sample lecture, engine v5, checkpoint
+  `laya-wahy-r6-v3_mixed`. It made 8 findings in 6 requests (the three verses of al-'Asr went as one passage) and
+  took 19.5 s. Laya saved 8 verdicts: 7 CORRECT, 1 FALSE (صحيح مسلم 2149), all boundaries complete (by the rule,
+  since this checkpoint answers the verdict only). The metrics matched the 6 logged requests.
+- `scripts/test.sh` all green:
+
+  | Suite | Result |
+  |---|---|
+  | Old backend | 152 |
+  | Server | 272, plus 6 live tests skipped |
+  | Engine | 111 |
+  | Web | 59 |
+  | Playwright | 4 |
+
+**Try:**
+
+```bash
+cd server && uv run pytest tests/test_verification.py -v -k "pause or passage"    # the job and the boundary split
+curl -X POST localhost:8120/api/lectures/1/verification/estimate \
+     -H 'content-type: application/json' -d '{"scope":"ALL","options":{"provider":"laya"}}'
+curl 'localhost:8120/api/telemetry/requests?limit=5'                               # the request log
+```

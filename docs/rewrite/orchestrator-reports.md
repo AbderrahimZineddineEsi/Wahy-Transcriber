@@ -5,6 +5,31 @@ State for recovery (session IDs, what to do if a child died) is in `orchestrator
 
 <!-- NEW REPORTS GO BELOW THIS LINE -->
 
+## 2026-11-06 19:40 — Phase 13 (AI provider layer) done, live check passed; phase 14 started
+
+Gate passed. Commit `6e0e658` "rewrite phase 13: AI provider layer" pushed, phase ticked. Live tests ran with your OK
+("go do whatever you want, and then launch the next phases as usual", read as option 1) and the keys already in `.env`; the
+OpenRouter key you pasted in chat was not used and is stored nowhere (a repo search finds no copy).
+
+| Provider | Model | Answer | Tokens in+out | Cost | Time |
+|---|---|---|---|---|---|
+| Gemini | gemini-3.5-flash-lite | CORRECT 0.99, complete | 852+119 | $0 (free tier) | 3.7 s |
+| JEV (OpenRouter key) | typesafe/jev-1.14-20261014 | CORRECT 0.80 | 413+43 | $0.000017 | 0.9 s |
+| OpenRouter chat | deepseek/deepseek-chat | CORRECT 0.95, complete | 924+104 | $0.00039 | 5.4 s |
+| Groq | whisper-large-v3-turbo | 2 s of tone transcribed | n/a | about $0.0001 | n/a |
+| Laya (GPU) | laya-wahy-r6-v3_mixed, envelope 3 | CORRECT 0.51 on a sample-lecture finding | n/a | $0 | 4.5 s |
+
+The OpenRouter model search for "deepseek" worked live too. Whole check under $0.001.
+- Gemini's test took 30 s overall although its one successful request took 3.7 s; the request log went with the test's
+  temporary database, so whether a rate-limit wait happened first is unknown.
+- For JEV and Laya, `confidence` is **not** the chosen verdict's probability (JEV 0.70 vs probability 0.80; Laya 0.147 vs
+  0.506). Use `probabilities` for "how sure". Phase 14 was told to keep this in mind in the roadmap notes.
+- Real replies are in `data/ai_live_replies/` (git-ignored, no key in any file). Swapping them for the hand-written test
+  replies broke 8 tests (cases the live calls did not produce), so both are kept: the real ones as `real_*.json` with their
+  own tests.
+- Tests (`scripts/test.sh`, all passed): old backend 152; new server 217 (+6 live skipped); engine 106; web 59; Playwright 4.
+- **Phase 14 (Verification pass and telemetry (server), Opus 5.5, high)** is running as `refactoring-step-14`.
+
 ## 2026-11-06 19:10 — Phase 13 (AI provider layer) built as a draft; needs your permission for live calls
 
 Draft pushed as `8eb3f4e` "rewrite phase 13 (draft): AI provider layer". The phase is **not ticked**: its Feature check

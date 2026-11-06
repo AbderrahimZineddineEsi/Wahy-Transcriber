@@ -234,6 +234,46 @@ export interface paths {
         patch: operations["update_detection_settings_api_detection_settings_patch"];
         trace?: never;
     };
+    "/api/findings/{finding_id}/expand": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Expand Finding
+         * @description Grow a finding over the words its start or end is missing (the old editor's auto-heal).
+         */
+        post: operations["expand_finding_api_findings__finding_id__expand_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/findings/{finding_id}/verdict": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Set Verdict
+         * @description The user's verdict on a finding, saved as a gold label (F-065).
+         */
+        put: operations["set_verdict_api_findings__finding_id__verdict_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/health": {
         parameters: {
             query?: never;
@@ -522,6 +562,88 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/lectures/{lecture_id}/verification": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Start Pass
+         * @description Start a verification pass over the selected findings (F-084, F-088). Returns the job; follow it at
+         *     GET /api/jobs/{id}/events and pause, resume or cancel it there.
+         */
+        post: operations["start_pass_api_lectures__lecture_id__verification_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/lectures/{lecture_id}/verification/approve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Approve All
+         * @description Accept every AI verdict of the lecture as the user's, as gold labels (F-091). The web app asks
+         *     first.
+         */
+        post: operations["approve_all_api_lectures__lecture_id__verification_approve_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/lectures/{lecture_id}/verification/estimate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Estimate Pass
+         * @description Findings, requests, tokens, cost and time of a pass, before it runs (F-087).
+         */
+        post: operations["estimate_pass_api_lectures__lecture_id__verification_estimate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/lectures/{lecture_id}/verification/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Preview Request
+         * @description The exact request the verifier would get for one finding, not sent (F-086).
+         */
+        post: operations["preview_request_api_lectures__lecture_id__verification_preview_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/lectures/{lecture_id}/versions": {
         parameters: {
             query?: never;
@@ -700,6 +822,51 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/telemetry/requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Requests
+         * @description Every AI request, newest first (F-095): provider, model, the findings it judged with their verdicts and
+         *     the user's corrections, tokens, latency and cost. Filter by lecture, pass (job), provider or purpose.
+         */
+        get: operations["list_requests_api_telemetry_requests_get"];
+        put?: never;
+        post?: never;
+        /**
+         * Clear Requests
+         * @description Clear the request log (of one lecture, or all). Verdicts stay.
+         */
+        delete: operations["clear_requests_api_telemetry_requests_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/telemetry/requests/{request_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Request
+         * @description One request with the exact payload sent and the payload received (F-096).
+         */
+        get: operations["get_request_api_telemetry_requests__request_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/transcription/models": {
         parameters: {
             query?: never;
@@ -757,6 +924,67 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/verification/passes/{job_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Pass Metrics
+         * @description A pass's numbers (F-089), also while it runs.
+         */
+        get: operations["pass_metrics_api_verification_passes__job_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/verification/prompts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Prompt Catalog
+         * @description The prompt presets, the optional rules and the default system prompt (F-086).
+         */
+        get: operations["prompt_catalog_api_verification_prompts_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/verification/settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Verifier Settings
+         * @description The verifier settings a pass uses unless it sends its own (F-085).
+         */
+        get: operations["get_verifier_settings_api_verification_settings_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update Verifier Settings */
+        patch: operations["update_verifier_settings_api_verification_settings_patch"];
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -765,6 +993,16 @@ export interface components {
         ActivateRequest: {
             /** Source Id */
             source_id: string;
+        };
+        /** Approved */
+        Approved: {
+            /**
+             * Approved
+             * @description findings whose AI verdict became the user's (gold) verdict
+             */
+            approved: number;
+            /** Labels */
+            labels: number;
         };
         /** Body_attach_media_api_lectures__lecture_id__media_put */
         Body_attach_media_api_lectures__lecture_id__media_put: {
@@ -796,6 +1034,11 @@ export interface components {
         Body_upload_source_api_corpora_sources__source_id__upload_post: {
             /** File */
             file: string;
+        };
+        /** Cleared */
+        Cleared: {
+            /** Deleted */
+            deleted: number;
         };
         /** CorpusHealth */
         CorpusHealth: {
@@ -938,6 +1181,74 @@ export interface components {
             /** Starts */
             starts: number;
         };
+        /**
+         * Estimate
+         * @description What a pass would cost before it runs (F-087). Tokens and cost are estimates from the requests'
+         *     size.
+         */
+        Estimate: {
+            /** Approx Input Tokens */
+            approx_input_tokens: number;
+            /** Approx Output Tokens */
+            approx_output_tokens: number;
+            /** Envelope Version */
+            envelope_version: number;
+            /** Est Cost Usd */
+            est_cost_usd: number;
+            /** Est Seconds */
+            est_seconds: number;
+            /**
+             * Findings
+             * @description findings that get a verdict
+             */
+            findings: number;
+            /**
+             * Items
+             * @description what is sent: a passage of verses is one item for several findings
+             */
+            items: number;
+            /** Model */
+            model: string;
+            /** Provider */
+            provider: string;
+            /** Requests */
+            requests: number;
+        };
+        /** ExpandIn */
+        ExpandIn: {
+            /**
+             * Boundary
+             * @description empty: the newest verdict's boundary (MISSING_BOTH when it has none)
+             */
+            boundary?: ("MISSING_START" | "MISSING_END" | "MISSING_BOTH") | null;
+        };
+        /** Expanded */
+        Expanded: {
+            /**
+             * Added
+             * @description words added at the start and at the end
+             */
+            added: {
+                [key: string]: number;
+            };
+            /** Changed */
+            changed: boolean;
+            /** Data */
+            data: {
+                [key: string]: unknown;
+            };
+            /** Finding Id */
+            finding_id: number;
+            /**
+             * Reason
+             * @description no_unit | no_match when nothing changed
+             */
+            reason?: string | null;
+            /** Word End */
+            word_end: number;
+            /** Word Start */
+            word_start: number;
+        };
         /** FindingOut */
         FindingOut: {
             /**
@@ -1033,6 +1344,13 @@ export interface components {
             running_jobs: number;
             /** Status */
             status: string;
+        };
+        /** HumanVerdict */
+        HumanVerdict: {
+            /** Boundary */
+            boundary: string | null;
+            /** Verdict */
+            verdict: string;
         };
         /**
          * JobSnapshot
@@ -1256,6 +1574,171 @@ export interface components {
             /** Prompt Price Per M */
             prompt_price_per_m: number;
         };
+        /**
+         * OptionsPatch
+         * @description A change to the saved verifier settings: only the fields given change (`prompt` is replaced whole).
+         */
+        OptionsPatch: {
+            /** Context Words */
+            context_words?: number | null;
+            /** Gemini Batch Size */
+            gemini_batch_size?: number | null;
+            /** Gemini Free Tier */
+            gemini_free_tier?: boolean | null;
+            /** Gemini Model */
+            gemini_model?: string | null;
+            /** Gemini Rpm */
+            gemini_rpm?: number | null;
+            /** Jev Model */
+            jev_model?: string | null;
+            /** Laya Checkpoint */
+            laya_checkpoint?: string | null;
+            /** Laya Device */
+            laya_device?: ("auto" | "cuda" | "cpu") | null;
+            /** Openrouter Model */
+            openrouter_model?: string | null;
+            prompt?: components["schemas"]["PromptConfig"] | null;
+            /** Provider */
+            provider?: ("gemini" | "jev" | "openrouter" | "laya" | "fake") | null;
+        };
+        /**
+         * PassMetrics
+         * @description A pass's numbers (F-089), from its saved requests and verdicts, so `cost_usd` is the sum of the logged
+         *     requests' costs.
+         */
+        PassMetrics: {
+            /**
+             * Avg Input Tokens
+             * @description the average context per successful request
+             */
+            avg_input_tokens: number;
+            /** Avg Latency Ms */
+            avg_latency_ms: number;
+            /**
+             * Clipped
+             * @description verdicts that say the start or the end is missing
+             */
+            clipped: number;
+            /** Cost Usd */
+            cost_usd: number;
+            /** Elapsed S */
+            elapsed_s: number | null;
+            /**
+             * Envelope Ms
+             * @description time the engine took to build the envelopes
+             */
+            envelope_ms?: number | null;
+            /** Findings Failed */
+            findings_failed: number;
+            /** Findings Total */
+            findings_total: number;
+            /** Findings Verified */
+            findings_verified: number;
+            /** Input Tokens */
+            input_tokens: number;
+            /** Job Id */
+            job_id: string;
+            /** Model */
+            model: string | null;
+            /** Output Tokens */
+            output_tokens: number;
+            /** Provider */
+            provider: string | null;
+            /** Requests */
+            requests: number;
+            /** Requests Failed */
+            requests_failed: number;
+            /** Requests Ok */
+            requests_ok: number;
+            /** Status */
+            status: string;
+            /** Total Latency Ms */
+            total_latency_ms: number;
+            /** Verdict Counts */
+            verdict_counts: {
+                [key: string]: number;
+            };
+        };
+        /**
+         * PassOptions
+         * @description Everything a verification pass can be told (F-085, F-086). Saved as the verifier settings; a pass can
+         *     send its own.
+         */
+        PassOptions: {
+            /**
+             * Context Words
+             * @description transcript words on each side (envelope v1)
+             * @default 25
+             */
+            context_words: number;
+            /**
+             * Gemini Batch Size
+             * @description findings per Gemini request
+             * @default 5
+             */
+            gemini_batch_size: number;
+            /**
+             * Gemini Free Tier
+             * @description pace the requests to the free tier and count them as free
+             * @default true
+             */
+            gemini_free_tier: boolean;
+            /**
+             * Gemini Model
+             * @default gemini-3.5-flash-lite
+             */
+            gemini_model: string;
+            /**
+             * Gemini Rpm
+             * @description requests per minute on the free tier
+             * @default 12
+             */
+            gemini_rpm: number;
+            /**
+             * Jev Model
+             * @default typesafe/jev-1.14
+             */
+            jev_model: string;
+            /**
+             * Laya Checkpoint
+             * @description empty: the selected checkpoint
+             */
+            laya_checkpoint?: string | null;
+            /** Laya Device */
+            laya_device?: ("auto" | "cuda" | "cpu") | null;
+            /**
+             * Openrouter Model
+             * @default deepseek/deepseek-chat
+             */
+            openrouter_model: string;
+            prompt?: components["schemas"]["PromptConfig"];
+            /**
+             * Provider
+             * @default gemini
+             * @enum {string}
+             */
+            provider: "gemini" | "jev" | "openrouter" | "laya" | "fake";
+        };
+        /** PassRequest */
+        PassRequest: {
+            /**
+             * Finding Ids
+             * @description exactly these findings (overrides the scope)
+             */
+            finding_ids?: number[] | null;
+            /** @description empty: the saved verifier settings */
+            options?: components["schemas"]["PassOptions"] | null;
+            /**
+             * Scope
+             * @default HADITH_AND_CANDIDATES
+             * @enum {string}
+             */
+            scope: "HADITH_AND_CANDIDATES" | "HADITH_ONLY" | "ALL";
+        };
+        /** PassStarted */
+        PassStarted: {
+            job: components["schemas"]["JobSnapshot"];
+        };
         /** PrepareRequest */
         PrepareRequest: {
             /**
@@ -1264,6 +1747,171 @@ export interface components {
              * @default false
              */
             redownload: boolean;
+        };
+        /**
+         * Preview
+         * @description The exact request the verifier would get for one finding (F-086), without sending it.
+         */
+        Preview: {
+            /** Approx Tokens */
+            approx_tokens: number;
+            /**
+             * Body
+             * @description the whole request body, as it would be sent (without the key)
+             */
+            body: unknown;
+            /** Endpoint */
+            endpoint: string;
+            /** Envelope Version */
+            envelope_version: number;
+            /**
+             * Finding Ids
+             * @description the findings this request judges (a passage holds several)
+             */
+            finding_ids: number[];
+            /** Model */
+            model: string;
+            /** Provider */
+            provider: string;
+            /** Questions */
+            questions: {
+                [key: string]: unknown;
+            };
+            /** State */
+            state: {
+                [key: string]: unknown;
+            };
+            /**
+             * System Prompt
+             * @description empty for JEV and Laya, which get no prompt
+             */
+            system_prompt: string;
+        };
+        /** PreviewRequest */
+        PreviewRequest: {
+            /** Finding Id */
+            finding_id: number;
+            options?: components["schemas"]["PassOptions"] | null;
+        };
+        /**
+         * PromptCatalog
+         * @description The texts the options screen shows: presets, rules and the default system prompt (F-086).
+         */
+        PromptCatalog: {
+            /** Default System Prompt */
+            default_system_prompt: string;
+            defaults: components["schemas"]["PassOptions"];
+            /** Presets */
+            presets: {
+                [key: string]: {
+                    [key: string]: unknown;
+                };
+            };
+            /** Rules */
+            rules: {
+                [key: string]: {
+                    [key: string]: unknown;
+                };
+            };
+        };
+        /** PromptConfig */
+        PromptConfig: {
+            /**
+             * Extra Instructions
+             * @default
+             */
+            extra_instructions: string;
+            /**
+             * Preset
+             * @default balanced
+             * @enum {string}
+             */
+            preset: "balanced" | "strict" | "lenient" | "boundaries";
+            /**
+             * Reason Detail
+             * @default brief
+             * @enum {string}
+             */
+            reason_detail: "brief" | "detailed";
+            /**
+             * Reason Lang
+             * @default ar
+             * @enum {string}
+             */
+            reason_lang: "ar" | "en";
+            rules?: components["schemas"]["PromptRules"];
+            /**
+             * System Prompt Override
+             * @description empty: the default system prompt
+             * @default
+             */
+            system_prompt_override: string;
+            /**
+             * Temperature
+             * @default 0.1
+             */
+            temperature: number;
+        };
+        /**
+         * PromptRules
+         * @description The optional rules (see prompts.RULES for each one's text). Laya ignores them.
+         */
+        PromptRules: {
+            /**
+             * Citation Cues
+             * @default true
+             */
+            citation_cues: boolean;
+            /**
+             * Cue Before Garbled
+             * @description N-020: a cue then garbled words: the quote started earlier
+             * @default false
+             */
+            cue_before_garbled: boolean;
+            /**
+             * Explaining Repeat
+             * @default false
+             */
+            explaining_repeat: boolean;
+            /**
+             * Explaining With Text
+             * @description N-020: explaining in the text's own words is not a quote
+             * @default false
+             */
+            explaining_with_text: boolean;
+            /**
+             * Ignore Asr Errors
+             * @default true
+             */
+            ignore_asr_errors: boolean;
+            /**
+             * Narrator Names
+             * @default false
+             */
+            narrator_names: boolean;
+            /**
+             * No Thinking
+             * @description ask OpenRouter reasoning models not to think
+             * @default false
+             */
+            no_thinking: boolean;
+            /**
+             * Passages
+             * @description consecutive verses found back to back go out as one passage
+             * @default true
+             */
+            passages: boolean;
+            /**
+             * Prefer Not Sure
+             * @default false
+             */
+            prefer_not_sure: boolean;
+            /**
+             * Suggest Merges
+             * @description send the close neighbours and ask whether to merge
+             * @default true
+             */
+            suggest_merges: boolean;
         };
         /** QuoteIn */
         QuoteIn: {
@@ -1301,6 +1949,134 @@ export interface components {
         RenameVersion: {
             /** Name */
             name: string;
+        };
+        /** RequestDetail */
+        RequestDetail: {
+            /**
+             * Context Chars
+             * @description size of the request payload, in characters
+             */
+            context_chars: number;
+            /** Cost Usd */
+            cost_usd: number | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Error */
+            error: string | null;
+            /** Findings */
+            findings: components["schemas"]["RequestFinding"][];
+            /** Id */
+            id: number;
+            /** Input Tokens */
+            input_tokens: number | null;
+            /** Job Id */
+            job_id: string | null;
+            /** Latency Ms */
+            latency_ms: number | null;
+            /** Lecture Id */
+            lecture_id: number | null;
+            /** Model */
+            model: string;
+            /** Ok */
+            ok: boolean;
+            /** Output Tokens */
+            output_tokens: number | null;
+            /** Provider */
+            provider: string;
+            /** Purpose */
+            purpose: string;
+            /**
+             * Request
+             * @description the exact payload sent (keys removed)
+             */
+            request: unknown;
+            /**
+             * Response
+             * @description the payload received
+             */
+            response: unknown | null;
+        };
+        /**
+         * RequestFinding
+         * @description A finding a request judged, with the verdict it got from that request and the user's correction, if
+         *     any.
+         */
+        RequestFinding: {
+            /** Boundary */
+            boundary?: string | null;
+            /** Confidence */
+            confidence?: number | null;
+            /** Display Ref */
+            display_ref: string | null;
+            /** Finding Id */
+            finding_id: number;
+            /** @description the user's newest verdict on the finding, if any */
+            human?: components["schemas"]["HumanVerdict"] | null;
+            /** Probabilities */
+            probabilities?: {
+                [key: string]: number;
+            } | null;
+            /** Source Type */
+            source_type: string | null;
+            /**
+             * Verdict
+             * @description the verdict this request gave (none for a failed request)
+             */
+            verdict?: string | null;
+        };
+        /** RequestPage */
+        RequestPage: {
+            /** Items */
+            items: components["schemas"]["RequestRow"][];
+            /** Total */
+            total: number;
+            /**
+             * Total Cost Usd
+             * @description the cost of every request that matches the filter
+             */
+            total_cost_usd: number;
+        };
+        /** RequestRow */
+        RequestRow: {
+            /**
+             * Context Chars
+             * @description size of the request payload, in characters
+             */
+            context_chars: number;
+            /** Cost Usd */
+            cost_usd: number | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Error */
+            error: string | null;
+            /** Findings */
+            findings: components["schemas"]["RequestFinding"][];
+            /** Id */
+            id: number;
+            /** Input Tokens */
+            input_tokens: number | null;
+            /** Job Id */
+            job_id: string | null;
+            /** Latency Ms */
+            latency_ms: number | null;
+            /** Lecture Id */
+            lecture_id: number | null;
+            /** Model */
+            model: string;
+            /** Ok */
+            ok: boolean;
+            /** Output Tokens */
+            output_tokens: number | null;
+            /** Provider */
+            provider: string;
+            /** Purpose */
+            purpose: string;
         };
         /** SearchHit */
         SearchHit: {
@@ -1377,6 +2153,20 @@ export interface components {
             type: string;
         };
         /**
+         * VerdictIn
+         * @description The user's own verdict on a finding (F-065). Without `boundary`, the boundary of the newest verdict
+         *     stays.
+         */
+        VerdictIn: {
+            /** Boundary */
+            boundary?: ("COMPLETE" | "MISSING_START" | "MISSING_END" | "MISSING_BOTH" | "EXTRA_START" | "EXTRA_END") | null;
+            /**
+             * Verdict
+             * @enum {string}
+             */
+            verdict: "CORRECT" | "FALSE" | "NOT_SURE";
+        };
+        /**
          * VerdictOut
          * @description The newest verdict on a finding (a verifier's or the user's). Values are the old app's strings.
          */
@@ -1395,6 +2185,22 @@ export interface components {
             verdict: string;
             /** Verifier */
             verifier: string;
+        };
+        /** VerdictSaved */
+        VerdictSaved: {
+            /** Boundary */
+            boundary: string | null;
+            /** Finding Id */
+            finding_id: number;
+            /**
+             * Label Id
+             * @description the gold label it was saved as
+             */
+            label_id: number;
+            /** Verdict */
+            verdict: string;
+            /** Verdict Id */
+            verdict_id: number;
         };
         /** VersionDetail */
         VersionDetail: {
@@ -1967,6 +2773,76 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["DetectionSettings"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    expand_finding_api_findings__finding_id__expand_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                finding_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["ExpandIn"] | null;
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Expanded"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_verdict_api_findings__finding_id__verdict_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                finding_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VerdictIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VerdictSaved"];
                 };
             };
             /** @description Validation Error */
@@ -2589,6 +3465,142 @@ export interface operations {
             };
         };
     };
+    start_pass_api_lectures__lecture_id__verification_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                lecture_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PassRequest"] | null;
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PassStarted"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    approve_all_api_lectures__lecture_id__verification_approve_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                lecture_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Approved"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    estimate_pass_api_lectures__lecture_id__verification_estimate_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                lecture_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PassRequest"] | null;
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Estimate"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    preview_request_api_lectures__lecture_id__verification_preview_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                lecture_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PreviewRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Preview"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     list_versions_api_lectures__lecture_id__versions_get: {
         parameters: {
             query?: never;
@@ -2953,6 +3965,105 @@ export interface operations {
             };
         };
     };
+    list_requests_api_telemetry_requests_get: {
+        parameters: {
+            query?: {
+                lecture_id?: number | null;
+                job_id?: string | null;
+                provider?: string | null;
+                purpose?: string | null;
+                ok?: boolean | null;
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RequestPage"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    clear_requests_api_telemetry_requests_delete: {
+        parameters: {
+            query?: {
+                lecture_id?: number | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Cleared"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_request_api_telemetry_requests__request_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                request_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RequestDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     list_models_api_transcription_models_get: {
         parameters: {
             query?: never;
@@ -3026,6 +4137,110 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["wahy__features__transcription__schemas__Started"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    pass_metrics_api_verification_passes__job_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                job_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PassMetrics"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    prompt_catalog_api_verification_prompts_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PromptCatalog"];
+                };
+            };
+        };
+    };
+    get_verifier_settings_api_verification_settings_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PassOptions"];
+                };
+            };
+        };
+    };
+    update_verifier_settings_api_verification_settings_patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OptionsPatch"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PassOptions"];
                 };
             };
             /** @description Validation Error */

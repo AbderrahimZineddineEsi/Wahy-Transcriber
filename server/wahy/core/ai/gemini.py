@@ -118,10 +118,24 @@ class GeminiProvider:
             answers += self._verify_batch(items[start : start + size], call, o)
         return answers
 
-    def _verify_batch(self, batch: list[Item], call: Call, o: GeminiOptions) -> list[Answer]:
+    @staticmethod
+    def batch_prompt(batch: list[Item], o: GeminiOptions) -> tuple[str, str]:
+        """(system prompt, user prompt) of one verification request."""
         payload = [{"finding_id": it.id, "state": it.state, "questions": it.questions} for it in batch]
         prompt = GEMINI_BATCH_INSTRUCTION + json.dumps(payload, ensure_ascii=False, indent=2)
         system = system_prompt(o.system_prompt, reason_lang=o.reason_lang, reason_detail=o.reason_detail)
+        return system, prompt
+
+    def preview(self, items: list[Item], options: GeminiOptions | None = None) -> dict[str, Any]:
+        """What one verification request for `items` (one batch) would send: {endpoint, model, body}."""
+        o = options or GeminiOptions()
+        model = (o.model or DEFAULT_MODEL).strip()
+        system, prompt = self.batch_prompt(items, o)
+        return {"endpoint": f"{BASE_URL}/models/{model}:generateContent", "model": model,
+                "body": request_body(system, prompt, o, GEMINI_RESPONSE_SCHEMA)}
+
+    def _verify_batch(self, batch: list[Item], call: Call, o: GeminiOptions) -> list[Answer]:
+        system, prompt = self.batch_prompt(batch, o)
         result = self.generate(
             system=system, prompt=prompt, call=call, options=o, schema=GEMINI_RESPONSE_SCHEMA, expect=list
         )
@@ -168,14 +182,7 @@ class GeminiProvider:
         if not key:
             raise AiError("no Gemini API key: set it in the settings", fatal=True)
         model = (o.model or DEFAULT_MODEL).strip()
-        config: dict[str, Any] = {"temperature": o.temperature, "responseMimeType": "application/json"}
-        if schema is not None:
-            config["responseSchema"] = schema
-        body = {
-            "systemInstruction": {"parts": [{"text": system}]},
-            "contents": [{"role": "user", "parts": [{"text": prompt}]}],
-            "generationConfig": config,
-        }
+        body = request_body(system, prompt, o, schema)
         url = f"{BASE_URL}/models/{model}:generateContent"
         reply = self.http.post(
             url,
@@ -282,6 +289,18 @@ class GeminiProvider:
             status=status,
             fatal=status in (401, 403),
         )
+
+
+def request_body(system: str, prompt: str, o: GeminiOptions, schema: dict[str, Any] | None) -> dict[str, Any]:
+    """The generateContent body (without the model, which goes in the URL)."""
+    config: dict[str, Any] = {"temperature": o.temperature, "responseMimeType": "application/json"}
+    if schema is not None:
+        config["responseSchema"] = schema
+    return {
+        "systemInstruction": {"parts": [{"text": system}]},
+        "contents": [{"role": "user", "parts": [{"text": prompt}]}],
+        "generationConfig": config,
+    }
 
 
 def _reply_text(data: dict[str, Any]) -> str:

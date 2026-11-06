@@ -7,7 +7,8 @@ end to end.
     fake.calls                                                     # the item ids of each request, in order
 
 `answer(item)` returns a flat JSON answer (as Gemini or a chat model would); `fail` lists item ids whose
-request fails with an AiError (`fatal_fail` ids fail as fatal).
+request fails with an AiError (`fatal_fail` ids fail as fatal); `cost_usd` is what each request is logged
+as costing.
 """
 
 from __future__ import annotations
@@ -42,10 +43,17 @@ class FakeVerifier:
         fail: set[str] | None = None,
         fatal_fail: set[str] | None = None,
         model: str = "fake-1",
+        cost_usd: float = 0.0,
     ):
-        self.log, self.answer, self.model = log, answer, model
+        self.log, self.answer, self.model, self.cost_usd = log, answer, model, cost_usd
         self.fail, self.fatal_fail = set(fail or ()), set(fatal_fail or ())
         self.calls: list[list[str]] = []
+
+    def preview(self, items: list[Item], options: Any = None) -> dict[str, Any]:
+        it = items[0]
+        return {"endpoint": "fake", "model": self.model,
+                "body": {"model": self.model, "finding_id": it.id, "state": it.state,
+                         "questions": it.questions}}
 
     def verify(self, items: list[Item], *, call: Call, options: Any = None) -> list[Answer]:
         out = []
@@ -77,7 +85,7 @@ class FakeVerifier:
                 response=data,
                 input_tokens=tokens,
                 output_tokens=40,
-                cost_usd=0.0,
+                cost_usd=self.cost_usd,
                 latency_ms=0,
             )
             a = answer_from_json(it, data, provider=self.name, model=self.model)

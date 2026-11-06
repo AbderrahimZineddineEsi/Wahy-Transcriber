@@ -14,6 +14,25 @@
         "title": "ActivateRequest",
         "type": "object"
       },
+      "Approved": {
+        "properties": {
+          "approved": {
+            "description": "findings whose AI verdict became the user's (gold) verdict",
+            "title": "Approved",
+            "type": "integer"
+          },
+          "labels": {
+            "title": "Labels",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "approved",
+          "labels"
+        ],
+        "title": "Approved",
+        "type": "object"
+      },
       "Body_attach_media_api_lectures__lecture_id__media_put": {
         "properties": {
           "file": {
@@ -106,6 +125,19 @@
           "file"
         ],
         "title": "Body_upload_source_api_corpora_sources__source_id__upload_post",
+        "type": "object"
+      },
+      "Cleared": {
+        "properties": {
+          "deleted": {
+            "title": "Deleted",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "deleted"
+        ],
+        "title": "Cleared",
         "type": "object"
       },
       "CorpusHealth": {
@@ -422,6 +454,145 @@
         "title": "EngineHealth",
         "type": "object"
       },
+      "Estimate": {
+        "description": "What a pass would cost before it runs (F-087). Tokens and cost are estimates from the requests'\nsize.",
+        "properties": {
+          "approx_input_tokens": {
+            "title": "Approx Input Tokens",
+            "type": "integer"
+          },
+          "approx_output_tokens": {
+            "title": "Approx Output Tokens",
+            "type": "integer"
+          },
+          "envelope_version": {
+            "title": "Envelope Version",
+            "type": "integer"
+          },
+          "est_cost_usd": {
+            "title": "Est Cost Usd",
+            "type": "number"
+          },
+          "est_seconds": {
+            "title": "Est Seconds",
+            "type": "integer"
+          },
+          "findings": {
+            "description": "findings that get a verdict",
+            "title": "Findings",
+            "type": "integer"
+          },
+          "items": {
+            "description": "what is sent: a passage of verses is one item for several findings",
+            "title": "Items",
+            "type": "integer"
+          },
+          "model": {
+            "title": "Model",
+            "type": "string"
+          },
+          "provider": {
+            "title": "Provider",
+            "type": "string"
+          },
+          "requests": {
+            "title": "Requests",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "provider",
+          "model",
+          "findings",
+          "items",
+          "requests",
+          "approx_input_tokens",
+          "approx_output_tokens",
+          "est_cost_usd",
+          "est_seconds",
+          "envelope_version"
+        ],
+        "title": "Estimate",
+        "type": "object"
+      },
+      "ExpandIn": {
+        "properties": {
+          "boundary": {
+            "anyOf": [
+              {
+                "enum": [
+                  "MISSING_START",
+                  "MISSING_END",
+                  "MISSING_BOTH"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "empty: the newest verdict's boundary (MISSING_BOTH when it has none)",
+            "title": "Boundary"
+          }
+        },
+        "title": "ExpandIn",
+        "type": "object"
+      },
+      "Expanded": {
+        "properties": {
+          "added": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "description": "words added at the start and at the end",
+            "title": "Added",
+            "type": "object"
+          },
+          "changed": {
+            "title": "Changed",
+            "type": "boolean"
+          },
+          "data": {
+            "additionalProperties": true,
+            "title": "Data",
+            "type": "object"
+          },
+          "finding_id": {
+            "title": "Finding Id",
+            "type": "integer"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "no_unit | no_match when nothing changed",
+            "title": "Reason"
+          },
+          "word_end": {
+            "title": "Word End",
+            "type": "integer"
+          },
+          "word_start": {
+            "title": "Word Start",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "finding_id",
+          "changed",
+          "added",
+          "word_start",
+          "word_end",
+          "data"
+        ],
+        "title": "Expanded",
+        "type": "object"
+      },
       "FindingOut": {
         "properties": {
           "data": {
@@ -679,6 +850,31 @@
           "running_jobs"
         ],
         "title": "Health",
+        "type": "object"
+      },
+      "HumanVerdict": {
+        "properties": {
+          "boundary": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Boundary"
+          },
+          "verdict": {
+            "title": "Verdict",
+            "type": "string"
+          }
+        },
+        "required": [
+          "verdict",
+          "boundary"
+        ],
+        "title": "HumanVerdict",
         "type": "object"
       },
       "JobSnapshot": {
@@ -1246,6 +1442,442 @@
         "title": "OpenRouterModel",
         "type": "object"
       },
+      "OptionsPatch": {
+        "description": "A change to the saved verifier settings: only the fields given change (`prompt` is replaced whole).",
+        "properties": {
+          "context_words": {
+            "anyOf": [
+              {
+                "maximum": 100.0,
+                "minimum": 5.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Context Words"
+          },
+          "gemini_batch_size": {
+            "anyOf": [
+              {
+                "maximum": 10.0,
+                "minimum": 5.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Gemini Batch Size"
+          },
+          "gemini_free_tier": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Gemini Free Tier"
+          },
+          "gemini_model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Gemini Model"
+          },
+          "gemini_rpm": {
+            "anyOf": [
+              {
+                "maximum": 120.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Gemini Rpm"
+          },
+          "jev_model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Jev Model"
+          },
+          "laya_checkpoint": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Laya Checkpoint"
+          },
+          "laya_device": {
+            "anyOf": [
+              {
+                "enum": [
+                  "auto",
+                  "cuda",
+                  "cpu"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Laya Device"
+          },
+          "openrouter_model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Openrouter Model"
+          },
+          "prompt": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PromptConfig"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "provider": {
+            "anyOf": [
+              {
+                "enum": [
+                  "gemini",
+                  "jev",
+                  "openrouter",
+                  "laya",
+                  "fake"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Provider"
+          }
+        },
+        "title": "OptionsPatch",
+        "type": "object"
+      },
+      "PassMetrics": {
+        "description": "A pass's numbers (F-089), from its saved requests and verdicts, so `cost_usd` is the sum of the logged\nrequests' costs.",
+        "properties": {
+          "avg_input_tokens": {
+            "description": "the average context per successful request",
+            "title": "Avg Input Tokens",
+            "type": "integer"
+          },
+          "avg_latency_ms": {
+            "title": "Avg Latency Ms",
+            "type": "integer"
+          },
+          "clipped": {
+            "description": "verdicts that say the start or the end is missing",
+            "title": "Clipped",
+            "type": "integer"
+          },
+          "cost_usd": {
+            "title": "Cost Usd",
+            "type": "number"
+          },
+          "elapsed_s": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Elapsed S"
+          },
+          "envelope_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "time the engine took to build the envelopes",
+            "title": "Envelope Ms"
+          },
+          "findings_failed": {
+            "title": "Findings Failed",
+            "type": "integer"
+          },
+          "findings_total": {
+            "title": "Findings Total",
+            "type": "integer"
+          },
+          "findings_verified": {
+            "title": "Findings Verified",
+            "type": "integer"
+          },
+          "input_tokens": {
+            "title": "Input Tokens",
+            "type": "integer"
+          },
+          "job_id": {
+            "title": "Job Id",
+            "type": "string"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          },
+          "output_tokens": {
+            "title": "Output Tokens",
+            "type": "integer"
+          },
+          "provider": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Provider"
+          },
+          "requests": {
+            "title": "Requests",
+            "type": "integer"
+          },
+          "requests_failed": {
+            "title": "Requests Failed",
+            "type": "integer"
+          },
+          "requests_ok": {
+            "title": "Requests Ok",
+            "type": "integer"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "total_latency_ms": {
+            "title": "Total Latency Ms",
+            "type": "integer"
+          },
+          "verdict_counts": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Verdict Counts",
+            "type": "object"
+          }
+        },
+        "required": [
+          "job_id",
+          "status",
+          "provider",
+          "model",
+          "findings_total",
+          "findings_verified",
+          "findings_failed",
+          "verdict_counts",
+          "clipped",
+          "requests",
+          "requests_ok",
+          "requests_failed",
+          "total_latency_ms",
+          "avg_latency_ms",
+          "input_tokens",
+          "output_tokens",
+          "avg_input_tokens",
+          "cost_usd",
+          "elapsed_s"
+        ],
+        "title": "PassMetrics",
+        "type": "object"
+      },
+      "PassOptions": {
+        "description": "Everything a verification pass can be told (F-085, F-086). Saved as the verifier settings; a pass can\nsend its own.",
+        "properties": {
+          "context_words": {
+            "default": 25,
+            "description": "transcript words on each side (envelope v1)",
+            "maximum": 100.0,
+            "minimum": 5.0,
+            "title": "Context Words",
+            "type": "integer"
+          },
+          "gemini_batch_size": {
+            "default": 5,
+            "description": "findings per Gemini request",
+            "maximum": 10.0,
+            "minimum": 5.0,
+            "title": "Gemini Batch Size",
+            "type": "integer"
+          },
+          "gemini_free_tier": {
+            "default": true,
+            "description": "pace the requests to the free tier and count them as free",
+            "title": "Gemini Free Tier",
+            "type": "boolean"
+          },
+          "gemini_model": {
+            "default": "gemini-3.5-flash-lite",
+            "title": "Gemini Model",
+            "type": "string"
+          },
+          "gemini_rpm": {
+            "default": 12,
+            "description": "requests per minute on the free tier",
+            "maximum": 120.0,
+            "minimum": 1.0,
+            "title": "Gemini Rpm",
+            "type": "integer"
+          },
+          "jev_model": {
+            "default": "typesafe/jev-1.14",
+            "title": "Jev Model",
+            "type": "string"
+          },
+          "laya_checkpoint": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "empty: the selected checkpoint",
+            "title": "Laya Checkpoint"
+          },
+          "laya_device": {
+            "anyOf": [
+              {
+                "enum": [
+                  "auto",
+                  "cuda",
+                  "cpu"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Laya Device"
+          },
+          "openrouter_model": {
+            "default": "deepseek/deepseek-chat",
+            "title": "Openrouter Model",
+            "type": "string"
+          },
+          "prompt": {
+            "$ref": "#/components/schemas/PromptConfig"
+          },
+          "provider": {
+            "default": "gemini",
+            "enum": [
+              "gemini",
+              "jev",
+              "openrouter",
+              "laya",
+              "fake"
+            ],
+            "title": "Provider",
+            "type": "string"
+          }
+        },
+        "title": "PassOptions",
+        "type": "object"
+      },
+      "PassRequest": {
+        "properties": {
+          "finding_ids": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "integer"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "exactly these findings (overrides the scope)",
+            "title": "Finding Ids"
+          },
+          "options": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PassOptions"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "empty: the saved verifier settings"
+          },
+          "scope": {
+            "default": "HADITH_AND_CANDIDATES",
+            "enum": [
+              "HADITH_AND_CANDIDATES",
+              "HADITH_ONLY",
+              "ALL"
+            ],
+            "title": "Scope",
+            "type": "string"
+          }
+        },
+        "title": "PassRequest",
+        "type": "object"
+      },
+      "PassStarted": {
+        "properties": {
+          "job": {
+            "$ref": "#/components/schemas/JobSnapshot"
+          }
+        },
+        "required": [
+          "job"
+        ],
+        "title": "PassStarted",
+        "type": "object"
+      },
       "PrepareRequest": {
         "properties": {
           "redownload": {
@@ -1256,6 +1888,251 @@
           }
         },
         "title": "PrepareRequest",
+        "type": "object"
+      },
+      "Preview": {
+        "description": "The exact request the verifier would get for one finding (F-086), without sending it.",
+        "properties": {
+          "approx_tokens": {
+            "title": "Approx Tokens",
+            "type": "integer"
+          },
+          "body": {
+            "description": "the whole request body, as it would be sent (without the key)",
+            "title": "Body"
+          },
+          "endpoint": {
+            "title": "Endpoint",
+            "type": "string"
+          },
+          "envelope_version": {
+            "title": "Envelope Version",
+            "type": "integer"
+          },
+          "finding_ids": {
+            "description": "the findings this request judges (a passage holds several)",
+            "items": {
+              "type": "integer"
+            },
+            "title": "Finding Ids",
+            "type": "array"
+          },
+          "model": {
+            "title": "Model",
+            "type": "string"
+          },
+          "provider": {
+            "title": "Provider",
+            "type": "string"
+          },
+          "questions": {
+            "additionalProperties": true,
+            "title": "Questions",
+            "type": "object"
+          },
+          "state": {
+            "additionalProperties": true,
+            "title": "State",
+            "type": "object"
+          },
+          "system_prompt": {
+            "description": "empty for JEV and Laya, which get no prompt",
+            "title": "System Prompt",
+            "type": "string"
+          }
+        },
+        "required": [
+          "provider",
+          "model",
+          "endpoint",
+          "finding_ids",
+          "envelope_version",
+          "system_prompt",
+          "state",
+          "questions",
+          "body",
+          "approx_tokens"
+        ],
+        "title": "Preview",
+        "type": "object"
+      },
+      "PreviewRequest": {
+        "properties": {
+          "finding_id": {
+            "title": "Finding Id",
+            "type": "integer"
+          },
+          "options": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PassOptions"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "finding_id"
+        ],
+        "title": "PreviewRequest",
+        "type": "object"
+      },
+      "PromptCatalog": {
+        "description": "The texts the options screen shows: presets, rules and the default system prompt (F-086).",
+        "properties": {
+          "default_system_prompt": {
+            "title": "Default System Prompt",
+            "type": "string"
+          },
+          "defaults": {
+            "$ref": "#/components/schemas/PassOptions"
+          },
+          "presets": {
+            "additionalProperties": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Presets",
+            "type": "object"
+          },
+          "rules": {
+            "additionalProperties": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Rules",
+            "type": "object"
+          }
+        },
+        "required": [
+          "presets",
+          "rules",
+          "default_system_prompt",
+          "defaults"
+        ],
+        "title": "PromptCatalog",
+        "type": "object"
+      },
+      "PromptConfig": {
+        "properties": {
+          "extra_instructions": {
+            "default": "",
+            "maxLength": 4000,
+            "title": "Extra Instructions",
+            "type": "string"
+          },
+          "preset": {
+            "default": "balanced",
+            "enum": [
+              "balanced",
+              "strict",
+              "lenient",
+              "boundaries"
+            ],
+            "title": "Preset",
+            "type": "string"
+          },
+          "reason_detail": {
+            "default": "brief",
+            "enum": [
+              "brief",
+              "detailed"
+            ],
+            "title": "Reason Detail",
+            "type": "string"
+          },
+          "reason_lang": {
+            "default": "ar",
+            "enum": [
+              "ar",
+              "en"
+            ],
+            "title": "Reason Lang",
+            "type": "string"
+          },
+          "rules": {
+            "$ref": "#/components/schemas/PromptRules"
+          },
+          "system_prompt_override": {
+            "default": "",
+            "description": "empty: the default system prompt",
+            "maxLength": 20000,
+            "title": "System Prompt Override",
+            "type": "string"
+          },
+          "temperature": {
+            "default": 0.1,
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Temperature",
+            "type": "number"
+          }
+        },
+        "title": "PromptConfig",
+        "type": "object"
+      },
+      "PromptRules": {
+        "description": "The optional rules (see prompts.RULES for each one's text). Laya ignores them.",
+        "properties": {
+          "citation_cues": {
+            "default": true,
+            "title": "Citation Cues",
+            "type": "boolean"
+          },
+          "cue_before_garbled": {
+            "default": false,
+            "description": "N-020: a cue then garbled words: the quote started earlier",
+            "title": "Cue Before Garbled",
+            "type": "boolean"
+          },
+          "explaining_repeat": {
+            "default": false,
+            "title": "Explaining Repeat",
+            "type": "boolean"
+          },
+          "explaining_with_text": {
+            "default": false,
+            "description": "N-020: explaining in the text's own words is not a quote",
+            "title": "Explaining With Text",
+            "type": "boolean"
+          },
+          "ignore_asr_errors": {
+            "default": true,
+            "title": "Ignore Asr Errors",
+            "type": "boolean"
+          },
+          "narrator_names": {
+            "default": false,
+            "title": "Narrator Names",
+            "type": "boolean"
+          },
+          "no_thinking": {
+            "default": false,
+            "description": "ask OpenRouter reasoning models not to think",
+            "title": "No Thinking",
+            "type": "boolean"
+          },
+          "passages": {
+            "default": true,
+            "description": "consecutive verses found back to back go out as one passage",
+            "title": "Passages",
+            "type": "boolean"
+          },
+          "prefer_not_sure": {
+            "default": false,
+            "title": "Prefer Not Sure",
+            "type": "boolean"
+          },
+          "suggest_merges": {
+            "default": true,
+            "description": "send the close neighbours and ask whether to merge",
+            "title": "Suggest Merges",
+            "type": "boolean"
+          }
+        },
+        "title": "PromptRules",
         "type": "object"
       },
       "QuoteIn": {
@@ -1332,6 +2209,420 @@
           "name"
         ],
         "title": "RenameVersion",
+        "type": "object"
+      },
+      "RequestDetail": {
+        "properties": {
+          "context_chars": {
+            "description": "size of the request payload, in characters",
+            "title": "Context Chars",
+            "type": "integer"
+          },
+          "cost_usd": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cost Usd"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "findings": {
+            "items": {
+              "$ref": "#/components/schemas/RequestFinding"
+            },
+            "title": "Findings",
+            "type": "array"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "input_tokens": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Input Tokens"
+          },
+          "job_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Job Id"
+          },
+          "latency_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latency Ms"
+          },
+          "lecture_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lecture Id"
+          },
+          "model": {
+            "title": "Model",
+            "type": "string"
+          },
+          "ok": {
+            "title": "Ok",
+            "type": "boolean"
+          },
+          "output_tokens": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Output Tokens"
+          },
+          "provider": {
+            "title": "Provider",
+            "type": "string"
+          },
+          "purpose": {
+            "title": "Purpose",
+            "type": "string"
+          },
+          "request": {
+            "description": "the exact payload sent (keys removed)",
+            "title": "Request"
+          },
+          "response": {
+            "anyOf": [
+              {},
+              {
+                "type": "null"
+              }
+            ],
+            "description": "the payload received",
+            "title": "Response"
+          }
+        },
+        "required": [
+          "id",
+          "created_at",
+          "provider",
+          "model",
+          "purpose",
+          "job_id",
+          "lecture_id",
+          "ok",
+          "error",
+          "input_tokens",
+          "output_tokens",
+          "cost_usd",
+          "latency_ms",
+          "context_chars",
+          "findings",
+          "request",
+          "response"
+        ],
+        "title": "RequestDetail",
+        "type": "object"
+      },
+      "RequestFinding": {
+        "description": "A finding a request judged, with the verdict it got from that request and the user's correction, if\nany.",
+        "properties": {
+          "boundary": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Boundary"
+          },
+          "confidence": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confidence"
+          },
+          "display_ref": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Display Ref"
+          },
+          "finding_id": {
+            "title": "Finding Id",
+            "type": "integer"
+          },
+          "human": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/HumanVerdict"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "the user's newest verdict on the finding, if any"
+          },
+          "probabilities": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "number"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Probabilities"
+          },
+          "source_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Type"
+          },
+          "verdict": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "the verdict this request gave (none for a failed request)",
+            "title": "Verdict"
+          }
+        },
+        "required": [
+          "finding_id",
+          "display_ref",
+          "source_type"
+        ],
+        "title": "RequestFinding",
+        "type": "object"
+      },
+      "RequestPage": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/RequestRow"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          },
+          "total_cost_usd": {
+            "description": "the cost of every request that matches the filter",
+            "title": "Total Cost Usd",
+            "type": "number"
+          }
+        },
+        "required": [
+          "total",
+          "total_cost_usd",
+          "items"
+        ],
+        "title": "RequestPage",
+        "type": "object"
+      },
+      "RequestRow": {
+        "properties": {
+          "context_chars": {
+            "description": "size of the request payload, in characters",
+            "title": "Context Chars",
+            "type": "integer"
+          },
+          "cost_usd": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cost Usd"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "findings": {
+            "items": {
+              "$ref": "#/components/schemas/RequestFinding"
+            },
+            "title": "Findings",
+            "type": "array"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "input_tokens": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Input Tokens"
+          },
+          "job_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Job Id"
+          },
+          "latency_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latency Ms"
+          },
+          "lecture_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lecture Id"
+          },
+          "model": {
+            "title": "Model",
+            "type": "string"
+          },
+          "ok": {
+            "title": "Ok",
+            "type": "boolean"
+          },
+          "output_tokens": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Output Tokens"
+          },
+          "provider": {
+            "title": "Provider",
+            "type": "string"
+          },
+          "purpose": {
+            "title": "Purpose",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "created_at",
+          "provider",
+          "model",
+          "purpose",
+          "job_id",
+          "lecture_id",
+          "ok",
+          "error",
+          "input_tokens",
+          "output_tokens",
+          "cost_usd",
+          "latency_ms",
+          "context_chars",
+          "findings"
+        ],
+        "title": "RequestRow",
         "type": "object"
       },
       "SearchHit": {
@@ -1557,6 +2848,44 @@
         "title": "ValidationError",
         "type": "object"
       },
+      "VerdictIn": {
+        "description": "The user's own verdict on a finding (F-065). Without `boundary`, the boundary of the newest verdict\nstays.",
+        "properties": {
+          "boundary": {
+            "anyOf": [
+              {
+                "enum": [
+                  "COMPLETE",
+                  "MISSING_START",
+                  "MISSING_END",
+                  "MISSING_BOTH",
+                  "EXTRA_START",
+                  "EXTRA_END"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Boundary"
+          },
+          "verdict": {
+            "enum": [
+              "CORRECT",
+              "FALSE",
+              "NOT_SURE"
+            ],
+            "title": "Verdict",
+            "type": "string"
+          }
+        },
+        "required": [
+          "verdict"
+        ],
+        "title": "VerdictIn",
+        "type": "object"
+      },
       "VerdictOut": {
         "description": "The newest verdict on a finding (a verifier's or the user's). Values are the old app's strings.",
         "properties": {
@@ -1598,6 +2927,47 @@
           "verifier"
         ],
         "title": "VerdictOut",
+        "type": "object"
+      },
+      "VerdictSaved": {
+        "properties": {
+          "boundary": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Boundary"
+          },
+          "finding_id": {
+            "title": "Finding Id",
+            "type": "integer"
+          },
+          "label_id": {
+            "description": "the gold label it was saved as",
+            "title": "Label Id",
+            "type": "integer"
+          },
+          "verdict": {
+            "title": "Verdict",
+            "type": "string"
+          },
+          "verdict_id": {
+            "title": "Verdict Id",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "finding_id",
+          "verdict_id",
+          "verdict",
+          "boundary",
+          "label_id"
+        ],
+        "title": "VerdictSaved",
         "type": "object"
       },
       "VersionDetail": {
@@ -2460,6 +3830,119 @@
         ]
       }
     },
+    "/api/findings/{finding_id}/expand": {
+      "post": {
+        "description": "Grow a finding over the words its start or end is missing (the old editor's auto-heal).",
+        "operationId": "expand_finding_api_findings__finding_id__expand_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "finding_id",
+            "required": true,
+            "schema": {
+              "title": "Finding Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/ExpandIn"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Body"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Expanded"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Expand Finding",
+        "tags": [
+          "verification"
+        ]
+      }
+    },
+    "/api/findings/{finding_id}/verdict": {
+      "put": {
+        "description": "The user's verdict on a finding, saved as a gold label (F-065).",
+        "operationId": "set_verdict_api_findings__finding_id__verdict_put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "finding_id",
+            "required": true,
+            "schema": {
+              "title": "Finding Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerdictIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerdictSaved"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Set Verdict",
+        "tags": [
+          "verification"
+        ]
+      }
+    },
     "/api/health": {
       "get": {
         "operationId": "health_api_health_get",
@@ -3314,6 +4797,222 @@
         ]
       }
     },
+    "/api/lectures/{lecture_id}/verification": {
+      "post": {
+        "description": "Start a verification pass over the selected findings (F-084, F-088). Returns the job; follow it at\nGET /api/jobs/{id}/events and pause, resume or cancel it there.",
+        "operationId": "start_pass_api_lectures__lecture_id__verification_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "lecture_id",
+            "required": true,
+            "schema": {
+              "title": "Lecture Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/PassRequest"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Body"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PassStarted"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Start Pass",
+        "tags": [
+          "verification"
+        ]
+      }
+    },
+    "/api/lectures/{lecture_id}/verification/approve": {
+      "post": {
+        "description": "Accept every AI verdict of the lecture as the user's, as gold labels (F-091). The web app asks\nfirst.",
+        "operationId": "approve_all_api_lectures__lecture_id__verification_approve_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "lecture_id",
+            "required": true,
+            "schema": {
+              "title": "Lecture Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Approved"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Approve All",
+        "tags": [
+          "verification"
+        ]
+      }
+    },
+    "/api/lectures/{lecture_id}/verification/estimate": {
+      "post": {
+        "description": "Findings, requests, tokens, cost and time of a pass, before it runs (F-087).",
+        "operationId": "estimate_pass_api_lectures__lecture_id__verification_estimate_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "lecture_id",
+            "required": true,
+            "schema": {
+              "title": "Lecture Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/PassRequest"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Body"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Estimate"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Estimate Pass",
+        "tags": [
+          "verification"
+        ]
+      }
+    },
+    "/api/lectures/{lecture_id}/verification/preview": {
+      "post": {
+        "description": "The exact request the verifier would get for one finding, not sent (F-086).",
+        "operationId": "preview_request_api_lectures__lecture_id__verification_preview_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "lecture_id",
+            "required": true,
+            "schema": {
+              "title": "Lecture Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PreviewRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Preview"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Preview Request",
+        "tags": [
+          "verification"
+        ]
+      }
+    },
     "/api/lectures/{lecture_id}/versions": {
       "get": {
         "operationId": "list_versions_api_lectures__lecture_id__versions_get",
@@ -3867,6 +5566,234 @@
         ]
       }
     },
+    "/api/telemetry/requests": {
+      "delete": {
+        "description": "Clear the request log (of one lecture, or all). Verdicts stay.",
+        "operationId": "clear_requests_api_telemetry_requests_delete",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "lecture_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Lecture Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cleared"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Clear Requests",
+        "tags": [
+          "telemetry"
+        ]
+      },
+      "get": {
+        "description": "Every AI request, newest first (F-095): provider, model, the findings it judged with their verdicts and\nthe user's corrections, tokens, latency and cost. Filter by lecture, pass (job), provider or purpose.",
+        "operationId": "list_requests_api_telemetry_requests_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "lecture_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Lecture Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "job_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Job Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "provider",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Provider"
+            }
+          },
+          {
+            "in": "query",
+            "name": "purpose",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Purpose"
+            }
+          },
+          {
+            "in": "query",
+            "name": "ok",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Ok"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 100,
+              "maximum": 1000,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RequestPage"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List Requests",
+        "tags": [
+          "telemetry"
+        ]
+      }
+    },
+    "/api/telemetry/requests/{request_id}": {
+      "get": {
+        "description": "One request with the exact payload sent and the payload received (F-096).",
+        "operationId": "get_request_api_telemetry_requests__request_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "request_id",
+            "required": true,
+            "schema": {
+              "title": "Request Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RequestDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Request",
+        "tags": [
+          "telemetry"
+        ]
+      }
+    },
     "/api/transcription/models": {
       "get": {
         "operationId": "list_models_api_transcription_models_get",
@@ -3973,6 +5900,132 @@
         "summary": "Transcribe Youtube",
         "tags": [
           "transcription"
+        ]
+      }
+    },
+    "/api/verification/passes/{job_id}": {
+      "get": {
+        "description": "A pass's numbers (F-089), also while it runs.",
+        "operationId": "pass_metrics_api_verification_passes__job_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PassMetrics"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Pass Metrics",
+        "tags": [
+          "verification"
+        ]
+      }
+    },
+    "/api/verification/prompts": {
+      "get": {
+        "description": "The prompt presets, the optional rules and the default system prompt (F-086).",
+        "operationId": "prompt_catalog_api_verification_prompts_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PromptCatalog"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Prompt Catalog",
+        "tags": [
+          "verification"
+        ]
+      }
+    },
+    "/api/verification/settings": {
+      "get": {
+        "description": "The verifier settings a pass uses unless it sends its own (F-085).",
+        "operationId": "get_verifier_settings_api_verification_settings_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PassOptions"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Get Verifier Settings",
+        "tags": [
+          "verification"
+        ]
+      },
+      "patch": {
+        "operationId": "update_verifier_settings_api_verification_settings_patch",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OptionsPatch"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PassOptions"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Update Verifier Settings",
+        "tags": [
+          "verification"
         ]
       }
     }

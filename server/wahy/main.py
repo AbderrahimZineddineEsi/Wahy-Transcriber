@@ -8,7 +8,7 @@ unfinished as interrupted, and create the shared machinery that routes reach thr
     gpu     core/gpu.py      the GPU owner
     engine  core/engine.py   the engine worker client (the worker itself starts on the first call)
     ai      core/ai/         the provider layer: every model call (Gemini, OpenRouter, Groq, Laya, fake)
-    lectures, transcription, corpora, detection, settings_service
+    lectures, transcription, corpora, detection, verification, telemetry, settings_service
             the feature services (features/*/service.py)
 
 Shutdown: running jobs stop at their next check (they show as interrupted), the GPU is freed and the engine
@@ -38,8 +38,12 @@ from wahy.features.lectures.router import router as lectures_router
 from wahy.features.lectures.service import LectureService
 from wahy.features.settings.router import router as settings_router
 from wahy.features.settings.service import SettingsService
+from wahy.features.telemetry.router import router as telemetry_router
+from wahy.features.telemetry.service import TelemetryService
 from wahy.features.transcription.router import router as transcription_router
 from wahy.features.transcription.service import TranscriptionService
+from wahy.features.verification.router import router as verification_router
+from wahy.features.verification.service import VerificationService
 
 log = logging.getLogger("wahy")
 
@@ -64,6 +68,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         app.state.corpora = CorporaService(db, s, jobs, app.state.engine)
         app.state.detection = DetectionService(db, s, jobs, app.state.engine, app.state.lectures,
                                                app.state.corpora)
+        app.state.verification = VerificationService(db, s, jobs, app.state.engine, app.state.ai,
+                                                     app.state.lectures, app.state.detection)
+        app.state.telemetry = TelemetryService(db)
         app.state.settings_service = SettingsService(s, app.state.gpu, app.state.engine, jobs,
                                                      app.state.corpora)
         try:
@@ -82,6 +89,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(transcription_router)
     app.include_router(corpora_router)
     app.include_router(detection_router)
+    app.include_router(verification_router)
+    app.include_router(telemetry_router)
     return app
 
 

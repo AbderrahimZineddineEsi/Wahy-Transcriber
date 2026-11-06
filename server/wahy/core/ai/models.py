@@ -28,6 +28,7 @@ class AiRequest(Base):
     output_tokens: Mapped[int | None]
     cost_usd: Mapped[float | None]
     latency_ms: Mapped[int | None]
+    finding_ids: Mapped[list[int] | None] = mapped_column(JSON)  # the findings the request was about
     request: Mapped[Any] = mapped_column(JSON)          # the raw payload sent, without the key
     response: Mapped[Any | None] = mapped_column(JSON)  # the raw payload received
     created_at: Mapped[datetime] = mapped_column(default=utcnow)

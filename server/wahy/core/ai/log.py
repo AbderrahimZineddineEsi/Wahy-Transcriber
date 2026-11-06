@@ -78,6 +78,7 @@ class RequestLog:
                 output_tokens=output_tokens,
                 cost_usd=cost_usd,
                 latency_ms=latency_ms,
+                finding_ids=list(call.finding_ids) if call.finding_ids else None,
                 request=_clean(request) or {},
                 response=_clean(response),
             )

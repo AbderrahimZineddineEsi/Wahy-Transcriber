@@ -3,6 +3,7 @@ features ask it, and never call a provider's HTTP API themselves.
 
     ai = AiLayer(db, settings, gpu)
     answers = ai.verify("gemini", items, call=call, options=GeminiOptions(rpm=5))
+    ai.preview("gemini", items[:5], GeminiOptions())   # the request it would send, not sent
     ai.laya.envelope().version            # which envelope Laya's checkpoint reads
     ai.catalog.search("deepseek")         # OpenRouter models with live prices
     ai.groq.transcribe_file(path, call=call)
@@ -46,6 +47,8 @@ class Verifier(Protocol):
     name: str
 
     def verify(self, items: list[Item], *, call: Call, options: Any = None) -> list[Answer]: ...
+
+    def preview(self, items: list[Item], options: Any = None) -> dict[str, Any]: ...
 
 
 class AiLayer:
@@ -93,6 +96,11 @@ class AiLayer:
         """Ask verifier `name` about `items`; one Answer per item, in order. Raises AiError when a request
         fails (`fatal`: the next items would fail the same way)."""
         return self.verifier(name).verify(items, call=call, options=options)
+
+    def preview(self, name: str, items: list[Item], options: Any = None) -> dict[str, Any]:
+        """What one request of verifier `name` for `items` would send, without sending it:
+        {endpoint, model, body}. Gemini puts all of `items` in the request; the others take the first."""
+        return self.verifier(name).preview(items, options)
 
     def ready(self) -> dict[str, bool]:
         """Which verifiers can be asked now (a key is set, Laya is installed)."""

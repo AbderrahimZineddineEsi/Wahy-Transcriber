@@ -30,13 +30,15 @@ class Call:
 
     `check()` is called before each request and during every wait: a job passes `ctx.check`, so pausing blocks
     there and cancelling raises there. `on_wait(seconds, reason)` is told about each wait (free-tier pacing, a
-    429), so the web app can show a countdown."""
+    429), so the web app can show a countdown. `finding_ids` is saved with each request, so the request log
+    can say which findings a request judged (a failed one too)."""
 
     purpose: str = "verify"
     job_id: str | None = None
     lecture_id: int | None = None
     check: Callable[[], None] = _never_stop
     on_wait: Callable[[float, str], None] | None = None
+    finding_ids: list[int] | None = None  # the findings this call is about (the request log shows them)
 
 
 @dataclass(frozen=True)
