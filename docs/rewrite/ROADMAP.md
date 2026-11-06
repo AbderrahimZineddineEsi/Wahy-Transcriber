@@ -138,7 +138,9 @@ decisions and why). The problems being fixed are in the friction map: https://cl
     `.txt/.srt/.vtt`, a YouTube link (yt-dlp), an uploaded file (ffmpeg), and the sample lecture. The media cache goes
     in `data/media/`.
   - `features/transcription`: Groq, faster-whisper (small, large-v3-turbo) and the specialized Whisper, all through
-    the GPU owner, running as a job.
+    the GPU owner, running as a job. Pass faster-whisper a decoded float32 array, not a file path: its path decoding
+    calls `av.open(metadata_errors=...)`, which PyAV 19 removed (fixed in the old app on 2026-11-06, commit 6b3d363).
+    API keys come from the gitignored `.env`.
   - Done when: parser tests use fixture files; transcription tests use a fake ASR; one live test is marked and only
     runs on request.
   - Feature check (through the API): an `.srt` file becomes a lecture with timed words; a YouTube link shows progress
@@ -334,3 +336,6 @@ Each entry: date, what changed, the user's words.
   just go fetch some jumuaa lecture by sheikh mohammed meziane".
 - **2026-11-04**: Phase 3 copied the Tafrigh runs to `data/tafrigh_runs/` and untracked `runs/` and `backend/runs/`
   (originals stay on disk, because the old app reads them). The new dev server uses port 8120 (8100 is taken here).
+- **2026-11-06**: Before a demo, the old app on `main` got a fix: local faster-whisper crashed on PyAV 19, and
+  `run.sh` now loads `.env` (Groq key). Cherry-picked here; phase 7 notes the PyAV pitfall. User: "push the change,
+  then go to the refactoring branch and make that change too if it was needed there".
