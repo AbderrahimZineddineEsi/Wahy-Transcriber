@@ -1,8 +1,8 @@
 """Laya fine-tuning dataset v2: the ablation folder for run 3 (envelope v2, docs/laya-finetune/envelope-v2.md).
 
 Same labels, same lectures and same train / val / test split as laya_v1 (laya_dataset.assign_splits). What changes is
-what Laya reads, and every state is built by the app's own code (js/ai-verifier.js buildLayaV2Requests, run through
-js/harness.js), so the training rows and the app cannot drift apart:
+what Laya reads, and every state is built by the app's own code (engine/src/envelopes.ts, version 2, run through
+engine_bridge.py and the engine worker), so the training rows and the app cannot drift apart:
 
   base        envelope v2: lecture fields before the corpus text, no duplicate verse text, boundary = two yes/no
               questions (start_missing / end_missing) with the word-overlap evidence in the state

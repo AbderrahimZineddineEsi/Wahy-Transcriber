@@ -21,8 +21,9 @@ decisions and why). The problems being fixed are in the friction map: https://cl
    Node/Express and NestJS, some Flutter): what was built, each new concept explained plainly with a small example
    from this code, how it was tested, and two or three commands to try. Keep it short. This is a learning log for the
    user, not instructions for the next session.
-6. Tick the phase, show the user a short summary, and ask before committing. On a yes, commit as
-   `rewrite phase N: <title>` and push (retry the push with a timeout if GitHub drops the connection).
+6. Tick the phase, show the user a short summary, then commit as `rewrite phase N: <title>` and push without asking
+   (retry the push with a timeout if GitHub drops the connection). At the start of a session, if the previous phase's
+   work is still uncommitted, commit and push it the same way before doing anything else.
 7. End by giving the user the exact start prompt for the next phase, with its model and effort.
 
 **Rules.**
@@ -106,7 +107,7 @@ decisions and why). The problems being fixed are in the friction map: https://cl
     Features: F-011, F-012, F-043.
   - Learn: ES modules vs browser globals; deep modules (a small interface over a lot of logic).
 
-- [ ] **5. Envelope builders and the engine worker**: Opus 5.5, high. ADRs 0002, 0003.
+- [x] **5. Envelope builders and the engine worker**: Opus 5.5, high. ADRs 0002, 0003.
   - Move the envelope builders v1, v2 and v3 (with passages, neighbours and `boundaryByRule`) into `engine/src/`, with
     one entry point: `envelopes(findings, words, version, options)`.
   - Add `search(text)` for corpus search, and a worker entry (`engine/src/worker.ts`): one JSON request per line on
@@ -121,7 +122,7 @@ decisions and why). The problems being fixed are in the friction map: https://cl
 
 ### Server
 
-- [ ] **6. Server core**: Opus 5.5, high. ADRs 0005, 0006, 0007.
+- [x] **6. Server core**: Opus 5.5, high. ADRs 0005, 0006, 0007.
   - `core/settings.py`, `core/db.py` with the first Alembic migration (lectures, lecture versions, words, findings,
     verdicts, labels, jobs, AI requests, settings), and `core/jobs.py`: submit, progress, pause, resume, cancel,
     status saved in SQLite, interrupted after a restart, and one progress stream per job (server-sent events).
@@ -232,7 +233,15 @@ decisions and why). The problems being fixed are in the friction map: https://cl
     edit caption timing.
   - Export: SRT, VTT and ASS captions that never split a quote, and the formatted text with bracket and reference
     styles.
-  - Done when: golden captions and text exports are identical; a test proves word timings survive a text edit.
+  - Commentary gaps (new, not in the old app): when a finding has `commentaryGaps`, the speaker's words between its
+    `segments` go outside the quote, for Quran, Hadith and Adhkar alike: `«part one» [commentary] «part two» [ref]`.
+    A Quran verse embedded in a hadith (`embeddedQuran`) still goes in its own `﴿…﴾` inside the segment it is in.
+    Add a setting to turn this off (the old code had an unused `showSharhBrackets` flag). The old app put the commentary
+    inside the brackets, so findings with gaps are the one expected difference from the golden exports. The web
+    transcript view (phases 12 and 17) shows the same split.
+  - Done when: golden captions and text exports are identical, apart from the commentary-gap split above, which has
+    its own test (Hadith with a gap, Hadith with a gap and an embedded verse, Quran with a gap); a test proves word
+    timings survive a text edit.
   - Feature check: export the sample lecture's captions; they match the old app's.
     Features: F-003, F-053, F-056, F-058 to F-064, F-067 to F-071.
   - Learn: the command pattern for undo; LCS alignment.
@@ -339,3 +348,6 @@ Each entry: date, what changed, the user's words.
 - **2026-11-06**: Before a demo, the old app on `main` got a fix: local faster-whisper crashed on PyAV 19, and
   `run.sh` now loads `.env` (Groq key). Cherry-picked here; phase 7 notes the PyAV pitfall. User: "push the change,
   then go to the refactoring branch and make that change too if it was needed there".
+- **2026-11-06**: Sessions now commit and push without asking: the previous phase's leftovers at the start, the new
+  phase at the end. User: "before you start push with the commit step 6 done (something like that) and when you finish
+  push with step 7 done (or whatever you made done) and make this remembered for future sessions".

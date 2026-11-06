@@ -141,6 +141,14 @@ One execution of Tafrigh over a lecture with fixed settings, saved so it can be 
 **Outline**:
 The heading structure that Tafrigh builds for a lesson.
 
+## The app
+
+**Job**:
+One piece of long work the server does in the background (a transcription, a detection, a verification pass, a
+Tafrigh run), with a status and progress the web app can follow, pause, resume or cancel. A job the server stopped
+while it ran is **interrupted**.
+_Avoid_: task, run
+
 ## Flagged ambiguities
 
 - "Run" meant four things in the old code: a Laya training run, a Tafrigh run, a saved lecture snapshot (the

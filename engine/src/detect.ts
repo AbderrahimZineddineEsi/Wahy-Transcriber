@@ -54,8 +54,10 @@ function isEngine(x: string): x is EngineVersion {
   return x === "v3" || x === "v4" || x === "v5";
 }
 
-function matcherFor(options: DetectOptions): Matcher {
-  const { corpus, engine = "v5", profile = "normal", qiraat = "AUTO", customQuotes = [] } = options;
+/** The engine built for these options (cached per corpus object). The envelope builders and corpus search read its
+ *  corpus units, so a finding's envelope comes from the same units the engine matched it against. */
+export function matcherFor(options: DetectOptions): Matcher {
+  const { corpus, engine = "v5", profile = "normal", qiraat = "AUTO", customQuotes = [], v5 } = options;
   const adhkar = options.adhkar ?? BUILTIN_ADHKAR_DATA;
   if (!corpus || !Array.isArray(corpus.ayat) || !Array.isArray(corpus.hadiths)) {
     throw new Error("detect needs a corpus with ayat and hadiths arrays");
@@ -64,6 +66,7 @@ function matcherFor(options: DetectOptions): Matcher {
   if (profile !== "normal" && !(engine === "v5" && profile === "loose")) {
     throw new Error(`engine ${engine} has no profile "${profile}"`);
   }
+  if (v5 !== undefined && engine !== "v5") throw new Error(`the v5 option is for engine v5, not ${engine}`);
   if (qiraat !== "AUTO" && !(qiraat in QIRAAT_AR_NAME)) {
     throw new Error(`unknown qira'ah "${qiraat}" (AUTO or one of ${Object.keys(QIRAAT_AR_NAME).join(", ")})`);
   }
@@ -71,24 +74,27 @@ function matcherFor(options: DetectOptions): Matcher {
   let cache = matchers.get(corpus);
   if (!cache) matchers.set(corpus, (cache = new Map()));
   // only v3 reads the qira'ah, so v4 and v5 share one matcher whatever it is
-  const key = JSON.stringify([engine, profile, engine === "v3" ? qiraat : null, adhkar, customQuotes]);
+  const key = JSON.stringify([engine, profile, engine === "v3" ? qiraat : null, adhkar, customQuotes, v5 ?? null]);
   let matcher = cache.get(key);
   if (matcher) {
     cache.delete(key); // re-insert: the Map's order is the least recently used first
   } else {
-    matcher = buildMatcher(corpus, engine, profile, qiraat, adhkar.map((x) => ({ ...x })), customQuotes);
+    matcher = buildMatcher(corpus, engine, profile, qiraat, adhkar.map((x) => ({ ...x })), customQuotes, v5);
     if (cache.size >= MAX_MATCHERS_PER_CORPUS) cache.delete(cache.keys().next().value!);
   }
   cache.set(key, matcher);
   return matcher;
 }
 
-/** js/state.js rebuildMatcher, with the engine choice passed in instead of read from localStorage. */
+/** js/state.js rebuildMatcher, with the engine choice passed in instead of read from localStorage. `v5` is the
+ *  datagen harness's rebuild with params.v5 (backend/laya_datagen/js/harness.js useEngine, "v5/<tag>"). */
 function buildMatcher(
   corpus: Corpus, engine: EngineVersion, profile: EngineProfile, qiraat: string, adhkar: unknown[], outside: unknown[],
+  v5?: Record<string, unknown>,
 ): Matcher {
   if (engine === "v5") {
-    return new WahyEngineV5(corpus.ayat, corpus.hadiths, { ...ENGINE_PARAMS, v5Profile: profile }, adhkar, outside);
+    const params = v5 === undefined ? { ...ENGINE_PARAMS, v5Profile: profile } : { ...ENGINE_PARAMS, v5Profile: profile, v5 };
+    return new WahyEngineV5(corpus.ayat, corpus.hadiths, params, adhkar, outside);
   }
   if (engine === "v4") return new WahyEngine(corpus.ayat, corpus.hadiths, ENGINE_PARAMS, adhkar, outside);
   return new QuotationMatcherJS(corpus.ayat, corpus.hadiths, { ...ENGINE_PARAMS, defaultQiraah: qiraat }, adhkar, outside);

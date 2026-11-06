@@ -67,6 +67,9 @@ export interface DetectOptions {
   adhkar?: Dhikr[];
   /** default: none */
   customQuotes?: CustomQuote[];
+  /** research only (the datagen's "v5/<tag>" engines): engine v5 rebuilt with params.v5 = this, for example
+   *  { fix: { variants: false } } to measure what one v5 fix brings. Not for the app. */
+  v5?: Record<string, unknown>;
 }
 
 export type SourceType = "QURAN" | "HADITH" | "ADHKAR";

@@ -26,7 +26,7 @@ server/                Python 3.12, FastAPI, managed with uv
       ai/              the provider layer (ADR 0004): gemini, openrouter, groq, laya_local, fake
     features/          one folder per feature: router.py, service.py, schemas.py, models.py
       lectures/  transcription/  detection/  verification/  editing/  export/
-      tafrigh/   corpora/        telemetry/  training/
+      tafrigh/   corpora/        telemetry/  training/      jobs/     settings/
   laya/                the research side (was backend/laya_datagen): datagen CLI, teachers, dataset build, evals
   tests/
 engine/                TypeScript: engines v3/v4/v5, envelope builders v1/v2/v3, worker entry, golden tests

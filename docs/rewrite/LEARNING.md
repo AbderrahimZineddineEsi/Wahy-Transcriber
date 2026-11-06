@@ -281,3 +281,189 @@ node --input-type=module -e '
   const words = m.synthesizeWordsFromRawText("قال الله تعالى قل هو الله أحد الله الصمد");
   console.log(m.detect(words, { corpus, engine: "v3" }).map(f => [f.displayRef, f.matchedText]));'
 ```
+
+## Phase 5: Envelope builders and the engine worker (2026-11-06)
+
+**What was built.** The engine package now builds Laya's inputs too, and other languages can call it:
+
+```ts
+envelopes(findings, words, 3, { corpus, engine: "v5", passages: true })   // → [{members, state, questions, boundaryByRule}]
+search("البقرة: 255", { corpus, engine: "v5", kind: "QURAN" })             // → [{unitId, sourceType, displayRef, fullText}]
+```
+
+- `engine/src/envelope-builders.js`: the old `js/ai-verifier.js` builders (v1, v1 with passages, v2, v3, the merge
+  question, `boundaryByRule`), moved verbatim. The only edit: what they read from browser globals (`activeMatcher`,
+  `RAW_QURAN_DATA`, `currentState`) is now an argument, `ctx = {units, ayat, detections}`.
+- `envelopes.ts` and `search.ts`: the typed entry points. `members` are finding indices, not objects, so they survive JSON.
+- `worker.ts`: a Node process that loads the corpus once and answers JSON lines (`detect`, `envelopes`, `search`,
+  `units`, `tokenize`, `info`, …).
+- `backend/laya_datagen/engine_bridge.py` now starts that worker instead of the old `js/harness.js` (deleted). Its
+  Python interface did not change, so no datagen code changed. One research option is gone: loading a *copy* of an
+  engine file (`"v5@tag"`); nothing used it.
+
+### Talking between processes: JSON lines over pipes
+
+The server is Python and the engine is JavaScript. They can't call each other's functions, so the server starts Node
+as a **child process** and they talk through its stdin and stdout, the same pipes `cat file | grep x` uses:
+
+```
+python → worker (stdin):   {"id": 7, "cmd": "detect", "words": [...], "options": {"engine": "v5"}}
+worker → python (stdout):  {"id": 7, "ok": true, "result": [...findings]}
+```
+
+Three rules make this safe:
+- **One message per line.** JSON never contains a raw newline (it's escaped as `\n`), so "read one line" = "read one
+  message". This is called *JSON Lines* or NDJSON.
+- **stdout is only for answers.** A stray `console.log` would be read as an answer and break everything, so the worker
+  redirects every other log to stderr. Errors become `{"ok": false, "error": ...}` and the worker keeps going.
+- **One request at a time, and an `id` on each.** The Python side holds a lock while it writes and reads, and checks
+  that the answer's `id` is its own.
+
+Why a long-lived process instead of `node detect.js` per call: loading the 90 MB corpus and building a matcher takes
+seconds and hundreds of MB. The worker pays that once. In NestJS terms it is like a microservice with a message
+transport, minus the network.
+
+### Why one envelope builder matters for Laya
+
+Laya learns from rows whose `state` was built by some function. If the app later builds the `state` with a slightly
+different function, the model sees inputs it was never trained on: **training/serving skew** (phase 2 measured it
+between the notebook's `to_v3_state` and the app). Now the datagen and the app call the same `envelopes()`. The proof:
+rebuilding `laya_v2` through the new worker gave **26 of 26 data files byte-identical** to a rebuild with the old harness.
+
+### A cache keyed on a fingerprint
+
+The datagen caches each lecture's findings under a key that includes the engine's **fingerprint**, a hash of every
+engine file and the corpus. Edit one engine file and the hash changes, so the cache misses and everything is detected
+again, and stale results are never reused. The new worker hashes `engine/src/*`, so its fingerprint is new and the first
+rebuild re-detected every lecture with every engine (18 minutes instead of 2). That made the rebuild a full end-to-end
+test, not only an envelope test.
+
+### How it was tested
+
+- **Golden** (`golden.test.ts`, about 75 s): every golden input × engine × envelope file (v1, the four v2 option sets,
+  both v3 ones): 112 files identical. Plus 20 cases recorded from the old code by `engine/golden/make_envelope_extras.mjs`
+  (v1 with passages, which Gemini, JEV and OpenRouter got by default, and envelopes for some findings only) and 72 corpus
+  searches. Two of those old functions were private to their file, so the generator re-runs the file's own source with
+  one extra export added; the function bodies run as they are.
+- **Does it have teeth?** Changing the boundary evidence from 2 edge words to 3 failed 3 envelope tests on the sample
+  alone.
+- **Interface tests** (`envelopes.test.ts`, `worker.test.ts`, under a second, small corpus): passages, targets,
+  neighbours, findings that went through JSON, clear errors; and a real worker process answering the same as the
+  package in-process, surviving a bad line.
+- **The datagen**: `backend/tests/laya_datagen` 62 of 62 on the new bridge; `laya_v2` rebuilt identically (above); the
+  `laya_review.ipynb` "Load lessons" path prints its recall table (v4 recall 0.736 on 16 lessons).
+
+**Something the rebuild revealed.** The `laya_v2` folder on disk (built 2026-10-27) can't be rebuilt even by the old
+code: passage grouping and the `v1_passages` format changed after it was built. So "identical" here means identical to
+what today's code builds, not identical to the folder on disk.
+
+**Try:**
+
+```bash
+npx vitest run --root engine src/envelopes.test.ts src/worker.test.ts     # 1 second
+printf '%s\n' '{"id":1,"cmd":"tokenize","text":"قالَ اللهُ تعالى"}' '{"id":2,"cmd":"search","text":"الصمد","options":{"engine":"v3"}}' \
+  | node engine/src/worker.ts --corpus engine/src/fixtures/small-corpus.json
+diff <(sed -n '34,148p' js/ai-verifier.js | sed 's/^  //') <(sed -n '19,133p' engine/src/envelope-builders.js)   # the move
+```
+
+## Phase 6: Server core (2026-11-06)
+
+**What was built.** The machinery every later server feature stands on, in `server/wahy/core/`:
+
+| Module | What a feature does with it | What it hides |
+|---|---|---|
+| `settings.py` | `settings.db_path`, `settings.key("gemini")` | `.env`, environment variables, keys as `SecretStr` |
+| `db.py` + `migrations/` | `with db.session() as s: s.add(Lecture(...))` | SQLite pragmas, Alembic, one session per thread |
+| `jobs.py` | `runner.submit("transcribe", params)`, `ctx.progress(...)`, `ctx.check()` | threads, pause/resume/cancel, saving, restarts |
+| `gpu.py` | `with gpu.use("laya") as model:` | waiting your turn, unloading the other model, freeing VRAM |
+| `engine.py` | `engine.detect(words, {"engine": "v5"})` | the Node worker: start, crash, timeout, one request at a time |
+
+Plus `features/jobs/router.py` (list, read, pause, resume, cancel, and `GET /api/jobs/<id>/events`) and the nine
+tables, each declared next to the feature that will own it (`features/lectures/models.py`, ...).
+
+### ORM and migrations
+
+An **ORM** maps a table to a class. You write `Lecture(title="درس", source_kind="youtube")` and SQLAlchemy writes
+the `INSERT`. (In NestJS, TypeORM or Prisma do the same.) The class says what the table *should* look like. A
+**migration** is the script that brings a real database file from one shape to the next: `0001_first_tables.py`
+creates the nine tables, and a later one might add a column. Alembic records which migrations a file already has in
+the `alembic_version` table. So `db.migrate()` at startup works the same on an empty file, on today's file, and on a
+file from three versions ago.
+
+The workflow: change a model, then run `uv run alembic revision --autogenerate -m "..."`. Alembic compares the models with
+the database and writes the migration, which you read before committing. A test (`test_the_migrations_match_the_models`)
+fails if someone changes a model and forgets the migration.
+
+Two SQLite details hide in `db.py`. Foreign keys are **off** by default, so `ON DELETE CASCADE` silently did nothing
+until we turned them on (the test proves deleting a lecture removes its words and findings but keeps its gold
+labels). And **WAL mode** lets the web app read while a job writes.
+
+### Threads vs asyncio, and locks
+
+FastAPI serves requests with **asyncio**: one thread juggles many requests, switching at every `await`. That is good
+for waiting on the network, but a job that runs Whisper for 10 minutes would freeze every request. So each job gets
+its own **thread**. The two worlds meet in the progress stream: the job thread can't touch asyncio objects directly,
+so it hands each update over with `loop.call_soon_threadsafe(queue.put_nowait, snapshot)`, which means "event loop,
+please run this when you can".
+
+**Pause** is built on a `threading.Condition`, a lock that a thread can sleep on:
+
+```python
+# inside the job, between steps            # the pause button (another thread)
+with a.cond:                               with a.cond:
+    while a.control == "pause":                a.control = "pause"
+        a.cond.wait()   # sleeps, lets go   # ... later, resume:
+                        # of the lock          a.control = "run"; a.cond.notify_all()   # wakes it
+```
+
+Nothing can stop a thread from outside in Python, so pause and cancel are **cooperative**: the job calls
+`ctx.check()` between steps, and that is where it sleeps (paused) or raises `JobCancelled`. That's why there are
+`pausing` and `cancelling` statuses: the button was pressed, but the job hasn't reached its next check yet.
+
+The GPU owner uses the same idea, with one twist: while a job waits for the GPU it calls `ctx.check()` every quarter
+second, so a job stuck waiting for Laya can still be cancelled.
+
+### Server-sent events
+
+SSE is the simplest way to push updates to a browser: a normal HTTP response that never ends quickly, made of
+blocks like this:
+
+```
+event: job
+data: {"id": "3f2a...", "status": "running", "progress": {"stage": "transcribe", "percent": 40.0}, ...}
+
+```
+
+In the browser, `new EventSource("/api/jobs/3f2a.../events")` calls you back for each block. It works one way only
+(server → browser), which is all a progress bar needs; WebSockets would be two-way and more work. Each event is the
+job's whole snapshot, not a diff, so a slow reader can safely skip to the newest one.
+
+### Surviving a restart
+
+Every status change is saved, so after a crash the database still says `running` for jobs no thread is running.
+At startup `recover()` turns them into `interrupted`. A job kind registered as `resumable=True` saves its own
+progress with `ctx.save_checkpoint({"next": 3})` and, when resumed, starts from `ctx.checkpoint`. The test stops a
+server half-way through 5 items, starts a second "server" on the same database, resumes, and checks that items
+0–1 ran before and 2–4 after: nothing twice, nothing skipped.
+
+### How it was tested
+
+- **46 server tests** at each module's interface: settings (4), database (8), jobs (15, including the progress stream
+  over HTTP and the restart), GPU owner with fake models (9), engine client (10) with the **real worker** on the
+  11-verse sample corpus, plus a small misbehaving stand-in worker (`tests/fixtures/misbehaving_worker.mjs`) that
+  crashes or hangs on request.
+- **Do they have teeth?** Breaking the code on purpose failed a test every time: foreign keys off, pause not waiting,
+  `recover()` not marking jobs, a resumed job redoing work, the GPU loading without unloading, two GPU users at once,
+  the engine not restarting. Without its timeout, the hang test hangs.
+- **Real corpus**: `EngineClient` on `data/corpus.json` gives findings identical to the golden files for the sample
+  lecture (v5 and v3). `scripts/test.sh` is all green (old backend 152, server 46, engine 82, web 1).
+- A surprise along the way: v4 and v5 find nothing on the 11-verse test corpus (they need a full corpus's
+  statistics), so the small-corpus tests use v3, as the engine's own worker test does.
+
+**Try:**
+
+```bash
+cd server && uv run pytest -q tests/test_jobs.py -k "restart or stream"     # the restart and progress-stream tests
+cd server && uv run alembic current && sqlite3 ../data/wahy.db .tables   # the migration level and the tables
+scripts/dev.sh        # then open http://localhost:8120/docs: the jobs routes, with the stream described
+```
