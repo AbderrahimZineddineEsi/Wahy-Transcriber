@@ -1,0 +1,969 @@
+<meta charset="utf-8">
+<title>Wahy Studio screens</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=Noto+Naskh+Arabic:wght@400;500;600&display=swap">
+<style>
+/* Layout: a quiet working tool. Transcript (the reading surface) on the start side, the video beside it on the end
+   side; a narrow rail for the app's places, and tabs for the open lecture. Colour is spent on meaning only:
+   kind of quote (verse, hadith, dhikr), verdict, and the spoken-word marker. These tokens match web/src/shell/tokens.css. */
+:root {
+  --paper: #f2f4f1;      --surface: #ffffff;   --surface-2: #e9ece8;  --line: #d6dbd5;
+  --ink: #17201e;        --ink-2: #4a5552;     --ink-3: #75817d;
+  --accent: #0e5d58;     --accent-ink: #ffffff; --accent-soft: #d9eae6;
+  --quran: #2a4d9b;      --quran-soft: #e3e9f7;
+  --hadith: #96461c;     --hadith-soft: #f5e6dc;
+  --dhikr: #6a3d88;      --dhikr-soft: #eee5f4;
+  --ok: #217b4c;         --ok-soft: #dcefe3;
+  --bad: #b3312e;        --bad-soft: #f7e0de;
+  --unsure: #9c6c0e;     --unsure-soft: #f5ebd2;
+  --none: #75817d;       --none-soft: #e9ece8;
+  --now: #ffdf6e;        --now-ink: #17201e;
+  --stage: #0c1110;      --stage-ink: #f3f5f4;
+  --shadow: 0 1px 2px rgb(16 24 22 / .06), 0 6px 20px rgb(16 24 22 / .08);
+
+  --font-ui: "IBM Plex Sans Arabic", "Segoe UI", Tahoma, sans-serif;
+  --font-read: "Noto Naskh Arabic", "Amiri", "Traditional Arabic", serif;
+  --font-quran: "Amiri", "Noto Naskh Arabic", serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+
+  --text-xs: .75rem; --text-s: .8125rem; --text-m: .875rem; --text-l: 1rem; --text-xl: 1.25rem; --text-2xl: 1.625rem;
+  --text-read: 1.3rem; --leading-read: 2.15;
+  --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 24px; --space-6: 32px; --space-7: 48px;
+  --radius-s: 4px; --radius-m: 8px; --radius-l: 12px;
+  --rail: 84px; --header: 56px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #0f1312;      --surface: #161b1a;   --surface-2: #1e2423;  --line: #2b3331;
+  --ink: #e4e9e7;        --ink-2: #aab5b1;     --ink-3: #7b8783;
+  --accent: #52b8ad;     --accent-ink: #05201d; --accent-soft: #163330;
+  --quran: #92b1f2;      --quran-soft: #1a2640;
+  --hadith: #e8a073;     --hadith-soft: #372319;
+  --dhikr: #c79de3;      --dhikr-soft: #2c2137;
+  --ok: #5fc88d;         --ok-soft: #142e1f;
+  --bad: #f17b75;        --bad-soft: #3a1918;
+  --unsure: #e5b649;     --unsure-soft: #342811;
+  --none: #7b8783;       --none-soft: #1e2423;
+  --now: #e6c24a;        --now-ink: #121212;
+  --stage: #070a09;      --stage-ink: #f3f5f4;
+  --shadow: 0 1px 2px rgb(0 0 0 / .4), 0 8px 24px rgb(0 0 0 / .45);
+  color-scheme: dark;
+} }
+:root[data-theme="dark"] {
+  --paper: #0f1312;      --surface: #161b1a;   --surface-2: #1e2423;  --line: #2b3331;
+  --ink: #e4e9e7;        --ink-2: #aab5b1;     --ink-3: #7b8783;
+  --accent: #52b8ad;     --accent-ink: #05201d; --accent-soft: #163330;
+  --quran: #92b1f2;      --quran-soft: #1a2640;
+  --hadith: #e8a073;     --hadith-soft: #372319;
+  --dhikr: #c79de3;      --dhikr-soft: #2c2137;
+  --ok: #5fc88d;         --ok-soft: #142e1f;
+  --bad: #f17b75;        --bad-soft: #3a1918;
+  --unsure: #e5b649;     --unsure-soft: #342811;
+  --none: #7b8783;       --none-soft: #1e2423;
+  --now: #e6c24a;        --now-ink: #121212;
+  --stage: #070a09;      --stage-ink: #f3f5f4;
+  --shadow: 0 1px 2px rgb(0 0 0 / .4), 0 8px 24px rgb(0 0 0 / .45);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body { background: var(--paper); color: var(--ink); font-family: var(--font-ui); font-size: var(--text-m); line-height: 1.6; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--surface); }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.num, .mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; direction: ltr; unicode-bidi: isolate; }
+h1, h2, h3 { margin: 0; font-weight: 600; text-wrap: balance; }
+h2 { font-size: var(--text-xl); }
+h3 { font-size: var(--text-l); }
+.muted { color: var(--ink-2); }
+.faint { color: var(--ink-3); }
+.label { font-size: var(--text-xs); color: var(--ink-3); font-weight: 500; }
+
+/* ---------- shell ---------- */
+.app { display: grid; grid-template-rows: var(--header) 1fr; min-height: 100%; }
+.top {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5;
+  display: flex; align-items: center; gap: var(--space-3);
+  background: var(--surface); border-bottom: 1px solid var(--line);
+  padding-block: 0; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.brand { display: flex; align-items: center; gap: var(--space-2); font-family: var(--font-quran); font-size: 1.35rem; font-weight: 700; white-space: nowrap; }
+.brand-mark { width: 26px; height: 26px; border-radius: 7px; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; font-size: 1rem; line-height: 1; }
+.crumb { display: flex; align-items: center; gap: var(--space-2); min-width: 0; color: var(--ink-2); }
+.crumb b { color: var(--ink); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.grow { flex: 1; }
+.iconbtn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 34px; min-width: 34px; padding: 0 10px;
+  border: 1px solid var(--line); border-radius: var(--radius-m); background: var(--surface); color: var(--ink-2); }
+.iconbtn:hover { color: var(--ink); background: var(--surface-2); }
+[dir="rtl"] .flip { transform: scaleX(-1); }
+.iconbtn svg, .rail svg, .btn svg { width: 18px; height: 18px; flex: none; }
+.jobpill { display: inline-flex; align-items: center; gap: 8px; height: 30px; padding: 0 12px; border-radius: 99px; background: var(--accent-soft); color: var(--accent); font-size: var(--text-s); white-space: nowrap; }
+.jobpill i { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); animation: pulse 1.6s infinite; }
+@keyframes pulse { 50% { opacity: .3; } }
+
+.frame { display: grid; grid-template-columns: var(--rail) 1fr; min-height: 0; }
+.rail { background: var(--surface); border-inline-end: 1px solid var(--line); display: flex; flex-direction: column; gap: 2px; padding: var(--space-3) var(--space-2); }
+.rail a { position: relative; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 10px 4px; border-radius: var(--radius-m); color: var(--ink-2); text-decoration: none; font-size: var(--text-xs); text-align: center; line-height: 1.3; }
+.rail a:hover { background: var(--surface-2); color: var(--ink); }
+.rail a[aria-current="true"] { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+.rail .badge { position: absolute; top: 4px; inset-inline-start: 50%; margin-inline-start: 8px; }
+.rail .sep { height: 1px; background: var(--line); margin: var(--space-2) 6px; }
+.badge { display: inline-grid; place-items: center; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 99px; background: var(--ink); color: var(--surface); font: 500 10.5px/1 var(--font-mono); }
+main { min-width: 0; padding-block: var(--space-5) var(--space-7); padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.screen { max-width: 1440px; margin: 0 auto; display: flex; flex-direction: column; gap: var(--space-4); }
+
+/* lecture tabs */
+.lechead { display: flex; flex-wrap: wrap; align-items: end; gap: var(--space-3) var(--space-5); border-bottom: 1px solid var(--line); }
+.lechead h1 { font-size: var(--text-xl); padding-bottom: var(--space-3); }
+.tabs { display: flex; gap: 2px; overflow-x: auto; }
+.tabs a { display: inline-flex; align-items: center; gap: 6px; padding: 10px 14px; color: var(--ink-2); text-decoration: none; border-bottom: 2px solid transparent; margin-bottom: -1px; white-space: nowrap; }
+.tabs a:hover { color: var(--ink); }
+.tabs a[aria-current="true"] { color: var(--ink); border-color: var(--accent); font-weight: 600; }
+.tabs .badge { background: var(--surface-2); color: var(--ink-2); }
+.tabs a[aria-current="true"] .badge { background: var(--accent); color: var(--accent-ink); }
+.version { margin-inline-start: auto; padding-bottom: var(--space-2); display: flex; align-items: center; gap: var(--space-2); }
+
+/* ---------- controls ---------- */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 36px; padding: 0 14px; border-radius: var(--radius-m); border: 1px solid var(--line); background: var(--surface); color: var(--ink); font-weight: 500; white-space: nowrap; }
+.btn:hover { background: var(--surface-2); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn.primary:hover { filter: brightness(1.08); }
+.btn.ghost { border-color: transparent; background: transparent; color: var(--ink-2); }
+.btn.small { height: 30px; padding: 0 10px; font-size: var(--text-s); }
+.btn.danger { color: var(--bad); }
+.seg { display: inline-flex; padding: 3px; gap: 2px; border-radius: var(--radius-m); background: var(--surface-2); }
+.seg button { border: 0; background: transparent; padding: 4px 10px; border-radius: 6px; color: var(--ink-2); font-size: var(--text-s); white-space: nowrap; }
+.seg button[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 1px 2px rgb(0 0 0 / .12); font-weight: 600; }
+.field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.input, select.input, textarea.input { height: 36px; padding: 0 10px; border: 1px solid var(--line); border-radius: var(--radius-m); background: var(--surface); width: 100%; min-width: 0; }
+textarea.input { height: auto; padding: 10px; line-height: 1.8; resize: vertical; }
+.switch { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; font-size: var(--text-s); color: var(--ink-2); white-space: nowrap; }
+.switch input { appearance: none; width: 32px; height: 18px; border-radius: 99px; background: var(--line); position: relative; margin: 0; transition: background .15s; }
+.switch input::after { content: ""; position: absolute; top: 2px; inset-inline-start: 2px; width: 14px; height: 14px; border-radius: 50%; background: var(--surface); transition: inset-inline-start .15s; }
+.switch input:checked { background: var(--accent); }
+.switch input:checked::after { inset-inline-start: 16px; }
+.chip { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border-radius: 99px; border: 1px solid var(--line); background: var(--surface); color: var(--ink-2); font-size: var(--text-s); white-space: nowrap; }
+.chip[aria-pressed="false"] { opacity: .45; text-decoration: line-through; }
+.dot { width: 8px; height: 8px; border-radius: 50%; flex: none; background: currentColor; }
+
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-l); }
+.panel-h { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) var(--space-4); border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+.panel-b { padding: var(--space-4); display: flex; flex-direction: column; gap: var(--space-4); }
+.row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-3); }
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--space-3); }
+
+/* verdict chip */
+.vchip { display: inline-flex; align-items: center; gap: 5px; height: 22px; padding: 0 8px; border-radius: 99px; font-size: var(--text-xs); font-weight: 600; white-space: nowrap; font-family: var(--font-ui); }
+.vchip.ok { background: var(--ok-soft); color: var(--ok); }
+.vchip.bad { background: var(--bad-soft); color: var(--bad); }
+.vchip.unsure { background: var(--unsure-soft); color: var(--unsure); }
+.vchip.none { background: var(--none-soft); color: var(--none); }
+.vchip.busy { background: var(--accent-soft); color: var(--accent); }
+.kchip { font-size: var(--text-xs); font-weight: 600; padding: 1px 8px; border-radius: var(--radius-s); }
+.kchip.quran { color: var(--quran); background: var(--quran-soft); }
+.kchip.hadith { color: var(--hadith); background: var(--hadith-soft); }
+.kchip.dhikr { color: var(--dhikr); background: var(--dhikr-soft); }
+
+/* ---------- lecture view ---------- */
+.kpis { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-5); color: var(--ink-2); font-size: var(--text-s); }
+.kpis span { display: inline-flex; gap: 5px; align-items: baseline; }
+.kpis b { color: var(--ink); font-family: var(--font-mono); font-weight: 500; }
+.toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-3); }
+.toolbar .search { width: 180px; }
+.stage { display: grid; grid-template-columns: minmax(0, 1fr) minmax(320px, 440px); gap: var(--space-4); align-items: start; }
+.stage[data-layout="text"] { grid-template-columns: minmax(0, 1fr); }
+.stage[data-layout="text"] .player { display: none; }
+.stage[data-layout="video"] { grid-template-columns: minmax(0, 960px); justify-content: center; }
+.stage[data-layout="video"] .reader { display: none; }
+.reader { position: relative; }
+.reader .panel-b { max-height: calc(100vh - 290px); min-height: 420px; overflow-y: auto; }
+.progressline { height: 3px; background: var(--surface-2); }
+.progressline i { display: block; height: 100%; width: 0; background: var(--accent); }
+.transcript { font-family: var(--font-read); font-size: var(--text-read); line-height: var(--leading-read); max-width: 46em; }
+.transcript p { margin: 0 0 1.1em; }
+.w { border-radius: 3px; padding: 0 1px; cursor: pointer; transition: background .12s; }
+.w:hover { background: var(--surface-2); }
+.w.past { color: var(--ink); }
+.w.future { color: var(--ink-2); }
+.w.now { background: var(--now); color: var(--now-ink); box-shadow: 0 0 0 2px var(--now); }
+.w.hit { outline: 2px solid var(--accent); outline-offset: 1px; }
+.f { border-radius: 4px; padding: 3px 2px; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+.f.quran { background: var(--quran-soft); }
+.f.quran .w { font-family: var(--font-quran); font-size: 1.08em; }
+.f.hadith { background: var(--hadith-soft); }
+.f.dhikr { background: var(--dhikr-soft); }
+.f .br { font-family: var(--font-quran); }
+.f.quran .br { color: var(--quran); }
+.f.hadith .br { color: var(--hadith); }
+.f.dhikr .br { color: var(--dhikr); }
+.ref { font-family: var(--font-ui); font-size: .62em; font-weight: 600; padding: 1px 6px; margin-inline-start: 4px; border-radius: var(--radius-s); vertical-align: .15em; white-space: nowrap; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; line-height: 1.6; }
+.f.quran .ref { color: var(--quran); }
+.f.hadith .ref { color: var(--hadith); }
+.f.dhikr .ref { color: var(--dhikr); }
+.ref .vd { width: 7px; height: 7px; border-radius: 50%; }
+.vd.ok { background: var(--ok); } .vd.bad { background: var(--bad); } .vd.unsure { background: var(--unsure); } .vd.none { background: transparent; box-shadow: inset 0 0 0 1.5px var(--none); }
+.f.bad { background: repeating-linear-gradient(-45deg, transparent 0 6px, var(--bad-soft) 6px 8px); }
+.f.sel { box-shadow: 0 0 0 2px var(--accent); }
+
+.player { position: sticky; top: calc(var(--header) + var(--space-4)); display: flex; flex-direction: column; gap: var(--space-3); }
+.video { position: relative; aspect-ratio: 16 / 9; max-width: 100%; border-radius: var(--radius-l); overflow: hidden; background:
+  radial-gradient(120% 90% at 70% 30%, #2a3634 0%, var(--stage) 70%); color: var(--stage-ink); }
+.video .speaker { position: absolute; inset: 18% 34% 0; border-radius: 50% 50% 0 0 / 38% 38% 0 0; background: linear-gradient(#3a4745, #1b2322); opacity: .8; }
+.video .speaker::before { content: ""; position: absolute; width: 38%; aspect-ratio: 1; border-radius: 50%; top: -22%; left: 31%; background: #46524f; }
+.video .cap { position: absolute; inset: auto 6% 8% 6%; text-align: center; font-family: var(--font-read); font-size: clamp(.85rem, 1.6vw, 1.08rem); line-height: 1.7; background: rgb(0 0 0 / .68); padding: 4px 10px; border-radius: 6px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.video .cap:empty { display: none; }
+.video .stamp { position: absolute; top: 10px; inset-inline-end: 10px; font: 500 11px var(--font-mono); background: rgb(0 0 0 / .5); padding: 2px 6px; border-radius: 4px; }
+.controls { display: flex; align-items: center; gap: var(--space-2); }
+.controls input[type=range] { flex: 1; accent-color: var(--accent); min-width: 0; }
+.time { font: 500 var(--text-s) var(--font-mono); color: var(--ink-2); white-space: nowrap; direction: ltr; }
+.nowcard { padding: var(--space-3) var(--space-4); display: flex; flex-direction: column; gap: 6px; }
+.nowcard .quote { font-family: var(--font-read); font-size: 1.02rem; line-height: 1.9; }
+
+.pop { position: absolute; z-index: 4; width: 300px; max-width: calc(100% - 24px); background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-l); box-shadow: var(--shadow); padding: var(--space-4); display: flex; flex-direction: column; gap: var(--space-3); }
+.pop .x { position: absolute; top: 8px; inset-inline-end: 8px; }
+.pop .quote { font-family: var(--font-read); font-size: 1rem; line-height: 1.9; max-height: 6.5em; overflow: hidden; }
+
+/* ---------- editor ---------- */
+.edgrid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(300px, 380px); gap: var(--space-4); align-items: start; }
+.board { font-family: var(--font-read); font-size: 1.12rem; line-height: 2.5; }
+.board .bw { display: inline-block; padding: 0 6px; margin: 2px 1px; border-radius: 6px; border: 1px solid transparent; cursor: pointer; line-height: 1.9; }
+.board .bw:hover { border-color: var(--line); background: var(--surface-2); }
+.board .bw.quran { background: var(--quran-soft); color: var(--quran); }
+.board .bw.hadith { background: var(--hadith-soft); color: var(--hadith); }
+.board .bw.dhikr { background: var(--dhikr-soft); color: var(--dhikr); }
+.board .bw.fsel { border-color: currentColor; }
+.board .bw.rsel { background: var(--accent); color: var(--accent-ink); }
+.board .bw.anchor { box-shadow: 0 0 0 2px var(--accent); }
+.board .brk { display: block; height: var(--space-3); }
+.inspector { position: sticky; top: calc(var(--header) + var(--space-4)); }
+.inspector .quote { font-family: var(--font-read); font-size: 1.02rem; line-height: 1.95; background: var(--surface-2); padding: var(--space-3); border-radius: var(--radius-m); max-height: 9em; overflow-y: auto; }
+.cands { display: flex; flex-direction: column; gap: 6px; }
+.cand { display: flex; align-items: center; gap: var(--space-2); padding: 8px 10px; border: 1px solid var(--line); border-radius: var(--radius-m); cursor: pointer; }
+.cand:has(input:checked) { border-color: var(--accent); background: var(--accent-soft); }
+.cand input { accent-color: var(--accent); margin: 0; }
+.cand .t { font-family: var(--font-read); font-size: .95rem; color: var(--ink-2); }
+.tokens { display: flex; flex-wrap: wrap; gap: 4px; font-family: var(--font-read); }
+.tokens span { padding: 1px 8px; border-radius: 99px; border: 1px dashed var(--line); font-size: .95rem; }
+.tokens span.diff { border-style: solid; border-color: var(--unsure); color: var(--unsure); }
+.miniplayer { display: flex; align-items: center; gap: var(--space-2); padding: 6px 10px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-m); flex-wrap: wrap; }
+.seltool { display: flex; align-items: center; gap: var(--space-2); padding: 6px; background: var(--ink); color: var(--surface); border-radius: var(--radius-m); box-shadow: var(--shadow); flex-wrap: wrap; }
+.seltool .btn { background: transparent; color: var(--surface); border-color: transparent; }
+.seltool .btn:hover { background: rgb(255 255 255 / .12); }
+.results { display: flex; flex-direction: column; gap: 6px; }
+.result { display: grid; grid-template-columns: auto 1fr auto; gap: var(--space-2); align-items: center; padding: 8px 10px; border: 1px solid var(--line); border-radius: var(--radius-m); }
+.result .t { font-family: var(--font-read); font-size: .98rem; min-width: 0; }
+
+table.data { width: 100%; border-collapse: collapse; font-size: var(--text-s); }
+table.data th { text-align: start; font-weight: 500; color: var(--ink-3); font-size: var(--text-xs); padding: 8px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+table.data td { padding: 10px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+table.data tr:last-child td { border-bottom: 0; }
+table.data tr.clickable:hover td { background: var(--surface-2); cursor: pointer; }
+table.data .ar { font-family: var(--font-read); font-size: .98rem; }
+.scroll-x { overflow-x: auto; }
+
+/* ---------- verify ---------- */
+.vgrid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(300px, 380px); gap: var(--space-4); align-items: start; }
+.stat { display: flex; flex-direction: column; gap: 2px; }
+.stat b { font: 500 var(--text-xl) var(--font-mono); }
+.stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-3) var(--space-4); }
+.bar { height: 8px; border-radius: 99px; background: var(--surface-2); overflow: hidden; }
+.bar i { display: block; height: 100%; background: var(--accent); width: 0; transition: width .3s; }
+.flist { display: flex; flex-direction: column; }
+.frow { display: grid; grid-template-columns: auto auto minmax(0, 1fr) auto; gap: var(--space-3); align-items: center; padding: 10px var(--space-4); border-bottom: 1px solid var(--line); }
+.frow:last-child { border-bottom: 0; }
+.frow input { accent-color: var(--accent); margin: 0; }
+.frow .t { font-family: var(--font-read); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 1rem; }
+.stages { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-2); }
+.stages div { display: flex; flex-direction: column; gap: 6px; font-size: var(--text-s); color: var(--ink-3); }
+.stages div.done { color: var(--ink); }
+.stages div.on { color: var(--accent); font-weight: 600; }
+.stages div i { height: 4px; border-radius: 99px; background: var(--surface-2); }
+.stages div.done i { background: var(--ink-3); }
+.stages div.on i { background: linear-gradient(to left, var(--accent) 62%, var(--surface-2) 62%); }
+[dir="ltr"] .stages div.on i { background: linear-gradient(to right, var(--accent) 62%, var(--surface-2) 62%); }
+
+/* sources tabs on new lecture */
+.srcs { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: var(--space-2); }
+.src { display: flex; flex-direction: column; align-items: start; gap: 4px; text-align: start; padding: var(--space-3); border: 1px solid var(--line); border-radius: var(--radius-m); background: var(--surface); }
+.src b { font-weight: 600; }
+.src span { font-size: var(--text-xs); color: var(--ink-3); }
+.src[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }
+.src[aria-pressed="true"] b { color: var(--accent); }
+.drop { border: 1.5px dashed var(--line); border-radius: var(--radius-m); padding: var(--space-5); text-align: center; color: var(--ink-3); }
+
+pre.code { margin: 0; font: 12.5px/1.7 var(--font-mono); background: var(--surface-2); padding: var(--space-3); border-radius: var(--radius-m); overflow: auto; max-height: 420px; direction: ltr; text-align: left; white-space: pre; }
+pre.code.ar { font-family: var(--font-mono), var(--font-read); direction: rtl; text-align: right; white-space: pre-wrap; }
+
+.outline { display: flex; gap: 4px; overflow-x: auto; padding-bottom: 4px; }
+.outline span { flex: none; padding: 4px 10px; border-radius: var(--radius-s); background: var(--surface-2); font-size: var(--text-s); }
+.outline span.h1 { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+.sent { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: var(--space-3); align-items: baseline; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.sent .t { font-family: var(--font-read); font-size: 1.02rem; line-height: 1.9; }
+.sent.matn .t { font-weight: 600; }
+
+/* toasts and notes */
+.toasts { position: fixed; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); inset-inline-start: 50%; transform: translateX(50%); display: flex; flex-direction: column; gap: 8px; z-index: 20; align-items: center; }
+[dir="ltr"] .toasts { transform: translateX(-50%); }
+.toast { background: var(--ink); color: var(--surface); padding: 10px 16px; border-radius: var(--radius-m); box-shadow: var(--shadow); font-size: var(--text-s); display: flex; gap: 12px; align-items: center; }
+.toast button { background: none; border: 0; color: var(--accent-soft); font-weight: 600; padding: 0; }
+.notes-btn { position: fixed; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); left: max(16px, env(safe-area-inset-left, 0px)); z-index: 15; direction: ltr; font-family: var(--font-ui); box-shadow: var(--shadow); }
+.notes { position: fixed; inset: 0 auto 0 0; width: min(400px, 100%); z-index: 16; background: var(--surface); border-right: 1px solid var(--line); box-shadow: var(--shadow); direction: ltr; text-align: left; font-family: "IBM Plex Sans Arabic", system-ui, sans-serif; padding: calc(20px + env(safe-area-inset-top, 0px)) max(20px, env(safe-area-inset-right, 0px)) 20px max(20px, env(safe-area-inset-left, 0px)); overflow-y: auto; display: flex; flex-direction: column; gap: 14px; }
+.notes h2 { font-size: 1.05rem; }
+.notes ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; }
+.notes .ids { font-family: var(--font-mono); font-size: 12px; color: var(--ink-2); }
+.notes nav { display: flex; flex-wrap: wrap; gap: 6px; }
+.notes nav a { font-size: 12px; padding: 3px 8px; border: 1px solid var(--line); border-radius: 99px; color: var(--ink-2); text-decoration: none; }
+.notes nav a[aria-current="true"] { border-color: var(--accent); color: var(--accent); }
+
+/* responsive */
+@media (max-width: 1100px) {
+  .stage, .edgrid, .vgrid { grid-template-columns: minmax(0, 1fr); }
+  .stage[data-layout="beside"] .player { position: static; order: -1; }
+  .inspector { position: static; }
+  .srcs { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 720px) {
+  :root { --header: 52px; }
+  .frame { grid-template-columns: minmax(0, 1fr); }
+  .rail { flex-direction: row; overflow-x: auto; border-inline-end: 0; border-bottom: 1px solid var(--line); padding: 4px; }
+  .rail a { flex: none; min-width: 64px; }
+  .rail .sep { display: none; }
+  .crumb, .jobpill span, .hide-s { display: none; }
+  .srcs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .stages { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .reader .panel-b { max-height: none; }
+  :root { --text-read: 1.15rem; }
+  .toolbar .search { width: 100%; }
+  .notes-btn { height: 30px; padding: 0 10px; font-size: 12px; bottom: calc(72px + env(safe-area-inset-bottom, 0px)); }
+}
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+
+<div class="app" dir="rtl" lang="ar">
+  <header class="top">
+    <a class="brand" href="#view" style="color:inherit;text-decoration:none"><span class="brand-mark">و</span>وحي ستوديو</a>
+    <div class="crumb hide-s"><span class="faint">/</span><b id="crumbTitle"></b></div>
+    <div class="grow"></div>
+    <span class="jobpill" title="مهمة تعمل في الخلفية"><i></i><span>تفريغ صوتي: خطبة الجمعة 62٪</span></span>
+    <button class="iconbtn" id="undoBtn" title="تراجع" disabled>
+      <svg class="flip" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14l-4-4 4-4"/><path d="M5 10h9a5 5 0 0 1 0 10h-3"/></svg>
+      <span class="hide-s" id="undoLabel">لا شيء للتراجع</span>
+    </button>
+    <button class="iconbtn hide-s" id="langBtn" title="اللغة">EN</button>
+    <button class="iconbtn" id="themeBtn" title="الوضع الفاتح أو الداكن">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/></svg>
+    </button>
+  </header>
+
+  <div class="frame">
+    <nav class="rail" aria-label="التنقل">
+      <a href="#lectures" data-nav="lectures"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M8 4v5"/></svg>المحاضرات</a>
+      <a href="#view" data-nav="lecture"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 5h11M4 10h16M4 15h9M4 20h13"/></svg>المحاضرة المفتوحة<span class="badge" id="railFindings">8</span></a>
+      <div class="sep"></div>
+      <a href="#corpora" data-nav="corpora"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 4h6a2 2 0 0 1 2 2v14a2 2 0 0 0-2-2H4zM20 4h-6a2 2 0 0 0-2 2v14a2 2 0 0 1 2-2h6z"/></svg>المصادر<span class="badge">18</span></a>
+      <a href="#training" data-nav="training"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v6c0 1.7 3.6 3 8 3s8-1.3 8-3V6M4 12v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/></svg>بيانات التدريب<span class="badge" id="railTraining">12</span></a>
+      <a href="#requests" data-nav="requests"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg>سجل الطلبات<span class="badge" id="railReq">7</span></a>
+      <div class="grow"></div>
+      <a href="#prefs" data-nav="prefs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>الإعدادات</a>
+    </nav>
+
+    <main id="main"></main>
+  </div>
+</div>
+
+<div class="toasts" id="toasts" dir="rtl"></div>
+<button class="btn notes-btn" id="notesBtn">Design notes</button>
+<aside class="notes" id="notes" hidden></aside>
+
+<script>
+const DATA = {"title": "محاضرة تجريبية — آيات وأحاديث وأذكار", "words": [["إن", 0, 0.24, 0], ["الحمد", 0.28, 0.6, 0], ["لله", 0.64, 0.88, 0], ["نحمده", 0.92, 1.25, 0], ["ونستعينه", 1.29, 1.81, 0], ["ونستغفره،", 1.85, 2.44, 0], ["ونفتتح", 2.8, 3.19, 0], ["درسنا", 3.23, 3.56, 0], ["اليوم", 3.6, 3.93, 0], ["بقول", 3.97, 4.23, 0], ["الله", 4.27, 4.53, 0], ["تبارك", 4.57, 4.9, 0], ["وتعالى", 4.94, 5.33, 0], ["في", 5.37, 5.61, 0], ["فاتحة", 5.65, 5.98, 0], ["الكتاب:", 6.02, 6.48, 0], ["الْحَمْدُ", 6.96, 7.55, 0], ["لِلَّهِ", 7.59, 8.04, 0], ["رَبِّ", 8.08, 8.4, 0], ["الْعَالَمِينَ،", 8.44, 9.09, 0], ["ونسأله", 9.45, 9.84, 0], ["سبحانه", 9.88, 10.27, 0], ["الإخلاص", 10.31, 10.76, 0], ["والقبول", 10.8, 11.25, 0], ["في", 11.29, 11.53, 0], ["القول", 11.57, 11.89, 0], ["والعمل.", 11.93, 12.38, 0], ["اعلموا", 12.93, 13.32, 1], ["رحمكم", 13.36, 13.68, 1], ["الله", 13.72, 13.98, 1], ["أن", 14.02, 14.26, 1], ["مدار", 14.3, 14.56, 1], ["صلاح", 14.6, 14.86, 1], ["الأعمال", 14.9, 15.35, 1], ["كلها", 15.39, 15.65, 1], ["على", 15.69, 15.93, 1], ["تقوى", 15.97, 16.23, 1], ["الله", 16.27, 16.53, 1], ["وتحري", 16.57, 16.89, 1], ["الصدق،", 16.93, 17.32, 1], ["كما", 17.68, 17.92, 1], ["أمرنا", 17.96, 18.29, 1], ["ربنا", 18.33, 18.59, 1], ["جل", 18.63, 18.87, 1], ["وعلا", 18.91, 19.17, 1], ["في", 19.21, 19.45, 1], ["سورة", 19.49, 19.75, 1], ["الأحزاب", 19.79, 20.24, 1], ["حيث", 20.28, 20.52, 1], ["قال", 20.56, 20.8, 1], ["تعالى:", 20.84, 21.23, 1], ["يَا", 21.71, 21.95, 1], ["أَيُّهَا", 21.99, 22.51, 1], ["الَّذِينَ", 22.55, 23.14, 1], ["آمَنُوا", 23.18, 23.63, 1], ["اتَّقُوا", 23.67, 24.19, 1], ["اللَّهَ", 24.23, 24.68, 1], ["وَقُولُوا", 24.72, 25.3, 1], ["قَوْلًا", 25.34, 25.79, 1], ["سَدِيدًا،", 25.83, 26.41, 1], ["فالتقوى", 26.77, 27.22, 1], ["والقول", 27.26, 27.65, 1], ["السديد", 27.69, 28.08, 1], ["أصل", 28.12, 28.36, 1], ["كل", 28.4, 28.64, 1], ["خير", 28.68, 28.92, 1], ["في", 28.96, 29.2, 1], ["الدنيا", 29.24, 29.63, 1], ["والآخرة.", 29.67, 30.19, 1], ["وقد", 30.74, 30.98, 1], ["جاء", 31.02, 31.26, 2], ["في", 31.3, 31.54, 2], ["الحديث", 31.58, 31.97, 2], ["الصحيح", 32.01, 32.4, 2], ["عن", 32.44, 32.68, 2], ["أمير", 32.72, 32.98, 2], ["المؤمنين", 33.02, 33.54, 2], ["عمر", 33.58, 33.82, 2], ["بن", 33.86, 34.1, 2], ["الخطاب", 34.14, 34.53, 2], ["رضي", 34.57, 34.81, 2], ["الله", 34.85, 35.11, 2], ["عنه", 35.15, 35.39, 2], ["أن", 35.43, 35.67, 2], ["النبي", 35.71, 36.04, 2], ["صلى", 36.08, 36.32, 2], ["الله", 36.36, 36.62, 2], ["عليه", 36.66, 36.92, 2], ["وسلم", 36.96, 37.22, 2], ["قال:", 37.26, 37.52, 2], ["إنَّمَا", 38, 38.45, 2], ["الْأَعْمَالُ", 38.49, 39.14, 2], ["بِالنِّيَّاتِ،", 39.18, 39.83, 2], ["وَإِنَّمَا", 40.19, 40.84, 2], ["لِكُلِّ", 40.88, 41.34, 2], ["امْرِئٍ", 41.38, 41.84, 2], ["مَا", 41.88, 42.12, 2], ["نَوَى،", 42.16, 42.55, 2], ["فَمَنْ", 42.91, 43.3, 2], ["كَانَتْ", 43.34, 43.79, 2], ["هِجْرَتُهُ", 43.83, 44.48, 2], ["إلَى", 44.52, 44.78, 2], ["اللَّهِ", 44.82, 45.27, 2], ["وَرَسُولِهِ", 45.31, 45.96, 2], ["فَهِجْرَتُهُ", 46, 46.65, 2], ["إلَى", 46.69, 46.95, 2], ["اللَّهِ", 46.99, 47.45, 2], ["وَرَسُولِهِ،", 47.49, 48.14, 2], ["وَمَنْ", 48.5, 48.89, 2], ["كَانَتْ", 48.93, 49.38, 2], ["هِجْرَتُهُ", 49.42, 50.07, 2], ["لِدُنْيَا", 50.11, 50.7, 2], ["يُصِيبُهَا", 50.74, 51.39, 2], ["أَوْ", 51.43, 51.69, 2], ["امْرَأَةٍ", 51.73, 52.31, 2], ["يَنْكِحُهَا", 52.35, 53, 2], ["فَهِجْرَتُهُ", 53.04, 53.69, 2], ["إلَى", 53.73, 53.99, 2], ["مَا", 54.03, 54.27, 2], ["هَاجَرَ", 54.31, 54.77, 2], ["إلَيْهِ\".", 54.81, 55.4, 2], ["رَوَاهُ", 55.88, 56.33, 2], ["إِمَامَا", 56.37, 56.89, 2], ["الْمُحَدِّثِينَ", 56.93, 57.58, 2], ["أَبُو", 57.62, 57.95, 2], ["عَبْدِ", 57.99, 58.38, 2], ["اللهِ", 58.42, 58.75, 2], ["مُحَمَّدُ", 58.79, 59.38, 2], ["بنُ", 59.42, 59.66, 2], ["إِسْمَاعِيل", 59.7, 60.35, 2], ["بن", 60.39, 60.63, 2], ["إِبْرَاهِيم", 60.67, 61.32, 2], ["بن", 61.36, 61.6, 2], ["الْمُغِيرَة", 61.64, 62.29, 2], ["بن", 62.33, 62.57, 2], ["بَرْدِزبَه", 62.61, 63.26, 2], ["الْبُخَارِيُّ", 63.3, 63.95, 2], ["الْجُعْفِيُّ", 63.99, 64.64, 2], ["[رقم:1]،", 64.68, 65.2, 2], ["وَأَبُو", 65.68, 66.14, 2], ["الْحُسَيْنِ", 66.18, 66.83, 2], ["مُسْلِمٌ", 66.87, 67.39, 2], ["بنُ", 67.43, 67.67, 2], ["الْحَجَّاج", 67.71, 68.36, 2], ["بن", 68.4, 68.64, 2], ["مُسْلِم", 68.68, 69.14, 2], ["الْقُشَيْرِيُّ", 69.18, 69.83, 2], ["النَّيْسَابُورِيُّ", 69.87, 70.52, 2], ["[رقم:1907]", 70.56, 71.21, 2], ["رَضِيَ", 71.69, 72.08, 2], ["اللهُ", 72.12, 72.45, 2], ["عَنْهُمَا", 72.49, 73.08, 2], ["فِي", 73.12, 73.36, 2], ["\"صَحِيحَيْهِمَا\"", 73.4, 74.05, 2], ["اللذَينِ", 74.09, 74.61, 2], ["هُمَا", 74.65, 74.98, 2], ["أَصَحُّ", 75.02, 75.48, 2], ["الْكُتُبِ", 75.52, 76.11, 2], ["الْمُصَنَّفَةِ،", 76.15, 76.8, 2], ["وهذا", 77.16, 77.42, 2], ["أصل", 77.46, 77.7, 2], ["عظيم", 77.74, 78, 2], ["من", 78.04, 78.28, 2], ["أصول", 78.32, 78.58, 2], ["الإسلام", 78.62, 79.08, 2], ["يدور", 79.12, 79.38, 2], ["عليه", 79.42, 79.68, 2], ["ثواب", 79.72, 79.98, 2], ["الأعمال.", 80.02, 80.54, 2], ["ومن", 81.09, 81.33, 2], ["أعظم", 81.37, 81.63, 3], ["آيات", 81.67, 81.93, 3], ["التوحيد", 81.97, 82.43, 3], ["في", 82.47, 82.71, 3], ["كتاب", 82.75, 83.01, 3], ["الله", 83.05, 83.31, 3], ["آية", 83.35, 83.59, 3], ["الكرسي", 83.63, 84.02, 3], ["في", 84.06, 84.3, 3], ["سورة", 84.34, 84.6, 3], ["البقرة،", 84.64, 85.09, 3], ["قال", 85.45, 85.69, 3], ["الله", 85.73, 85.99, 3], ["عز", 86.03, 86.27, 3], ["وجل:", 86.31, 86.57, 3], ["اللَّهُ", 87.05, 87.5, 3], ["لَا", 87.54, 87.78, 3], ["إِلَٰهَ", 87.82, 88.28, 3], ["إِلَّا", 88.32, 88.71, 3], ["هُوَ", 88.75, 89.01, 3], ["الْحَيُّ", 89.05, 89.57, 3], ["الْقَيُّومُ", 89.61, 90.26, 3], ["لَا", 90.3, 90.54, 3], ["تَأْخُذُهُ", 90.58, 91.23, 3], ["سِنَةٌ", 91.27, 91.66, 3], ["وَلَا", 91.7, 92.03, 3], ["نَوْمٌ", 92.07, 92.46, 3], ["لَّهُ", 92.5, 92.83, 3], ["مَا", 92.87, 93.11, 3], ["فِي", 93.15, 93.39, 3], ["السَّمَاوَاتِ", 93.43, 94.08, 3], ["وَمَا", 94.12, 94.45, 3], ["فِي", 94.49, 94.73, 3], ["الْأَرْضِ", 94.77, 95.36, 3], ["مَن", 95.4, 95.64, 3], ["ذَا", 95.68, 95.92, 3], ["الَّذِي", 95.96, 96.42, 3], ["يَشْفَعُ", 96.46, 96.98, 3], ["عِندَهُ", 97.02, 97.48, 3], ["إِلَّا", 97.52, 97.91, 3], ["بِإِذْنِهِ", 97.95, 98.6, 3], ["يَعْلَمُ", 98.64, 99.16, 3], ["مَا", 99.2, 99.44, 3], ["بَيْنَ", 99.48, 99.87, 3], ["أَيْدِيهِمْ", 99.91, 100.56, 3], ["وَمَا", 100.6, 100.93, 3], ["خَلْفَهُمْ", 100.97, 101.62, 3], ["وَلَا", 101.66, 101.99, 3], ["يُحِيطُونَ", 102.03, 102.68, 3], ["بِشَيْءٍ", 102.72, 103.24, 3], ["مِّنْ", 103.28, 103.61, 3], ["عِلْمِهِ", 103.65, 104.17, 3], ["إِلَّا", 104.21, 104.6, 3], ["بِمَا", 104.64, 104.97, 3], ["شَاءَ", 105.01, 105.34, 3], ["وَسِعَ", 105.38, 105.77, 3], ["كُرْسِيُّهُ", 105.81, 106.46, 3], ["السَّمَاوَاتِ", 106.5, 107.15, 3], ["وَالْأَرْضَ", 107.19, 107.84, 3], ["وَلَا", 107.88, 108.21, 3], ["يَئُودُهُ", 108.25, 108.83, 3], ["حِفْظُهُمَا", 108.87, 109.52, 3], ["وَهُوَ", 109.56, 109.95, 3], ["الْعَلِيُّ", 109.99, 110.64, 3], ["الْعَظِيمُ،", 110.68, 111.33, 3], ["فينبغي", 111.69, 112.08, 3], ["للمؤمن", 112.12, 112.51, 3], ["أن", 112.55, 112.79, 3], ["يتدبر", 112.83, 113.16, 3], ["معانيها", 113.2, 113.66, 3], ["عند", 113.7, 113.94, 3], ["كل", 113.98, 114.22, 3], ["صلاة.", 114.26, 114.59, 3], ["وتذكروا", 115.14, 115.59, 3], ["وصية", 115.63, 115.89, 4], ["الله", 115.93, 116.19, 4], ["الجامعة", 116.23, 116.69, 4], ["في", 116.73, 116.97, 4], ["سورة", 117.01, 117.27, 4], ["العصر", 117.31, 117.64, 4], ["حيث", 117.68, 117.92, 4], ["أقسم", 117.96, 118.22, 4], ["سبحانه", 118.26, 118.65, 4], ["فقال:", 118.69, 119.02, 4], ["وَالْعَصْرِ", 119.5, 120.15, 4], ["إِنَّ", 120.19, 120.52, 4], ["الْإِنسَانَ", 120.56, 121.21, 4], ["لَفِي", 121.25, 121.58, 4], ["خُسْرٍ", 121.62, 122.01, 4], ["إِلَّا", 122.05, 122.44, 4], ["الَّذِينَ", 122.48, 123.06, 4], ["آمَنُوا", 123.1, 123.56, 4], ["وَعَمِلُوا", 123.6, 124.25, 4], ["الصَّالِحَاتِ", 124.29, 124.94, 4], ["وَتَوَاصَوْا", 124.98, 125.63, 4], ["بِالْحَقِّ", 125.67, 126.32, 4], ["وَتَوَاصَوْا", 126.36, 127.01, 4], ["بِالصَّبْرِ،", 127.05, 127.7, 4], ["ونختم", 128.06, 128.38, 4], ["مجلسنا", 128.42, 128.81, 4], ["هذا", 128.85, 129.09, 4], ["بالذكر", 129.13, 129.52, 4], ["المأثور", 129.56, 130.02, 4], ["في", 130.06, 130.3, 4], ["كفارة", 130.34, 130.66, 4], ["المجلس:", 130.7, 131.16, 4], ["لَا", 131.64, 131.88, 4], ["إِلَٰهَ", 131.92, 132.38, 4], ["إِلَّا", 132.42, 132.81, 4], ["اللَّهُ.", 132.85, 133.37, 4]], "findings": [{"type": "quran", "ref": "يونس: 10", "s": 16, "e": 20, "band": "CANDIDATE", "amb": true, "cands": ["يونس: 10", "الفاتحة: 2", "الزمر: 75", "غافر: 65"]}, {"type": "quran", "ref": "الأحزاب: 70", "s": 51, "e": 60, "band": "VERIFIED", "amb": false, "cands": ["الأحزاب: 70"]}, {"type": "hadith", "ref": "صحيح مسلم (2149)", "s": 75, "e": 80, "band": "CANDIDATE", "amb": false, "cands": ["صحيح مسلم (2149)"]}, {"type": "hadith", "ref": "الأربعون النووية (1)", "s": 90, "e": 159, "band": "VERIFIED", "amb": false, "cands": ["الأربعون النووية (1)"]}, {"type": "quran", "ref": "البقرة: 255", "s": 185, "e": 235, "band": "VERIFIED", "amb": false, "cands": ["البقرة: 255"]}, {"type": "quran", "ref": "العصر: 1", "s": 254, "e": 255, "band": "VERIFIED", "amb": false, "cands": ["العصر: 1"]}, {"type": "quran", "ref": "العصر: 2", "s": 255, "e": 259, "band": "VERIFIED", "amb": false, "cands": ["العصر: 2"]}, {"type": "quran", "ref": "العصر: 3", "s": 259, "e": 268, "band": "VERIFIED", "amb": false, "cands": ["العصر: 3"]}], "captions": [[0.0, 4.9, "إن الحمد لله نحمده ونستعينه ونستغفره، ونفتتح درسنا اليوم بقول الله تبارك"], [4.9399999999999995, 6.48, "وتعالى في فاتحة الكتاب:"], [6.96, 9.09, "﴿الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ،﴾ [يونس: 10]"], [9.45, 12.38, "ونسأله سبحانه الإخلاص والقبول في القول والعمل."], [12.93, 16.89, "اعلموا رحمكم الله أن مدار صلاح الأعمال كلها على تقوى الله وتحري"], [16.93, 21.23, "الصدق، كما أمرنا ربنا جل وعلا في سورة الأحزاب حيث قال تعالى:"], [21.71, 26.41, "﴿يَا أَيُّهَا الَّذِينَ آمَنُوا اتَّقُوا اللَّهَ وَقُولُوا قَوْلًا سَدِيدًا،﴾ [الأحزاب: 70]"], [26.77, 30.19, "فالتقوى والقول السديد أصل كل خير في الدنيا والآخرة."], [30.74, 32.68, "وقد جاء في الحديث الصحيح عن"], [32.72, 34.53, "«أمير المؤمنين عمر بن الخطاب» [صحيح مسلم (2149)]"], [34.57, 37.52, "رضي الله عنه أن النبي صلى الله عليه وسلم قال:"], [38.0, 48.14, "«إنَّمَا الْأَعْمَالُ بِالنِّيَّاتِ، وَإِنَّمَا لِكُلِّ امْرِئٍ مَا نَوَى، فَمَنْ كَانَتْ هِجْرَتُهُ إلَى اللَّهِ وَرَسُولِهِ فَهِجْرَتُهُ إلَى اللَّهِ وَرَسُولِهِ، …»"], [48.5, 55.4, "«… وَمَنْ كَانَتْ هِجْرَتُهُ لِدُنْيَا يُصِيبُهَا أَوْ امْرَأَةٍ يَنْكِحُهَا فَهِجْرَتُهُ إلَى مَا هَاجَرَ إلَيْهِ\". …»"], [55.88, 65.2, "«… رَوَاهُ إِمَامَا الْمُحَدِّثِينَ أَبُو عَبْدِ اللهِ مُحَمَّدُ بنُ إِسْمَاعِيل بن إِبْرَاهِيم بن الْمُغِيرَة بن بَرْدِزبَه الْبُخَارِيُّ الْجُعْفِيُّ [رقم:1]، …»"], [65.68, 76.8, "«… وَأَبُو الْحُسَيْنِ مُسْلِمٌ بنُ الْحَجَّاج بن مُسْلِم الْقُشَيْرِيُّ النَّيْسَابُورِيُّ [رقم:1907] رَضِيَ اللهُ عَنْهُمَا فِي \"صَحِيحَيْهِمَا\" اللذَينِ هُمَا أَصَحُّ الْكُتُبِ الْمُصَنَّفَةِ،» [الأربعون النووية (1)]"], [77.16, 80.54, "وهذا أصل عظيم من أصول الإسلام يدور عليه ثواب الأعمال."], [81.09, 85.09, "ومن أعظم آيات التوحيد في كتاب الله آية الكرسي في سورة البقرة،"], [85.45, 86.57, "قال الله عز وجل:"], [87.05, 93.39, "﴿اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ لَا تَأْخُذُهُ سِنَةٌ وَلَا نَوْمٌ لَّهُ مَا فِي …﴾"], [93.43, 100.56, "﴿… السَّمَاوَاتِ وَمَا فِي الْأَرْضِ مَن ذَا الَّذِي يَشْفَعُ عِندَهُ إِلَّا بِإِذْنِهِ يَعْلَمُ مَا بَيْنَ أَيْدِيهِمْ …﴾"], [100.6, 111.33, "﴿… وَمَا خَلْفَهُمْ وَلَا يُحِيطُونَ بِشَيْءٍ مِّنْ عِلْمِهِ إِلَّا بِمَا شَاءَ وَسِعَ كُرْسِيُّهُ السَّمَاوَاتِ وَالْأَرْضَ وَلَا يَئُودُهُ حِفْظُهُمَا وَهُوَ الْعَلِيُّ الْعَظِيمُ،﴾ [البقرة: 255]"], [111.69, 114.59, "فينبغي للمؤمن أن يتدبر معانيها عند كل صلاة."], [115.14, 119.02, "وتذكروا وصية الله الجامعة في سورة العصر حيث أقسم سبحانه فقال:"], [119.5, 120.15, "﴿وَالْعَصْرِ﴾"], [120.19, 122.01, "﴿إِنَّ الْإِنسَانَ لَفِي خُسْرٍ﴾"], [122.05, 127.7, "﴿إِلَّا الَّذِينَ آمَنُوا وَعَمِلُوا الصَّالِحَاتِ وَتَوَاصَوْا بِالْحَقِّ وَتَوَاصَوْا بِالصَّبْرِ،﴾ [العصر: 1-3]"], [128.06, 131.16, "ونختم مجلسنا هذا بالذكر المأثور في كفارة المجلس:"], [131.64, 133.37, "لَا إِلَٰهَ إِلَّا اللَّهُ."]]};
+const W = DATA.words, CAP = DATA.captions;
+const KIND_AR = { quran: "آية", hadith: "حديث", dhikr: "ذكر" };
+const VERD = { ok: "صحيح", unsure: "غير متأكد", bad: "كلام عادي", none: "لم يُتحقق" };
+const BOUND = { complete: "كامل", missStart: "ينقصه البداية", missEnd: "ينقصه النهاية" };
+// Verdicts are made up for the mockup (no verification pass has run on the golden sample).
+const DEMO = [
+  { verdict: "unsure", boundary: "complete", by: "Laya v3_mixed", conf: .58 },
+  { verdict: "ok", boundary: "complete", by: "Laya v3_mixed", conf: .97 },
+  { verdict: "bad", boundary: "complete", by: "Laya v3_mixed", conf: .93 },
+  { verdict: "ok", boundary: "complete", by: "Laya v3_mixed", conf: .95 },
+  { verdict: "ok", boundary: "complete", by: "Laya v3_mixed", conf: .99 },
+  { verdict: "ok", boundary: "missEnd", by: "Laya v3_mixed", conf: .71 },
+  { verdict: "ok", boundary: "complete", by: "Laya v3_mixed", conf: .96 },
+  { verdict: "none", boundary: null, by: null, conf: null },
+];
+let F = DATA.findings.map((f, i) => ({ id: i + 1, ...f, ...DEMO[i] }));
+
+const S = {
+  layout: "beside", kind: "all", show: { ok: true, unsure: true, bad: true, none: true }, clipped: false,
+  script: "spoken", q: "", follow: true, t: 0, playing: false, stopAt: null, pop: null,
+  edMode: "findings", edFinding: 1, anchor: null, range: null, undo: [],
+  verifier: "laya", vRun: null, src: "youtube",
+};
+const $ = (s, el = document) => el.querySelector(s);
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const strip = (s) => s.replace(/[ً-ْٰـ]/g, "");
+const norm = (s) => strip(s).replace(/[إأآٱ]/g, "ا").replace(/ى/g, "ي").replace(/ة/g, "ه").replace(/[^ء-ي]/g, "");
+const mmss = (t) => { t = Math.max(0, t); const m = Math.floor(t / 60), s = Math.floor(t % 60); return `${m}:${String(s).padStart(2, "0")}`; };
+const DUR = W[W.length - 1][2] + 1;
+const wordAt = (t) => { // time -> word index (binary search over start times), the logic phase 12 will unit-test
+  let lo = 0, hi = W.length - 1, ans = -1;
+  while (lo <= hi) { const mid = (lo + hi) >> 1; if (W[mid][1] <= t) { ans = mid; lo = mid + 1; } else hi = mid - 1; }
+  return ans;
+};
+const findingOf = () => { const m = new Array(W.length).fill(-1); F.forEach((f, i) => { for (let k = f.s; k < f.e; k++) m[k] = i; }); return m; };
+const shown = (f) => (S.kind === "all" || S.kind === f.type) && S.show[f.verdict] && (!S.clipped || (f.boundary && f.boundary !== "complete"));
+const wtext = (i, inF) => (inF && S.script === "spoken") ? strip(W[i][0]) : W[i][0];
+const fText = (f, std) => W.slice(f.s, f.e).map((w) => std ? w[0] : strip(w[0])).join(" ");
+const BR = { quran: ["﴿", "﴾"], hadith: ["«", "»"], dhikr: ["«", "»"] };
+const vchip = (v) => `<span class="vchip ${v}">${VERD[v]}</span>`;
+const count = (k) => F.filter((f) => f.type === k).length;
+function toast(msg, action) {
+  const el = document.createElement("div"); el.className = "toast";
+  el.innerHTML = `<span>${esc(msg)}</span>${action ? `<button>${esc(action[0])}</button>` : ""}`;
+  if (action) el.querySelector("button").onclick = () => { action[1](); el.remove(); };
+  $("#toasts").append(el); setTimeout(() => el.remove(), 4200);
+}
+
+/* ---------------- screens ---------------- */
+const SCREENS = {};
+const lecHead = (tab) => {
+  const checked = F.filter((f) => f.verdict !== "none").length;
+  const T = [["view", "العرض", F.length], ["edit", "التحرير"], ["verify", "التحقق", `${checked}/${F.length}`], ["tafrigh", "التفريغ"], ["export", "التصدير"]];
+  return `<div class="lechead"><h1>${esc(DATA.title)}</h1>
+    <nav class="tabs">${T.map(([k, l, b]) => `<a href="#${k}" aria-current="${k === tab}">${l}${b != null ? ` <span class="badge">${b}</span>` : ""}</a>`).join("")}</nav>
+    <div class="version"><span class="label">النسخة</span><select class="input" id="verSel" style="width:auto;height:32px"><option>3 · تحقق Laya · اليوم 14:20</option><option>2 · المحرك v5 · اليوم 14:02</option><option>1 · المحرك v4 · أمس</option></select></div>
+  </div>`;
+};
+
+SCREENS.view = () => {
+  const words = W.length, caps = CAP.length;
+  const clipped = F.filter((f) => f.boundary && f.boundary !== "complete").length;
+  return `${lecHead("view")}
+  <div class="kpis"><span><b>${words}</b>كلمة</span><span><b>${count("quran")}</b>آيات</span><span><b>${count("hadith")}</b>أحاديث</span><span><b>${count("dhikr")}</b>أذكار</span><span><b>${caps}</b>ترجمة</span><span><b class="mono">${mmss(DUR)}</b>المدة</span></div>
+  <div class="toolbar">
+    <div class="seg" role="group" aria-label="التخطيط">
+      <button data-layout="beside" aria-pressed="${S.layout === "beside"}">النص بجانب الفيديو</button>
+      <button data-layout="text" aria-pressed="${S.layout === "text"}">النص فقط</button>
+      <button data-layout="video" aria-pressed="${S.layout === "video"}">الفيديو فقط</button>
+    </div>
+    <div class="seg" role="group" aria-label="النوع">
+      ${[["all", "الكل"], ["quran", "آيات"], ["hadith", "أحاديث"], ["dhikr", "أذكار"]].map(([k, l]) => `<button data-kind="${k}" aria-pressed="${S.kind === k}">${l}</button>`).join("")}
+    </div>
+    <div class="row" style="gap:6px" role="group" aria-label="الحكم">
+      ${["ok", "unsure", "bad", "none"].map((v) => `<button class="chip" data-verdict="${v}" aria-pressed="${S.show[v]}" style="color:var(--${v})"><span class="dot"></span><span style="color:var(--ink-2)">${VERD[v]}</span></button>`).join("")}
+      <button class="chip" id="clipBtn" aria-pressed="true" style="${S.clipped ? "border-color:var(--accent);color:var(--accent)" : ""}">ناقص الحدود <span class="mono">${clipped}</span></button>
+    </div>
+    <div class="grow"></div>
+    <label class="switch"><input type="checkbox" id="scriptSw" ${S.script === "standard" ? "checked" : ""}>بالرسم المعتمد</label>
+    <label class="switch"><input type="checkbox" id="followSw" ${S.follow ? "checked" : ""}>متابعة تلقائية</label>
+    <input class="input search" id="searchIn" placeholder="ابحث في المحاضرة" value="${esc(S.q)}">
+  </div>
+  <div class="stage" data-layout="${S.layout}" id="stage">
+    <section class="panel reader" aria-label="النص">
+      <div class="progressline"><i id="readProg"></i></div>
+      <div class="panel-b" id="readerBody"><div class="transcript" id="transcript"></div></div>
+    </section>
+    <aside class="player">
+      <div class="video" id="video"><div class="speaker"></div><span class="stamp" id="stamp">youtube · 720p</span><div class="cap" id="cap"></div></div>
+      <div class="controls">
+        <button class="iconbtn" id="back5" title="رجوع 5 ثوان"><span class="mono">5−</span></button>
+        <button class="btn primary" id="playBtn" style="min-width:84px">تشغيل</button>
+        <button class="iconbtn" id="fwd5" title="تقديم 5 ثوان"><span class="mono">5+</span></button>
+        <input type="range" id="seek" min="0" max="${DUR}" step="0.1" value="${S.t}" aria-label="الخط الزمني">
+        <span class="time" id="timeLbl"></span>
+      </div>
+      <div class="panel nowcard" id="nowcard"></div>
+    </aside>
+  </div>`;
+};
+
+function renderTranscript() {
+  const el = $("#transcript"); if (!el) return;
+  const fm = findingOf(); const q = norm(S.q);
+  let html = "", para = 0, i = 0;
+  html += "<p>";
+  while (i < W.length) {
+    if (W[i][3] !== para) { para = W[i][3]; html += "</p><p>"; }
+    const fi = fm[i];
+    if (fi >= 0 && shown(F[fi]) && F[fi].s === i) {
+      const f = F[fi]; const [o, c] = BR[f.type];
+      html += `<span class="f ${f.type} ${f.verdict === "bad" ? "bad" : ""} ${S.pop === fi ? "sel" : ""}" data-f="${fi}"><span class="br">${o}</span>`;
+      for (let k = f.s; k < f.e; k++) html += `<span class="w" data-i="${k}">${esc(wtext(k, true))}</span> `;
+      html = html.trimEnd() + `<span class="br">${c}</span><span class="ref" data-ref="${fi}" style="background:var(--surface)"><span class="vd ${f.verdict}"></span>${esc(f.ref)}${f.amb ? " ·؟" : ""}</span></span> `;
+      i = f.e; continue;
+    }
+    const hit = q && norm(W[i][0]).includes(q);
+    html += `<span class="w${hit ? " hit" : ""}" data-i="${i}">${esc(W[i][0])}</span> `;
+    i++;
+  }
+  el.innerHTML = html + "</p>";
+  if (S.pop != null) showPop(S.pop, true);
+  syncTime();
+}
+
+function syncTime() {
+  const cur = wordAt(S.t);
+  document.querySelectorAll("#transcript .w").forEach((w) => {
+    const i = +w.dataset.i; w.classList.toggle("now", i === cur && S.t > 0); w.classList.toggle("future", i > cur);
+  });
+  const p = $("#readProg"); if (p) p.style.width = `${(S.t / DUR) * 100}%`;
+  const tl = $("#timeLbl"); if (tl) tl.textContent = `${mmss(S.t)} / ${mmss(DUR)}`;
+  const sk = $("#seek"); if (sk && document.activeElement !== sk) sk.value = S.t;
+  const capEl = $("#cap");
+  if (capEl) { const c = CAP.find((c) => S.t >= c[0] && S.t <= c[1] + .3); capEl.textContent = c ? (S.script === "spoken" ? strip(c[2]) : c[2]) : ""; }
+  const nc = $("#nowcard");
+  if (nc) {
+    const fi = findingOf()[cur]; const f = F[fi];
+    nc.innerHTML = f ? `<div class="row"><span class="kchip ${f.type}">${KIND_AR[f.type]}</span><b>${esc(f.ref)}</b><span class="grow"></span>${vchip(f.verdict)}</div><div class="quote">${esc(fText(f, S.script === "standard"))}</div>`
+      : `<span class="label">الآن</span><span class="muted">${cur >= 0 ? "كلام المتحدث، لا اقتباس هنا." : "اضغط تشغيل، أو انقر أي كلمة للانتقال إليها."}</span>`;
+  }
+  if (S.follow && S.playing) { const n = $("#transcript .w.now"); if (n) n.scrollIntoView({ block: "nearest", behavior: "smooth" }); }
+  const pb = $("#playBtn"); if (pb) pb.textContent = S.playing ? "إيقاف مؤقت" : "تشغيل";
+}
+
+let timer = null;
+function play(on) {
+  S.playing = on; clearInterval(timer);
+  if (on) timer = setInterval(() => {
+    S.t += 0.1; if (S.stopAt != null && S.t >= S.stopAt) { S.stopAt = null; play(false); }
+    if (S.t >= DUR) { S.t = DUR; play(false); }
+    syncTime();
+  }, 100);
+  syncTime();
+}
+
+function showPop(fi, keep) {
+  const old = $("#pop"); if (old) old.remove();
+  const f = F[fi]; const anchor = document.querySelector(`[data-ref="${fi}"]`) || document.querySelector(`[data-f="${fi}"]`);
+  if (!f || !anchor) return;
+  S.pop = fi;
+  const reader = $(".reader"); const r = anchor.getBoundingClientRect(), rr = reader.getBoundingClientRect();
+  const pop = document.createElement("div"); pop.className = "pop"; pop.id = "pop";
+  pop.innerHTML = `<button class="iconbtn x" id="popX" title="إغلاق">✕</button>
+    <div class="row"><span class="kchip ${f.type}">${KIND_AR[f.type]}</span><b>${esc(f.ref)}</b></div>
+    <div class="row">${vchip(f.verdict)}${f.boundary ? `<span class="faint" style="font-size:var(--text-xs)">${BOUND[f.boundary]}</span>` : ""}${f.by ? `<span class="faint mono" style="font-size:11px">${f.by} · ${Math.round(f.conf * 100)}٪</span>` : ""}</div>
+    ${f.amb ? `<div class="muted" style="font-size:var(--text-s)">مرجع غير محسوم: ${f.cands.length} مواضع محتملة (${f.cands.slice(1).map(esc).join("، ")}).</div>` : ""}
+    <div class="quote">${esc(fText(f, true))}</div>
+    <div class="row"><button class="btn small primary" id="popPlay">تشغيل الاقتباس</button><a class="btn small" href="#edit" id="popEdit">تحرير</a><a class="btn small ghost" href="#verify">تحقق</a></div>`;
+  reader.append(pop);
+  let top = r.bottom - rr.top + 8; if (top + 280 > reader.clientHeight) top = Math.max(8, r.top - rr.top - 290);
+  pop.style.top = `${top}px`;
+  const rtl = document.documentElement.dir !== "ltr";
+  const x = rtl ? Math.min(rr.right - r.right, rr.width - 316) : Math.min(r.left - rr.left, rr.width - 316);
+  pop.style[rtl ? "right" : "left"] = `${Math.max(12, x)}px`;
+  $("#popX").onclick = () => { S.pop = null; pop.remove(); renderTranscript(); };
+  $("#popPlay").onclick = () => { S.t = W[f.s][1]; S.stopAt = W[f.e - 1][2]; play(true); };
+  $("#popEdit").onclick = () => { S.edFinding = f.id; S.range = null; };
+  if (!keep) document.querySelectorAll(".f.sel").forEach((e) => e.classList.remove("sel")), anchor.closest(".f")?.classList.add("sel");
+}
+
+function bindView() {
+  document.querySelectorAll("[data-layout]").forEach((b) => b.onclick = () => { S.layout = b.dataset.layout; route(); });
+  document.querySelectorAll("[data-kind]").forEach((b) => b.onclick = () => { S.kind = b.dataset.kind; S.pop = null; route(); });
+  document.querySelectorAll("[data-verdict]").forEach((b) => b.onclick = () => { S.show[b.dataset.verdict] = !S.show[b.dataset.verdict]; S.pop = null; route(); });
+  $("#clipBtn").onclick = () => { S.clipped = !S.clipped; S.pop = null; route(); };
+  $("#scriptSw").onchange = (e) => { S.script = e.target.checked ? "standard" : "spoken"; renderTranscript(); };
+  $("#followSw").onchange = (e) => { S.follow = e.target.checked; };
+  $("#searchIn").oninput = (e) => { S.q = e.target.value; renderTranscript(); };
+  $("#playBtn").onclick = () => play(!S.playing);
+  $("#back5").onclick = () => { S.t = Math.max(0, S.t - 5); syncTime(); };
+  $("#fwd5").onclick = () => { S.t = Math.min(DUR, S.t + 5); syncTime(); };
+  $("#seek").oninput = (e) => { S.t = +e.target.value; syncTime(); };
+  $("#transcript").onclick = (e) => {
+    const ref = e.target.closest("[data-ref]");
+    if (ref) { showPop(+ref.dataset.ref); return; }
+    const w = e.target.closest(".w"); if (!w) return;
+    S.t = W[+w.dataset.i][1] + 0.001; S.stopAt = null; syncTime();
+    const f = w.closest(".f"); if (f) showPop(+f.dataset.f); else { S.pop = null; $("#pop")?.remove(); document.querySelectorAll(".f.sel").forEach((e) => e.classList.remove("sel")); }
+  };
+  renderTranscript();
+}
+
+/* ---------- editor ---------- */
+SCREENS.edit = () => {
+  const modes = [["findings", "الاقتباسات"], ["text", "النص الكامل"], ["timing", "توقيت الترجمات"]];
+  let body = "";
+  if (S.edMode === "findings") body = `<div class="edgrid">
+      <section class="panel"><div class="panel-h"><h3>لوحة الكلمات</h3><span class="muted" style="font-size:var(--text-s)">انقر الكلمة الأولى ثم الأخيرة لإضافة اقتباس فائت، أو انقر اقتباسا لفحصه.</span></div>
+        <div class="panel-b"><div id="seltool"></div><div class="board" id="board"></div></div></section>
+      <aside class="inspector" id="inspector"></aside></div>`;
+  else if (S.edMode === "text") body = `<section class="panel"><div class="panel-h"><h3>النص الكامل</h3><span class="grow"></span><button class="btn primary small" id="saveText">حفظ ومحاذاة الكلمات</button></div>
+      <div class="panel-b"><p class="muted" style="margin:0;font-size:var(--text-s)">عند الحفظ تُحاذى الكلمات مع النص القديم، فتحتفظ الكلمات التي لم تتغير بتوقيتها، وتأخذ الكلمات الجديدة توقيتا تقديريا.</p>
+      <textarea class="input" rows="16" style="font-family:var(--font-read);font-size:1.1rem">${esc(paraText())}</textarea></div></section>`;
+  else body = `<section class="panel"><div class="panel-h"><h3>توقيت الترجمات</h3><span class="muted" style="font-size:var(--text-s)">${CAP.length} ترجمة. لا تنقسم أي ترجمة داخل اقتباس.</span></div>
+      <div class="scroll-x"><table class="data"><thead><tr><th>#</th><th>البداية</th><th>النهاية</th><th>النص</th><th></th></tr></thead><tbody>
+      ${CAP.slice(0, 12).map((c, i) => `<tr><td class="mono faint">${i + 1}</td><td><input class="input mono" style="width:96px;height:30px" value="${c[0].toFixed(2)}"></td><td><input class="input mono" style="width:96px;height:30px" value="${c[1].toFixed(2)}"></td><td class="ar">${esc(c[2])}</td><td style="white-space:nowrap"><button class="btn small ghost">−0.1</button><button class="btn small ghost">+0.1</button><button class="btn small ghost">من المشغل</button></td></tr>`).join("")}
+      </tbody></table></div></section>`;
+  return `${lecHead("edit")}
+    <div class="row"><div class="seg">${modes.map(([k, l]) => `<button data-edmode="${k}" aria-pressed="${S.edMode === k}">${l}</button>`).join("")}</div>
+      <div class="grow"></div>
+      <div class="miniplayer"><button class="iconbtn" style="height:28px"><span class="mono">2−</span></button><button class="btn small primary">تشغيل</button><button class="iconbtn" style="height:28px"><span class="mono">2+</span></button><span class="time">0:21 / ${mmss(DUR)}</span><label class="switch"><input type="checkbox" checked>الفيديو يتبع التحديد</label></div></div>
+    ${body}`;
+};
+const paraText = () => { let out = "", p = 0; W.forEach((w) => { if (w[3] !== p) { out = out.trimEnd() + "\n\n"; p = w[3]; } out += w[0] + " "; }); return out.trim(); };
+
+function renderBoard() {
+  const b = $("#board"); if (!b) return;
+  const fm = findingOf(); const sel = F.find((f) => f.id === S.edFinding);
+  let html = "", p = 0;
+  W.forEach((w, i) => {
+    if (w[3] !== p) { html += `<span class="brk"></span>`; p = w[3]; }
+    const fi = fm[i]; const f = F[fi];
+    const inR = S.range && i >= S.range[0] && i <= S.range[1];
+    const cls = ["bw", f ? f.type : "", f && sel && f.id === sel.id && !S.range ? "fsel" : "", inR ? "rsel" : "", S.anchor === i ? "anchor" : ""].join(" ");
+    html += `<span class="${cls}" data-i="${i}">${esc(strip(w[0]))}</span>`;
+  });
+  b.innerHTML = html;
+  $("#seltool").innerHTML = S.anchor != null && !S.range ? `<div class="muted" style="font-size:var(--text-s)">بداية التحديد: «${esc(strip(W[S.anchor][0]))}». انقر الكلمة الأخيرة.</div>`
+    : S.range ? `<div class="seltool"><span style="padding:0 8px;font-size:var(--text-s)">${S.range[1] - S.range[0] + 1} كلمات محددة</span><button class="btn small" data-act="missed">إضافة اقتباس فائت</button><button class="btn small">تعديل الكلمات</button><button class="btn small">حفظ كذكر</button><button class="btn small" data-act="clear">إلغاء</button></div>` : "";
+  renderInspector();
+}
+
+function renderInspector() {
+  const el = $("#inspector"); if (!el) return;
+  if (S.range) {
+    const words = W.slice(S.range[0], S.range[1] + 1).map((w) => strip(w[0])).join(" ");
+    const isDhikr = norm(words).includes(norm("لا إله إلا الله"));
+    const res = isDhikr ? [["dhikr", "لا إله إلا الله", "الأذكار · التهليل"], ["quran", "فَاعْلَمْ أَنَّهُ لَا إِلَٰهَ إِلَّا اللَّهُ", "محمد: 19"], ["quran", "إِنَّهُمْ كَانُوا إِذَا قِيلَ لَهُمْ لَا إِلَٰهَ إِلَّا اللَّهُ يَسْتَكْبِرُونَ", "الصافات: 35"]]
+      : [["quran", "…أقرب آية في المصدر…", "نتيجة بحث"], ["hadith", "…أقرب حديث…", "نتيجة بحث"]];
+    el.innerHTML = `<section class="panel"><div class="panel-h"><h3>اقتباس فائت</h3></div><div class="panel-b">
+      <div class="quote">${esc(words)}</div>
+      <div class="field"><span class="label">النوع</span><div class="seg"><button aria-pressed="${isDhikr}">ذكر</button><button aria-pressed="${!isDhikr}">آية</button><button aria-pressed="false">حديث</button></div></div>
+      <div class="field"><span class="label">البحث في المصادر</span><input class="input" value="${esc(words)}"></div>
+      <div class="results">${res.map(([k, t, r], i) => `<label class="result"><input type="radio" name="res" ${i === 0 ? "checked" : ""} style="accent-color:var(--accent);margin:0"><span class="t">${esc(t)}</span><span class="kchip ${k}">${esc(r)}</span></label>`).join("")}</div>
+      <label class="switch"><input type="checkbox">اقتباس من خارج المصادر</label>
+      <div class="row"><button class="btn primary" id="insertMissed" data-kind="${isDhikr ? "dhikr" : "quran"}" data-ref="${isDhikr ? "التهليل" : res[0][2]}">إدراج الاقتباس</button><button class="btn ghost" data-act="clear">إلغاء</button></div>
+    </div></section>`;
+    $("#insertMissed").onclick = (e) => insertMissed(e.target.dataset.kind, e.target.dataset.ref);
+    el.querySelectorAll("[data-act=clear]").forEach((b) => b.onclick = clearSel);
+    return;
+  }
+  const idx = F.findIndex((f) => f.id === S.edFinding); const f = F[idx] || F[0];
+  const spoken = W.slice(f.s, f.e).map((w) => strip(w[0])); const canon = W.slice(f.s, f.e).map((w) => w[0]);
+  el.innerHTML = `<section class="panel"><div class="panel-h">
+      <button class="iconbtn" id="prevF" title="السابق">→</button><span class="mono faint">${idx + 1} / ${F.length}</span><button class="iconbtn" id="nextF" title="التالي">←</button>
+      <span class="grow"></span><span class="kchip ${f.type}">${KIND_AR[f.type]}</span><b>${esc(f.ref)}</b></div>
+    <div class="panel-b">
+      <div class="row">${vchip(f.verdict)}${f.boundary ? `<span class="faint" style="font-size:var(--text-xs)">${BOUND[f.boundary]}</span>` : ""}<span class="grow"></span><span class="faint mono" style="font-size:11px">${f.band}</span></div>
+      <div class="field"><span class="label">كما قيل</span><div class="quote">${esc(spoken.join(" "))}</div></div>
+      <div class="field"><span class="label">المراجع المطابقة ${f.cands.length > 1 ? `(${f.cands.length})` : ""}</span><div class="cands">
+        ${f.cands.map((c, i) => `<label class="cand"><input type="radio" name="cand" ${i === 0 ? "checked" : ""}><b style="font-size:var(--text-s)">${esc(c)}</b><span class="grow"></span>${i === 0 ? `<span class="faint" style="font-size:var(--text-xs)">المعتمد</span>` : ""}</label>`).join("")}
+        <button class="btn small ghost" style="align-self:start">+ إضافة مرجع من البحث</button></div></div>
+      <div class="field"><span class="label">كلمات المصدر (انقر لتطبيقها على النص)</span><div class="tokens">${canon.slice(0, 14).map((w, i) => `<span class="${w !== spoken[i] ? "diff" : ""}">${esc(w)}</span>`).join("")}${canon.length > 14 ? "<span>…</span>" : ""}</div></div>
+      <div class="grid2" style="grid-template-columns:1fr 1fr">
+        <div class="field"><span class="label">البداية</span><div class="row" style="gap:4px"><button class="btn small">− كلمة</button><button class="btn small">+ كلمة</button></div></div>
+        <div class="field"><span class="label">النهاية</span><div class="row" style="gap:4px"><button class="btn small">− كلمة</button><button class="btn small">+ كلمة</button></div></div>
+      </div>
+      <div class="field"><span class="label">حكمك</span><div class="seg" id="humanV">${["ok", "unsure", "bad"].map((v) => `<button data-hv="${v}" aria-pressed="${f.human === v}">${VERD[v]}</button>`).join("")}</div></div>
+      <label class="switch"><input type="checkbox" id="refWrong" ${f.refWrong ? "checked" : ""}>المرجع خاطئ أو ناقص</label>
+      <div class="row"><button class="btn small">تغيير النوع</button><button class="btn small">تحقق من هذا الاقتباس</button><span class="grow"></span><button class="btn small danger" id="delF">حذف…</button></div>
+    </div></section>`;
+  $("#prevF").onclick = () => { S.edFinding = F[(idx - 1 + F.length) % F.length].id; renderBoard(); };
+  $("#nextF").onclick = () => { S.edFinding = F[(idx + 1) % F.length].id; renderBoard(); };
+  el.querySelectorAll("[data-hv]").forEach((b) => b.onclick = () => { f.human = b.dataset.hv; f.verdict = b.dataset.hv; renderInspector(); toast("حُفظ حكمك تسمية ذهبية لبيانات التدريب"); });
+  $("#refWrong").onchange = (e) => { f.refWrong = e.target.checked; };
+  $("#delF").onclick = () => toast("سيُسأل: لماذا الحذف؟ كلام عادي (تسمية سلبية) أو اقتباس مكرر أو خطأ في النص");
+}
+function clearSel() { S.anchor = null; S.range = null; renderBoard(); }
+function insertMissed(kind, ref) {
+  const [s, e] = S.range; const id = Math.max(...F.map((f) => f.id)) + 1;
+  const nf = { id, type: kind, ref, s, e: e + 1, band: "MANUAL", amb: false, cands: [ref], verdict: "ok", boundary: "complete", by: "أنت", conf: 1, human: "ok" };
+  F.push(nf); F.sort((a, b) => a.s - b.s);
+  S.undo.push({ label: "إضافة اقتباس فائت", undo: () => { F = F.filter((f) => f.id !== id); } });
+  S.range = null; S.anchor = null; S.edFinding = id; updateUndo(); renderBoard();
+  toast(`أضيف الاقتباس: ${ref}`, ["تراجع", doUndo]);
+}
+function doUndo() { const u = S.undo.pop(); if (!u) return; u.undo(); updateUndo(); route(); toast(`تم التراجع: ${u.label}`); }
+function updateUndo() {
+  const u = S.undo[S.undo.length - 1]; $("#undoBtn").disabled = !u; $("#undoLabel").textContent = u ? `تراجع: ${u.label}` : "لا شيء للتراجع";
+  $("#railFindings").textContent = F.length;
+}
+function bindEdit() {
+  document.querySelectorAll("[data-edmode]").forEach((b) => b.onclick = () => { S.edMode = b.dataset.edmode; route(); });
+  const board = $("#board"); if (!board) { $("#saveText")?.addEventListener("click", () => toast("حُفظ النص؛ 280 كلمة احتفظت بتوقيتها")); return; }
+  board.onclick = (e) => {
+    const w = e.target.closest(".bw"); if (!w) return; const i = +w.dataset.i; const fi = findingOf()[i];
+    if (S.anchor == null && !S.range && fi >= 0) { S.edFinding = F[fi].id; renderBoard(); return; }
+    if (S.range) { S.range = null; S.anchor = i; }
+    else if (S.anchor == null) S.anchor = i;
+    else { S.range = [Math.min(S.anchor, i), Math.max(S.anchor, i)]; S.anchor = null; }
+    renderBoard();
+  };
+  $("#seltool").onclick = (e) => { const a = e.target.closest("[data-act]"); if (!a) return; if (a.dataset.act === "clear") clearSel(); else renderInspector(); };
+  renderBoard();
+}
+
+/* ---------- verify ---------- */
+SCREENS.verify = () => {
+  const V = { laya: ["Laya (محلي)", "v3_mixed · المغلف v3", "0.00$", "≈ 35 ث", "≈ 5,100"], gemini: ["Gemini", "gemini-2.5-flash · مجاني", "0.00$", "≈ 1.5 د", "≈ 9,800"], jev: ["JEV", "OpenRouter decisions", "0.004$", "≈ 20 ث", "≈ 7,400"], chat: ["نموذج محادثة", "OpenRouter · بحث في الفهرس", "0.011$", "≈ 40 ث", "≈ 9,800"] };
+  const v = V[S.verifier]; const sel = F.filter((f) => f.pick !== false).length;
+  return `${lecHead("verify")}
+  <div class="vgrid">
+    <section class="panel"><div class="panel-h"><h3>الاقتباسات المرسلة</h3><span class="muted" style="font-size:var(--text-s)">أزل العلامة عن أي اقتباس لا تريد إرساله.</span><span class="grow"></span>
+      <select class="input" style="width:auto;height:32px"><option>الكل</option><option>الأحاديث والمشتبه بها</option><option>الأحاديث فقط</option></select></div>
+      <div class="flist" id="flist">${F.map((f, i) => `<label class="frow"><input type="checkbox" data-pick="${i}" ${f.pick !== false ? "checked" : ""}><span class="kchip ${f.type}">${esc(f.ref)}</span><span class="t">${esc(fText(f, false))}</span><span id="vc${i}">${vchip(f.verdict)}</span></label>`).join("")}</div>
+    </section>
+    <aside class="panel" style="position:sticky;top:calc(var(--header) + 16px)"><div class="panel-h"><h3>جولة تحقق</h3></div><div class="panel-b">
+      <div class="field"><span class="label">المحقق</span><div class="seg" style="flex-wrap:wrap">${Object.entries(V).map(([k, x]) => `<button data-verifier="${k}" aria-pressed="${S.verifier === k}">${x[0]}</button>`).join("")}</div></div>
+      <div class="field"><span class="label">${S.verifier === "laya" ? "نقطة الحفظ" : "النموذج"}</span><select class="input"><option>${v[1]}</option></select></div>
+      ${S.verifier === "laya" ? `<div class="muted" style="font-size:var(--text-s)">يُرسل كل مقطع من الآيات المتتالية مغلفا واحدا، مع الاقتباسات المجاورة.</div>` : `<details><summary class="muted" style="cursor:pointer;font-size:var(--text-s)">خيارات النموذج والتعليمات</summary><div class="panel-b" style="padding:12px 0 0"><div class="grid2"><div class="field"><span class="label">حجم الدفعة</span><input class="input mono" value="8"></div><div class="field"><span class="label">أسلوب الحكم</span><select class="input"><option>متوازن</option><option>صارم</option><option>متساهل</option><option>تركيز على الحدود</option></select></div></div></div></details>`}
+      <div class="stats"><div class="stat"><span class="label">اقتباسات</span><b>${sel}</b></div><div class="stat"><span class="label">رموز</span><b>${v[4]}</b></div><div class="stat"><span class="label">التكلفة</span><b>${v[2]}</b></div><div class="stat"><span class="label">الوقت</span><b>${v[3]}</b></div></div>
+      <div id="vprog"></div>
+      <div class="row"><button class="btn primary" id="vStart">بدء التحقق</button><a class="btn ghost" href="#requests">سجل الطلبات</a></div>
+    </div></aside>
+  </div>`;
+};
+function bindVerify() {
+  document.querySelectorAll("[data-verifier]").forEach((b) => b.onclick = () => { S.verifier = b.dataset.verifier; route(); });
+  document.querySelectorAll("[data-pick]").forEach((c) => c.onchange = () => { F[+c.dataset.pick].pick = c.checked; route(); });
+  $("#vStart").onclick = () => {
+    const picked = F.map((f, i) => i).filter((i) => F[i].pick !== false); let k = 0, paused = false;
+    const prog = $("#vprog");
+    const draw = () => { prog.innerHTML = `<div class="field"><div class="row"><span class="label">${k} / ${picked.length} اقتباسات</span><span class="grow"></span><span class="label mono">${k * 3} طلبات</span></div><div class="bar"><i style="width:${(k / picked.length) * 100}%"></i></div><div class="row"><button class="btn small" id="vPause">${paused ? "استئناف" : "إيقاف مؤقت"}</button><button class="btn small danger" id="vCancel">إلغاء</button></div></div>`;
+      $("#vPause").onclick = () => { paused = !paused; draw(); }; $("#vCancel").onclick = () => { clearInterval(S.vRun); prog.innerHTML = `<span class="muted">أُلغيت الجولة؛ الأحكام التي وصلت محفوظة.</span>`; }; };
+    picked.forEach((i) => { $(`#vc${i}`).innerHTML = `<span class="vchip none">في الانتظار</span>`; });
+    draw(); clearInterval(S.vRun);
+    S.vRun = setInterval(() => {
+      if (paused) return;
+      if (k >= picked.length) { clearInterval(S.vRun); prog.innerHTML = `<div class="muted">انتهت الجولة: ${picked.length} أحكام محفوظة في نسخة جديدة من المحاضرة.</div>`; toast("انتهى التحقق"); return; }
+      const i = picked[k]; if (F[i].verdict === "none") { F[i].verdict = "ok"; F[i].boundary = "complete"; F[i].by = "Laya v3_mixed"; F[i].conf = .9; }
+      $(`#vc${i}`).innerHTML = vchip(F[i].verdict); k++; if (picked[k] != null) $(`#vc${picked[k]}`).innerHTML = `<span class="vchip busy">قيد الفحص</span>`; draw();
+    }, 650);
+  };
+}
+
+/* ---------- lectures ---------- */
+SCREENS.lectures = () => {
+  const srcs = [["paste", "لصق نص", "نص أو SRT أو VTT"], ["file", "ملف نصي", ".txt .srt .vtt"], ["youtube", "رابط يوتيوب", "تنزيل ثم تفريغ صوتي"], ["upload", "رفع وسائط", ".mp4 .mp3 .wav"], ["sample", "المحاضرة التجريبية", "ثابتة، للمقارنة"]];
+  const form = {
+    paste: `<textarea class="input" rows="5" placeholder="الصق النص أو محتوى ملف الترجمة هنا"></textarea>`,
+    file: `<div class="drop">اسحب ملف .txt أو .srt أو .vtt إلى هنا، أو <u>اختر ملفا</u></div>`,
+    youtube: `<input class="input mono" dir="ltr" value="https://www.youtube.com/watch?v=pckn5mI4Q5g">`,
+    upload: `<div class="drop">اسحب ملف صوت أو فيديو إلى هنا، أو <u>اختر ملفا</u></div>`,
+    sample: `<p class="muted" style="margin:0">محاضرة قصيرة فيها آيات وأحاديث وأذكار. هي نفسها في كل مرة، فتصلح للمقارنة مع الملفات الذهبية.</p>`,
+  }[S.src];
+  const asr = S.src === "youtube" || S.src === "upload";
+  return `<div class="row"><h2>المحاضرات</h2></div>
+  <section class="panel"><div class="panel-h"><h3>محاضرة جديدة</h3></div><div class="panel-b">
+    <div class="field"><span class="label">العنوان</span><input class="input" value="خطبة الجمعة: فضل العشر الأوائل"></div>
+    <div class="srcs">${srcs.map(([k, l, d]) => `<button class="src" data-src="${k}" aria-pressed="${S.src === k}"><b>${l}</b><span>${d}</span></button>`).join("")}</div>
+    ${form}
+    ${asr ? `<div class="row"><div class="field" style="flex:1;min-width:220px"><span class="label">نموذج التفريغ الصوتي</span><select class="input"><option>Groq · whisper-large-v3-turbo</option><option>Whisper العربي المتخصص (محلي)</option><option>Whisper turbo int8 (محلي)</option><option>Whisper small int8 (محلي)</option></select></div><label class="switch" style="align-self:end;height:36px"><input type="checkbox" checked>عند الفشل، جرّب النموذج التالي</label></div>` : ""}
+    <div class="row"><button class="btn primary" id="startLecture">${S.src === "sample" ? "فتح المحاضرة التجريبية" : asr ? "بدء التفريغ" : "إنشاء المحاضرة"}</button><span class="faint" style="font-size:var(--text-s)">يبدأ كشف الاقتباسات وحده بعد انتهاء النص.</span></div>
+  </div></section>
+  <section class="panel"><div class="panel-h"><h3>يعمل الآن</h3><span class="grow"></span><span class="faint mono" style="font-size:var(--text-s)">job 41</span></div><div class="panel-b">
+    <div class="row"><b>خطبة الجمعة: الشيخ محمد مزيان</b><span class="faint">· youtube · 38:12</span><span class="grow"></span><button class="btn small">إيقاف مؤقت</button><button class="btn small danger">إلغاء</button></div>
+    <div class="stages"><div class="done"><i></i>تنزيل</div><div class="done"><i></i>استخراج الصوت</div><div class="on"><i></i>تفريغ صوتي 62٪</div><div><i></i>كشف الاقتباسات</div></div>
+    <span class="faint" style="font-size:var(--text-s)">Groq · المقطع 14 من 23 · بقي نحو دقيقة</span>
+  </div></section>
+  <section class="panel"><div class="panel-h"><h3>المحاضرات المحفوظة</h3><span class="grow"></span><input class="input" style="width:200px;height:32px" placeholder="بحث"></div>
+    <div class="scroll-x"><table class="data"><thead><tr><th>العنوان</th><th>المصدر</th><th>الكلمات</th><th>الاقتباسات</th><th>النسخ</th><th>آخر تعديل</th><th></th></tr></thead><tbody>
+      <tr class="clickable" data-open="1"><td><b>${esc(DATA.title)}</b></td><td>تجريبية</td><td class="mono">280</td><td class="mono">${F.length}</td><td class="mono">3</td><td class="faint">اليوم 14:20</td><td><button class="btn small ghost">إعادة تسمية</button><button class="btn small ghost danger">حذف</button></td></tr>
+      <tr class="clickable"><td><b>خطبة الجمعة: الشيخ محمد مزيان</b></td><td>يوتيوب</td><td class="mono faint">…</td><td class="mono faint">…</td><td class="mono">0</td><td class="faint">يعمل الآن</td><td></td></tr>
+      <tr class="clickable"><td><b>درس شرح الأربعين النووية: الحديث الأول</b></td><td>رفع ملف</td><td class="mono">6,412</td><td class="mono">41</td><td class="mono">2</td><td class="faint">2026-11-04</td><td><button class="btn small ghost">إعادة تسمية</button><button class="btn small ghost danger">حذف</button></td></tr>
+      <tr class="clickable"><td><b>نص ملصق: موعظة قصيرة</b></td><td>لصق نص</td><td class="mono">812</td><td class="mono">6</td><td class="mono">1</td><td class="faint">2026-11-02</td><td><button class="btn small ghost">إعادة تسمية</button><button class="btn small ghost danger">حذف</button></td></tr>
+    </tbody></table></div></section>`;
+};
+function bindLectures() {
+  document.querySelectorAll("[data-src]").forEach((b) => b.onclick = () => { S.src = b.dataset.src; route(); });
+  document.querySelectorAll("[data-open]").forEach((r) => r.onclick = (e) => { if (!e.target.closest("button")) location.hash = "#view"; });
+  $("#startLecture").onclick = () => { if (S.src === "sample") location.hash = "#view"; else toast("بدأت المهمة؛ تابع تقدمها هنا أو في الشريط العلوي"); };
+}
+
+/* ---------- tafrigh ---------- */
+SCREENS.tafrigh = () => {
+  const sents = [
+    ["h1", "مقدمة الدرس", ""], ["", "إن الحمد لله نحمده ونستعينه ونستغفره، ونفتتح درسنا اليوم بقول الله تبارك وتعالى في فاتحة الكتاب: ﴿الحمد لله رب العالمين﴾.", "97٪"],
+    ["", "ونسأله سبحانه الإخلاص والقبول في القول والعمل.", "99٪"], ["h1", "التقوى والقول السديد", ""],
+    ["", "اعلموا رحمكم الله أن مدار صلاح الأعمال كلها على تقوى الله وتحري الصدق.", "96٪"],
+    ["matn", "﴿يا أيها الذين آمنوا اتقوا الله وقولوا قولا سديدا﴾ [الأحزاب: 70]", "99٪"],
+    ["", "فالتقوى والقول السديد أصل كل خير في الدنيا والآخرة.", "72٪ · للمراجعة"],
+  ];
+  return `${lecHead("tafrigh")}
+  <div class="vgrid">
+    <section class="panel"><div class="panel-h"><h3>الدرس المكتوب</h3><span class="grow"></span><select class="input" style="width:auto;height:32px"><option>تفريغ 2 · نافذة 6 · gemini</option><option>تفريغ 1 · جملة جملة · JEV</option></select><button class="btn small">مقارنة</button></div>
+      <div class="panel-b"><div class="outline"><span class="h1">مقدمة الدرس</span><span class="h1">التقوى والقول السديد</span><span>حديث النية</span><span>آية الكرسي</span><span>سورة العصر</span><span>الخاتمة</span></div>
+      <div>${sents.map(([k, t, c]) => k === "h1" ? `<h3 style="margin:16px 0 4px;font-family:var(--font-quran);font-size:1.3rem">${t}</h3>` : `<div class="sent ${k}"><span class="mono faint" style="font-size:11px">${k === "matn" ? "متن" : "شرح"}</span><span class="t">${t}</span><span class="${c.includes("مراجعة") ? "vchip unsure" : "faint mono"}" style="font-size:11px">${c}</span></div>`).join("")}</div></div></section>
+    <aside class="panel"><div class="panel-h"><h3>إعدادات التفريغ</h3></div><div class="panel-b">
+      <div class="stats"><div class="stat"><span class="label">جمل</span><b>23</b></div><div class="stat"><span class="label">للمراجعة</span><b>2</b></div><div class="stat"><span class="label">طلبات</span><b>4</b></div><div class="stat"><span class="label">التكلفة</span><b>0.00$</b></div></div>
+      <div class="field"><span class="label">النموذج</span><select class="input"><option>Gemini (تلقائي)</option><option>OpenRouter · JEV</option></select></div>
+      <div class="field"><span class="label">الطريقة</span><div class="seg"><button aria-pressed="false">جملة جملة</button><button aria-pressed="true">نافذة من 6 جمل</button></div></div>
+      <div class="field"><span class="label">تصحيح أخطاء التفريغ الصوتي</span><div class="seg"><button aria-pressed="true">عند الشك</button><button aria-pressed="false">دائما</button><button aria-pressed="false">أبدا</button></div></div>
+      <div class="field"><span class="label">الجمل</span><div class="row"><input class="input mono" style="width:70px" value="1"><span>إلى</span><input class="input mono" style="width:70px" value="20"><button class="btn small ghost">أول 10</button><button class="btn small ghost">أول 25</button></div></div>
+      <div class="row"><button class="btn primary">بدء التفريغ</button><button class="btn ghost">قائمة المراجعة (2)</button></div>
+    </div></aside></div>`;
+};
+
+/* ---------- export ---------- */
+SCREENS.export = () => {
+  const srt = CAP.slice(0, 9).map((c, i) => `${i + 1}\n${fmt(c[0])} --> ${fmt(c[1])}\n${c[2]}`).join("\n\n");
+  return `${lecHead("export")}
+  <div class="vgrid">
+    <section class="panel"><div class="panel-h"><h3>معاينة</h3><span class="grow"></span><span class="faint mono" style="font-size:var(--text-s)">wahy-captions.srt</span></div><div class="panel-b"><pre class="code ar">${esc(srt)}</pre></div></section>
+    <aside class="panel"><div class="panel-h"><h3>تصدير</h3></div><div class="panel-b">
+      <div class="field"><span class="label">ترجمات</span><div class="seg"><button aria-pressed="true">SRT</button><button aria-pressed="false">VTT</button><button aria-pressed="false">ASS</button></div></div>
+      <div class="field"><span class="label">نص منسق</span><div class="seg"><button aria-pressed="false">HTML</button><button aria-pressed="false">Markdown</button><button aria-pressed="false">نص</button><button aria-pressed="false">JSON</button></div></div>
+      <div class="grid2" style="grid-template-columns:1fr 1fr"><div class="field"><span class="label">أقواس الآيات</span><select class="input"><option>﴿ … ﴾</option><option>( … )</option></select></div><div class="field"><span class="label">أقواس الأحاديث</span><select class="input"><option>« … »</option><option>" … "</option></select></div></div>
+      <div class="field"><span class="label">المرجع</span><select class="input"><option>السورة: الآية</option><option>السورة والآية بالحروف</option><option>بلا مرجع</option></select></div>
+      <label class="switch"><input type="checkbox" checked>الشرح بين أجزاء الاقتباس خارج الأقواس</label>
+      <label class="switch"><input type="checkbox">بالرسم المعتمد</label>
+      <label class="switch"><input type="checkbox" checked>إخفاء ما حُكم بأنه كلام عادي</label>
+      <button class="btn primary" id="doExport">تنزيل الملف</button>
+    </div></aside></div>`;
+};
+const fmt = (t) => { const h = Math.floor(t / 3600), m = Math.floor(t % 3600 / 60), s = Math.floor(t % 60), ms = Math.round((t % 1) * 1000); return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")},${String(ms).padStart(3, "0")}`; };
+
+/* ---------- corpora ---------- */
+SCREENS.corpora = () => {
+  const adhkar = [["سبحان الله", 1], ["الحمد لله", 1], ["لا إله إلا الله", 1], ["الله أكبر", 1], ["أستغفر الله", 1], ["لا حول ولا قوة إلا بالله", 1], ["سبحان الله وبحمده سبحان الله العظيم", 1], ["اللهم صل على محمد وعلى آل محمد", 0]];
+  return `<div class="row"><h2>المصادر</h2></div>
+  <nav class="tabs" style="border-bottom:1px solid var(--line)"><a aria-current="true" href="#corpora">الأذكار <span class="badge">18</span></a><a href="#corpora">اقتباسات خاصة <span class="badge">3</span></a><a href="#corpora">القرآن</a><a href="#corpora">الحديث</a><a href="#corpora">مصادر الحديث</a></nav>
+  <div class="vgrid">
+    <section class="panel"><div class="panel-h"><div class="seg"><button aria-pressed="true">الكل</button><button aria-pressed="false">المدمجة</button><button aria-pressed="false">أذكاري</button></div><span class="grow"></span><label class="switch"><input type="checkbox" checked>كشف الأذكار</label></div>
+      <div class="scroll-x"><table class="data"><thead><tr><th>الذكر</th><th>النوع</th><th></th></tr></thead><tbody>
+      ${adhkar.map(([t, b]) => `<tr><td class="ar">${t}</td><td>${b ? `<span class="faint">مدمج · للقراءة فقط</span>` : "من إضافتك"}</td><td>${b ? "" : `<button class="btn small ghost">تعديل</button><button class="btn small ghost danger">حذف</button>`}</td></tr>`).join("")}
+      </tbody></table></div></section>
+    <aside class="panel"><div class="panel-h"><h3>إضافة ذكر</h3></div><div class="panel-b">
+      <input class="input" placeholder="كلمتان على الأقل" style="font-family:var(--font-read)"><button class="btn primary" style="align-self:start">إضافة</button>
+      <div class="row"><button class="btn small ghost">تصدير JSON</button><button class="btn small ghost">استيراد JSON</button></div>
+      <hr style="border:0;border-top:1px solid var(--line);width:100%">
+      <div class="field"><span class="label">مصدر الحديث المستخدم</span>
+        <label class="cand"><input type="radio" name="hs" checked><b style="font-size:var(--text-s)">مصدر وحي المدمج</b><span class="grow"></span><span class="vchip ok">جاهز</span></label>
+        <label class="cand"><input type="radio" name="hs"><b style="font-size:var(--text-s)">Open Hadith Data (بالأسانيد)</b><span class="grow"></span><span class="faint mono" style="font-size:11px">46,891</span><span class="vchip ok">جاهز</span></label></div>
+    </div></aside></div>`;
+};
+
+/* ---------- training ---------- */
+SCREENS.training = () => `<div class="row"><h2>بيانات التدريب</h2><span class="grow"></span><button class="btn primary">تصدير Laya JSONL</button></div>
+  <div class="kpis"><span><b>12</b>سجلا</span><span><b>7</b>صحيح</span><span><b>3</b>كلام عادي</span><span><b>1</b>ناقص الحدود</span><span><b>1</b>اقتباس فائت</span></div>
+  <section class="panel"><div class="panel-h"><div class="seg"><button aria-pressed="true">الكل</button><button aria-pressed="false">تسميات ذهبية</button><button aria-pressed="false">من المعلم</button><button aria-pressed="false">موافقة على حكم</button></div></div>
+  <div class="scroll-x"><table class="data"><thead><tr><th>الاقتباس</th><th>المرجع</th><th>التسمية</th><th>الحدود</th><th>المصدر</th><th>المحاضرة</th></tr></thead><tbody>
+    <tr><td class="ar">أمير المؤمنين عمر بن الخطاب</td><td>صحيح مسلم (2149)</td><td>${vchip("bad")}</td><td>—</td><td>أنت (حذف بسبب)</td><td class="faint">التجريبية</td></tr>
+    <tr><td class="ar">يا أيها الذين آمنوا اتقوا الله وقولوا قولا سديدا</td><td>الأحزاب: 70</td><td>${vchip("ok")}</td><td>كامل</td><td>أنت (موافقة)</td><td class="faint">التجريبية</td></tr>
+    <tr><td class="ar">لا إله إلا الله</td><td>التهليل</td><td>${vchip("ok")}</td><td>كامل</td><td>أنت (اقتباس فائت)</td><td class="faint">التجريبية</td></tr>
+    <tr><td class="ar">والعصر</td><td>العصر: 1</td><td>${vchip("ok")}</td><td>ينقصه النهاية</td><td>أنت (تصحيح)</td><td class="faint">التجريبية</td></tr>
+  </tbody></table></div></section>`;
+
+/* ---------- requests ---------- */
+SCREENS.requests = () => {
+  const rows = [["14:20:41", "Laya", "الأحزاب: 70", "ok", "612", "0.00$", "0.9 ث"], ["14:20:40", "Laya", "صحيح مسلم (2149)", "bad", "540", "0.00$", "0.8 ث"], ["14:20:39", "Laya", "يونس: 10", "unsure", "588", "0.00$", "0.9 ث"], ["13:02:11", "Gemini", "البقرة: 255", "ok", "1,912", "0.00$", "2.4 ث"], ["13:02:09", "Gemini", "الأربعون النووية (1)", "ok", "2,240", "0.00$", "2.6 ث"]];
+  return `<div class="row"><h2>سجل الطلبات</h2><span class="grow"></span><select class="input" style="width:auto;height:32px"><option>كل المزودين</option><option>Laya</option><option>Gemini</option></select></div>
+  <div class="vgrid">
+    <section class="panel"><div class="scroll-x"><table class="data"><thead><tr><th>الوقت</th><th>المزود</th><th>الاقتباس</th><th>الحكم</th><th>رموز</th><th>التكلفة</th><th>المدة</th></tr></thead><tbody>
+      ${rows.map((r, i) => `<tr class="clickable"${i === 1 ? ` style="background:var(--accent-soft)"` : ""}><td class="mono">${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${vchip(r[3])}</td><td class="mono">${r[4]}</td><td class="mono">${r[5]}</td><td class="mono">${r[6]}</td></tr>`).join("")}
+    </tbody></table></div></section>
+    <aside class="panel"><div class="panel-h"><h3>الطلب</h3><span class="grow"></span><div class="seg"><button aria-pressed="true">مقروء</button><button aria-pressed="false">خام</button></div><button class="btn small ghost">نسخ</button></div><div class="panel-b">
+      <span class="label">المدخل (مغلف v3)</span>
+      <pre class="code">{
+  "v": 3,
+  "kind": "hadith",
+  "ref": "صحيح مسلم (2149)",
+  "before": "وقد جاء في الحديث الصحيح عن",
+  "span": "أمير المؤمنين عمر بن الخطاب",
+  "after": "رضي الله عنه أن النبي ﷺ قال",
+  "neighbours": ["الأحزاب: 70", "الأربعون النووية (1)"]
+}</pre>
+      <span class="label">المخرج</span>
+      <pre class="code">{ "verdict": "false", "p": 0.93, "boundary": "complete" }</pre>
+    </div></aside></div>`;
+};
+
+/* ---------- prefs ---------- */
+SCREENS.prefs = () => `<div class="row"><h2>الإعدادات</h2></div>
+  <div class="grid2" style="grid-template-columns:repeat(auto-fit,minmax(300px,1fr));align-items:start">
+    <section class="panel"><div class="panel-h"><h3>مفاتيح الخدمات</h3><span class="faint" style="font-size:var(--text-xs)">تُحفظ على الخادم في .env ولا تصل إلى المتصفح</span></div><div class="panel-b">
+      ${[["Groq", 1], ["Gemini", 0], ["OpenRouter", 1]].map(([k, s]) => `<div class="row"><b style="min-width:90px">${k}</b>${s ? `<span class="vchip ok">مضبوط</span>` : `<span class="vchip none">غير مضبوط</span>`}<span class="grow"></span><input class="input mono" dir="ltr" style="width:180px;height:32px" placeholder="${s ? "استبدال المفتاح" : "الصق المفتاح"}" type="password"><button class="btn small">حفظ</button></div>`).join("")}
+    </div></section>
+    <section class="panel"><div class="panel-h"><h3>الحالة</h3></div><div class="panel-b">
+      <table class="data"><tbody>
+        <tr><td>الخادم</td><td>${vchip("ok").replace("صحيح", "متصل")}</td><td class="mono faint">:8120</td></tr>
+        <tr><td>المحرك</td><td>${vchip("ok").replace("صحيح", "جاهز")}</td><td class="mono faint">6,236 آية · 46,891 حديث</td></tr>
+        <tr><td>المعالج الرسومي</td><td>GTX 1050</td><td class="mono faint">3.1 / 4.0 GB حرة</td></tr>
+        <tr><td>Laya</td><td>v3_mixed · المغلف v3</td><td><button class="btn small">إلغاء التحميل</button></td></tr>
+      </tbody></table></div></section>
+    <section class="panel"><div class="panel-h"><h3>الكشف</h3></div><div class="panel-b">
+      <div class="field"><span class="label">المحرك</span><div class="seg"><button aria-pressed="true">v5</button><button aria-pressed="false">v5 متساهل</button></div></div>
+      <div class="field"><span class="label">القراءة</span><select class="input"><option>تلقائي (حفص والقراءات العشر)</option><option>حفص</option><option>ورش</option><option>قالون</option></select></div>
+    </div></section>
+    <section class="panel"><div class="panel-h"><h3>الواجهة</h3></div><div class="panel-b">
+      <div class="field"><span class="label">اللغة</span><div class="seg"><button aria-pressed="true">العربية</button><button aria-pressed="false" id="toEn">English</button></div></div>
+      <div class="field"><span class="label">المظهر</span><div class="seg"><button data-theme-set="light" aria-pressed="false">فاتح</button><button data-theme-set="dark" aria-pressed="false">داكن</button><button data-theme-set="" aria-pressed="false">حسب النظام</button></div></div>
+    </div></section>
+  </div>`;
+
+/* ---------------- notes ---------------- */
+const NOTES = {
+  view: ["Lecture view (the main screen)", "F-029 to F-039, F-030, F-033, F-042", [
+    "Transcript on the reading side (right in Arabic), video beside it. Layout switch: beside / text only / video only.",
+    "Press play, or click any word: the yellow marker is the spoken word, found from the time by a binary search over word start times.",
+    "Verses are set in Amiri inside lapis tint with ﴿ ﴾, hadith in sienna tint with « », adhkar in plum. A false finding gets red hatching, not a different colour.",
+    "Each finding ends with its reference tag and a verdict dot. Click the tag for the card: verdict, boundary, play the quote, edit (jumps to the editor on that finding), verify.",
+    "Verdict chips filter (struck through = hidden; the words stay as plain text). The clipped filter shows findings with a missing start or end.",
+    "'Standard script' swaps the spoken text (simulated here by removing the diacritics) for the source text, in the transcript and the caption.",
+    "Real data: the golden sample's 280 words, timings, v5 findings and SRT captions. The verdicts are made up; no pass has run.",
+  ]],
+  edit: ["Editor", "F-047 to F-068, N-007, F-003", [
+    "Three modes: quotes (word board + inspector), full text, caption timing.",
+    "Try the phase 17 flow: click «لا» and then «الله.» at the end of the last line (the closing dhikr v5 missed), insert it, then undo from the toast or the header. The header undo names the last edit.",
+    "Click a coloured word to inspect that finding. The first finding is ambiguous (Yunus 10 vs al-Fatiha 2): its candidates are listed to approve another one.",
+    "Human verdict and the 'reference wrong' flag (N-007) are saved as gold labels.",
+  ]],
+  verify: ["Verification", "F-080 to F-090", [
+    "Pick a verifier; the estimate (findings, tokens, cost, time) updates. Untick quotes you don't want sent.",
+    "Start runs a fake pass: chips go waiting → checking → verdict; pause and cancel work.",
+    "Laya sends each passage of consecutive verses as one envelope, as in training.",
+  ]],
+  lectures: ["Lectures", "F-016 to F-027, F-023", [
+    "One 'new lecture' card with five sources; the transcription model appears only for YouTube and uploads.",
+    "A running job shows its stages (download, extract audio, transcribe, detect) here and as a pill in the header on every screen.",
+    "Saved lectures: click the sample row to open it.",
+  ]],
+  tafrigh: ["Tafrigh", "F-106 to F-122", ["The written lesson with its outline as a bar of headings; matn and commentary marked per sentence; settings, estimate and test slice beside it. Kept light in this round."]],
+  export: ["Export", "F-069 to F-071, phase 16 commentary gaps", ["Preview is the golden SRT. Options: format, brackets, reference style, commentary outside the brackets (new), standard script, hide ordinary speech."]],
+  corpora: ["Corpora", "F-072 to F-079, F-045, F-046", ["Adhkar with built-in rows read-only (phase 8 decision), add/import/export, and the hadith source choice."]],
+  training: ["Training data", "F-100 to F-104", ["Counters, filters by origin (gold, teacher, approval) and the Laya JSONL export."]],
+  requests: ["Request log", "F-095, F-096", ["Every AI request with tokens, cost and latency; the inspector shows input and output, readable or raw."]],
+  prefs: ["Settings", "F-002, F-008, F-010, F-011, F-012, F-097, F-128", ["Keys are 'set / not set' only. Health, engine, GPU and Laya status in one card. Language and theme. Engine offers v5 and v5:loose only (Versions kept)."]],
+};
+const LIST = [["lectures", "Lectures"], ["view", "Lecture view"], ["edit", "Editor"], ["verify", "Verify"], ["tafrigh", "Tafrigh"], ["export", "Export"], ["corpora", "Corpora"], ["training", "Training"], ["requests", "Requests"], ["prefs", "Settings"]];
+function renderNotes(k) {
+  const n = NOTES[k]; const el = $("#notes");
+  el.innerHTML = `<div class="row"><b>Phase 9 mockup</b><span class="grow"></span><button class="btn small" id="notesX">Close</button></div>
+    <nav>${LIST.map(([h, l]) => `<a href="#${h}" aria-current="${h === k}">${l}</a>`).join("")}</nav>
+    <h2>${n[0]}</h2><div class="ids">${n[1]}</div><ul>${n[2].map((x) => `<li>${esc(x)}</li>`).join("")}</ul>
+    <p class="muted" style="margin:0;font-size:13px">Whole app: Arabic right to left, Western digits, light and dark (header button or your system). Colour means kind of quote or verdict, nothing else. The navigation rail holds the places; the open lecture has its own tabs (view, edit, verify, Tafrigh, export) with live counts.</p>`;
+  $("#notesX").onclick = () => { el.hidden = true; };
+}
+
+/* ---------------- router ---------------- */
+const LECTURE_TABS = ["view", "edit", "verify", "tafrigh", "export"];
+function route() {
+  let k = location.hash.slice(1); if (!SCREENS[k]) k = "view";
+  if (k !== "view") play(false);
+  $("#main").innerHTML = `<div class="screen">${SCREENS[k]()}</div>`;
+  document.querySelectorAll(".rail a").forEach((a) => a.setAttribute("aria-current", String(a.dataset.nav === k || (a.dataset.nav === "lecture" && LECTURE_TABS.includes(k)))));
+  $("#crumbTitle").textContent = LECTURE_TABS.includes(k) ? DATA.title : "";
+  ({ view: bindView, edit: bindEdit, verify: bindVerify, lectures: bindLectures })[k]?.();
+  if (k === "export") $("#doExport").onclick = () => toast("صُدّر wahy-captions.srt");
+  if (k === "prefs") { document.querySelectorAll("[data-theme-set]").forEach((b) => b.onclick = () => setTheme(b.dataset.themeSet)); $("#toEn").onclick = langToast; }
+  renderNotes(k);
+}
+function setTheme(t) { if (t) document.documentElement.dataset.theme = t; else delete document.documentElement.dataset.theme; try { localStorage.setItem("wahy-mock-theme", t); } catch (e) { /* storage blocked */ } }
+function langToast() { toast("في التطبيق تنقلب الواجهة إلى الإنجليزية من اليسار إلى اليمين، ويبقى نص المحاضرة عربيا"); }
+$("#themeBtn").onclick = () => {
+  const dark = document.documentElement.dataset.theme ? document.documentElement.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  setTheme(dark ? "light" : "dark");
+};
+$("#undoBtn").onclick = doUndo;
+$("#langBtn").onclick = langToast;
+$("#notesBtn").onclick = () => { $("#notes").hidden = !$("#notes").hidden; };
+try { const t = localStorage.getItem("wahy-mock-theme"); if (t) document.documentElement.dataset.theme = t; } catch (e) { /* storage blocked */ }
+document.addEventListener("click", (e) => { if (S.pop != null && !e.target.closest("#pop") && !e.target.closest("#transcript")) { S.pop = null; $("#pop")?.remove(); } });
+window.addEventListener("hashchange", route);
+S.t = 21.9; // open mid-lecture, on the al-Ahzab verse
+route();
+</script>

@@ -870,6 +870,20 @@ Claimed code that is not a feature of its own, so the coverage counts it as gene
 - The transcript sits beside the video with word-by-word sync (F-032); this is the main screen.
 - The old look need not survive: the new screens follow the phase 9 mockups.
 - (More from the user during the walkthrough and phase 9.)
+- **Phase 9 draft (2026-11-06), waiting for the user's approval.** Clickable mockups in
+  `docs/rewrite/mockups/screens.html`, with tokens in `web/src/shell/tokens.css`. What the draft proposes:
+  - A rail for the app's places (lectures, the open lecture, corpora, training data, request log, settings) with live
+    count badges (F-001); the open lecture has its own tabs: view, edit, verify, Tafrigh, export (replaces the old
+    quick-jump buttons, F-042).
+  - The lecture view is the main screen: transcript on the reading side (right in Arabic), video beside it, with
+    layouts beside / text only / video only (F-030); the spoken word gets a yellow marker; a finding's reference tag
+    opens its card, and the card's "edit" opens the editor on that finding.
+  - Colour means only the kind of quote (verse lapis, hadith sienna, dhikr plum), the verdict (green, amber, red,
+    grey), or the spoken word. A false finding is hatched red. Verses are set in Amiri, the transcript in Noto Naskh
+    Arabic, the interface in IBM Plex Sans Arabic, times and counts in IBM Plex Mono. Western digits.
+  - Editor (F-047): three modes (quotes on a word board with an inspector, full text, caption timing); a missed
+    quote is two clicks on the board; the header's undo button names the last edit.
+  - The user's words on the mockups go here once they have seen them.
 
 ## New features (proposed)
 

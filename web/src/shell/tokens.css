@@ -1,0 +1,185 @@
+/*
+ * Wahy Studio design tokens (roadmap phase 9). Same values as the mockup in docs/rewrite/mockups/screens.html.
+ *
+ * How to use (phase 10): import after Tailwind in src/index.css, `@import "./shell/tokens.css";`, then write
+ * `bg-paper text-ink`, `bg-quran-soft text-quran`, `font-read`, `rounded-m` and so on. The raw values live in CSS
+ * variables, so the theme switches at runtime without rebuilding:
+ *   <html data-theme="dark">   dark, chosen by the user
+ *   <html data-theme="light">  light, chosen by the user
+ *   no data-theme              follows the system (prefers-color-scheme)
+ * Direction: <html dir="rtl" lang="ar"> by default; write logical utilities (ms-*, me-*, ps-*, pe-*, start-*,
+ * end-*, text-start) instead of left/right ones, so English (ltr) mirrors for free.
+ *
+ * Colour means one of three things only: the kind of quote (quran, hadith, dhikr), a verdict (ok, unsure, bad,
+ * none), or the spoken word (now). Everything else is neutral, plus one accent for actions and selection.
+ * Fonts: IBM Plex Sans Arabic (interface), Noto Naskh Arabic (transcript), Amiri (Quran and the brand),
+ * IBM Plex Mono (times, counts, ids). Phase 10 loads them.
+ */
+
+:root {
+  /* neutrals, slightly green-grey */
+  --wahy-paper: #f2f4f1;
+  --wahy-surface: #ffffff;
+  --wahy-surface-2: #e9ece8;
+  --wahy-line: #d6dbd5;
+  --wahy-ink: #17201e;
+  --wahy-ink-2: #4a5552;
+  --wahy-ink-3: #75817d;
+  /* accent: actions, selection, focus, progress */
+  --wahy-accent: #0e5d58;
+  --wahy-accent-ink: #ffffff;
+  --wahy-accent-soft: #d9eae6;
+  /* kinds of quote */
+  --wahy-quran: #2a4d9b;
+  --wahy-quran-soft: #e3e9f7;
+  --wahy-hadith: #96461c;
+  --wahy-hadith-soft: #f5e6dc;
+  --wahy-dhikr: #6a3d88;
+  --wahy-dhikr-soft: #eee5f4;
+  /* verdicts */
+  --wahy-ok: #217b4c;
+  --wahy-ok-soft: #dcefe3;
+  --wahy-bad: #b3312e;
+  --wahy-bad-soft: #f7e0de;
+  --wahy-unsure: #9c6c0e;
+  --wahy-unsure-soft: #f5ebd2;
+  --wahy-none: #75817d;
+  --wahy-none-soft: #e9ece8;
+  /* the spoken word, and the video stage */
+  --wahy-now: #ffdf6e;
+  --wahy-now-ink: #17201e;
+  --wahy-stage: #0c1110;
+  --wahy-stage-ink: #f3f5f4;
+  --wahy-shadow: 0 1px 2px rgb(16 24 22 / 0.06), 0 6px 20px rgb(16 24 22 / 0.08);
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --wahy-paper: #0f1312;
+    --wahy-surface: #161b1a;
+    --wahy-surface-2: #1e2423;
+    --wahy-line: #2b3331;
+    --wahy-ink: #e4e9e7;
+    --wahy-ink-2: #aab5b1;
+    --wahy-ink-3: #7b8783;
+    --wahy-accent: #52b8ad;
+    --wahy-accent-ink: #05201d;
+    --wahy-accent-soft: #163330;
+    --wahy-quran: #92b1f2;
+    --wahy-quran-soft: #1a2640;
+    --wahy-hadith: #e8a073;
+    --wahy-hadith-soft: #372319;
+    --wahy-dhikr: #c79de3;
+    --wahy-dhikr-soft: #2c2137;
+    --wahy-ok: #5fc88d;
+    --wahy-ok-soft: #142e1f;
+    --wahy-bad: #f17b75;
+    --wahy-bad-soft: #3a1918;
+    --wahy-unsure: #e5b649;
+    --wahy-unsure-soft: #342811;
+    --wahy-none: #7b8783;
+    --wahy-none-soft: #1e2423;
+    --wahy-now: #e6c24a;
+    --wahy-now-ink: #121212;
+    --wahy-stage: #070a09;
+    --wahy-stage-ink: #f3f5f4;
+    --wahy-shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 8px 24px rgb(0 0 0 / 0.45);
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --wahy-paper: #0f1312;
+  --wahy-surface: #161b1a;
+  --wahy-surface-2: #1e2423;
+  --wahy-line: #2b3331;
+  --wahy-ink: #e4e9e7;
+  --wahy-ink-2: #aab5b1;
+  --wahy-ink-3: #7b8783;
+  --wahy-accent: #52b8ad;
+  --wahy-accent-ink: #05201d;
+  --wahy-accent-soft: #163330;
+  --wahy-quran: #92b1f2;
+  --wahy-quran-soft: #1a2640;
+  --wahy-hadith: #e8a073;
+  --wahy-hadith-soft: #372319;
+  --wahy-dhikr: #c79de3;
+  --wahy-dhikr-soft: #2c2137;
+  --wahy-ok: #5fc88d;
+  --wahy-ok-soft: #142e1f;
+  --wahy-bad: #f17b75;
+  --wahy-bad-soft: #3a1918;
+  --wahy-unsure: #e5b649;
+  --wahy-unsure-soft: #342811;
+  --wahy-none: #7b8783;
+  --wahy-none-soft: #1e2423;
+  --wahy-now: #e6c24a;
+  --wahy-now-ink: #121212;
+  --wahy-stage: #070a09;
+  --wahy-stage-ink: #f3f5f4;
+  --wahy-shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 8px 24px rgb(0 0 0 / 0.45);
+  color-scheme: dark;
+}
+
+/* Tailwind v4 theme: `inline` makes each utility read the variable, so a theme switch needs no rebuild. */
+@theme inline {
+  --color-paper: var(--wahy-paper);
+  --color-surface: var(--wahy-surface);
+  --color-surface-2: var(--wahy-surface-2);
+  --color-line: var(--wahy-line);
+  --color-ink: var(--wahy-ink);
+  --color-ink-2: var(--wahy-ink-2);
+  --color-ink-3: var(--wahy-ink-3);
+  --color-accent: var(--wahy-accent);
+  --color-accent-ink: var(--wahy-accent-ink);
+  --color-accent-soft: var(--wahy-accent-soft);
+  --color-quran: var(--wahy-quran);
+  --color-quran-soft: var(--wahy-quran-soft);
+  --color-hadith: var(--wahy-hadith);
+  --color-hadith-soft: var(--wahy-hadith-soft);
+  --color-dhikr: var(--wahy-dhikr);
+  --color-dhikr-soft: var(--wahy-dhikr-soft);
+  --color-ok: var(--wahy-ok);
+  --color-ok-soft: var(--wahy-ok-soft);
+  --color-bad: var(--wahy-bad);
+  --color-bad-soft: var(--wahy-bad-soft);
+  --color-unsure: var(--wahy-unsure);
+  --color-unsure-soft: var(--wahy-unsure-soft);
+  --color-none: var(--wahy-none);
+  --color-none-soft: var(--wahy-none-soft);
+  --color-now: var(--wahy-now);
+  --color-now-ink: var(--wahy-now-ink);
+  --color-stage: var(--wahy-stage);
+  --color-stage-ink: var(--wahy-stage-ink);
+  --shadow-pop: var(--wahy-shadow);
+}
+
+@theme {
+  --font-ui: "IBM Plex Sans Arabic", "Segoe UI", Tahoma, sans-serif;
+  --font-read: "Noto Naskh Arabic", "Amiri", "Traditional Arabic", serif;
+  --font-quran: "Amiri", "Noto Naskh Arabic", serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+
+  /* type scale; the transcript has its own size and a tall line height for Arabic marks */
+  --text-xs: 0.75rem;
+  --text-s: 0.8125rem;
+  --text-m: 0.875rem;
+  --text-l: 1rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.625rem;
+  --text-read: 1.3rem;
+  --text-read--line-height: 2.15;
+
+  /* spacing: Tailwind multiplies this base (p-1 = 4px, p-2 = 8px, p-3 = 12px, p-4 = 16px, p-6 = 24px, p-8 = 32px) */
+  --spacing: 4px;
+
+  --radius-s: 4px;
+  --radius-m: 8px;
+  --radius-l: 12px;
+
+  /* layout sizes */
+  --spacing-rail: 84px;
+  --spacing-header: 56px;
+  --spacing-player: 440px;
+}

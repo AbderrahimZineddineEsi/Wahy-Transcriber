@@ -683,3 +683,52 @@ scripts/dev.sh     # http://localhost:8120/docs → POST /api/lectures/sample, t
 4. Full `scripts/test.sh`; one test (`test_db`'s table list) had to learn the two new tables.
 Commands: `uv run alembic revision --autogenerate`, `uv run pytest`, `uv run ruff check .`, a throw-away script that
 prepared the real Open Hadith Data through the API.
+
+## Phase 9: Screen design (2026-11-06, draft waiting for your approval)
+
+### What was built
+
+- `docs/rewrite/mockups/screens.html`: a clickable mockup of ten screens (lectures, lecture view, editor, verify,
+  Tafrigh, export, corpora, training data, request log, settings), in Arabic right to left, light and dark. It runs on
+  real data: the golden sample's 280 words with their timings, the v5 findings and the SRT captions from phase 2. Only
+  the verdicts are invented. A "Design notes" button (bottom left) explains each screen in English and lists its F-IDs.
+- `web/src/shell/tokens.css`: the same colours, fonts, type sizes, spacing and radii as Tailwind tokens. Nothing
+  imports it yet; phase 10 does.
+
+### New concepts
+
+- **Design tokens.** A token is a named design decision: `--wahy-quran: #2a4d9b` instead of writing that hex in
+  forty places. Components use the name (`text-quran`), so changing the verse colour, or adding a dark theme, means
+  editing one line per theme. It is the same idea as a constant in code, applied to design. In Tailwind v4 the
+  `@theme` block turns tokens into utilities: `--color-quran` becomes `text-quran`, `bg-quran`, `border-quran`.
+- **Runtime themes with `@theme inline`.** The raw values sit in CSS variables that change with `data-theme` on
+  `<html>`; `@theme inline` makes the utility read the variable (`.bg-paper { background-color: var(--wahy-paper) }`),
+  so switching to dark is one attribute change, with no rebuild. Three states: `data-theme="dark"`, `"light"`, or none
+  (follow the system through `prefers-color-scheme`).
+- **Right-to-left layout.** With `<html dir="rtl">` the browser lays rows out from the right. Write *logical*
+  properties: `margin-inline-start` (Tailwind `ms-3`) means "on the side where the text starts", which is the right in
+  Arabic and the left in English. Then the English interface mirrors itself for free. Two traps: numbers, times and
+  code are left to right inside Arabic text (the mockup wraps them in `direction: ltr; unicode-bidi: isolate`), and
+  icons that mean a direction (undo, previous/next) must be flipped in RTL, while icons that don't (play) must not.
+- **Colour as meaning.** The mockup spends colour on three things only: the kind of a quote, its verdict and the
+  spoken word. If everything is colourful, nothing stands out. A false finding is hatched rather than recoloured, so
+  you can still see it is a hadith.
+- **The word-sync logic, previewed.** The yellow marker is found by a binary search over word start times
+  (`wordAt(t)` in the mockup's script): with 20,000 words in a 2-hour lecture that is about 15 comparisons per frame,
+  not 20,000. Phase 12 turns this into a tested function.
+
+### How it was checked
+
+- Headless Chromium (the cached Playwright build) opened every screen at 1440 px and at phone width (400 px), in light
+  and dark: no script errors, no sideways scrolling. The two-click "missed quote" flow was clicked through: the
+  finding count went from 8 to 9 and the header said "تراجع: إضافة اقتباس فائت".
+- The tokens were compiled with Tailwind's own compiler: `bg-paper`, `text-quran`, `font-read`, `text-read`,
+  `rounded-m`, `p-4`, `w-player` and `shadow-pop` all come out as expected.
+- Not done: your approval. The phase is ticked only after you have looked at the mockups and your words are recorded.
+
+**Try:**
+
+```bash
+xdg-open docs/rewrite/mockups/screens.html     # click a word, press تشغيل, click a reference tag, open التحرير
+grep -n "quran" web/src/shell/tokens.css       # one colour, three places: light, dark, and the Tailwind name
+```
