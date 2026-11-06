@@ -637,10 +637,12 @@ first saved as a lecture version.
 - **Same options for search and detection.** The worker keeps one *matcher* (hundreds of MB) per option set. If search
   used different options than detection, the first search after a detection would build a second matcher. Both call
   `engine_options()`, and a test asserts the options are equal.
-- **Seeding a table.** `seed_adhkar()` runs at start-up: it inserts the 18 built-in adhkar that are missing and
-  refreshes their text, but never touches rows with `is_custom = true`. That is how "your additions survive updates"
-  works. A drift test runs Node on `engine/src/shared.js` and compares it with the seed file, so the two copies
-  cannot disagree silently.
+- **Seeding a table.** `seed_adhkar()` runs at start-up but inserts the 18 initial adhkar only once: it
+  checks the settings key `corpora.adhkar_seeded`, and when that is not set it seeds an empty table and sets the key
+  (a table that already has rows only gets the key). After that the rows are the user's: any of them can be edited or
+  deleted, an edited or deleted row is never restored, and deleting all of them does not bring them back. A test runs
+  Node on `engine/src/shared.js` and checks that the seed file equals the engine's list, but only at the first seed;
+  later the engine gets whatever rows are in the table.
 - **Job vs. synchronous call.** Preparing a source (minutes) and detecting (seconds to minutes) are jobs; adding a dhikr
   is a plain request. If the user would want a progress bar or a cancel button, it is a job.
 
@@ -651,14 +653,15 @@ first saved as a lecture version.
 - The cached download stays in `data/corpora/downloads/`, so "prepare again" needs no network, and
   `{"redownload": true}` throws it away first. A zip that turns out to be broken is deleted, because a broken cache
   would fail forever.
-- Built-in adhkar cannot be edited or deleted (409); the global adhkar switch is how you turn them off. This is a
-  small change from the old app, where they were editable.
+- Adhkar are not built-in: the 18 are initial rows in the table, and the user can edit or delete any of them (there is
+  no 409 for adhkar). The global adhkar switch turns the whole list off. (The first version of phase 8 made the 18
+  read-only; the user reversed that the same day.) `is_custom` only records that the user added the row.
 - Custom quotes are de-duplicated by letters only (marks and alef/yaa/taa-marbuta forms ignored), as before, with a
   small Python normaliser so adding a quote does not need the engine.
 
 ### How it was tested
 
-- **153 server tests** pass (42 new: 17 corpora, 25 detection), engine 82, old backend 152, web 1; ruff clean.
+- **155 server tests** pass (42 new: 19 corpora, 25 detection; the adhkar rules were corrected afterwards), engine 82, old backend 152, web 1; ruff clean.
 - **Golden through the API: 16 of 16** (sample + 3 lectures × v3, v4, v5, v5:loose) are identical to the old app.
 - Real-engine tests on the small corpus: a custom quote is found by the next detection and is gone after deleting it;
   turning adhkar off removes dhikr findings; the worker restarts on another hadith file and back.

@@ -359,7 +359,10 @@ Each entry: date, what changed, the user's words.
   (no torch in `server/`). Test files may have long lines (ruff E501 off for `tests/*`).
 - **2026-11-06**: Phase 8 (done): hadith sources keep the old app's files in `data/corpora/` (prepared file
   `hadith_<source>.json`, cached zip in `downloads/`); choosing a source restarts the engine worker with `--hadiths`
-  (`EngineClient.use_hadiths`). Adhkar (18 built-in, seeded) and custom quotes are tables (migration `0003`) sent to the
-  engine with each detect call. Built-in adhkar can no longer be edited or deleted (the adhkar switch turns them off).
+  (`EngineClient.use_hadiths`). Adhkar and custom quotes are tables (migration `0003`) sent to the
+  engine with each detect call. Adhkar are NOT built-in (corrected 2026-11-06, user decision): the 18 are only the
+  initial rows, seeded once (remembered by the settings key `corpora.adhkar_seeded`), and the user can edit or delete
+  ANY row; an edited or deleted row is never restored at start-up, and deleting all of them does not bring them back.
+  The global adhkar switch stays.
   Detection does not start by itself after a paste or a transcription: the web app calls `POST /api/lectures/{id}/detect`
   (phase 11). Re-detecting saves the replaced findings as a lecture version.

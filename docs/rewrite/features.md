@@ -454,13 +454,13 @@ see or set is listed once, with an ID that never changes and is never reused.
   - suggest: keep (phase 21).
   - check: open the corpora screen; the four totals match the corpus.
   - user: "agree with all" (as suggested)
-- [ ] **F-073 Adhkar list.** Add (at least two words), edit in the table, delete, copy; filter built-in or your own;
-  counts of each.
+- [ ] **F-073 Adhkar list.** Add (at least two words), edit in the table, delete, copy; filter initial or added by you;
+  counts of each. Every row, including the 18 initial ones, can be edited or deleted.
   - where: `index.html:1071-1115`, `js/events.js:2109-2125`, `js/events.js:2243-2321`, `js/state.js:525-562`
   - suggest: keep.
   - check: add a dhikr; the next detection finds it in a lecture that says it.
   - user: "agree with all" (as suggested)
-- [ ] **F-074 Adhkar import, export and reset.** Export the list as JSON, import a JSON list, or restore the built-in
+- [ ] **F-074 Adhkar import, export and reset.** Export the list as JSON, import a JSON list, or restore the initial
   list (removes your additions after a confirm).
   - where: `index.html:1085-1095`, `js/events.js:2181-2242`
   - suggest: keep.
@@ -477,10 +477,11 @@ see or set is listed once, with an ID that never changes and is never reused.
   - suggest: keep.
   - check: filter surah 18, page 2; ayat 26 to 50 of al-Kahf show.
   - user: "agree with all" (as suggested)
-- [ ] **F-077 Built-in adhkar.** A seed list of the best-known short adhkar; your additions are kept across updates.
+- [ ] **F-077 Initial adhkar.** A list of the best-known short adhkar put in the table once, on a new database; they are
+  ordinary rows (edit or delete any), and your changes are kept across updates: nothing is restored at start-up.
   - where: `js/state.js:39-62`, `js/state.js:256-306`
   - suggest: keep — as seed rows of the adhkar table.
-  - check: a new database has the built-in adhkar; adding one and upgrading keeps it.
+  - check: a new database has the initial adhkar; edit one, delete one, add one and restart: all three are kept.
   - user: "agree with all" (as suggested)
 - [ ] **F-078 Corpus cache.** The prepared corpus is cached (browser IndexedDB and a server cache file) so the next
   start is instant.

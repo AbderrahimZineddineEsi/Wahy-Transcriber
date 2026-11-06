@@ -42,3 +42,7 @@ come back at start-up). The adhkar switch stays. Fix: server service/routes/migr
 for 2026-11-06 phase 8, LEARNING.md wording, and check that phase 9's screen design does not assume read-only adhkar.
 Child name: refactoring-step-8b, Sonnet 5.5, high. Commit as "rewrite phase 8: adhkar are editable rows". Do not tick
 anything new; phase 8 is already ticked.
+
+## Running now: refactoring-step-8b (adhkar correction)
+- Session ID: 928b4213-af85-438b-9682-8a14a3e03d45, log: /tmp/claude-1000/-home-zeno-Documents-work-new-projects-Wahy-Transcriber/428c450a-c0e2-4fc7-86dc-884ec1da7570/scratchpad/step-8b.json. Launched while phase 9 waits for the user's verdict on docs/rewrite/mockups/screens.html.
+- Phase 9 child (6f? see step-9.id) ended with a QUESTION (approve mockups / approve with changes / publish first). Not yet answered.

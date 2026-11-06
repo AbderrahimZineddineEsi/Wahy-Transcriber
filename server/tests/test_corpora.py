@@ -14,7 +14,7 @@ from fakes import FakeEngine
 
 from wahy.core.engine import EngineClient
 from wahy.core.settings import REPO_ROOT
-from wahy.features.corpora.service import BUILTIN_ADHKAR, CorporaService, normalise
+from wahy.features.corpora.service import BUILTIN_ADHKAR, SEEDED_KEY, CorporaService, normalise
 from wahy.features.corpora.sources import (
     AlreadyPreparing,
     SourceError,
@@ -22,6 +22,7 @@ from wahy.features.corpora.sources import (
     UnknownSource,
     convert_open_hadith_zip,
 )
+from wahy.features.settings.store import SettingsStore
 
 SMALL_CORPUS = REPO_ROOT / "engine" / "src" / "fixtures" / "small-corpus.json"
 NIYYAT = "إنما الأعمال بالنيات وإنما لكل امرئ ما نوى"
@@ -210,42 +211,78 @@ def test_info_reports_what_the_engine_loaded(api):
 
 # ---- adhkar ------------------------------------------------------------------------------------------------------
 
-def test_the_built_in_adhkar_are_the_engines_own_list():
-    """The seed file is a copy of BUILTIN_ADHKAR_DATA in engine/src/shared.js: they must not drift apart."""
+def test_the_initial_seed_equals_the_engines_list():
+    """The seed file is a copy of BUILTIN_ADHKAR_DATA in engine/src/shared.js. The two only have to agree at the
+    first seed: after that the table is the user's and the engine gets the rows from it on every detect call."""
     js = "import('./engine/src/shared.js').then(m => console.log(JSON.stringify(m.BUILTIN_ADHKAR_DATA)))"
     out = subprocess.run(["node", "-e", js], cwd=REPO_ROOT, capture_output=True, text=True, check=True)
     assert json.loads(out.stdout) == BUILTIN_ADHKAR
 
 
-def test_a_new_database_has_the_built_in_adhkar_and_additions_survive_a_restart(api):
+def restart(api) -> CorporaService:
+    """What a server restart does to the corpora service (it seeds in its constructor)."""
+    return CorporaService(api.app.state.db, api.app.state.settings, api.app.state.jobs, FakeEngine())
+
+
+def test_a_new_database_has_the_initial_adhkar_and_additions_survive_a_restart(api):
     adhkar = api.get("/api/corpora/adhkar").json()
     assert len(adhkar) == 18 and not any(d["is_custom"] for d in adhkar)
+    assert [(d["id"], d["category"], d["ref"], d["t"]) for d in adhkar] == \
+        [(i["id"], i["category"], i["ref"], i["t"]) for i in BUILTIN_ADHKAR]
 
     r = api.post("/api/corpora/adhkar", json={"ref": "دعاء", "t": "اللهم اغفر لي"})
     assert r.status_code == 201 and r.json()["is_custom"] and r.json()["category"] == "أذكار متفرقة"
     mine = r.json()
 
-    corpora = CorporaService(api.app.state.db, api.app.state.settings, api.app.state.jobs, FakeEngine())
-    corpora.seed_adhkar()                                                  # what a restart does
+    corpora = restart(api)
     after = api.get("/api/corpora/adhkar").json()
     assert len(after) == 19 and after[0]["id"] == mine["id"]                # the user's own come first
 
     engine_list = corpora.engine_adhkar()
     assert engine_list[0] == {"id": mine["id"], "category": "أذكار متفرقة", "ref": "دعاء", "t": "اللهم اغفر لي",
                               "isCustom": True}
-    assert engine_list[1:] == BUILTIN_ADHKAR                               # the built-ins as the engine knows them
+    assert engine_list[1:] == BUILTIN_ADHKAR                               # the initial rows, as the engine knows them
 
 
-def test_a_built_in_dhikr_cannot_be_edited_or_deleted_a_custom_one_can(api):
-    body = {"ref": "x", "t": "y"}
-    assert api.put("/api/corpora/adhkar/Adhkar:tahlil", json=body).status_code == 409
-    assert api.delete("/api/corpora/adhkar/Adhkar:tahlil").status_code == 409
+def test_any_dhikr_can_be_edited_or_deleted(api):
+    body = {"category": "التهليل", "ref": "مختصر", "t": "لا إله إلا الله وحده"}
+    r = api.put("/api/corpora/adhkar/Adhkar:tahlil", json=body)           # an initial row
+    assert r.status_code == 200 and (r.json()["ref"], r.json()["t"]) == ("مختصر", "لا إله إلا الله وحده")
+    assert api.delete("/api/corpora/adhkar/Adhkar:tahlil_full").status_code == 204
+    assert api.delete("/api/corpora/adhkar/Adhkar:tahlil_full").status_code == 404
+    assert api.put("/api/corpora/adhkar/Adhkar:tahlil_full", json=body).status_code == 404
+    ids = [d["id"] for d in api.get("/api/corpora/adhkar").json()]
+    assert len(ids) == 17 and "Adhkar:tahlil_full" not in ids
+
     mine = api.post("/api/corpora/adhkar", json={"ref": "دعاء", "t": "اللهم اغفر لي"}).json()
     r = api.put(f"/api/corpora/adhkar/{mine['id']}", json={"category": "أدعية", "ref": "دعاء 2", "t": "اللهم ارحمني"})
     assert r.status_code == 200 and (r.json()["category"], r.json()["t"]) == ("أدعية", "اللهم ارحمني")
     assert api.delete(f"/api/corpora/adhkar/{mine['id']}").status_code == 204
-    assert api.delete(f"/api/corpora/adhkar/{mine['id']}").status_code == 404
     assert api.post("/api/corpora/adhkar", json={"ref": " ", "t": "x"}).status_code == 422
+
+
+def test_an_edited_or_deleted_dhikr_is_never_restored_at_start_up(api):
+    api.put("/api/corpora/adhkar/Adhkar:tahlil", json={"category": "c", "ref": "r", "t": "نص معدل"})
+    api.delete("/api/corpora/adhkar/Adhkar:tasbih_hamd")
+    corpora = restart(api)
+    after = {d["id"]: d for d in api.get("/api/corpora/adhkar").json()}
+    assert len(after) == 17 and "Adhkar:tasbih_hamd" not in after
+    assert after["Adhkar:tahlil"]["t"] == "نص معدل"
+
+    for d in list(after):                                                  # delete everything...
+        assert api.delete(f"/api/corpora/adhkar/{d}").status_code == 204
+    restart(api)                                                           # ...and a restart does not bring them back
+    assert api.get("/api/corpora/adhkar").json() == []
+    assert corpora.engine_adhkar() == []
+
+
+def test_a_database_made_before_the_seed_flag_is_not_seeded_again(api):
+    """Rows exist but the flag is missing (an older database): only the flag is set, nothing is added back."""
+    api.delete("/api/corpora/adhkar/Adhkar:tahlil")
+    SettingsStore(api.app.state.db).set(SEEDED_KEY, False)
+    restart(api)
+    ids = [d["id"] for d in api.get("/api/corpora/adhkar").json()]
+    assert len(ids) == 17 and "Adhkar:tahlil" not in ids
 
 
 # ---- custom quotes -----------------------------------------------------------------------------------------------

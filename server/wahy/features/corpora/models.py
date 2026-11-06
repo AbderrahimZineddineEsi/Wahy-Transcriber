@@ -12,8 +12,9 @@ from wahy.core.db import Base, utcnow
 
 
 class Dhikr(Base):
-    """One dhikr. The built-in ones are seeded at start-up; the user's own are `is_custom`. The engine gets
-    them as {id, category, ref, t} (plus `isCustom` for the user's own), in `position` order."""
+    """One dhikr. Every row is editable and deletable. The 18 initial rows are seeded once (see
+    CorporaService.seed_adhkar); `is_custom` only records that the user added the row. The engine gets them as
+    {id, category, ref, t} (plus `isCustom` for the user's additions), in `position` order."""
 
     __tablename__ = "adhkar"
     __table_args__ = (Index(None, "position"),)
@@ -23,7 +24,7 @@ class Dhikr(Base):
     ref: Mapped[str]
     t: Mapped[str]                                           # the vocalised text
     is_custom: Mapped[bool] = mapped_column(default=False)
-    position: Mapped[int]                                    # the user's own first (negative), then built-ins
+    position: Mapped[int]                                    # additions first (negative), then initial
     created_at: Mapped[datetime] = mapped_column(default=utcnow)
 
 

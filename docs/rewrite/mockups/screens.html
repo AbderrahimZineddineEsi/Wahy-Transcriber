@@ -823,9 +823,9 @@ SCREENS.corpora = () => {
   return `<div class="row"><h2>المصادر</h2></div>
   <nav class="tabs" style="border-bottom:1px solid var(--line)"><a aria-current="true" href="#corpora">الأذكار <span class="badge">18</span></a><a href="#corpora">اقتباسات خاصة <span class="badge">3</span></a><a href="#corpora">القرآن</a><a href="#corpora">الحديث</a><a href="#corpora">مصادر الحديث</a></nav>
   <div class="vgrid">
-    <section class="panel"><div class="panel-h"><div class="seg"><button aria-pressed="true">الكل</button><button aria-pressed="false">المدمجة</button><button aria-pressed="false">أذكاري</button></div><span class="grow"></span><label class="switch"><input type="checkbox" checked>كشف الأذكار</label></div>
+    <section class="panel"><div class="panel-h"><div class="seg"><button aria-pressed="true">الكل</button><button aria-pressed="false">الأولى</button><button aria-pressed="false">أذكاري</button></div><span class="grow"></span><label class="switch"><input type="checkbox" checked>كشف الأذكار</label></div>
       <div class="scroll-x"><table class="data"><thead><tr><th>الذكر</th><th>النوع</th><th></th></tr></thead><tbody>
-      ${adhkar.map(([t, b]) => `<tr><td class="ar">${t}</td><td>${b ? `<span class="faint">مدمج · للقراءة فقط</span>` : "من إضافتك"}</td><td>${b ? "" : `<button class="btn small ghost">تعديل</button><button class="btn small ghost danger">حذف</button>`}</td></tr>`).join("")}
+      ${adhkar.map(([t, b]) => `<tr><td class="ar">${t}</td><td>${b ? `<span class="faint">من القائمة الأولى</span>` : "من إضافتك"}</td><td><button class="btn small ghost">تعديل</button><button class="btn small ghost danger">حذف</button></td></tr>`).join("")}
       </tbody></table></div></section>
     <aside class="panel"><div class="panel-h"><h3>إضافة ذكر</h3></div><div class="panel-b">
       <input class="input" placeholder="كلمتان على الأقل" style="font-family:var(--font-read)"><button class="btn primary" style="align-self:start">إضافة</button>
@@ -924,7 +924,7 @@ const NOTES = {
   ]],
   tafrigh: ["Tafrigh", "F-106 to F-122", ["The written lesson with its outline as a bar of headings; matn and commentary marked per sentence; settings, estimate and test slice beside it. Kept light in this round."]],
   export: ["Export", "F-069 to F-071, phase 16 commentary gaps", ["Preview is the golden SRT. Options: format, brackets, reference style, commentary outside the brackets (new), standard script, hide ordinary speech."]],
-  corpora: ["Corpora", "F-072 to F-079, F-045, F-046", ["Adhkar with built-in rows read-only (phase 8 decision), add/import/export, and the hadith source choice."]],
+  corpora: ["Corpora", "F-072 to F-079, F-045, F-046", ["Adhkar as ordinary rows, any of them editable or deletable (phase 8 decision), add/import/export, and the hadith source choice."]],
   training: ["Training data", "F-100 to F-104", ["Counters, filters by origin (gold, teacher, approval) and the Laya JSONL export."]],
   requests: ["Request log", "F-095, F-096", ["Every AI request with tokens, cost and latency; the inspector shows input and output, readable or raw."]],
   prefs: ["Settings", "F-002, F-008, F-010, F-011, F-012, F-097, F-128", ["Keys are 'set / not set' only. Health, engine, GPU and Laya status in one card. Language and theme. Engine offers v5 and v5:loose only (Versions kept)."]],

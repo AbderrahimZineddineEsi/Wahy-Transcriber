@@ -35,6 +35,7 @@ from wahy.features.settings.store import SettingsStore
 BUILTIN_ADHKAR: list[dict[str, str]] = json.loads(
     (Path(__file__).with_name("builtin_adhkar.json")).read_text(encoding="utf-8"))
 SOURCE_KEY = "corpora.hadith_source"
+SEEDED_KEY = "corpora.adhkar_seeded"
 MIN_QUOTE_CHARS = 4
 
 _MARKS = re.compile(r"[ؐ-ًؚ-ٰٟۖ-ۭـ]")
@@ -53,7 +54,7 @@ class BadInput(CorporaError, ValueError):
 
 
 class Conflict(CorporaError):
-    """Not allowed now: editing a built-in dhikr, activating a source that is not ready."""
+    """Not allowed now: activating a source that is not ready."""
 
 
 def normalise(text: str) -> str:
@@ -138,21 +139,18 @@ class CorporaService:
     # ---- adhkar --------------------------------------------------------------------------------------------
 
     def seed_adhkar(self) -> None:
-        """Put the built-in adhkar in the table (and bring their text up to date). The user's own are never
-        touched, so they survive updates (F-077)."""
+        """Put the 18 initial adhkar in the table, once. They are ordinary rows afterwards: the user can edit
+        or delete any of them, so an edited or deleted row is never restored and deleting all of them does not
+        bring them back. "Seeded" is remembered in the settings table (`SEEDED_KEY`). A database that already
+        has rows (made before the flag existed) only gets the flag."""
+        if self.store.get(SEEDED_KEY, False):
+            return
         with self.db.session() as s:
-            have = {d.id: d for d in s.scalars(select(Dhikr).where(Dhikr.is_custom.is_(False)))}
-            for position, item in enumerate(BUILTIN_ADHKAR):
-                row = have.get(item["id"])
-                if row is None:
+            if not (s.scalar(select(func.count(Dhikr.id))) or 0):
+                for position, item in enumerate(BUILTIN_ADHKAR):
                     s.add(Dhikr(id=item["id"], category=item["category"], ref=item["ref"], t=item["t"],
                                 is_custom=False, position=position))
-                else:
-                    row.category, row.ref, row.t, row.position = (item["category"], item["ref"], item["t"],
-                                                                  position)
-            gone = set(have) - {item["id"] for item in BUILTIN_ADHKAR}
-            for old in gone:
-                s.delete(have[old])
+        self.store.set(SEEDED_KEY, True)
 
     def list_adhkar(self) -> list[DhikrOut]:
         with self.db.session() as s:
@@ -170,25 +168,23 @@ class CorporaService:
 
     def update_dhikr(self, dhikr_id: str, body: DhikrIn) -> DhikrOut:
         with self.db.session() as s:
-            row = self._custom_dhikr(s, dhikr_id)
+            row = self._dhikr(s, dhikr_id)
             row.category, row.ref, row.t = body.category, body.ref, body.t
             return DhikrOut.model_validate(row)
 
     def delete_dhikr(self, dhikr_id: str) -> None:
         with self.db.session() as s:
-            s.delete(self._custom_dhikr(s, dhikr_id))
+            s.delete(self._dhikr(s, dhikr_id))
 
     @staticmethod
-    def _custom_dhikr(s, dhikr_id: str) -> Dhikr:
+    def _dhikr(s, dhikr_id: str) -> Dhikr:
         row = s.get(Dhikr, dhikr_id)
         if row is None:
             raise NotFound(dhikr_id)
-        if not row.is_custom:
-            raise Conflict("built-in adhkar cannot be edited or deleted; turn adhkar detection off instead")
         return row
 
     def engine_adhkar(self) -> list[dict[str, Any]]:
-        """The list as the engine takes it: customs first, then the built-ins in their own order."""
+        """The rows as the engine takes them, in list order (additions first, then the initial ones)."""
         out = []
         for d in self.list_adhkar():
             item: dict[str, Any] = {"id": d.id, "category": d.category, "ref": d.ref, "t": d.t}
