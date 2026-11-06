@@ -34,6 +34,11 @@ if [ ! -s data/corpus.json ]; then
     || echo "[WARNING] corpus download failed; the app will fall back to the remote sources."
 fi
 
+# API keys (GROQ_API_KEY, OPENROUTER_API_KEY, ...) from the gitignored .env
+if [ -f .env ]; then
+  set -a; source .env; set +a
+fi
+
 cd backend
 # --timeout-graceful-shutdown: a reload must not wait forever on a stalled download (e.g. a backgrounded tab
 # that stopped reading the 90 MB corpus), or the server stops answering after any backend edit
