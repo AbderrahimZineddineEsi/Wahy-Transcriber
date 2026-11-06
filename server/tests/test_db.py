@@ -11,7 +11,7 @@ from wahy.core.db import Database
 from wahy.tables import AiRequest, Base, Finding, Job, Label, Lecture, LectureVersion, Verdict, Word
 
 TABLES = {"lectures", "lecture_versions", "words", "findings", "verdicts", "labels", "jobs", "ai_requests",
-          "settings"}
+          "settings", "adhkar", "custom_quotes"}
 
 
 def test_migrating_creates_every_table(db: Database):

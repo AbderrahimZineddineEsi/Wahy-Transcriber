@@ -149,7 +149,7 @@ decisions and why). The problems being fixed are in the friction map: https://cl
     Features: F-016 to F-028, N-009.
   - Learn: FastAPI routers, services and `Depends`; running ffmpeg and yt-dlp from Python.
 
-- [ ] **8. Corpora and detection**: Sonnet 5.5, high.
+- [x] **8. Corpora and detection**: Sonnet 5.5, high.
   - `features/corpora`: corpus sources (download, prepare, upload, cache), the adhkar list and custom quotes, stored in
     the database.
   - `features/detection`: a detect job through the engine worker, with the engine version, profile and Qira'at, plus a
@@ -357,3 +357,9 @@ Each entry: date, what changed, the user's words.
   dropped (plain HTTP with retries), `numpy` is a core dependency, and `faster-whisper` plus the NVIDIA cuBLAS and cuDNN
   wheels are the optional `local-asr` extra (`uv sync --extra local-asr`). The specialized Whisper was not run live
   (no torch in `server/`). Test files may have long lines (ruff E501 off for `tests/*`).
+- **2026-11-06**: Phase 8 (done): hadith sources keep the old app's files in `data/corpora/` (prepared file
+  `hadith_<source>.json`, cached zip in `downloads/`); choosing a source restarts the engine worker with `--hadiths`
+  (`EngineClient.use_hadiths`). Adhkar (18 built-in, seeded) and custom quotes are tables (migration `0003`) sent to the
+  engine with each detect call. Built-in adhkar can no longer be edited or deleted (the adhkar switch turns them off).
+  Detection does not start by itself after a paste or a transcription: the web app calls `POST /api/lectures/{id}/detect`
+  (phase 11). Re-detecting saves the replaced findings as a lecture version.

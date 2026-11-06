@@ -65,3 +65,41 @@ class FakeYoutube:
         shutil.copy(self.source, target)
         on_progress(90.0)
         return Downloaded(target, self.title, self.duration)
+
+
+class FakeEngine:
+    """Stands in for the engine worker (core/engine.py): records what it was asked and answers from a function,
+    so the services can be tested without Node or the corpus."""
+
+    def __init__(self, finder=None):
+        # finder(words, options) → findings; the default finds nothing
+        self.finder = finder or (lambda words, options: [])
+        self.detect_calls: list[tuple[list, dict]] = []
+        self.search_calls: list[tuple[str, dict]] = []
+        self.hadiths: Path | None = None
+        self.closed = 0
+
+    def detect(self, words, options=None):
+        self.detect_calls.append((words, options or {}))
+        return self.finder(words, options or {})
+
+    def search(self, text, options=None):
+        self.search_calls.append((text, options or {}))
+        return [{"unitId": "112:1", "sourceType": "QURAN", "displayRef": "الإخلاص: 1", "fullText": "قل هو الله أحد"}]
+
+    def info(self):
+        return {"quran": 6236, "hadiths": 39737, "fingerprint": {"files": {}, "corpus": {}}}
+
+    def use_hadiths(self, path):
+        changed = (Path(path) if path else None) != self.hadiths
+        self.hadiths = Path(path) if path else None
+        return changed
+
+    def close(self):
+        self.closed += 1
+
+
+def make_finding(start: int, end: int, *, unit: str = "112:1", source: str = "QURAN") -> dict:
+    """The few fields of an engine finding that the detection feature reads, plus an extra one that must survive."""
+    return {"id": f"finding_{start}", "sourceType": source, "unitId": unit, "displayRef": f"ref {unit}",
+            "wordStartIdx": start, "wordEndIdx": end, "segments": [[start, end + 1]], "evidence": {"S": 1.5}}

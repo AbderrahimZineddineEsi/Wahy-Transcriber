@@ -7,7 +7,8 @@ unfinished as interrupted, and create the shared machinery that routes reach thr
     jobs    core/jobs.py     the job runner
     gpu     core/gpu.py      the GPU owner
     engine  core/engine.py   the engine worker client (the worker itself starts on the first call)
-    lectures, transcription   the feature services (features/lectures, features/transcription)
+    lectures, transcription, corpora, detection
+            the feature services (features/*/service.py)
 
 Shutdown: running jobs stop at their next check (they show as interrupted), the GPU is freed and the engine
 worker is stopped.
@@ -26,6 +27,10 @@ from wahy.core.engine import EngineClient
 from wahy.core.gpu import GpuOwner
 from wahy.core.jobs import JobRunner
 from wahy.core.settings import Settings, get_settings
+from wahy.features.corpora.router import router as corpora_router
+from wahy.features.corpora.service import CorporaService
+from wahy.features.detection.router import router as detection_router
+from wahy.features.detection.service import DetectionService
 from wahy.features.jobs.router import router as jobs_router
 from wahy.features.lectures.router import router as lectures_router
 from wahy.features.lectures.service import LectureService
@@ -50,6 +55,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         app.state.engine = EngineClient.from_settings(s)
         app.state.lectures = LectureService(db, s)
         app.state.transcription = TranscriptionService(db, s, app.state.gpu, jobs, app.state.lectures)
+        app.state.corpora = CorporaService(db, s, jobs, app.state.engine)
+        app.state.detection = DetectionService(db, s, jobs, app.state.engine, app.state.lectures,
+                                               app.state.corpora)
         try:
             yield
         finally:
@@ -67,6 +75,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(jobs_router)
     app.include_router(lectures_router)
     app.include_router(transcription_router)
+    app.include_router(corpora_router)
+    app.include_router(detection_router)
     return app
 
 

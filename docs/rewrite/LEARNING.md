@@ -606,3 +606,80 @@ scripts/dev.sh      # http://localhost:8120/docs → POST /api/lectures/sample, 
 Commands used: `uv add`, `uv run alembic revision --autogenerate`, `uv run pytest`, `uv run ruff check .`, `yt-dlp
 --flat-playlist ytsearch…` (to find the khutba), `curl -N …/events` (the progress stream), `node
 server/tests/fixtures/make_parsing_golden.mjs`.
+
+## Phase 8: Corpora and detection (2026-11-06)
+
+**What was built.** Two server features. `features/corpora` keeps the reference texts the engine searches: the hadith
+*sources* (the built-in one, and Open Hadith Data: download, prepare, upload by hand, delete, choose), the **adhkar**
+list and the **custom quotes** (both in SQLite, migration `0003`). `features/detection` turns a lecture's words into
+**findings** with a job: `POST /api/lectures/{id}/detect` returns a job at once, the job calls the engine worker and
+saves the findings; `GET /api/lectures/{id}/findings` reads them; `GET/PATCH /api/detection/settings` keeps the
+engine choice (`v5`, `v5:loose`, `v4`, `v3`), the Qira'ah and the adhkar switch; `GET /api/corpus/search` is the
+reference picker's search. The old app's rule "re-detect makes a new version" became: the findings being replaced are
+first saved as a lecture version.
+
+### New concepts
+
+- **An integration test that crosses a process boundary.** A normal test calls a function. Here the thing under test
+  is *four programs*: your test → FastAPI → a job thread → a Node process that has the 90 MB corpus loaded. The test
+  `test_golden_findings_through_the_api` sends each golden lecture through `POST /detect`, waits for the job, reads
+  `GET /findings` and requires the *old app's* findings, field for field. If any layer garbles a number, drops a
+  field or reorders findings, it fails. Everything between the HTTP call and the old JavaScript is covered by one
+  assertion. The price: it needs the full corpus and takes about a minute, so it skips itself when `data/corpus.json`
+  is missing, and the fast tests use a **fake engine** (a class with the same methods that records what it was asked).
+  Rule of thumb: fakes test *our* logic fast; one real end-to-end test proves the pieces really fit.
+- **State that lives in a child process.** The engine worker reads the corpus *once, when it starts*. So "use another
+  hadith source" cannot be a function call; it means restarting the worker with `--hadiths <file>`. `EngineClient.use_hadiths(path)`
+  hides this: it returns `False` if nothing changed (no restart), `True` if it restarted. Adhkar and custom quotes need
+  no restart because they travel with each `detect` call. Example in `service.py`: `engine_adhkar()` reads the table
+  and the list is sent as `options["adhkar"]`. In NestJS terms: a provider that owns a long-lived resource and
+  re-creates it when its config changes.
+- **Same options for search and detection.** The worker keeps one *matcher* (hundreds of MB) per option set. If search
+  used different options than detection, the first search after a detection would build a second matcher. Both call
+  `engine_options()`, and a test asserts the options are equal.
+- **Seeding a table.** `seed_adhkar()` runs at start-up: it inserts the 18 built-in adhkar that are missing and
+  refreshes their text, but never touches rows with `is_custom = true`. That is how "your additions survive updates"
+  works. A drift test runs Node on `engine/src/shared.js` and compares it with the seed file, so the two copies
+  cannot disagree silently.
+- **Job vs. synchronous call.** Preparing a source (minutes) and detecting (seconds to minutes) are jobs; adding a dhikr
+  is a plain request. If the user would want a progress bar or a cancel button, it is a job.
+
+### Small things worth knowing
+
+- Switching the hadith source is remembered in the `settings` table (`SettingsStore`, a 20-line class); if its prepared
+  file is deleted, the server quietly uses the built-in hadiths again.
+- The cached download stays in `data/corpora/downloads/`, so "prepare again" needs no network, and
+  `{"redownload": true}` throws it away first. A zip that turns out to be broken is deleted, because a broken cache
+  would fail forever.
+- Built-in adhkar cannot be edited or deleted (409); the global adhkar switch is how you turn them off. This is a
+  small change from the old app, where they were editable.
+- Custom quotes are de-duplicated by letters only (marks and alef/yaa/taa-marbuta forms ignored), as before, with a
+  small Python normaliser so adding a quote does not need the engine.
+
+### How it was tested
+
+- **153 server tests** pass (42 new: 17 corpora, 25 detection), engine 82, old backend 152, web 1; ruff clean.
+- **Golden through the API: 16 of 16** (sample + 3 lectures × v3, v4, v5, v5:loose) are identical to the old app.
+- Real-engine tests on the small corpus: a custom quote is found by the next detection and is gone after deleting it;
+  turning adhkar off removes dhikr findings; the worker restarts on another hadith file and back.
+- **Feature check with the real data** (cached Open Hadith Data zip): status `missing` → job → `ready`, 46,891 hadiths;
+  after choosing it, a search for «إنما الأعمال بالنيات» returns `OHD:Bukhari:1`.
+- Not done on purpose: no automatic detection after a transcription or a paste (the web app will call `detect`, phase 11).
+
+**Try:**
+
+```bash
+cd server && uv run pytest -q tests/test_detection.py -k golden          # the old app's findings, through the API (~1 min)
+cd server && uv run pytest -q tests/test_corpora.py                      # sources, adhkar, custom quotes
+scripts/dev.sh     # http://localhost:8120/docs → POST /api/lectures/sample, then POST /api/lectures/1/detect, GET /api/lectures/1/findings
+```
+
+### How it was made
+
+1. Read the old `backend/corpus_sources.py` and its routes, the JS adhkar/outside-hadith code, and the engine worker's
+   commands; ported the source manager nearly verbatim (progress texts in English, cancel checks added).
+2. Models + migration (`alembic --autogenerate`, on a scratch database), then sources, service, router; then detection.
+3. Fast tests with a fake engine first, then real-worker tests on the small corpus, then the golden test last.
+4. Full `scripts/test.sh`; one test (`test_db`'s table list) had to learn the two new tables.
+Commands: `uv run alembic revision --autogenerate`, `uv run pytest`, `uv run ruff check .`, a throw-away script that
+prepared the real Open Hadith Data through the API.

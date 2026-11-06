@@ -65,6 +65,9 @@ class EngineClient:
         """`argv` replaces the whole worker command line (tests use it to run a worker that misbehaves)."""
         self.argv = argv or [node, f"--max-old-space-size={max_heap_mb}", str(WORKER),
                              "--corpus", str(Path(corpus_path).resolve())]
+        self._base_argv = list(self.argv)           # without --hadiths
+        self._fixed_argv = argv is not None
+        self._hadiths: Path | None = None
         self.timeout_s = timeout_s
         self._lock = threading.Lock()
         self._proc: subprocess.Popen[str] | None = None
@@ -100,6 +103,25 @@ class EngineClient:
         """Corpus units matching `text` (a reference such as "البقرة: 255" or words). Options also: kind,
         limit."""
         return self.call("search", text=text, options=options or {})
+
+    @property
+    def hadiths_path(self) -> Path | None:
+        """The hadith file the worker reads in place of the corpus's own hadiths (None: the corpus's own)."""
+        return self._hadiths
+
+    def use_hadiths(self, path: Path | str | None) -> bool:
+        """Read the hadiths from another file (a prepared corpus source, see features/corpora) or, with None,
+        from the corpus file again. The worker loads the corpus when it starts, so a change restarts it (the
+        next call starts the new one). Returns whether anything changed."""
+        new = Path(path).resolve() if path else None
+        with self._lock:
+            if new == self._hadiths:
+                return False
+            self._hadiths = new
+            if not self._fixed_argv:
+                self.argv = [*self._base_argv, *(["--hadiths", str(new)] if new else [])]
+        self.close()
+        return True
 
     def call(self, cmd: str, **args: Any) -> Any:
         """Send one command to the worker and return its result (see engine/src/worker.ts for the
