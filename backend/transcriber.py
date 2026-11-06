@@ -237,6 +237,23 @@ def transcribe_with_groq_chunks(
     return stitched_words
 
 
+def _load_wav_for_whisper(wav_path: Path):
+    """Read our normalized 16 kHz mono PCM16 WAV into a float32 array.
+
+    faster-whisper decodes file paths with PyAV and passes `metadata_errors=`, which PyAV 19 removed;
+    handing it an array skips PyAV entirely. Anything not in that exact format falls back to the path.
+    """
+    import wave
+
+    import numpy as np
+
+    with wave.open(str(wav_path), "rb") as wf:
+        if wf.getframerate() != 16000 or wf.getnchannels() != 1 or wf.getsampwidth() != 2:
+            return str(wav_path)
+        pcm = wf.readframes(wf.getnframes())
+    return np.frombuffer(pcm, dtype=np.int16).astype(np.float32) / 32768.0
+
+
 def transcribe_with_local_faster_whisper(
     wav_path: Path,
     model_size: str = "small",  # "small" or "large-v3-turbo"
@@ -267,7 +284,7 @@ def transcribe_with_local_faster_whisper(
             cpu_threads=4,
         )
         segments, _info = model.transcribe(
-            str(wav_path),
+            _load_wav_for_whisper(wav_path),
             language="ar",
             word_timestamps=True,
             vad_filter=True,
