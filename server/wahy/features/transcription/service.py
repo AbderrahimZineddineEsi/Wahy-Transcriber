@@ -24,6 +24,9 @@ from collections.abc import Callable
 from dataclasses import asdict
 from typing import Any, BinaryIO
 
+from wahy.core.ai.groq import GroqAsr
+from wahy.core.ai.log import RequestLog
+from wahy.core.ai.types import Call
 from wahy.core.db import Database
 from wahy.core.gpu import GpuOwner
 from wahy.core.jobs import JobContext, JobRunner
@@ -71,10 +74,11 @@ def normalise_words(raw: list[RawWord]) -> list[TimedWord]:
 class TranscriptionService:
     def __init__(self, db: Database, settings: Settings, gpu: GpuOwner, jobs: JobRunner,
                  lectures: LectureService, *, audio: AudioTools | None = None,
-                 backends: dict[str, AsrBackend] | None = None):
+                 backends: dict[str, AsrBackend] | None = None, groq: GroqAsr | None = None):
         self.db, self.settings, self.gpu, self.jobs, self.lectures = db, settings, gpu, jobs, lectures
         self.audio = audio or AudioTools()
-        self.backends = backends if backends is not None else default_backends(gpu, settings)
+        groq = groq or GroqAsr(RequestLog(db), lambda: settings.key("groq"))
+        self.backends = backends if backends is not None else default_backends(gpu, groq)
         if backends is None:
             register_models(gpu)
         jobs.register("transcribe", self.run_job)
@@ -168,7 +172,8 @@ class TranscriptionService:
             audio = self.audio.prepare(self.lectures.media.path(media_rel), work_dir, ctx.check)
             ctx.progress(stage="transcribe", percent=0)
             used, raw, fallback = self._run_chain(
-                model, auto_fallback, audio, ctx.check,
+                model, auto_fallback, audio,
+                Call(purpose="transcribe", job_id=ctx.job_id, lecture_id=lecture_id, check=ctx.check),
                 lambda p: ctx.progress(stage="transcribe", percent=round(p, 1)))
             words = normalise_words(raw)
             if not words:
@@ -184,7 +189,7 @@ class TranscriptionService:
                 "duration_s": round(audio.duration_s, 2), "from_cache": from_cache,
                 "warnings": [asdict(w) for w in warnings]}
 
-    def _run_chain(self, model: str, auto_fallback: bool, audio: PreparedAudio, check: Callable[[], None],
+    def _run_chain(self, model: str, auto_fallback: bool, audio: PreparedAudio, call: Call,
                    on_percent: Callable[[float], None]) -> tuple[str, list[RawWord], dict[str, str] | None]:
         """Try `model`, then (if allowed) its fallbacks. Returns the label that ran, the words, and why a
         fallback happened (None when the first choice worked)."""
@@ -193,7 +198,7 @@ class TranscriptionService:
         for model_id in order:
             backend = self.backends[model_id]
             try:
-                raw = backend.transcribe(audio, on_percent=on_percent, check=check)
+                raw = backend.transcribe(audio, on_percent=on_percent, check=call.check, call=call)
             except AsrError as e:
                 log.warning("%s failed: %s", model_id, e)
                 first_error = first_error or e

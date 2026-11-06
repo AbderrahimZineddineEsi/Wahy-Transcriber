@@ -528,6 +528,35 @@
         "title": "FindingsOut",
         "type": "object"
       },
+      "GeminiModels": {
+        "properties": {
+          "models": {
+            "description": "the models this key can call with generateContent",
+            "items": {
+              "type": "string"
+            },
+            "title": "Models",
+            "type": "array"
+          },
+          "recommended": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recommended"
+          }
+        },
+        "required": [
+          "models",
+          "recommended"
+        ],
+        "title": "GeminiModels",
+        "type": "object"
+      },
       "GpuHealth": {
         "properties": {
           "card": {
@@ -778,6 +807,145 @@
         "title": "KeyUpdate",
         "type": "object"
       },
+      "LayaEnvelope": {
+        "properties": {
+          "head_max_len": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Head Max Len"
+          },
+          "max_len": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Len"
+          },
+          "options": {
+            "additionalProperties": true,
+            "title": "Options",
+            "type": "object"
+          },
+          "questions": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Questions"
+          },
+          "version": {
+            "description": "the envelope version the checkpoint was trained on (1, 2 or 3)",
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "version",
+          "options",
+          "questions"
+        ],
+        "title": "LayaEnvelope",
+        "type": "object"
+      },
+      "LayaLoad": {
+        "description": "`checkpoint`: a Hugging Face repo or a local folder (default: the one selected). `device`: auto, cuda\nor cpu.",
+        "properties": {
+          "checkpoint": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Checkpoint"
+          },
+          "device": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Device"
+          }
+        },
+        "title": "LayaLoad",
+        "type": "object"
+      },
+      "LayaStatusOut": {
+        "properties": {
+          "checkpoint": {
+            "title": "Checkpoint",
+            "type": "string"
+          },
+          "device": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "cuda or cpu while loaded",
+            "title": "Device"
+          },
+          "envelope": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/LayaEnvelope"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "installed": {
+            "description": "the laya package and torch are installed (uv sync --extra laya)",
+            "title": "Installed",
+            "type": "boolean"
+          },
+          "loaded": {
+            "title": "Loaded",
+            "type": "boolean"
+          },
+          "vram": {
+            "additionalProperties": true,
+            "title": "Vram",
+            "type": "object"
+          }
+        },
+        "required": [
+          "loaded",
+          "checkpoint",
+          "envelope",
+          "vram",
+          "installed"
+        ],
+        "title": "LayaStatusOut",
+        "type": "object"
+      },
       "LectureDetail": {
         "properties": {
           "created_at": {
@@ -1011,6 +1179,71 @@
           "available"
         ],
         "title": "ModelInfo",
+        "type": "object"
+      },
+      "OpenRouterModel": {
+        "description": "One model of OpenRouter's live catalog. Prices are $ per million tokens.",
+        "properties": {
+          "chinese": {
+            "title": "Chinese",
+            "type": "boolean"
+          },
+          "completion_price_per_m": {
+            "title": "Completion Price Per M",
+            "type": "number"
+          },
+          "context_length": {
+            "title": "Context Length",
+            "type": "integer"
+          },
+          "description": {
+            "default": "",
+            "title": "Description",
+            "type": "string"
+          },
+          "free": {
+            "title": "Free",
+            "type": "boolean"
+          },
+          "gemini": {
+            "title": "Gemini",
+            "type": "boolean"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "jev": {
+            "title": "Jev",
+            "type": "boolean"
+          },
+          "json_mode": {
+            "description": "the model accepts JSON mode (response_format)",
+            "title": "Json Mode",
+            "type": "boolean"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "prompt_price_per_m": {
+            "title": "Prompt Price Per M",
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "context_length",
+          "prompt_price_per_m",
+          "completion_price_per_m",
+          "free",
+          "jev",
+          "gemini",
+          "chinese",
+          "json_mode"
+        ],
+        "title": "OpenRouterModel",
         "type": "object"
       },
       "PrepareRequest": {
@@ -3391,6 +3624,106 @@
         ]
       }
     },
+    "/api/settings/ai/gemini/models": {
+      "get": {
+        "description": "The Gemini models the saved key can call (F-081 \"fetch models available to my key\").",
+        "operationId": "gemini_models_api_settings_ai_gemini_models_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeminiModels"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Gemini Models",
+        "tags": [
+          "settings"
+        ]
+      }
+    },
+    "/api/settings/ai/openrouter/models": {
+      "get": {
+        "description": "Search OpenRouter's whole catalog with live prices (F-083). `category`: all, jev, gemini, chinese,\nfree.",
+        "operationId": "openrouter_models_api_settings_ai_openrouter_models_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "default": "",
+              "title": "Q",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "category",
+            "required": false,
+            "schema": {
+              "default": "all",
+              "title": "Category",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "refresh",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Refresh",
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 60,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/OpenRouterModel"
+                  },
+                  "title": "Response Openrouter Models Api Settings Ai Openrouter Models Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Openrouter Models",
+        "tags": [
+          "settings"
+        ]
+      }
+    },
     "/api/settings/keys/{provider}": {
       "put": {
         "description": "Save one provider's key in the server's .env (empty removes it). Answers which keys are set.",
@@ -3443,6 +3776,92 @@
           }
         },
         "summary": "Save Key",
+        "tags": [
+          "settings"
+        ]
+      }
+    },
+    "/api/settings/laya": {
+      "get": {
+        "description": "Loaded or not, device, VRAM, the checkpoint and the envelope version it reads (F-097).",
+        "operationId": "laya_status_api_settings_laya_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LayaStatusOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Laya Status",
+        "tags": [
+          "settings"
+        ]
+      }
+    },
+    "/api/settings/laya/load": {
+      "post": {
+        "description": "Load a checkpoint on a device (F-098); waits while another job uses the GPU, which unloads Whisper.",
+        "operationId": "laya_load_api_settings_laya_load_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LayaLoad"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LayaStatusOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Laya Load",
+        "tags": [
+          "settings"
+        ]
+      }
+    },
+    "/api/settings/laya/unload": {
+      "post": {
+        "description": "Unload Laya to free the GPU (F-098).",
+        "operationId": "laya_unload_api_settings_laya_unload_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LayaStatusOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Laya Unload",
         "tags": [
           "settings"
         ]

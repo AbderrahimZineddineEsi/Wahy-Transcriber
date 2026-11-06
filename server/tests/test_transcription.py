@@ -14,6 +14,8 @@ from fakes import FakeAsr, FakeYoutube, make_audio, sample_words
 from helpers import wait_for
 from pydantic import SecretStr
 
+from wahy.core.ai.groq import GroqAsr
+from wahy.core.ai.log import RequestLog
 from wahy.core.gpu import GpuOwner
 from wahy.core.jobs import JobCancelled
 from wahy.features.lectures.parsing import TimedWord
@@ -113,7 +115,8 @@ class FakeAudio:
 
 
 def groq(handler, key="gsk_test", **kw):
-    return GroqBackend(lambda: key, transport=httpx.MockTransport(handler), sleep=lambda _s: None, **kw)
+    asr = GroqAsr(RequestLog(None), lambda: key, transport=httpx.MockTransport(handler), sleep=lambda _s: None, **kw)
+    return GroqBackend(asr)
 
 
 def test_groq_words_are_put_back_on_the_lectures_clock(tmp_path):

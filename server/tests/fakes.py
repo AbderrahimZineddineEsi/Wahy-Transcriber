@@ -38,7 +38,7 @@ class FakeAsr:
         self.audio_seconds: list[float] = []
 
     def transcribe(self, audio: PreparedAudio, *, on_percent: Callable[[float], None],
-                   check: Callable[[], None]) -> list[RawWord]:
+                   check: Callable[[], None], call=None) -> list[RawWord]:
         self.calls += 1
         self.audio_seconds.append(audio.duration_s)
         if self.error:

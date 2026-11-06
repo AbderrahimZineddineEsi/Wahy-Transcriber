@@ -7,6 +7,7 @@ unfinished as interrupted, and create the shared machinery that routes reach thr
     jobs    core/jobs.py     the job runner
     gpu     core/gpu.py      the GPU owner
     engine  core/engine.py   the engine worker client (the worker itself starts on the first call)
+    ai      core/ai/         the provider layer: every model call (Gemini, OpenRouter, Groq, Laya, fake)
     lectures, transcription, corpora, detection, settings_service
             the feature services (features/*/service.py)
 
@@ -22,6 +23,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
+from wahy.core.ai.layer import AiLayer
 from wahy.core.db import Database
 from wahy.core.engine import EngineClient
 from wahy.core.gpu import GpuOwner
@@ -56,7 +58,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         app.state.gpu = GpuOwner()
         app.state.engine = EngineClient.from_settings(s)
         app.state.lectures = LectureService(db, s)
-        app.state.transcription = TranscriptionService(db, s, app.state.gpu, jobs, app.state.lectures)
+        app.state.ai = AiLayer(db, s, app.state.gpu)
+        app.state.transcription = TranscriptionService(db, s, app.state.gpu, jobs, app.state.lectures,
+                                                       groq=app.state.ai.groq)
         app.state.corpora = CorporaService(db, s, jobs, app.state.engine)
         app.state.detection = DetectionService(db, s, jobs, app.state.engine, app.state.lectures,
                                                app.state.corpora)

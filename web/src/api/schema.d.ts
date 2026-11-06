@@ -579,6 +579,47 @@ export interface paths {
         patch: operations["edit_word_api_lectures__lecture_id__words__idx__patch"];
         trace?: never;
     };
+    "/api/settings/ai/gemini/models": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Gemini Models
+         * @description The Gemini models the saved key can call (F-081 "fetch models available to my key").
+         */
+        get: operations["gemini_models_api_settings_ai_gemini_models_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/settings/ai/openrouter/models": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Openrouter Models
+         * @description Search OpenRouter's whole catalog with live prices (F-083). `category`: all, jev, gemini, chinese,
+         *     free.
+         */
+        get: operations["openrouter_models_api_settings_ai_openrouter_models_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/settings/keys/{provider}": {
         parameters: {
             query?: never;
@@ -593,6 +634,66 @@ export interface paths {
          */
         put: operations["save_key_api_settings_keys__provider__put"];
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/settings/laya": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Laya Status
+         * @description Loaded or not, device, VRAM, the checkpoint and the envelope version it reads (F-097).
+         */
+        get: operations["laya_status_api_settings_laya_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/settings/laya/load": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Laya Load
+         * @description Load a checkpoint on a device (F-098); waits while another job uses the GPU, which unloads Whisper.
+         */
+        post: operations["laya_load_api_settings_laya_load_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/settings/laya/unload": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Laya Unload
+         * @description Unload Laya to free the GPU (F-098).
+         */
+        post: operations["laya_unload_api_settings_laya_unload_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -874,6 +975,16 @@ export interface components {
             /** Lecture Id */
             lecture_id: number;
         };
+        /** GeminiModels */
+        GeminiModels: {
+            /**
+             * Models
+             * @description the models this key can call with generateContent
+             */
+            models: string[];
+            /** Recommended */
+            recommended: string | null;
+        };
         /** GpuHealth */
         GpuHealth: {
             /**
@@ -971,6 +1082,57 @@ export interface components {
             /** Value */
             value?: string | null;
         };
+        /** LayaEnvelope */
+        LayaEnvelope: {
+            /** Head Max Len */
+            head_max_len?: number | null;
+            /** Max Len */
+            max_len?: number | null;
+            /** Options */
+            options: {
+                [key: string]: unknown;
+            };
+            /** Questions */
+            questions: string[] | null;
+            /**
+             * Version
+             * @description the envelope version the checkpoint was trained on (1, 2 or 3)
+             */
+            version: number;
+        };
+        /**
+         * LayaLoad
+         * @description `checkpoint`: a Hugging Face repo or a local folder (default: the one selected). `device`: auto, cuda
+         *     or cpu.
+         */
+        LayaLoad: {
+            /** Checkpoint */
+            checkpoint?: string | null;
+            /** Device */
+            device?: string | null;
+        };
+        /** LayaStatusOut */
+        LayaStatusOut: {
+            /** Checkpoint */
+            checkpoint: string;
+            /**
+             * Device
+             * @description cuda or cpu while loaded
+             */
+            device?: string | null;
+            envelope: components["schemas"]["LayaEnvelope"] | null;
+            /**
+             * Installed
+             * @description the laya package and torch are installed (uv sync --extra laya)
+             */
+            installed: boolean;
+            /** Loaded */
+            loaded: boolean;
+            /** Vram */
+            vram: {
+                [key: string]: unknown;
+            };
+        };
         /** LectureDetail */
         LectureDetail: {
             /**
@@ -1059,6 +1221,40 @@ export interface components {
             label: string;
             /** Reason */
             reason?: string | null;
+        };
+        /**
+         * OpenRouterModel
+         * @description One model of OpenRouter's live catalog. Prices are $ per million tokens.
+         */
+        OpenRouterModel: {
+            /** Chinese */
+            chinese: boolean;
+            /** Completion Price Per M */
+            completion_price_per_m: number;
+            /** Context Length */
+            context_length: number;
+            /**
+             * Description
+             * @default
+             */
+            description: string;
+            /** Free */
+            free: boolean;
+            /** Gemini */
+            gemini: boolean;
+            /** Id */
+            id: string;
+            /** Jev */
+            jev: boolean;
+            /**
+             * Json Mode
+             * @description the model accepts JSON mode (response_format)
+             */
+            json_mode: boolean;
+            /** Name */
+            name: string;
+            /** Prompt Price Per M */
+            prompt_price_per_m: number;
         };
         /** PrepareRequest */
         PrepareRequest: {
@@ -2593,6 +2789,60 @@ export interface operations {
             };
         };
     };
+    gemini_models_api_settings_ai_gemini_models_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GeminiModels"];
+                };
+            };
+        };
+    };
+    openrouter_models_api_settings_ai_openrouter_models_get: {
+        parameters: {
+            query?: {
+                q?: string;
+                category?: string;
+                refresh?: boolean;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OpenRouterModel"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     save_key_api_settings_keys__provider__put: {
         parameters: {
             query?: never;
@@ -2626,6 +2876,79 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    laya_status_api_settings_laya_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LayaStatusOut"];
+                };
+            };
+        };
+    };
+    laya_load_api_settings_laya_load_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LayaLoad"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LayaStatusOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    laya_unload_api_settings_laya_unload_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LayaStatusOut"];
                 };
             };
         };

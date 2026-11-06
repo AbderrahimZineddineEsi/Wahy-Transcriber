@@ -1,0 +1,29 @@
+{
+  "model": "typesafe/jev-1.14",
+  "answers": {
+    "verdict": {
+      "choice": "CORRECT",
+      "confidence": 0.91,
+      "probabilities": {
+        "CORRECT": 0.91,
+        "FALSE": 0.06,
+        "NOT_SURE": 0.03
+      }
+    },
+    "boundary_status": {
+      "choice": "MISSING_START",
+      "confidence": 0.66,
+      "probabilities": {
+        "COMPLETE_SPAN": 0.3,
+        "MISSING_START": 0.66,
+        "MISSING_END": 0.02,
+        "MISSING_BOTH": 0.02
+      }
+    }
+  },
+  "usage": {
+    "input_tokens": 742,
+    "output_tokens": 6,
+    "cost": 3.12e-05
+  }
+}

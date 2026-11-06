@@ -1,0 +1,23 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "[{\"finding_id\": \"f1\", \"verdict\": \"CORRECT\", \"confidence\": 0.93, \"probabilities\": {\"CORRECT\": 0.93, \"FALSE\": 0.04, \"NOT_SURE\": 0.03}, \"boundary_status\": \"MISSING_END\", \"boundary_confidence\": 0.7, \"merge_suggestion\": \"NO_MERGE\", \"reason\": \"الشيخ يتلو الآية بنصها.\"}, {\"finding_id\": \"f2\", \"verdict\": \"FALSE\", \"confidence\": 0.88, \"probabilities\": {\"CORRECT\": 0.07, \"FALSE\": 0.88, \"NOT_SURE\": 0.05}, \"boundary_status\": \"MISSING_START\", \"boundary_confidence\": 0.6, \"reason\": \"عبارة عادية في كلام الشيخ.\"}]"
+          }
+        ],
+        "role": "model"
+      },
+      "finishReason": "STOP",
+      "index": 0
+    }
+  ],
+  "usageMetadata": {
+    "promptTokenCount": 1834,
+    "candidatesTokenCount": 212,
+    "totalTokenCount": 2046
+  },
+  "modelVersion": "gemini-3.5-flash-lite",
+  "responseId": "abc123"
+}

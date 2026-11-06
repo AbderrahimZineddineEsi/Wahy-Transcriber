@@ -1,0 +1,21 @@
+{
+  "id": "gen-1",
+  "model": "deepseek/deepseek-chat",
+  "object": "chat.completion",
+  "choices": [
+    {
+      "index": 0,
+      "finish_reason": "stop",
+      "message": {
+        "role": "assistant",
+        "content": "```json\n{\"verdict\": \"NOT_SURE\", \"confidence\": 0.6, \"boundary_status\": \"COMPLETE_SPAN\", \"boundary_confidence\": 0.8, \"reason\": \"الكلمات مشوشة.\"}\n```"
+      }
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 1290,
+    "completion_tokens": 61,
+    "total_tokens": 1351,
+    "cost": 0.00042
+  }
+}

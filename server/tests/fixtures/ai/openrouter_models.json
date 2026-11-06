@@ -1,0 +1,102 @@
+{
+  "data": [
+    {
+      "id": "deepseek/deepseek-chat",
+      "name": "DeepSeek: DeepSeek V3",
+      "context_length": 163840,
+      "pricing": {
+        "prompt": "0.00000027",
+        "completion": "0.0000011"
+      },
+      "supported_parameters": [
+        "max_tokens",
+        "temperature",
+        "response_format",
+        "structured_outputs"
+      ],
+      "description": "DeepSeek V3"
+    },
+    {
+      "id": "deepseek/deepseek-r1",
+      "name": "DeepSeek: R1",
+      "context_length": 163840,
+      "pricing": {
+        "prompt": "0.0000004",
+        "completion": "0.000002"
+      },
+      "supported_parameters": [
+        "max_tokens",
+        "temperature",
+        "reasoning",
+        "include_reasoning",
+        "response_format"
+      ]
+    },
+    {
+      "id": "deepseek/deepseek-chat:free",
+      "name": "DeepSeek: DeepSeek V3 (free)",
+      "context_length": 163840,
+      "pricing": {
+        "prompt": "0",
+        "completion": "0"
+      },
+      "supported_parameters": [
+        "max_tokens",
+        "temperature"
+      ]
+    },
+    {
+      "id": "google/gemini-3.1-flash-lite",
+      "name": "Google: Gemini 3.1 Flash Lite",
+      "context_length": 1048576,
+      "pricing": {
+        "prompt": "0.0000001",
+        "completion": "0.0000004"
+      },
+      "supported_parameters": [
+        "max_tokens",
+        "response_format",
+        "structured_outputs",
+        "reasoning"
+      ]
+    },
+    {
+      "id": "qwen/qwen3-235b",
+      "name": "Qwen: Qwen3 235B",
+      "context_length": 131072,
+      "pricing": {
+        "prompt": "0.00000013",
+        "completion": "0.0000006"
+      },
+      "supported_parameters": [
+        "max_tokens",
+        "temperature"
+      ]
+    },
+    {
+      "id": "typesafe/jev-1.14",
+      "name": "Typesafe: JEV 1.14",
+      "context_length": 8192,
+      "pricing": {
+        "prompt": "0.000000042",
+        "completion": "0"
+      }
+    },
+    {
+      "id": "anthropic/claude-sonnet-5.5",
+      "name": "Anthropic: Claude Sonnet 5.5",
+      "context_length": 1000000,
+      "pricing": {
+        "prompt": "0.000003",
+        "completion": "0.000015"
+      },
+      "supported_parameters": [
+        "max_tokens",
+        "temperature",
+        "reasoning",
+        "structured_outputs",
+        "response_format"
+      ]
+    }
+  ]
+}

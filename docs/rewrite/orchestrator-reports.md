@@ -5,6 +5,45 @@ State for recovery (session IDs, what to do if a child died) is in `orchestrator
 
 <!-- NEW REPORTS GO BELOW THIS LINE -->
 
+## 2026-11-06 — Stopped: the 5-hour usage limit hit during phase 13 (resets 6:50pm Algiers time)
+
+Not a code failure. The phase 13 child (`refactoring-step-13`, session `43054219-e576-4766-a945-dc8c87c3d9b6`) ran 72 turns and was cut off
+by "You've hit your 5-hour limit · resets 6:50pm (Africa/Algiers)". Phases 1 to 12 are done and pushed (last: `01ff976`).
+- **Phase 13 is half done and uncommitted** in the working tree: new files in `server/wahy/core/ai/` (gemini, groq,
+  openrouter, laya_local, pacer, layer, log, prompts, types, fake, http), recorded fixtures in
+  `server/tests/fixtures/ai/`, edits to settings and transcription (Groq moved), and regenerated web API types. Not yet
+  tested or ticked.
+- **Resumed at 18:50, right after the reset** (you said "continue"). Resume command:
+  `claude -p --resume 43054219-e576-4766-a945-dc8c87c3d9b6 "Continue phase 13 from where you stopped..."`; phase 14 follows when it is done.
+- Phase 13's Feature check (one live call per provider) needs your permission; the child will ask when it gets there.
+
+## 2026-11-06 — Phase 12 (Lecture view) done, milestone B passed; phase 13 started
+
+Gate passed. Commit `01ff976` "rewrite phase 12: Lecture view" pushed, phase ticked.
+- Built: transcript beside the video as in the approved mockup; yellow marker on the spoken word, click-a-word seeks,
+  auto-follow, progress bar; quotes coloured by kind with brackets and a reference tag whose card shows verdict, boundary,
+  "play the quote", edit, verify; filters (kind, verdict with presets, clipped; hidden quotes stay as plain speech);
+  counts, three layouts, "standard script" switch, search, double-click to correct a word (timing kept), live caption,
+  "now" card; lecture tabs (only "view" built, the rest say "coming soon"); version picker (read-only view, save,
+  rename, delete); an "open lecture" place in the rail.
+- Tests: old backend 152; new server 167 (+1 live skipped); engine 106 (incl. 24 new caption golden tests); web Vitest 59
+  (34 new); Playwright 4. **Milestone B passed**: highlight follows playback and clicking a word mid-lecture jumps the
+  video there.
+- 2-hour check (20,160 words, 576 findings, 2 h video; `WAHY_E2E_PERF=1`, not in `scripts/test.sh`): opens in ~2.1 s, plays
+  at 60 fps, a click near the end paints in 22 ms. **Weak spot: a filter change takes ~1.7 s** on the dev server (the
+  toolbar still answers at once).
+- Screenshots compared with the mockup in light, dark and phone width (no sideways scroll), taken with a Playwright
+  script because the browser tool is not allowed headless. Your real `data/wahy.db` was not touched.
+- **Decisions recorded by the child under Changes (please read):**
+  1. The old caption builder now lives in `engine/src/captions.ts` and reproduces the old SRT files exactly (shared by the
+     web preview and phase 16 export).
+  2. Two small server additions: each finding carries its newest verdict; a new route corrects one word (phase 16 moves
+     it into the undo log).
+  3. "Standard script" is only a display setting for now; phase 16 decides how it reaches exports.
+  4. **Making a saved version the current one again is NOT built** (a reduction of scope the child recorded). Say if you
+     want it added in a later correction session.
+- **Phase 13 (AI provider layer, Opus 5.5, high)** is running as `refactoring-step-13`.
+
 ## 2026-11-06 — Phase 11 (Web: new lecture and saved lectures) done, milestone A passed; phase 12 started
 
 Gate passed. Commit `fb1c192` "rewrite phase 11: Web: new lecture and saved lectures" pushed, phase ticked.

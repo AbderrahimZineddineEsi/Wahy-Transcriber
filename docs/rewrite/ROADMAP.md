@@ -383,4 +383,16 @@ Each entry: date, what changed, the user's words.
   Versions: a saved version opens read only; switching back to it as the current findings is not built. The other
   lecture tabs (edit, verify, Tafrigh, export) are placeholders until their phases. The 2-hour check is
   `WAHY_E2E_PERF=1 npx playwright test e2e/perf-long-lecture.spec.ts`, not part of `scripts/test.sh`.
+- **2026-11-06**: Phase 13 (draft, waiting for permission to run the live Feature check): `core/ai/` is built. Groq's
+  HTTP call moved from `features/transcription/backends.py` to `core/ai/groq.py` (the transcription backend keeps the
+  audio chunking). Every attempt is logged, failed ones (429s, dropped connections) included. JEV uses `JEV_API_KEY`
+  if set, else the OpenRouter key. The old app's boundary clean-up (`normalizeBoundaryVerdict`) runs in `core/ai` for
+  every provider. Prompt presets and rules (F-086) are left to phase 14: `core/ai` takes a system prompt, temperature
+  and "thinking off" as options. The recorded-response fixtures (`server/tests/fixtures/ai/`) are written in each
+  provider's documented reply shape (no real replies were saved before); the live tests save real replies in
+  `data/ai_live_replies/` when run. Small additions the features needed: `GET /api/settings/ai/openrouter/models`,
+  `GET /api/settings/ai/gemini/models`, `GET /api/settings/laya`, `POST /api/settings/laya/load|unload`. New optional
+  extra `laya` (laya, torch 2.14.1+cu126 from PyTorch's CUDA 12.6 index, huggingface-hub); to fit it with
+  `local-asr`, that extra's cuBLAS pin went from `>=12.9.3.13` to `>=12.6` (faster-whisper checked on CUDA after the
+  change). The server venv now has both extras: `uv sync --extra local-asr --extra laya`.
 

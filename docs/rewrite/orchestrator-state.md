@@ -61,3 +61,10 @@ anything new; phase 8 is already ticked.
 ## Running now: phase 12 Lecture view (Opus 5.5, high)
 - Child: refactoring-step-12, session ID b1959715-1ae9-4b89-9ae8-7a2db256e77f, log: /tmp/claude-1000/-home-zeno-Documents-work-new-projects-Wahy-Transcriber/428c450a-c0e2-4fc7-86dc-884ec1da7570/scratchpad/step-12.json. Phase 11 done (fb1c192), milestone A passed.
 - If it died: git status/log, then `claude -p --resume b1959715-1ae9-4b89-9ae8-7a2db256e77f "Continue phase 12 from where you stopped; finish, tick, commit and push."`
+
+## Running now: phase 13 AI provider layer (Opus 5.5, high)
+- Child: refactoring-step-13, session ID 43054219-e576-4766-a945-dc8c87c3d9b6, log: /tmp/claude-1000/-home-zeno-Documents-work-new-projects-Wahy-Transcriber/428c450a-c0e2-4fc7-86dc-884ec1da7570/scratchpad/step-13.json. Launcher: /tmp/claude-1000/-home-zeno-Documents-work-new-projects-Wahy-Transcriber/428c450a-c0e2-4fc7-86dc-884ec1da7570/scratchpad/run_phase.sh N model label effort. Phase 12 done (01ff976).
+- If it died: git status/log, then `claude -p --resume 43054219-e576-4766-a945-dc8c87c3d9b6 "Continue phase 13 from where you stopped; finish, tick, commit and push."`
+
+## STOPPED 2026-11-06 18:50: usage limit hit during phase 13 (resets 18:50 Algiers). Phase 13 child died with uncommitted work.
+- Resume: `claude -p --resume 43054219-e576-4766-a945-dc8c87c3d9b6 "Continue phase 13 from where you stopped; the usage limit cut you off. Check git status for your uncommitted work, finish, test, tick, commit and push."` via a run like /tmp/claude-1000/-home-zeno-Documents-work-new-projects-Wahy-Transcriber/428c450a-c0e2-4fc7-86dc-884ec1da7570/scratchpad/run_phase.sh (use --resume instead of --session-id).

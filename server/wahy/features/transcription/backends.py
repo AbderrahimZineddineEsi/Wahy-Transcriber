@@ -16,23 +16,17 @@ turned into one (it must reach the job runner).
 from __future__ import annotations
 
 import logging
-import time
 from collections.abc import Callable, Iterator
 from contextlib import contextmanager
 from dataclasses import dataclass
 from typing import Any, Protocol
 
-import httpx
-
+from wahy.core.ai.groq import ARABIC_PROMPT, GroqAsr
+from wahy.core.ai.types import AiError, Call
 from wahy.core.gpu import GpuOwner
 from wahy.core.jobs import JobCancelled, JobInterrupted
-from wahy.core.settings import Settings
 from wahy.features.transcription.audio import PreparedAudio
 
-ARABIC_PROMPT = ("إن الحمد لله نحمده ونستعينه ونستغفره، قال الله تعالى في القرآن الكريم، "
-                 "وقال رسول الله صلى الله عليه وسلم في الحديث الصحيح:")
-
-GROQ_URL = "https://api.groq.com/openai/v1/audio/transcriptions"
 SPECIALIZED_MODEL_ID = "Abu-Dju/whisper-large-v3-ar"
 
 log = logging.getLogger("wahy.asr")
@@ -58,7 +52,7 @@ class AsrBackend(Protocol):
     label: str         # what a lecture records as its model, e.g. "groq:whisper-large-v3-turbo"
 
     def transcribe(self, audio: PreparedAudio, *, on_percent: Callable[[float], None],
-                   check: Callable[[], None]) -> list[RawWord]: ...
+                   check: Callable[[], None], call: Call | None = None) -> list[RawWord]: ...
 
 
 @contextmanager
@@ -90,65 +84,33 @@ def _words_of_segment(text: str, start: float, end: float) -> list[RawWord]:
 # ---- Groq (cloud) --------------------------------------------------------------------------------
 
 class GroqBackend:
+    """Groq's Whisper. The HTTP call, its retries and its request log live in core/ai/groq.py (ADR 0004); this
+    part cuts the audio into chunks Groq accepts and puts the words back on the lecture's clock."""
+
     id = "groq-whisper-large-v3-turbo"
     label = "groq:whisper-large-v3-turbo"
-    RETRY_STATUS = {429, 500, 502, 503, 504}
 
-    def __init__(self, api_key: Callable[[], str | None], *, transport: httpx.BaseTransport | None = None,
-                 sleep: Callable[[float], None] = time.sleep, attempts: int = 3):
-        self._api_key = api_key
-        self._transport = transport
-        self._sleep = sleep
-        self._attempts = attempts
+    def __init__(self, groq: GroqAsr):
+        self.groq = groq
 
     def transcribe(self, audio: PreparedAudio, *, on_percent: Callable[[float], None],
-                   check: Callable[[], None]) -> list[RawWord]:
-        key = self._api_key()
-        if not key:
+                   check: Callable[[], None], call: Call | None = None) -> list[RawWord]:
+        call = call or Call(purpose="transcribe", check=check)
+        if not self.groq.has_key():
             raise AsrError("no Groq API key: set GROQ_API_KEY in .env, or pick a local model")
         words: list[RawWord] = []
         with _translating("Groq"):
             chunks = audio.groq_chunks()
-            with httpx.Client(timeout=300.0, transport=self._transport) as client:
-                for i, chunk in enumerate(chunks):
-                    check()
-                    payload = self._post(client, key, chunk.path, check)
-                    words += self._words(payload, chunk.offset_s)
-                    on_percent(100 * (i + 1) / len(chunks))
+            for i, chunk in enumerate(chunks):
+                check()
+                try:
+                    payload = self.groq.transcribe_file(chunk.path, call=call,
+                                                        duration_s=getattr(chunk, "duration_s", None))
+                except AiError as e:
+                    raise AsrError(str(e)) from e
+                words += self._words(payload, chunk.offset_s)
+                on_percent(100 * (i + 1) / len(chunks))
         return words
-
-    def _post(self, client: httpx.Client, key: str, path, check: Callable[[], None]) -> dict[str, Any]:
-        last = ""
-        for attempt in range(self._attempts):
-            check()
-            wait: float | None = None
-            try:
-                with open(path, "rb") as fp:
-                    resp = client.post(
-                        GROQ_URL, headers={"Authorization": f"Bearer {key}"},
-                        files={"file": (path.name, fp, "audio/mpeg")},
-                        data={"model": "whisper-large-v3-turbo", "language": "ar",
-                              "response_format": "verbose_json", "prompt": ARABIC_PROMPT,
-                              "timestamp_granularities[]": ["word", "segment"]})
-            except httpx.HTTPError as e:
-                last = f"connection failed: {e}"
-            else:
-                if resp.status_code == 200:
-                    return resp.json()
-                last = f"HTTP {resp.status_code}: {resp.text[:300]}"
-                if resp.status_code not in self.RETRY_STATUS:
-                    break
-                wait = _retry_after(resp)
-            if attempt + 1 < self._attempts:
-                self._wait(wait or 2.0 * 2 ** attempt, check)
-        raise AsrError(f"Groq rejected the request ({last})")
-
-    def _wait(self, seconds: float, check: Callable[[], None]) -> None:
-        """Sleep in short steps so a pause or cancel still works while waiting."""
-        end = time.monotonic() + seconds
-        while (left := end - time.monotonic()) > 0:
-            check()
-            self._sleep(min(1.0, left))
 
     @staticmethod
     def _words(payload: dict[str, Any], offset: float) -> list[RawWord]:
@@ -163,13 +125,6 @@ class GroqBackend:
         return out
 
 
-def _retry_after(resp: httpx.Response) -> float | None:
-    try:
-        return min(60.0, float(resp.headers["retry-after"]))
-    except (KeyError, ValueError):
-        return None
-
-
 # ---- local faster-whisper ------------------------------------------------------------------------
 
 class LocalWhisperBackend:
@@ -179,7 +134,7 @@ class LocalWhisperBackend:
         self.gpu, self.id, self.label, self.gpu_key = gpu, id, label, gpu_key
 
     def transcribe(self, audio: PreparedAudio, *, on_percent: Callable[[float], None],
-                   check: Callable[[], None]) -> list[RawWord]:
+                   check: Callable[[], None], call: Call | None = None) -> list[RawWord]:
         words: list[RawWord] = []
         try:
             with _translating(self.label):
@@ -215,7 +170,7 @@ class SpecializedBackend:
         self.gpu = gpu
 
     def transcribe(self, audio: PreparedAudio, *, on_percent: Callable[[float], None],
-                   check: Callable[[], None]) -> list[RawWord]:
+                   check: Callable[[], None], call: Call | None = None) -> list[RawWord]:
         words: list[RawWord] = []
         try:
             with _translating(self.label):
@@ -318,12 +273,12 @@ def register_models(gpu: GpuOwner) -> None:
     gpu.register(SpecializedBackend.gpu_key, load=_load_specialized)
 
 
-def default_backends(gpu: GpuOwner, settings: Settings) -> dict[str, AsrBackend]:
+def default_backends(gpu: GpuOwner, groq: GroqAsr) -> dict[str, AsrBackend]:
     local = [
         LocalWhisperBackend(gpu, id="local-turbo-int8", label="local:faster-whisper-large-v3-turbo-int8",
                             gpu_key="whisper:large-v3-turbo"),
         LocalWhisperBackend(gpu, id="local-small-int8", label="local:faster-whisper-small-int8",
                             gpu_key="whisper:small"),
     ]
-    backends: list[AsrBackend] = [GroqBackend(lambda: settings.key("groq")), SpecializedBackend(gpu), *local]
+    backends: list[AsrBackend] = [GroqBackend(groq), SpecializedBackend(gpu), *local]
     return {b.id: b for b in backends}

@@ -1,0 +1,20 @@
+{
+  "id": "gen-2",
+  "model": "deepseek/deepseek-r1",
+  "choices": [
+    {
+      "index": 0,
+      "finish_reason": "length",
+      "message": {
+        "role": "assistant",
+        "content": ""
+      }
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 1290,
+    "completion_tokens": 1500,
+    "total_tokens": 2790,
+    "cost": 0.0031
+  }
+}

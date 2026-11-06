@@ -924,3 +924,62 @@ cd web && npx vitest run src/features/lectures/view                          # t
 cd web && npx playwright test e2e/lecture-view.spec.ts                       # click-to-seek in a real browser
 cd web && WAHY_E2E_PERF=1 npx playwright test e2e/perf-long-lecture.spec.ts  # the 2-hour measurement
 ```
+
+## Phase 13 — AI provider layer (draft: the live check waits for your permission)
+
+Every model call now goes through one folder, `server/wahy/core/ai/` (ADR 0004). Five verifiers answer the same call,
+`ai.verify(name, items, call=..., options=...)` → one `Answer` per item: **gemini** (batches of 5 to 10, free-tier
+pacer), **jev** (OpenRouter's Decisions API), **openrouter** (any chat model, JSON mode), **laya** (your local model,
+through the GPU owner) and **fake** (for tests). Groq's Whisper moved here too. Each request is saved as an
+`AiRequest` row with its tokens, cost, latency and raw payload, minus keys. Failed attempts are saved too, so a 429
+shows in the telemetry.
+
+Small routes for the settings screens: OpenRouter's catalog search with live prices, the Gemini models your key can
+call, and Laya status, load and unload.
+
+### Concepts
+
+- **Ports and adapters.** The *port* is the shape every verifier promises: `verify(items, *, call, options) ->
+  [Answer]`. Each provider file is an *adapter* that turns that promise into one company's HTTP API. The verification
+  pass (phase 14) only knows the port, so swapping Gemini for Laya is a string. A test plugs in `FakeVerifier`. In
+  NestJS terms it is an interface token with several providers behind it; in Flutter, an abstract repository with a
+  real and a mock implementation.
+- **One shape for all answers.** Gemini answers `{"verdict": "CORRECT", "confidence": 0.93}`, JEV and Laya answer
+  `{"verdict": {"choice": "CORRECT", "probabilities": {...}}}`. `answer_from_json` and `answer_from_decisions` turn
+  both into the same `Answer`, so "0.93 correct" means the same whoever said it.
+- **Rate limiting with a sliding window** (`pacer.py`). The pacer keeps the start times of the last minute's requests.
+  At 5 a minute, the 6th request waits until the oldest is 60 s old. One pacer serves the whole server, because the
+  limit belongs to your key, not to one job.
+- **Retries and backoff** (`http.py`). A busy answer (429, 5xx) or a dropped connection is tried again. The wait is
+  what the server asks for (`Retry-After: 12`, or Gemini's `"retryDelay": "7s"` + 1.5 s), else a growing delay
+  (Gemini: 5, 15, 35, 65 s). A wrong key (401) is *not* retried: waiting can't fix it, so it is marked `fatal`, and a
+  pass stops instead of failing 300 findings one by one. Waits run in 1-second steps that call `call.check()`, so
+  pausing or cancelling a job works even in the middle of a 60-second wait.
+- **The checkpoint says which envelope it reads.** `rl_agent_config.json` of `laya-wahy-r6-v3_mixed` holds
+  `"wahy_envelope": 3`. `ai.laya.envelope()` reads it from the Hugging Face cache without loading the model. Phase 14
+  then builds v3 envelopes with the engine, and the serving input matches the training input (ADR 0003).
+- **Dependency extras.** `uv sync --extra laya` adds laya and torch only where they are wanted. torch comes from
+  PyTorch's CUDA 12.6 index, because PyPI's CUDA 13 builds no longer have kernels for your GTX 1050 (sm_61). That
+  forced faster-whisper's cuBLAS pin down to 12.6, and Whisper was checked on CUDA afterwards.
+
+### How it was tested
+
+- 46 new tests, all offline: `test_ai_core.py` (13), `test_ai_gemini.py` (9), `test_ai_openrouter.py` (13),
+  `test_ai_groq_laya.py` (11). The providers are replayed from response files in `server/tests/fixtures/ai/`
+  through `httpx.MockTransport`. No real replies existed yet, so the files follow each provider's documented shape.
+  Checks from `features.md`: a recorded 429 waits 8.5 s and then succeeds (F-094); 20 requests at 5 a minute never
+  put more than 5 in any minute (F-081); "deepseek" lists DeepSeek models with prices (F-083); JEV returns calibrated
+  probabilities (F-082); loading Whisper unloads Laya and Laya loads again when needed (F-098, with a fake Laya model
+  and the real GPU owner); the status shows the device and envelope 3 (F-097, F-093).
+- 5 live tests (`test_ai_live.py`, marked `live`), one per provider. They were **not run**: they need your
+  permission. When run, they save the real replies in `data/ai_live_replies/`, which can replace the hand-written
+  fixtures.
+- `scripts/test.sh` all green: old backend 152, server 213 (+6 live skipped), engine 106, web 59, Playwright 4.
+
+**Try:**
+
+```bash
+cd server && uv run pytest tests/test_ai_gemini.py -v              # the 429 / pacer / batch tests
+cd server && uv run pytest tests/test_ai_live.py --live -v         # the real calls (costs < $0.01; ask first)
+curl 'localhost:8120/api/settings/ai/openrouter/models?q=deepseek' # live prices, once ./scripts/dev.sh runs
+```

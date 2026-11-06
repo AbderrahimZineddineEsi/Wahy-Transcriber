@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 from pydantic import BaseModel, Field
 
 
@@ -38,3 +40,51 @@ class KeyUpdate(BaseModel):
     """`value` is the new key; an empty or missing value removes it."""
 
     value: str | None = None
+
+
+# ---- AI providers (core/ai) --------------------------------------------------------------------------------
+
+class OpenRouterModel(BaseModel):
+    """One model of OpenRouter's live catalog. Prices are $ per million tokens."""
+
+    id: str
+    name: str
+    context_length: int
+    prompt_price_per_m: float
+    completion_price_per_m: float
+    description: str = ""
+    free: bool
+    jev: bool
+    gemini: bool
+    chinese: bool
+    json_mode: bool = Field(description="the model accepts JSON mode (response_format)")
+
+
+class GeminiModels(BaseModel):
+    models: list[str] = Field(description="the models this key can call with generateContent")
+    recommended: str | None
+
+
+class LayaEnvelope(BaseModel):
+    version: int = Field(description="the envelope version the checkpoint was trained on (1, 2 or 3)")
+    options: dict[str, Any]
+    questions: list[str] | None
+    max_len: int | None = None
+    head_max_len: int | None = None
+
+
+class LayaStatusOut(BaseModel):
+    loaded: bool
+    checkpoint: str
+    device: str | None = Field(None, description="cuda or cpu while loaded")
+    envelope: LayaEnvelope | None
+    vram: dict[str, Any]
+    installed: bool = Field(description="the laya package and torch are installed (uv sync --extra laya)")
+
+
+class LayaLoad(BaseModel):
+    """`checkpoint`: a Hugging Face repo or a local folder (default: the one selected). `device`: auto, cuda
+    or cpu."""
+
+    checkpoint: str | None = None
+    device: str | None = None
