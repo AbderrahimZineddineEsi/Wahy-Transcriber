@@ -422,6 +422,17 @@
         "title": "Cleared",
         "type": "object"
       },
+      "CommentKind": {
+        "enum": [
+          "sneeze",
+          "student_question",
+          "interruption",
+          "attendee_exchange",
+          "other_incidental"
+        ],
+        "title": "CommentKind",
+        "type": "string"
+      },
       "CorpusHealth": {
         "properties": {
           "hadith_source": {
@@ -3401,6 +3412,76 @@
         "title": "RequestRow",
         "type": "object"
       },
+      "ReviewItem": {
+        "properties": {
+          "active_text": {
+            "title": "Active Text",
+            "type": "string"
+          },
+          "confidence": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confidence"
+          },
+          "final_decision": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/StructuralDecision"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "has_typo_versions": {
+            "default": false,
+            "title": "Has Typo Versions",
+            "type": "boolean"
+          },
+          "original_text": {
+            "title": "Original Text",
+            "type": "string"
+          },
+          "reasons": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Reasons",
+            "type": "array"
+          },
+          "review_flags": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Review Flags",
+            "type": "array"
+          },
+          "segment_id": {
+            "title": "Segment Id",
+            "type": "string"
+          },
+          "tag_probabilities": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "title": "Tag Probabilities",
+            "type": "object"
+          }
+        },
+        "required": [
+          "segment_id",
+          "original_text",
+          "active_text"
+        ],
+        "title": "ReviewItem",
+        "type": "object"
+      },
       "SearchHit": {
         "properties": {
           "displayRef": {
@@ -3604,6 +3685,74 @@
         "title": "SourceOut",
         "type": "object"
       },
+      "StructuralDecision": {
+        "properties": {
+          "comment_kind": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CommentKind"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "confidence": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confidence"
+          },
+          "level": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Level"
+          },
+          "parent_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parent Id"
+          },
+          "tag": {
+            "$ref": "#/components/schemas/StructuralTag"
+          }
+        },
+        "required": [
+          "tag"
+        ],
+        "title": "StructuralDecision",
+        "type": "object"
+      },
+      "StructuralTag": {
+        "enum": [
+          "paragraph",
+          "list_intro",
+          "list_item",
+          "heading",
+          "matn_section",
+          "continuation",
+          "comment"
+        ],
+        "title": "StructuralTag",
+        "type": "string"
+      },
       "Suggestion": {
         "description": "A unit ranked for a missed quote's words (F-052).",
         "properties": {
@@ -3654,6 +3803,1297 @@
           "matched"
         ],
         "title": "Suggestion",
+        "type": "object"
+      },
+      "TafrighCloneIn": {
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "maxLength": 120,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          }
+        },
+        "title": "TafrighCloneIn",
+        "type": "object"
+      },
+      "TafrighCompareIn": {
+        "properties": {
+          "run_ids": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 6,
+            "minItems": 2,
+            "title": "Run Ids",
+            "type": "array"
+          }
+        },
+        "required": [
+          "run_ids"
+        ],
+        "title": "TafrighCompareIn",
+        "type": "object"
+      },
+      "TafrighCompareOut": {
+        "description": "Saved Tafrigh runs side by side (F-122): settings, cost, and which sentences get different labels.",
+        "properties": {
+          "comparisons": {
+            "items": {
+              "$ref": "#/components/schemas/TafrighComparison"
+            },
+            "title": "Comparisons",
+            "type": "array"
+          },
+          "markdown": {
+            "title": "Markdown",
+            "type": "string"
+          },
+          "runs": {
+            "items": {
+              "$ref": "#/components/schemas/TafrighCompareRun"
+            },
+            "title": "Runs",
+            "type": "array"
+          }
+        },
+        "required": [
+          "runs",
+          "comparisons",
+          "markdown"
+        ],
+        "title": "TafrighCompareOut",
+        "type": "object"
+      },
+      "TafrighCompareRun": {
+        "properties": {
+          "cost_per_100_sentences_usd": {
+            "title": "Cost Per 100 Sentences Usd",
+            "type": "number"
+          },
+          "failure_rate": {
+            "title": "Failure Rate",
+            "type": "number"
+          },
+          "fallback_rate": {
+            "title": "Fallback Rate",
+            "type": "number"
+          },
+          "jev_layout": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Jev Layout"
+          },
+          "model_candidate": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model Candidate"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "num_segments": {
+            "title": "Num Segments",
+            "type": "integer"
+          },
+          "processing_mode": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Processing Mode"
+          },
+          "requests_sent": {
+            "title": "Requests Sent",
+            "type": "integer"
+          },
+          "run_id": {
+            "title": "Run Id",
+            "type": "string"
+          },
+          "tag_distribution": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Tag Distribution",
+            "type": "object"
+          },
+          "total_cost_usd": {
+            "title": "Total Cost Usd",
+            "type": "number"
+          },
+          "typo_strategy": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Typo Strategy"
+          },
+          "wall_clock_seconds": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Wall Clock Seconds"
+          }
+        },
+        "required": [
+          "run_id",
+          "name",
+          "model_candidate",
+          "processing_mode",
+          "jev_layout",
+          "typo_strategy",
+          "num_segments",
+          "wall_clock_seconds",
+          "total_cost_usd",
+          "cost_per_100_sentences_usd",
+          "requests_sent",
+          "failure_rate",
+          "fallback_rate",
+          "tag_distribution"
+        ],
+        "title": "TafrighCompareRun",
+        "type": "object"
+      },
+      "TafrighComparison": {
+        "description": "The first run against another one: the sentences they label differently.",
+        "properties": {
+          "a": {
+            "title": "A",
+            "type": "string"
+          },
+          "b": {
+            "title": "B",
+            "type": "string"
+          },
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "disagreements": {
+            "items": {
+              "$ref": "#/components/schemas/TafrighDisagreement"
+            },
+            "title": "Disagreements",
+            "type": "array"
+          }
+        },
+        "required": [
+          "a",
+          "b",
+          "count",
+          "disagreements"
+        ],
+        "title": "TafrighComparison",
+        "type": "object"
+      },
+      "TafrighDisagreement": {
+        "properties": {
+          "diff_type": {
+            "title": "Diff Type",
+            "type": "string"
+          },
+          "run_a": {
+            "title": "Run A",
+            "type": "string"
+          },
+          "run_b": {
+            "title": "Run B",
+            "type": "string"
+          },
+          "segment_id": {
+            "title": "Segment Id",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "segment_id",
+          "text",
+          "diff_type",
+          "run_a",
+          "run_b"
+        ],
+        "title": "TafrighDisagreement",
+        "type": "object"
+      },
+      "TafrighEstimate": {
+        "description": "Requests and tokens of a run over the chosen sentences, for every mode, from the real prompts (F-114).\n`price` is the OpenRouter price of the chosen model, when it is known.",
+        "properties": {
+          "jev": {
+            "additionalProperties": true,
+            "title": "Jev",
+            "type": "object"
+          },
+          "laya": {
+            "additionalProperties": true,
+            "title": "Laya",
+            "type": "object"
+          },
+          "per_sentence": {
+            "additionalProperties": true,
+            "title": "Per Sentence",
+            "type": "object"
+          },
+          "price": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TafrighPriceOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "sentences": {
+            "title": "Sentences",
+            "type": "integer"
+          },
+          "windowed": {
+            "additionalProperties": true,
+            "title": "Windowed",
+            "type": "object"
+          }
+        },
+        "required": [
+          "sentences",
+          "per_sentence",
+          "windowed",
+          "jev",
+          "laya"
+        ],
+        "title": "TafrighEstimate",
+        "type": "object"
+      },
+      "TafrighExportedFile": {
+        "properties": {
+          "content": {
+            "title": "Content",
+            "type": "string"
+          },
+          "filename": {
+            "title": "Filename",
+            "type": "string"
+          },
+          "mime": {
+            "title": "Mime",
+            "type": "string"
+          }
+        },
+        "required": [
+          "filename",
+          "mime",
+          "content"
+        ],
+        "title": "TafrighExportedFile",
+        "type": "object"
+      },
+      "TafrighGeminiModels": {
+        "properties": {
+          "models": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Models",
+            "type": "array"
+          },
+          "recommended": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recommended"
+          }
+        },
+        "required": [
+          "models",
+          "recommended"
+        ],
+        "title": "TafrighGeminiModels",
+        "type": "object"
+      },
+      "TafrighMatnIn": {
+        "description": "The matn being explained (F-108): pasted text, or a file `data/matns/<matn_id>.txt`.",
+        "properties": {
+          "matn_id": {
+            "anyOf": [
+              {
+                "pattern": "^[\\w\\-]{1,64}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Matn Id"
+          },
+          "mode": {
+            "default": "no_matn",
+            "enum": [
+              "no_matn",
+              "upload",
+              "builtin"
+            ],
+            "title": "Mode",
+            "type": "string"
+          },
+          "raw_matn_text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Raw Matn Text"
+          }
+        },
+        "title": "TafrighMatnIn",
+        "type": "object"
+      },
+      "TafrighOutlineEntry": {
+        "properties": {
+          "level": {
+            "title": "Level",
+            "type": "integer"
+          },
+          "parent_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parent Id"
+          },
+          "segment_id": {
+            "title": "Segment Id",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "segment_id",
+          "level",
+          "title",
+          "parent_id"
+        ],
+        "title": "TafrighOutlineEntry",
+        "type": "object"
+      },
+      "TafrighPreview": {
+        "description": "The sentences a run would classify, before any model is called (F-106).",
+        "properties": {
+          "quotes": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "description": "quotes sent as their own sentences, by kind",
+            "title": "Quotes",
+            "type": "object"
+          },
+          "seg_config": {
+            "$ref": "#/components/schemas/TafrighSegConfigIn"
+          },
+          "sentences": {
+            "items": {
+              "$ref": "#/components/schemas/TafrighSentenceOut"
+            },
+            "title": "Sentences",
+            "type": "array"
+          },
+          "stats": {
+            "$ref": "#/components/schemas/TafrighPreviewStats"
+          },
+          "text_source": {
+            "enum": [
+              "raw_findings",
+              "corrected",
+              "raw"
+            ],
+            "title": "Text Source",
+            "type": "string"
+          },
+          "words": {
+            "title": "Words",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "sentences",
+          "stats",
+          "seg_config",
+          "text_source",
+          "quotes",
+          "words"
+        ],
+        "title": "TafrighPreview",
+        "type": "object"
+      },
+      "TafrighPreviewRequest": {
+        "properties": {
+          "seg_config": {
+            "$ref": "#/components/schemas/TafrighSegConfigIn",
+            "default": {
+              "max_words": 40,
+              "min_words": 2,
+              "pause_sec": 0.7,
+              "use_punctuation": true
+            }
+          },
+          "text_source": {
+            "default": "raw_findings",
+            "description": "raw_findings: quotes as found | corrected: quotes from their source | raw",
+            "enum": [
+              "raw_findings",
+              "corrected",
+              "raw"
+            ],
+            "title": "Text Source",
+            "type": "string"
+          },
+          "use_detection_boundaries": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "each quote its own sentence; default: yes, except for the raw text",
+            "title": "Use Detection Boundaries"
+          }
+        },
+        "title": "TafrighPreviewRequest",
+        "type": "object"
+      },
+      "TafrighPreviewStats": {
+        "properties": {
+          "avg_duration_sec": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Avg Duration Sec"
+          },
+          "avg_words": {
+            "title": "Avg Words",
+            "type": "number"
+          },
+          "cut_reasons": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Cut Reasons",
+            "type": "object"
+          },
+          "has_timestamps": {
+            "title": "Has Timestamps",
+            "type": "boolean"
+          },
+          "max_words": {
+            "title": "Max Words",
+            "type": "integer"
+          },
+          "median_words": {
+            "title": "Median Words",
+            "type": "integer"
+          },
+          "min_words": {
+            "title": "Min Words",
+            "type": "integer"
+          },
+          "over_cap": {
+            "title": "Over Cap",
+            "type": "integer"
+          },
+          "quote_sentences": {
+            "title": "Quote Sentences",
+            "type": "integer"
+          },
+          "sentences": {
+            "title": "Sentences",
+            "type": "integer"
+          },
+          "words_total": {
+            "title": "Words Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "sentences",
+          "words_total",
+          "min_words",
+          "max_words",
+          "avg_words",
+          "median_words",
+          "over_cap",
+          "avg_duration_sec",
+          "cut_reasons",
+          "quote_sentences",
+          "has_timestamps"
+        ],
+        "title": "TafrighPreviewStats",
+        "type": "object"
+      },
+      "TafrighPriceOut": {
+        "properties": {
+          "completion_per_token": {
+            "title": "Completion Per Token",
+            "type": "number"
+          },
+          "model": {
+            "title": "Model",
+            "type": "string"
+          },
+          "prompt_per_token": {
+            "title": "Prompt Per Token",
+            "type": "number"
+          }
+        },
+        "required": [
+          "model",
+          "prompt_per_token",
+          "completion_per_token"
+        ],
+        "title": "TafrighPriceOut",
+        "type": "object"
+      },
+      "TafrighReviewIn": {
+        "properties": {
+          "action": {
+            "default": "confirm",
+            "enum": [
+              "confirm",
+              "correct",
+              "reject"
+            ],
+            "title": "Action",
+            "type": "string"
+          },
+          "corrected_comment_kind": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CommentKind"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "corrected_level": {
+            "anyOf": [
+              {
+                "maximum": 6.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Corrected Level"
+          },
+          "corrected_parent": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Corrected Parent"
+          },
+          "corrected_tag": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/StructuralTag"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "corrected_text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Corrected Text"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "reviewer_id": {
+            "default": "web_editor",
+            "title": "Reviewer Id",
+            "type": "string"
+          },
+          "segment_id": {
+            "title": "Segment Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "segment_id"
+        ],
+        "title": "TafrighReviewIn",
+        "type": "object"
+      },
+      "TafrighRunDetail": {
+        "description": "A saved Tafrigh run with its renders (F-117 to F-119).",
+        "properties": {
+          "html": {
+            "title": "Html",
+            "type": "string"
+          },
+          "manifest": {
+            "additionalProperties": true,
+            "title": "Manifest",
+            "type": "object"
+          },
+          "markdown": {
+            "title": "Markdown",
+            "type": "string"
+          },
+          "outline": {
+            "items": {
+              "$ref": "#/components/schemas/TafrighOutlineEntry"
+            },
+            "title": "Outline",
+            "type": "array"
+          },
+          "report": {
+            "additionalProperties": true,
+            "title": "Report",
+            "type": "object"
+          },
+          "review_items": {
+            "items": {
+              "$ref": "#/components/schemas/ReviewItem"
+            },
+            "title": "Review Items",
+            "type": "array"
+          },
+          "run": {
+            "$ref": "#/components/schemas/TafrighRunSummary"
+          },
+          "structured_json": {
+            "additionalProperties": true,
+            "title": "Structured Json",
+            "type": "object"
+          },
+          "warnings": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "run",
+          "markdown",
+          "html",
+          "structured_json",
+          "outline",
+          "review_items",
+          "report",
+          "manifest",
+          "warnings"
+        ],
+        "title": "TafrighRunDetail",
+        "type": "object"
+      },
+      "TafrighRunPatch": {
+        "properties": {
+          "name": {
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "TafrighRunPatch",
+        "type": "object"
+      },
+      "TafrighRunRequest": {
+        "properties": {
+          "disable_thinking": {
+            "default": false,
+            "title": "Disable Thinking",
+            "type": "boolean"
+          },
+          "first_n": {
+            "anyOf": [
+              {
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "shortcut for target_range [0, n): the cheap test slice (20 sentences)",
+            "title": "First N"
+          },
+          "gemini_route": {
+            "default": "auto",
+            "description": "auto: through OpenRouter when its key is set, else Google directly",
+            "enum": [
+              "auto",
+              "direct",
+              "openrouter"
+            ],
+            "title": "Gemini Route",
+            "type": "string"
+          },
+          "jev_execution_order": {
+            "default": "parallel",
+            "enum": [
+              "parallel",
+              "sequential",
+              "combined"
+            ],
+            "title": "Jev Execution Order",
+            "type": "string"
+          },
+          "jev_layout": {
+            "default": "independent_questions",
+            "enum": [
+              "independent_questions",
+              "split_as_tag_option"
+            ],
+            "title": "Jev Layout",
+            "type": "string"
+          },
+          "jev_model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Jev Model"
+          },
+          "matn": {
+            "$ref": "#/components/schemas/TafrighMatnIn",
+            "default": {
+              "mode": "no_matn"
+            }
+          },
+          "model_candidate": {
+            "default": "gemini_all",
+            "description": "the classifier (F-110)",
+            "enum": [
+              "gemini_all",
+              "jev_hybrid",
+              "laya_hybrid",
+              "openrouter_chat"
+            ],
+            "title": "Model Candidate",
+            "type": "string"
+          },
+          "model_name": {
+            "default": "auto",
+            "description": "a Gemini model, or auto: the best Flash-Lite this key can call",
+            "title": "Model Name",
+            "type": "string"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "maxLength": 120,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "the run's name in the saved runs",
+            "title": "Name"
+          },
+          "openrouter_chat_model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "for model_candidate openrouter_chat",
+            "title": "Openrouter Chat Model"
+          },
+          "openrouter_gemini_model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Openrouter Gemini Model"
+          },
+          "processing_mode": {
+            "default": "windowed",
+            "enum": [
+              "per_sentence",
+              "windowed"
+            ],
+            "title": "Processing Mode",
+            "type": "string"
+          },
+          "seg_config": {
+            "$ref": "#/components/schemas/TafrighSegConfigIn",
+            "default": {
+              "max_words": 40,
+              "min_words": 2,
+              "pause_sec": 0.7,
+              "use_punctuation": true
+            }
+          },
+          "target_range": {
+            "anyOf": [
+              {
+                "maxItems": 2,
+                "minItems": 2,
+                "prefixItems": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "integer"
+                  }
+                ],
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "only sentences [from, to) are classified; the others are context (F-113)",
+            "title": "Target Range"
+          },
+          "text_source": {
+            "default": "raw_findings",
+            "description": "raw_findings: quotes as found | corrected: quotes from their source | raw",
+            "enum": [
+              "raw_findings",
+              "corrected",
+              "raw"
+            ],
+            "title": "Text Source",
+            "type": "string"
+          },
+          "typo_strategy": {
+            "default": "gated",
+            "enum": [
+              "gated",
+              "always_correct",
+              "asr_confidence_gated",
+              "off"
+            ],
+            "title": "Typo Strategy",
+            "type": "string"
+          },
+          "use_detection_boundaries": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "each quote its own sentence; default: yes, except for the raw text",
+            "title": "Use Detection Boundaries"
+          },
+          "window_size": {
+            "default": 15,
+            "description": "sentences per request in windowed mode (F-111)",
+            "maximum": 40.0,
+            "minimum": 1.0,
+            "title": "Window Size",
+            "type": "integer"
+          }
+        },
+        "title": "TafrighRunRequest",
+        "type": "object"
+      },
+      "TafrighRunSummary": {
+        "properties": {
+          "copied_from": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Copied From"
+          },
+          "created_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created At"
+          },
+          "job_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Job Id"
+          },
+          "lecture_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lecture Id"
+          },
+          "model_candidate": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model Candidate"
+          },
+          "model_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model Name"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "needs_review": {
+            "title": "Needs Review",
+            "type": "integer"
+          },
+          "num_segments": {
+            "title": "Num Segments",
+            "type": "integer"
+          },
+          "processing_mode": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Processing Mode"
+          },
+          "requests_sent": {
+            "title": "Requests Sent",
+            "type": "integer"
+          },
+          "reviewed": {
+            "title": "Reviewed",
+            "type": "integer"
+          },
+          "run_id": {
+            "title": "Run Id",
+            "type": "string"
+          },
+          "stopped": {
+            "title": "Stopped",
+            "type": "boolean"
+          },
+          "target_range": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "integer"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Range"
+          },
+          "total_cost_usd": {
+            "title": "Total Cost Usd",
+            "type": "number"
+          },
+          "typo_strategy": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Typo Strategy"
+          },
+          "wall_clock_seconds": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Wall Clock Seconds"
+          },
+          "window_size": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Window Size"
+          }
+        },
+        "required": [
+          "run_id",
+          "lecture_id",
+          "name",
+          "created_at",
+          "copied_from",
+          "job_id",
+          "num_segments",
+          "needs_review",
+          "reviewed",
+          "processing_mode",
+          "window_size",
+          "model_candidate",
+          "model_name",
+          "typo_strategy",
+          "target_range",
+          "stopped",
+          "total_cost_usd",
+          "requests_sent",
+          "wall_clock_seconds"
+        ],
+        "title": "TafrighRunSummary",
+        "type": "object"
+      },
+      "TafrighSegConfigIn": {
+        "description": "How the text is cut into sentences (F-107).",
+        "properties": {
+          "max_words": {
+            "default": 40,
+            "maximum": 500.0,
+            "minimum": 0.0,
+            "title": "Max Words",
+            "type": "integer"
+          },
+          "min_words": {
+            "default": 2,
+            "maximum": 50.0,
+            "minimum": 1.0,
+            "title": "Min Words",
+            "type": "integer"
+          },
+          "pause_sec": {
+            "default": 0.7,
+            "description": "a silence at least this long ends a sentence",
+            "maximum": 10.0,
+            "minimum": 0.0,
+            "title": "Pause Sec",
+            "type": "number"
+          },
+          "use_punctuation": {
+            "default": true,
+            "title": "Use Punctuation",
+            "type": "boolean"
+          }
+        },
+        "title": "TafrighSegConfigIn",
+        "type": "object"
+      },
+      "TafrighSentenceOut": {
+        "properties": {
+          "cut_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cut Reason"
+          },
+          "end_time": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "End Time"
+          },
+          "has_detection": {
+            "title": "Has Detection",
+            "type": "boolean"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "index": {
+            "title": "Index",
+            "type": "integer"
+          },
+          "quote_kinds": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Quote Kinds",
+            "type": "array"
+          },
+          "start_time": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Start Time"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          },
+          "words": {
+            "title": "Words",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "index",
+          "id",
+          "text",
+          "words",
+          "start_time",
+          "end_time",
+          "cut_reason",
+          "has_detection",
+          "quote_kinds"
+        ],
+        "title": "TafrighSentenceOut",
+        "type": "object"
+      },
+      "TafrighStarted": {
+        "properties": {
+          "job": {
+            "$ref": "#/components/schemas/JobSnapshot"
+          }
+        },
+        "required": [
+          "job"
+        ],
+        "title": "TafrighStarted",
         "type": "object"
       },
       "TranscribeOptions": {
@@ -6625,6 +8065,186 @@
         ]
       }
     },
+    "/api/lectures/{lecture_id}/tafrigh/estimate": {
+      "post": {
+        "description": "Requests and tokens of a run for each mode, without calling a model (F-114).",
+        "operationId": "estimate_api_lectures__lecture_id__tafrigh_estimate_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "lecture_id",
+            "required": true,
+            "schema": {
+              "title": "Lecture Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/TafrighRunRequest"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Body"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TafrighEstimate"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Estimate",
+        "tags": [
+          "tafrigh"
+        ]
+      }
+    },
+    "/api/lectures/{lecture_id}/tafrigh/preview": {
+      "post": {
+        "description": "The sentences a run would classify, with statistics, before any model call (F-106, F-107).",
+        "operationId": "preview_api_lectures__lecture_id__tafrigh_preview_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "lecture_id",
+            "required": true,
+            "schema": {
+              "title": "Lecture Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/TafrighPreviewRequest"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Body"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TafrighPreview"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Preview",
+        "tags": [
+          "tafrigh"
+        ]
+      }
+    },
+    "/api/lectures/{lecture_id}/tafrigh/runs": {
+      "post": {
+        "description": "Start a Tafrigh run (F-110 to F-113, F-115). Returns the job; follow it at GET /api/jobs/{id}/events.",
+        "operationId": "start_run_api_lectures__lecture_id__tafrigh_runs_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "lecture_id",
+            "required": true,
+            "schema": {
+              "title": "Lecture Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/TafrighRunRequest"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Body"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TafrighStarted"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Start Run",
+        "tags": [
+          "tafrigh"
+        ]
+      }
+    },
     "/api/lectures/{lecture_id}/transcribe": {
       "post": {
         "description": "Transcribe (again) a lecture that has a link or media. The new words replace the old ones.",
@@ -7444,6 +9064,462 @@
         "summary": "Laya Unload",
         "tags": [
           "settings"
+        ]
+      }
+    },
+    "/api/tafrigh/compare": {
+      "post": {
+        "description": "Saved runs side by side: settings, cost, and the sentences they label differently (F-122).",
+        "operationId": "compare_api_tafrigh_compare_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TafrighCompareIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TafrighCompareOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Compare",
+        "tags": [
+          "tafrigh"
+        ]
+      }
+    },
+    "/api/tafrigh/jobs/{job_id}/stop": {
+      "post": {
+        "description": "Stop a running Tafrigh job now and keep the sentences that are finished (cancel keeps nothing).",
+        "operationId": "stop_run_api_tafrigh_jobs__job_id__stop_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TafrighStarted"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Stop Run",
+        "tags": [
+          "tafrigh"
+        ]
+      }
+    },
+    "/api/tafrigh/models": {
+      "get": {
+        "description": "The Gemini models the saved key can call.",
+        "operationId": "gemini_models_api_tafrigh_models_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TafrighGeminiModels"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Gemini Models",
+        "tags": [
+          "tafrigh"
+        ]
+      }
+    },
+    "/api/tafrigh/runs": {
+      "get": {
+        "description": "Saved Tafrigh runs, newest first (F-121).",
+        "operationId": "list_runs_api_tafrigh_runs_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "lecture_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Lecture Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/TafrighRunSummary"
+                  },
+                  "title": "Response List Runs Api Tafrigh Runs Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List Runs",
+        "tags": [
+          "tafrigh"
+        ]
+      }
+    },
+    "/api/tafrigh/runs/{run_id}": {
+      "delete": {
+        "operationId": "delete_run_api_tafrigh_runs__run_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "run_id",
+            "required": true,
+            "schema": {
+              "title": "Run Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Delete Run",
+        "tags": [
+          "tafrigh"
+        ]
+      },
+      "get": {
+        "operationId": "get_run_api_tafrigh_runs__run_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "run_id",
+            "required": true,
+            "schema": {
+              "title": "Run Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TafrighRunDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Run",
+        "tags": [
+          "tafrigh"
+        ]
+      },
+      "patch": {
+        "operationId": "rename_run_api_tafrigh_runs__run_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "run_id",
+            "required": true,
+            "schema": {
+              "title": "Run Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TafrighRunPatch"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TafrighRunSummary"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Rename Run",
+        "tags": [
+          "tafrigh"
+        ]
+      }
+    },
+    "/api/tafrigh/runs/{run_id}/clone": {
+      "post": {
+        "description": "\"Save as new\": a copy with its own id, so review edits in the copy leave this run as it is (F-121).",
+        "operationId": "clone_run_api_tafrigh_runs__run_id__clone_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "run_id",
+            "required": true,
+            "schema": {
+              "title": "Run Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/TafrighCloneIn"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Body"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TafrighRunSummary"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Clone Run",
+        "tags": [
+          "tafrigh"
+        ]
+      }
+    },
+    "/api/tafrigh/runs/{run_id}/export": {
+      "get": {
+        "operationId": "export_run_api_tafrigh_runs__run_id__export_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "run_id",
+            "required": true,
+            "schema": {
+              "title": "Run Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "format",
+            "required": false,
+            "schema": {
+              "default": "md",
+              "enum": [
+                "md",
+                "html",
+                "json"
+              ],
+              "title": "Format",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TafrighExportedFile"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Export Run",
+        "tags": [
+          "tafrigh"
+        ]
+      }
+    },
+    "/api/tafrigh/runs/{run_id}/review": {
+      "post": {
+        "description": "Confirm, relabel or reject one sentence. Saved at once; the run is returned re-rendered (F-119).",
+        "operationId": "review_api_tafrigh_runs__run_id__review_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "run_id",
+            "required": true,
+            "schema": {
+              "title": "Run Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TafrighReviewIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TafrighRunDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Review",
+        "tags": [
+          "tafrigh"
         ]
       }
     },

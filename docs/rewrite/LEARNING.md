@@ -1363,3 +1363,81 @@ cd web && npx vitest run src/features/editing            # the selection reducer
 cd web && npx playwright test e2e/editor.spec.ts          # the feature check in a real browser
 scripts/dev.sh   # then open a lecture → Edit, click two words, insert, and press undo in the header
 ```
+
+## Phase 18 — Tafrigh (server)
+
+### What was built
+
+Tafrigh turns a transcript into a written lesson: it cuts the text into sentences, asks a model to label each one
+(paragraph, heading, list item, matn, comment...), fixes clear ASR typos, and renders Markdown / HTML. The code already
+existed in `backend/tafrigh/` (5,700 lines, 2,000 lines of tests). This phase **moved it, it did not rewrite it**:
+
+- `server/wahy/features/tafrigh/` holds the same segmenter, validators, outline repair, renderer and review queue.
+  It is a *copy*: the old app must keep working until phase 24, so `backend/tafrigh/` stays.
+- Three things are new. (1) The adapters no longer speak HTTP: they call `core/ai` (`ai.gemini.generate`,
+  `ai.openrouter.complete_json`, `ai.jev.decide`, `ai.laya.predict`), so keys, retries, free-tier pacing, cost and the
+  request log are in one place. (2) A run is a **job**. (3) A run is a **folder** in `data/tafrigh_runs/<run_id>/`.
+- API: `POST /api/lectures/{id}/tafrigh/preview | estimate | runs`, `POST /api/tafrigh/jobs/{job}/stop`,
+  `GET/PATCH/DELETE /api/tafrigh/runs/{id}`, `.../clone`, `.../review`, `.../export?format=md|html|json`,
+  `POST /api/tafrigh/compare`.
+
+### New ideas
+
+**Moving code without breaking it.** The safest port keeps the tested logic byte-for-byte and changes only the seams:
+imports, the error type, and how the model is called. Here that was four adapters and one pipeline file; the 70 tests
+of the old package run unchanged against the new package (only imports and the HTTP-level tests changed). A style pass
+(ruff) would have touched every line, so the ported folder has a per-file lint exemption in `pyproject.toml` for long
+Arabic prompt lines, instead of a rewrite that could change behaviour.
+
+**A seam is where you can substitute.** Adapters take `ai` (the `AiLayer`) in their constructor. A test passes an
+`AiLayer` built over `httpx.MockTransport`, so the *real* adapter, the *real* AI layer and a *fake provider server*
+run together, offline:
+
+```python
+ai = make_ai(httpx.MockTransport(handler))          # tests/tafrigh/helpers.py
+GeminiAdapter(ai, route="openrouter", openrouter_model="gemini-3.1-flash-lite").classify_uow(uow)
+```
+
+**Two ways to end a job early.** *Cancel* (the job runner's) raises `JobCancelled` at the next `ctx.check()` and keeps
+nothing. *Stop* is Tafrigh's: the service sets a `threading.Event`, and `Call.check` (which every wait in `core/ai`
+calls) raises `TafrighStop`; the pipeline catches it and returns the sentences it has finished. One `check` function
+does both, so a stop works even while a request is waiting out a 429. The old code needed a second thread and a lock
+(`snapshot_result`) for this; they are gone.
+
+**Persistence = write after every change, read lazily.** `RunStore` keeps a run in memory for speed but writes
+`session.json` (atomically: write a `.tmp`, then `os.replace`) after the run and after every review action, and loads it
+from disk when it is not in memory. That is the whole fix for "relabel, restart the server, the relabel is gone": the
+old app only kept runs in a Python dict. The run id comes from the URL and becomes a folder name, so it is matched
+against `^run_[0-9a-f]{12}$` first (otherwise `../../x` would be a path-traversal bug).
+
+**Derived outline.** After a review turns a sentence into a heading, the outline state saved at the end of the run does
+not know. `RunSummary`/`RunDetail.outline` is therefore *computed* from the sentences' current labels, not copied.
+
+### How it was tested
+
+- The ported tests: segmenter, matn alignment, validators, renderer, outline repair, pipeline modes (windowed and
+  per-sentence), review queue, evaluation, run logger and comparison, JEV contract. Run unchanged except for imports.
+- New: `test_tafrigh_service.py` (the API end to end on the sample lecture: preview with a 10-word cap, a run as a job,
+  the request log attributed to the job, **the restart test** (run, relabel, start a *second app* on the same data
+  folder, the relabel and the outline are there), clone independence, compare lists exactly the changed sentence,
+  stop keeps the finished sentences, a window of 6 over 12 sentences is 2 requests, refusals, the offline fallback,
+  "no run changes the original words"), `test_tafrigh_source.py` (the text builder), `test_tafrigh_adapters.py`.
+- **Feature check (live, free tier, $0):** on the sample lecture (12 sentences, so the 20-sentence slice covers it) a
+  windowed run (2 requests) and a per-sentence run (12 requests) on `gemini-3.5-flash-lite`; compare lists the 2
+  sentences the two runs label differently (`seg_0004`, `seg_0011`: paragraph vs continuation).
+
+### Things worth knowing
+
+- `training_store.py`, `exporters.py` and `pilot_tools.py` came across with their tests, because the old tests cover
+  them; they are research tooling and phase 20 (training data, F-120) decides what happens to them.
+- The OpenRouter key in `.env` is expired (401); `gemini_route: "auto"` prefers OpenRouter when a key is set, so a run
+  with the default route fails with a clear message. Use `gemini_route: "direct"` or replace the key.
+- A Tafrigh job is **not resumable** after a restart (the classifier has no checkpoint); it shows as interrupted.
+
+**Try:**
+
+```bash
+cd server && uv run pytest tests/tafrigh -q                      # 89 tests, offline
+cd server && uv run pytest tests/tafrigh/test_tafrigh_service.py -k restart -v
+scripts/dev.sh   # then: curl -XPOST localhost:8120/api/lectures/sample; curl -XPOST localhost:8120/api/lectures/1/tafrigh/runs -H 'content-type: application/json' -d '{"first_n":20,"gemini_route":"direct"}'
+```

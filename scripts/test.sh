@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Runs every test suite: old backend, new server, engine, web. Stops at the first red suite.
-# Known failing old test: test_review_endpoint_survives_a_server_reload (fixed by rewrite phase 18).
+# Known failing old test: test_review_endpoint_survives_a_server_reload. The new server's restart test
+# (server/tests/tafrigh/test_tafrigh_service.py) covers it since phase 18; the old one goes with the old app (phase 24).
 set -euo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
 

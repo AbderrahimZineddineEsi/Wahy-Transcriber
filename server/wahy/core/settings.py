@@ -33,6 +33,8 @@ class Settings(BaseSettings):
     db_path: Path | None = Field(None, validation_alias="WAHY_DB_PATH")
     corpus_path: Path | None = Field(None, validation_alias="WAHY_CORPUS_PATH")
     media_dir: Path | None = Field(None, validation_alias="WAHY_MEDIA_DIR")
+    # one folder per Tafrigh run (features/tafrigh/store.py)
+    tafrigh_runs_dir: Path | None = Field(None, validation_alias="WAHY_TAFRIGH_RUNS_DIR")
     # the file that "save a key" in the web app writes to (the gitignored .env at the repo root by default)
     env_path: Path = Field(REPO_ROOT / ".env", validation_alias="WAHY_ENV_FILE")
 
@@ -52,6 +54,7 @@ class Settings(BaseSettings):
         self.db_path = (self.db_path or self.data_dir / "wahy.db").resolve()
         self.corpus_path = (self.corpus_path or self.data_dir / "corpus.json").resolve()
         self.media_dir = (self.media_dir or self.data_dir / "media").resolve()
+        self.tafrigh_runs_dir = (self.tafrigh_runs_dir or self.data_dir / "tafrigh_runs").resolve()
         return self
 
     def key(self, provider: str) -> str | None:

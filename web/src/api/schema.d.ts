@@ -812,6 +812,66 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/lectures/{lecture_id}/tafrigh/estimate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Estimate
+         * @description Requests and tokens of a run for each mode, without calling a model (F-114).
+         */
+        post: operations["estimate_api_lectures__lecture_id__tafrigh_estimate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/lectures/{lecture_id}/tafrigh/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Preview
+         * @description The sentences a run would classify, with statistics, before any model call (F-106, F-107).
+         */
+        post: operations["preview_api_lectures__lecture_id__tafrigh_preview_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/lectures/{lecture_id}/tafrigh/runs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Start Run
+         * @description Start a Tafrigh run (F-110 to F-113, F-115). Returns the job; follow it at GET /api/jobs/{id}/events.
+         */
+        post: operations["start_run_api_lectures__lecture_id__tafrigh_runs_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/lectures/{lecture_id}/transcribe": {
         parameters: {
             query?: never;
@@ -1086,6 +1146,162 @@ export interface paths {
          * @description Unload Laya to free the GPU (F-098).
          */
         post: operations["laya_unload_api_settings_laya_unload_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/tafrigh/compare": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Compare
+         * @description Saved runs side by side: settings, cost, and the sentences they label differently (F-122).
+         */
+        post: operations["compare_api_tafrigh_compare_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/tafrigh/jobs/{job_id}/stop": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Stop Run
+         * @description Stop a running Tafrigh job now and keep the sentences that are finished (cancel keeps nothing).
+         */
+        post: operations["stop_run_api_tafrigh_jobs__job_id__stop_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/tafrigh/models": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Gemini Models
+         * @description The Gemini models the saved key can call.
+         */
+        get: operations["gemini_models_api_tafrigh_models_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/tafrigh/runs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Runs
+         * @description Saved Tafrigh runs, newest first (F-121).
+         */
+        get: operations["list_runs_api_tafrigh_runs_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/tafrigh/runs/{run_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Run */
+        get: operations["get_run_api_tafrigh_runs__run_id__get"];
+        put?: never;
+        post?: never;
+        /** Delete Run */
+        delete: operations["delete_run_api_tafrigh_runs__run_id__delete"];
+        options?: never;
+        head?: never;
+        /** Rename Run */
+        patch: operations["rename_run_api_tafrigh_runs__run_id__patch"];
+        trace?: never;
+    };
+    "/api/tafrigh/runs/{run_id}/clone": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Clone Run
+         * @description "Save as new": a copy with its own id, so review edits in the copy leave this run as it is (F-121).
+         */
+        post: operations["clone_run_api_tafrigh_runs__run_id__clone_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/tafrigh/runs/{run_id}/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Export Run */
+        get: operations["export_run_api_tafrigh_runs__run_id__export_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/tafrigh/runs/{run_id}/review": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Review
+         * @description Confirm, relabel or reject one sentence. Saved at once; the run is returned re-rendered (F-119).
+         */
+        post: operations["review_api_tafrigh_runs__run_id__review_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1440,6 +1656,11 @@ export interface components {
             /** Deleted */
             deleted: number;
         };
+        /**
+         * CommentKind
+         * @enum {string}
+         */
+        CommentKind: "sneeze" | "student_question" | "interruption" | "attendee_exchange" | "other_incidental";
         /** CorpusHealth */
         CorpusHealth: {
             /** Hadith Source */
@@ -2743,6 +2964,31 @@ export interface components {
             /** Purpose */
             purpose: string;
         };
+        /** ReviewItem */
+        ReviewItem: {
+            /** Active Text */
+            active_text: string;
+            /** Confidence */
+            confidence?: number | null;
+            final_decision?: components["schemas"]["StructuralDecision"] | null;
+            /**
+             * Has Typo Versions
+             * @default false
+             */
+            has_typo_versions: boolean;
+            /** Original Text */
+            original_text: string;
+            /** Reasons */
+            reasons?: string[];
+            /** Review Flags */
+            review_flags?: string[];
+            /** Segment Id */
+            segment_id: string;
+            /** Tag Probabilities */
+            tag_probabilities?: {
+                [key: string]: number;
+            };
+        };
         /** SearchHit */
         SearchHit: {
             /** Displayref */
@@ -2816,6 +3062,22 @@ export interface components {
             /** Zip Cached */
             zip_cached: boolean;
         };
+        /** StructuralDecision */
+        StructuralDecision: {
+            comment_kind?: components["schemas"]["CommentKind"] | null;
+            /** Confidence */
+            confidence?: number | null;
+            /** Level */
+            level?: number | null;
+            /** Parent Id */
+            parent_id?: string | null;
+            tag: components["schemas"]["StructuralTag"];
+        };
+        /**
+         * StructuralTag
+         * @enum {string}
+         */
+        StructuralTag: "paragraph" | "list_intro" | "list_item" | "heading" | "matn_section" | "continuation" | "comment";
         /**
          * Suggestion
          * @description A unit ranked for a missed quote's words (F-052).
@@ -2841,6 +3103,506 @@ export interface components {
              * @description the unit's words, as the full-text preview shows them
              */
             words: string[];
+        };
+        /** TafrighCloneIn */
+        TafrighCloneIn: {
+            /** Name */
+            name?: string | null;
+        };
+        /** TafrighCompareIn */
+        TafrighCompareIn: {
+            /** Run Ids */
+            run_ids: string[];
+        };
+        /**
+         * TafrighCompareOut
+         * @description Saved Tafrigh runs side by side (F-122): settings, cost, and which sentences get different labels.
+         */
+        TafrighCompareOut: {
+            /** Comparisons */
+            comparisons: components["schemas"]["TafrighComparison"][];
+            /** Markdown */
+            markdown: string;
+            /** Runs */
+            runs: components["schemas"]["TafrighCompareRun"][];
+        };
+        /** TafrighCompareRun */
+        TafrighCompareRun: {
+            /** Cost Per 100 Sentences Usd */
+            cost_per_100_sentences_usd: number;
+            /** Failure Rate */
+            failure_rate: number;
+            /** Fallback Rate */
+            fallback_rate: number;
+            /** Jev Layout */
+            jev_layout: string | null;
+            /** Model Candidate */
+            model_candidate: string | null;
+            /** Name */
+            name: string;
+            /** Num Segments */
+            num_segments: number;
+            /** Processing Mode */
+            processing_mode: string | null;
+            /** Requests Sent */
+            requests_sent: number;
+            /** Run Id */
+            run_id: string;
+            /** Tag Distribution */
+            tag_distribution: {
+                [key: string]: number;
+            };
+            /** Total Cost Usd */
+            total_cost_usd: number;
+            /** Typo Strategy */
+            typo_strategy: string | null;
+            /** Wall Clock Seconds */
+            wall_clock_seconds: number | null;
+        };
+        /**
+         * TafrighComparison
+         * @description The first run against another one: the sentences they label differently.
+         */
+        TafrighComparison: {
+            /** A */
+            a: string;
+            /** B */
+            b: string;
+            /** Count */
+            count: number;
+            /** Disagreements */
+            disagreements: components["schemas"]["TafrighDisagreement"][];
+        };
+        /** TafrighDisagreement */
+        TafrighDisagreement: {
+            /** Diff Type */
+            diff_type: string;
+            /** Run A */
+            run_a: string;
+            /** Run B */
+            run_b: string;
+            /** Segment Id */
+            segment_id: string;
+            /** Text */
+            text: string;
+        };
+        /**
+         * TafrighEstimate
+         * @description Requests and tokens of a run over the chosen sentences, for every mode, from the real prompts (F-114).
+         *     `price` is the OpenRouter price of the chosen model, when it is known.
+         */
+        TafrighEstimate: {
+            /** Jev */
+            jev: {
+                [key: string]: unknown;
+            };
+            /** Laya */
+            laya: {
+                [key: string]: unknown;
+            };
+            /** Per Sentence */
+            per_sentence: {
+                [key: string]: unknown;
+            };
+            price?: components["schemas"]["TafrighPriceOut"] | null;
+            /** Sentences */
+            sentences: number;
+            /** Windowed */
+            windowed: {
+                [key: string]: unknown;
+            };
+        };
+        /** TafrighExportedFile */
+        TafrighExportedFile: {
+            /** Content */
+            content: string;
+            /** Filename */
+            filename: string;
+            /** Mime */
+            mime: string;
+        };
+        /** TafrighGeminiModels */
+        TafrighGeminiModels: {
+            /** Models */
+            models: string[];
+            /** Recommended */
+            recommended: string | null;
+        };
+        /**
+         * TafrighMatnIn
+         * @description The matn being explained (F-108): pasted text, or a file `data/matns/<matn_id>.txt`.
+         */
+        TafrighMatnIn: {
+            /** Matn Id */
+            matn_id?: string | null;
+            /**
+             * Mode
+             * @default no_matn
+             * @enum {string}
+             */
+            mode: "no_matn" | "upload" | "builtin";
+            /** Raw Matn Text */
+            raw_matn_text?: string | null;
+        };
+        /** TafrighOutlineEntry */
+        TafrighOutlineEntry: {
+            /** Level */
+            level: number;
+            /** Parent Id */
+            parent_id: string | null;
+            /** Segment Id */
+            segment_id: string;
+            /** Title */
+            title: string;
+        };
+        /**
+         * TafrighPreview
+         * @description The sentences a run would classify, before any model is called (F-106).
+         */
+        TafrighPreview: {
+            /**
+             * Quotes
+             * @description quotes sent as their own sentences, by kind
+             */
+            quotes: {
+                [key: string]: number;
+            };
+            seg_config: components["schemas"]["TafrighSegConfigIn"];
+            /** Sentences */
+            sentences: components["schemas"]["TafrighSentenceOut"][];
+            stats: components["schemas"]["TafrighPreviewStats"];
+            /**
+             * Text Source
+             * @enum {string}
+             */
+            text_source: "raw_findings" | "corrected" | "raw";
+            /** Words */
+            words: number;
+        };
+        /** TafrighPreviewRequest */
+        TafrighPreviewRequest: {
+            /**
+             * @default {
+             *       "max_words": 40,
+             *       "min_words": 2,
+             *       "pause_sec": 0.7,
+             *       "use_punctuation": true
+             *     }
+             */
+            seg_config: components["schemas"]["TafrighSegConfigIn"];
+            /**
+             * Text Source
+             * @description raw_findings: quotes as found | corrected: quotes from their source | raw
+             * @default raw_findings
+             * @enum {string}
+             */
+            text_source: "raw_findings" | "corrected" | "raw";
+            /**
+             * Use Detection Boundaries
+             * @description each quote its own sentence; default: yes, except for the raw text
+             */
+            use_detection_boundaries?: boolean | null;
+        };
+        /** TafrighPreviewStats */
+        TafrighPreviewStats: {
+            /** Avg Duration Sec */
+            avg_duration_sec: number | null;
+            /** Avg Words */
+            avg_words: number;
+            /** Cut Reasons */
+            cut_reasons: {
+                [key: string]: number;
+            };
+            /** Has Timestamps */
+            has_timestamps: boolean;
+            /** Max Words */
+            max_words: number;
+            /** Median Words */
+            median_words: number;
+            /** Min Words */
+            min_words: number;
+            /** Over Cap */
+            over_cap: number;
+            /** Quote Sentences */
+            quote_sentences: number;
+            /** Sentences */
+            sentences: number;
+            /** Words Total */
+            words_total: number;
+        };
+        /** TafrighPriceOut */
+        TafrighPriceOut: {
+            /** Completion Per Token */
+            completion_per_token: number;
+            /** Model */
+            model: string;
+            /** Prompt Per Token */
+            prompt_per_token: number;
+        };
+        /** TafrighReviewIn */
+        TafrighReviewIn: {
+            /**
+             * Action
+             * @default confirm
+             * @enum {string}
+             */
+            action: "confirm" | "correct" | "reject";
+            corrected_comment_kind?: components["schemas"]["CommentKind"] | null;
+            /** Corrected Level */
+            corrected_level?: number | null;
+            /** Corrected Parent */
+            corrected_parent?: string | null;
+            corrected_tag?: components["schemas"]["StructuralTag"] | null;
+            /** Corrected Text */
+            corrected_text?: string | null;
+            /** Note */
+            note?: string | null;
+            /**
+             * Reviewer Id
+             * @default web_editor
+             */
+            reviewer_id: string;
+            /** Segment Id */
+            segment_id: string;
+        };
+        /**
+         * TafrighRunDetail
+         * @description A saved Tafrigh run with its renders (F-117 to F-119).
+         */
+        TafrighRunDetail: {
+            /** Html */
+            html: string;
+            /** Manifest */
+            manifest: {
+                [key: string]: unknown;
+            };
+            /** Markdown */
+            markdown: string;
+            /** Outline */
+            outline: components["schemas"]["TafrighOutlineEntry"][];
+            /** Report */
+            report: {
+                [key: string]: unknown;
+            };
+            /** Review Items */
+            review_items: components["schemas"]["ReviewItem"][];
+            run: components["schemas"]["TafrighRunSummary"];
+            /** Structured Json */
+            structured_json: {
+                [key: string]: unknown;
+            };
+            /** Warnings */
+            warnings: string[];
+        };
+        /** TafrighRunPatch */
+        TafrighRunPatch: {
+            /** Name */
+            name: string;
+        };
+        /** TafrighRunRequest */
+        TafrighRunRequest: {
+            /**
+             * Disable Thinking
+             * @default false
+             */
+            disable_thinking: boolean;
+            /**
+             * First N
+             * @description shortcut for target_range [0, n): the cheap test slice (20 sentences)
+             */
+            first_n?: number | null;
+            /**
+             * Gemini Route
+             * @description auto: through OpenRouter when its key is set, else Google directly
+             * @default auto
+             * @enum {string}
+             */
+            gemini_route: "auto" | "direct" | "openrouter";
+            /**
+             * Jev Execution Order
+             * @default parallel
+             * @enum {string}
+             */
+            jev_execution_order: "parallel" | "sequential" | "combined";
+            /**
+             * Jev Layout
+             * @default independent_questions
+             * @enum {string}
+             */
+            jev_layout: "independent_questions" | "split_as_tag_option";
+            /** Jev Model */
+            jev_model?: string | null;
+            /**
+             * @default {
+             *       "mode": "no_matn"
+             *     }
+             */
+            matn: components["schemas"]["TafrighMatnIn"];
+            /**
+             * Model Candidate
+             * @description the classifier (F-110)
+             * @default gemini_all
+             * @enum {string}
+             */
+            model_candidate: "gemini_all" | "jev_hybrid" | "laya_hybrid" | "openrouter_chat";
+            /**
+             * Model Name
+             * @description a Gemini model, or auto: the best Flash-Lite this key can call
+             * @default auto
+             */
+            model_name: string;
+            /**
+             * Name
+             * @description the run's name in the saved runs
+             */
+            name?: string | null;
+            /**
+             * Openrouter Chat Model
+             * @description for model_candidate openrouter_chat
+             */
+            openrouter_chat_model?: string | null;
+            /** Openrouter Gemini Model */
+            openrouter_gemini_model?: string | null;
+            /**
+             * Processing Mode
+             * @default windowed
+             * @enum {string}
+             */
+            processing_mode: "per_sentence" | "windowed";
+            /**
+             * @default {
+             *       "max_words": 40,
+             *       "min_words": 2,
+             *       "pause_sec": 0.7,
+             *       "use_punctuation": true
+             *     }
+             */
+            seg_config: components["schemas"]["TafrighSegConfigIn"];
+            /**
+             * Target Range
+             * @description only sentences [from, to) are classified; the others are context (F-113)
+             */
+            target_range?: [
+                number,
+                number
+            ] | null;
+            /**
+             * Text Source
+             * @description raw_findings: quotes as found | corrected: quotes from their source | raw
+             * @default raw_findings
+             * @enum {string}
+             */
+            text_source: "raw_findings" | "corrected" | "raw";
+            /**
+             * Typo Strategy
+             * @default gated
+             * @enum {string}
+             */
+            typo_strategy: "gated" | "always_correct" | "asr_confidence_gated" | "off";
+            /**
+             * Use Detection Boundaries
+             * @description each quote its own sentence; default: yes, except for the raw text
+             */
+            use_detection_boundaries?: boolean | null;
+            /**
+             * Window Size
+             * @description sentences per request in windowed mode (F-111)
+             * @default 15
+             */
+            window_size: number;
+        };
+        /** TafrighRunSummary */
+        TafrighRunSummary: {
+            /** Copied From */
+            copied_from: string | null;
+            /** Created At */
+            created_at: string | null;
+            /** Job Id */
+            job_id: string | null;
+            /** Lecture Id */
+            lecture_id: number | null;
+            /** Model Candidate */
+            model_candidate: string | null;
+            /** Model Name */
+            model_name: string | null;
+            /** Name */
+            name: string;
+            /** Needs Review */
+            needs_review: number;
+            /** Num Segments */
+            num_segments: number;
+            /** Processing Mode */
+            processing_mode: string | null;
+            /** Requests Sent */
+            requests_sent: number;
+            /** Reviewed */
+            reviewed: number;
+            /** Run Id */
+            run_id: string;
+            /** Stopped */
+            stopped: boolean;
+            /** Target Range */
+            target_range: number[] | null;
+            /** Total Cost Usd */
+            total_cost_usd: number;
+            /** Typo Strategy */
+            typo_strategy: string | null;
+            /** Wall Clock Seconds */
+            wall_clock_seconds: number | null;
+            /** Window Size */
+            window_size: number | null;
+        };
+        /**
+         * TafrighSegConfigIn
+         * @description How the text is cut into sentences (F-107).
+         */
+        TafrighSegConfigIn: {
+            /**
+             * Max Words
+             * @default 40
+             */
+            max_words: number;
+            /**
+             * Min Words
+             * @default 2
+             */
+            min_words: number;
+            /**
+             * Pause Sec
+             * @description a silence at least this long ends a sentence
+             * @default 0.7
+             */
+            pause_sec: number;
+            /**
+             * Use Punctuation
+             * @default true
+             */
+            use_punctuation: boolean;
+        };
+        /** TafrighSentenceOut */
+        TafrighSentenceOut: {
+            /** Cut Reason */
+            cut_reason: string | null;
+            /** End Time */
+            end_time: number | null;
+            /** Has Detection */
+            has_detection: boolean;
+            /** Id */
+            id: string;
+            /** Index */
+            index: number;
+            /** Quote Kinds */
+            quote_kinds: string[];
+            /** Start Time */
+            start_time: number | null;
+            /** Text */
+            text: string;
+            /** Words */
+            words: number;
+        };
+        /** TafrighStarted */
+        TafrighStarted: {
+            job: components["schemas"]["JobSnapshot"];
         };
         /** TranscribeOptions */
         TranscribeOptions: {
@@ -4679,6 +5441,111 @@ export interface operations {
             };
         };
     };
+    estimate_api_lectures__lecture_id__tafrigh_estimate_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                lecture_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["TafrighRunRequest"] | null;
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TafrighEstimate"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    preview_api_lectures__lecture_id__tafrigh_preview_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                lecture_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["TafrighPreviewRequest"] | null;
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TafrighPreview"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    start_run_api_lectures__lecture_id__tafrigh_runs_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                lecture_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["TafrighRunRequest"] | null;
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TafrighStarted"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     transcribe_lecture_api_lectures__lecture_id__transcribe_post: {
         parameters: {
             query?: never;
@@ -5210,6 +6077,319 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["LayaStatusOut"];
+                };
+            };
+        };
+    };
+    compare_api_tafrigh_compare_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TafrighCompareIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TafrighCompareOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    stop_run_api_tafrigh_jobs__job_id__stop_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                job_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TafrighStarted"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    gemini_models_api_tafrigh_models_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TafrighGeminiModels"];
+                };
+            };
+        };
+    };
+    list_runs_api_tafrigh_runs_get: {
+        parameters: {
+            query?: {
+                lecture_id?: number | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TafrighRunSummary"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_run_api_tafrigh_runs__run_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                run_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TafrighRunDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_run_api_tafrigh_runs__run_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                run_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    rename_run_api_tafrigh_runs__run_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                run_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TafrighRunPatch"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TafrighRunSummary"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    clone_run_api_tafrigh_runs__run_id__clone_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                run_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["TafrighCloneIn"] | null;
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TafrighRunSummary"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    export_run_api_tafrigh_runs__run_id__export_get: {
+        parameters: {
+            query?: {
+                format?: "md" | "html" | "json";
+            };
+            header?: never;
+            path: {
+                run_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TafrighExportedFile"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    review_api_tafrigh_runs__run_id__review_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                run_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TafrighReviewIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TafrighRunDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

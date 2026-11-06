@@ -5,6 +5,26 @@ State for recovery (session IDs, what to do if a child died) is in `orchestrator
 
 <!-- NEW REPORTS GO BELOW THIS LINE -->
 
+## 2026-11-07 00:05 — Correction 16b (bracket embedded Quran verses) done; phase 18 started
+
+Gate passed. Commit `8ae75a1` "rewrite phase 16: bracket embedded Quran verses" pushed. Per your choice, a Quran verse inside a
+hadith now gets its own ﴿…﴾ inside the hadith's brackets even with no commentary gap (with the commentary split on or off;
+not in standard script or for a finding switched to its source text, since source text has no verse marks).
+- **To revert:** in `engine/src/captions.ts`, section "verses inside a hadith", set `BRACKET_EMBEDDED_QURAN` to `false`, and
+  empty the list in `engine/src/golden-differences.ts` (also written in the phase 16 section of `LEARNING.md`).
+- Golden files were not regenerated. With the split off, every export still matches the old app byte for byte except one
+  finding in all golden inputs: Muslim 6889 in yt_iG2F8nymm1A (engine v3), in five files (SRT, VTT, ASS, Markdown, text):
+  old `«رب السماوات ورب الأرض رب العرش العظيم،»` -> new `«﴿رب السماوات ورب الأرض رب﴾ العرش العظيم،»`. The bracket closes early
+  because v3 marked only those five words as the verse (engine behaviour, not export). The change is an explicit list in
+  `engine/src/golden-differences.ts`; a test fails if a listed text is not found exactly once.
+- The web transcript had its own code that never drew embedded verses (not even in the commentary-gap case); it now marks the
+  verse words and draws the brackets with the same engine rule. New Vitest cases: `model.test.ts` and a new
+  `Transcript.test.tsx` comparing the rendered transcript with the text export.
+- `GLOSSARY.md` has a new term "Embedded verse"; the roadmap has a Changes entry with your words.
+- Tests (`scripts/test.sh` exit 0): old backend 152 (+1 deselected, known); server 308 (+6 skipped), lint clean; engine 259;
+  web Vitest 105; Playwright 8.
+- **Phase 18 (Tafrigh (server), Sonnet 5.5, high)** is running as `refactoring-step-18`.
+
 ## 2026-11-06 23:50 — Phase 17 (Web: editor and export) done; correction 16b started
 
 The phase 17 child finished its work and committed it (`5ce8362` "rewrite phase 17: Web: editor and export", pushed, phase

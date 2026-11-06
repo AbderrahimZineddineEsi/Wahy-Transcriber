@@ -107,3 +107,11 @@ Queue: phase 17 running -> 16b (bracket embedded Quran verses) -> 18 -> ... -> 2
 
 ## Running now: 16b bracket embedded Quran verses (Opus 5.5, high). Phase 17 done (5ce8362, final message lost to the usage limit).
 - Child: refactoring-step-16b, session ID e04698c3-9cea-4c30-a3d5-288d2ea8d995, log: /tmp/claude-1000/-home-zeno-Documents-work-new-projects-Wahy-Transcriber/428c450a-c0e2-4fc7-86dc-884ec1da7570/scratchpad/step-16b.json. After it: phase 18.
+
+## Running now: phase 18 Tafrigh (server) (Sonnet 5.5, high)
+- Child: refactoring-step-18, session ID cb67a47a-75c5-48a1-abb2-15adffb0f5c1, log: /tmp/claude-1000/-home-zeno-Documents-work-new-projects-Wahy-Transcriber/428c450a-c0e2-4fc7-86dc-884ec1da7570/scratchpad/step-18.json. 16b done (8ae75a1).
+- If it ends with QUESTION: use the decider-session rule above (Opus high), not the user.
+
+## 2026-11-07 00:28: phase 18 child died on a network error (API unreachable, ENOTFOUND) with uncommitted work in server/wahy/features/tafrigh/ etc. Network is back. Resuming the same session (log step-18b.json).
+
+## 2026-11-07 00:55: the resumed phase 18 child showed no activity for ~17 min (no tool, test or git process; roadmap already ticked in the working tree, nothing committed) so I killed it (probably a hung API call after the network drop) and resume the same session again (log step-18c.json).

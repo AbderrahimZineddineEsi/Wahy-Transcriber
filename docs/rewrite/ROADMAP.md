@@ -279,7 +279,7 @@ decisions and why). The problems being fixed are in the friction map: https://cl
 
 ### Tafrigh
 
-- [ ] **18. Tafrigh (server)**: Sonnet 5.5, high.
+- [x] **18. Tafrigh (server)**: Sonnet 5.5, high.
   - Move `backend/tafrigh/` into `features/tafrigh/` mostly unchanged; its adapters use `core/ai`. It runs as a job
     (modes, typo strategy, the 20-sentence test slice, estimate, pause, stop). Review actions survive a restart.
     Tafrigh runs are saved in `data/tafrigh_runs/` and can be saved, cloned and compared, with outline, render and
@@ -287,6 +287,11 @@ decisions and why). The problems being fixed are in the friction map: https://cl
   - Done when: the ported Tafrigh tests pass, including the restart test that fails today.
   - Feature check: run Tafrigh on the sample lecture's test slice, then compare two Tafrigh runs.
     Features: F-106 to F-123.
+  - Feature check result (2026-11-07): live on the sample lecture (12 sentences, so the 20-sentence slice covers it),
+    `gemini-3.5-flash-lite` on Google's free tier ($0): a windowed run (window 10, 2 requests) and a per-sentence run
+    (12 requests), both saved in `data/tafrigh_runs/`; compare listed the 2 sentences the runs label differently.
+    Offline tests: 89 Tafrigh tests, including the restart test; `scripts/test.sh` green.
+  - Notes: see the 2026-11-07 phase 18 entry under **Changes**.
   - Learn: moving a well-tested package without breaking it.
 
 - [ ] **19. Web: Tafrigh**: Sonnet 5.5, high.
@@ -485,3 +490,12 @@ Each entry: date, what changed, the user's words.
   files), listed by hand in `engine/src/golden-differences.ts` and asserted. The web transcript did not draw embedded
   verses at all before (not even in the gap case); it now does, through the same rule. User: "i think i want them
   bracketed, if i didn't like it i'll change it back".
+- **2026-11-07**: Phase 18 (done): `backend/tafrigh/` was *copied* to `server/wahy/features/tafrigh/` (the old app keeps
+  using the original until phase 24). Adapters call `core/ai`; a run is a job (`kind: tafrigh`, not resumable) and a
+  folder in `data/tafrigh_runs/<run_id>/` that review actions rewrite, so they survive a restart. Left out on purpose:
+  `master_verification.py` (F-123: the matrix script goes; "no run changes the original words" is now a test). Carried
+  across with their tests for phase 20 to decide: `training_store.py`, `exporters.py`, `pilot_tools.py`. Saving
+  sentences as Laya training examples (F-120) is phase 20: `laya_export.py` is ported but has no endpoint yet.
+  Re-detecting with a chosen engine before a run (F-109) is the existing detection job, started by the web app
+  (phase 19). The default processing mode is `windowed` (size 15), as the previous Tafrigh cost measurements
+  recommended. The OpenRouter key in `.env` is expired.

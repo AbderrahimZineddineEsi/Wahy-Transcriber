@@ -1,0 +1,782 @@
+"""
+Pipeline Orchestrator for Wahy-Transcriber AI Tafrigh Phase.
+Executes Stages 1 through 7 in both per_sentence and windowed processing modes.
+Ensures zero text mutation, full provenance tracking, and graceful fallback handling.
+"""
+
+from __future__ import annotations
+
+import time
+import uuid
+from collections.abc import Callable
+from typing import Any
+
+from wahy.core.ai.types import AiError, redact
+from wahy.core.jobs import JobCancelled, JobInterrupted
+
+from .adapters.base import BaseAdapter
+from .adapters.gemini_adapter import GeminiAdapter
+from .adapters.jev_adapter import JEVAdapter
+from .adapters.laya_adapter import LayaAdapter
+from .edit_resolver import resolve_model_edits
+from .matn_aligner import MatnConfig, SequentialMatnAligner
+from .models import (
+    LectureSpan,
+    OutlineState,
+    StructuralDecision,
+    StructuralTag,
+    TranscriptSegment,
+)
+from .schemas import (
+    GeminiWindowItemSchema,
+    JEVRequestConfig,
+    PipelineConfig,
+)
+from .segmenter import SegmentationConfig, segment_transcript
+from .unit_of_work import UnitOfWork
+from .validators import (
+    validate_and_apply_edits,
+    validate_and_apply_splits,
+    validate_structural_transition,
+)
+
+
+class TafrighModelError(RuntimeError):
+    """The model backend is unusable (bad key, unknown model, repeated failures): stop the run with a clear reason."""
+
+
+class TafrighStop(Exception):
+    """Raised from inside a model wait (through `Call.check`) when the user pressed stop: the run ends now and keeps
+    the sentences that are finished. (Cancel is `JobCancelled` instead, which keeps nothing.)"""
+
+
+MAX_CONSECUTIVE_MODEL_FAILURES = 4
+
+
+class PipelineResult:
+    def __init__(
+        self,
+        segments: list[TranscriptSegment],
+        outline_state: OutlineState,
+        lecture_spans: list[LectureSpan],
+        run_manifest: dict[str, Any],
+        request_logs: list[dict[str, Any]],
+    ) -> None:
+        self.segments = segments
+        self.outline_state = outline_state
+        self.lecture_spans = lecture_spans
+        self.run_manifest = run_manifest
+        self.request_logs = request_logs
+
+
+class TafrighPipeline:
+    """Orchestrates Stages 1-7 for processing Arabic Islamic lecture transcripts."""
+
+    def __init__(
+        self,
+        pipeline_config: PipelineConfig | None = None,
+        matn_config: MatnConfig | None = None,
+        adapters: dict[str, BaseAdapter] | None = None,
+    ) -> None:
+        self.config = pipeline_config or PipelineConfig()
+        self.matn_config = matn_config or MatnConfig()
+        self.adapters = adapters or {}
+        self.segmentation_config: SegmentationConfig | None = None
+        self._init_default_adapters()
+        # on_progress(done, total, message, details) and control() -> "run" | "pause" | "cancel" are set by the caller
+        self.on_progress: Callable[..., None] | None = None
+        self.control: Callable[[], str] | None = None
+        self._fail_streak = 0
+        self._finalized: set = set()
+        self._total_initial = 0
+        self._stop_id: str | None = None
+        self._cancelled = False
+        self._paused_sec = 0.0
+        self._started = 0.0
+        self._stats: dict[str, Any] = {}
+        self._current: dict[str, Any] = {}
+        self._inflight = 0          # target sentences of the request being waited on (progress bar's striped part)
+        self._window_no = 0
+
+    def _init_default_adapters(self) -> None:
+        if "gemini" not in self.adapters:
+            self.adapters["gemini"] = GeminiAdapter(typo_strategy=self.config.typo_strategy)
+        if "jev" not in self.adapters:
+            cfg = JEVRequestConfig(
+                jev_layout=self.config.jev_layout,
+                execution_order=self.config.jev_execution_order,
+            )
+            self.adapters["jev"] = JEVAdapter(config=cfg)
+        if "laya" not in self.adapters:
+            cfg = JEVRequestConfig(
+                jev_layout=self.config.jev_layout,
+                execution_order=self.config.jev_execution_order,
+            )
+            self.adapters["laya"] = LayaAdapter(config=cfg)
+
+    @staticmethod
+    def _quote_ranges(seg: TranscriptSegment) -> list[tuple[int, int]]:
+        """Detected quotations inside this sentence, as char ranges relative to it."""
+        base, n = seg.source_pos.char_start, len(seg.original_text)
+        out = []
+        for d in seg.detection_signals:
+            a, b = max(0, int(d.get("start", 0)) - base), min(n, int(d.get("end", 0)) - base)
+            if a < b:
+                out.append((a, b))
+        return out
+
+    def _apply_typos(self, seg: TranscriptSegment, raw_edits: list[Any], source: str) -> None:
+        """Verify model edits (word-indexed, quoted original, never inside a quotation), then version them."""
+        accepted, rejected = resolve_model_edits(seg, raw_edits, protected=self._quote_ranges(seg))
+        seg.trace["edits"] = {
+            "source": source,
+            "proposed": [e if isinstance(e, dict) else getattr(e, "model_dump", lambda: str(e))() for e in raw_edits],
+            "accepted": [e.model_dump() | {"original": seg.original_text[e.start:e.end]} for e in accepted],
+            "rejected": rejected,
+        }
+        # a fix inside a detected quotation is not a problem: the quotation is shown from its source anyway
+        # nor is a "fix" that changes nothing
+        if any(r.get("why") not in ("inside_detected_quotation", "no_change") for r in rejected):
+            seg.review_flags.append("EDIT_REJECTED")
+        if accepted:
+            res = validate_and_apply_edits(seg, accepted, max_change_ratio=self.config.max_edit_change_ratio)
+            if getattr(res, "is_valid", False):
+                self._stats["edits"] = self._stats.get("edits", 0) + len(accepted)
+            else:
+                seg.trace["edits"]["validation_error"] = getattr(res, "error", "")
+
+    @staticmethod
+    def _model_input(seg: TranscriptSegment, uow: UnitOfWork,
+                     before: list[TranscriptSegment], after: list[TranscriptSegment]) -> dict[str, Any]:
+        """What the structural classifier saw for this sentence, kept for Laya fine-tuning exports."""
+        state: dict[str, Any] = {
+            "target_text": seg.original_text,
+            "context_before": [s.original_text for s in before],
+            "context_after": [s.original_text for s in after],
+            "partial_toc": uow.partial_toc,
+        }
+        base, n = seg.source_pos.char_start, len(seg.original_text)
+        quotes = [{"type": d.get("type"), "ref": d.get("ref"),
+                   "text": seg.original_text[max(0, int(d.get("start", 0)) - base):min(n, max(0, int(d.get("end", 0)) - base))]}
+                  for d in seg.detection_signals if d.get("ref")]
+        if quotes:
+            state["quotations_in_target"] = quotes
+        return {"state": state, "allowed_choices": [dict(c) for c in uow.allowed_choices]}
+
+    def _set_current(self, seg: TranscriptSegment, purpose: str) -> None:
+        self._current = {"id": seg.id, "text": seg.original_text.strip()[:160], "purpose": purpose}
+
+    def _adapter_label(self, key: str, adapter: Any) -> str:
+        if key == "jev":
+            return f"jev:{getattr(adapter, 'model', '')}"
+        if key == "laya":
+            return "laya (local)"
+        return getattr(adapter, "provider_label", key)
+
+    def _usage(self) -> dict[str, tuple[str, int, float, int, int]]:
+        out = {}
+        for key, a in self.adapters.items():
+            out[key] = (self._adapter_label(key, a), int(getattr(a, "request_count", 0) or 0),
+                        float(getattr(a, "total_cost_usd", 0.0) or 0.0),
+                        int(getattr(a, "input_tokens_total", getattr(a, "total_input_tokens", 0)) or 0),
+                        int(getattr(a, "output_tokens_total", getattr(a, "total_output_tokens", 0)) or 0))
+        return out
+
+    def _account(self, purpose: str, before: dict[str, tuple[str, int, float, int, int]]) -> None:
+        """Attribute what this call cost to (purpose, model): the results show the classifier and any helper model
+        (splits, typo fixes, retries) on separate lines, with the cost the provider reported."""
+        group = purpose.replace("_retry", "")
+        for key, (label, req, cost, tin, tout) in self._usage().items():
+            b = before.get(key, (label, 0, 0.0, 0, 0))
+            if req == b[1] and cost == b[2] and tin == b[3]:
+                continue
+            row = self._stats.setdefault("breakdown", {}).setdefault(f"{group}|{label}", {
+                "purpose": group, "model": label, "requests": 0, "retries": 0, "cost_usd": 0.0,
+                "input_tokens": 0, "output_tokens": 0})
+            row["requests"] += req - b[1]
+            row["retries"] += (req - b[1]) if purpose.endswith("_retry") else 0
+            row["cost_usd"] = round(row["cost_usd"] + cost - b[2], 8)
+            row["input_tokens"] += tin - b[3]
+            row["output_tokens"] += tout - b[4]
+
+    def _cost_breakdown(self) -> list[dict[str, Any]]:
+        return sorted(self._stats.get("breakdown", {}).values(), key=lambda r: -r["requests"])
+
+    def _model_call(self, seg_ids: list[str], purpose: str, fn: Callable[[], Any], request_logs: list[dict[str, Any]]) -> Any:
+        """Run one model call. Config-type failures (bad key / unknown model) abort the run; transient ones
+        are logged and returned as None so the caller can flag the segment and carry on."""
+        t0 = time.perf_counter()
+        self._current["purpose"] = purpose
+        before = self._usage()
+        try:
+            try:
+                out = fn()
+            finally:
+                self._account(purpose, before)
+                # real requests: a JEV sentence is 3 in parallel, a cut-off reply and its retry are 2
+                real = sum(u[1] - before.get(k, u)[1] for k, u in self._usage().items())
+                self._stats["requests"] = self._stats.get("requests", 0) + max(1, real)
+            self._fail_streak = 0
+            if not purpose.startswith("classify"):  # classify calls are logged by their caller with more detail
+                request_logs.append({
+                    "request_id": f"req_{uuid.uuid4().hex[:8]}", "purpose": purpose, "unit_of_work_ids": seg_ids,
+                    "latency_ms": round((time.perf_counter() - t0) * 1000, 2),
+                    "provider": getattr(self.adapters.get("gemini"), "provider_label", "gemini"),
+                })
+            return out
+        except (TafrighStop, JobCancelled, JobInterrupted):
+            raise  # the user stopped or cancelled, or the server is shutting down: not a model failure
+        except AiError as exc:
+            request_logs.append({
+                "request_id": f"req_{uuid.uuid4().hex[:8]}", "purpose": purpose, "unit_of_work_ids": seg_ids,
+                "latency_ms": round((time.perf_counter() - t0) * 1000, 2), "error": str(exc), "http_status": exc.status,
+            })
+            self._stats["errors"] = self._stats.get("errors", 0) + 1
+            if exc.fatal:
+                raise TafrighModelError(f"{exc}") from exc
+            if exc.status in (400, 401, 402, 403, 404):
+                raise TafrighModelError(f"رفض مزود النموذج الطلب (HTTP {exc.status}): {exc}") from exc
+            self._fail_streak += 1
+        except Exception as exc:  # parse / validation failures from the adapter
+            request_logs.append({
+                "request_id": f"req_{uuid.uuid4().hex[:8]}", "purpose": purpose, "unit_of_work_ids": seg_ids,
+                "latency_ms": round((time.perf_counter() - t0) * 1000, 2), "error": redact(exc),
+            })
+            self._stats["errors"] = self._stats.get("errors", 0) + 1
+            self._fail_streak += 1
+        if self._fail_streak >= MAX_CONSECUTIVE_MODEL_FAILURES:
+            raise TafrighModelError(f"فشلت {self._fail_streak} طلبات متتالية إلى النموذج؛ تم إيقاف التفريغ. آخر خطأ مسجل في سجل الطلبات.")
+        return None
+
+    def _allowed_choices(self, outline_state: OutlineState, **kw: Any) -> list[dict[str, Any]]:
+        """Structural choices for the model. Without a matn there is nothing to read as «المتن», so that option is withheld."""
+        choices = outline_state.get_allowed_structural_choices(**kw)
+        has_matn = self.matn_config.mode != "no_matn" and bool(self.matn_config.raw_matn_text or self.matn_config.matn_id)
+        if not has_matn:
+            choices = [c for c in choices if c.get("tag") != StructuralTag.MATN_SECTION.value]
+        return choices
+
+    def _windowed(self) -> bool:
+        return self.config.processing_mode == "windowed" and self.config.model_candidate == "gemini_all"
+
+    def _requests_per_sentence(self) -> int:
+        """Requests one sentence costs in per-sentence mode (JEV asks its three questions separately in parallel)."""
+        if self.config.model_candidate == "jev_hybrid":
+            cfg = getattr(self.adapters.get("jev"), "config", None)
+            if cfg is not None and cfg.jev_layout == "independent_questions" and cfg.execution_order == "parallel":
+                return 3
+        return 1
+
+    def _details(self, done: int, total: int) -> dict[str, Any]:
+        calls = sum(int(getattr(a, "request_count", 0) or 0) for a in self.adapters.values())
+        cost = sum(float(getattr(a, "total_cost_usd", 0.0) or 0.0) for a in self.adapters.values())
+        elapsed = max(0.0, time.time() - self._started - self._paused_sec)
+        per = elapsed / done if done else None
+        sent = self._stats.get("requests", 0)
+        left = max(0, total - done - self._inflight)
+        if self._windowed():
+            w = max(1, self.config.window_size)
+            planned = sent + (1 if self._inflight else 0) + -(-left // w)
+        else:
+            each = self._requests_per_sentence()
+            planned = sent + (each if self._inflight else 0) + left * each
+        return {
+            "done": done, "total": total,
+            "elapsed_sec": round(elapsed, 1),
+            "sec_per_sentence": round(per, 2) if per else None,
+            "eta_sec": round(per * (total - done), 1) if per else None,
+            "model_calls": calls, "cost_usd": round(cost, 6),
+            # requests: sent so far (including failed ones) and the expected total; splits, typo fixes and
+            # sentences a window left out add requests as they come up
+            "requests_sent": sent, "requests_planned": planned,
+            "mode": "windowed" if self._windowed() else "per_sentence", "window_size": self.config.window_size,
+            "window_no": self._window_no,
+            "inflight": {"from": done, "to": min(total, done + self._inflight)} if self._inflight else None,
+            "cost_breakdown": self._cost_breakdown(),
+            "errors": self._stats.get("errors", 0), "splits": self._stats.get("splits", 0),
+            "edits": self._stats.get("edits", 0), "tags": dict(self._stats.get("tags", {})),
+            "current": dict(self._current), "last_tag": self._stats.get("last_tag"),
+        }
+
+    def _report(self, msg: str = "", paused: bool = False) -> None:
+        """Progress = segments finalized so far over the target count. Only ever grows, even when sentences
+        are split or a window falls back to per-sentence processing (those used to report their own local numbers)."""
+        if not self.on_progress:
+            return
+        done = len(self._finalized)
+        total = max(self._total_initial, done)
+        info = self._details(done, total)
+        info["paused"] = paused
+        self.on_progress(done, total, msg.format(done=done, total=total) if msg else "", info)
+
+    def _checkpoint(self) -> bool:
+        """Honour pause / stop / cancel between sentences. Returns False when the run must stop."""
+        if not self.control:
+            return not self._cancelled
+        state = self.control()
+        if state == "pause":
+            t0 = time.time()
+            while state == "pause":
+                self._report("متوقف مؤقتاً — {done} من {total}", paused=True)
+                time.sleep(0.4)
+                state = self.control()
+            self._paused_sec += time.time() - t0
+        if state in ("cancel", "stop"):
+            self._cancelled = True
+        return not self._cancelled
+
+    @staticmethod
+    def _repair_decision(dec: StructuralDecision, outline_state: OutlineState) -> StructuralDecision:
+        """Fix what the outline already determines instead of throwing the answer away. A heading's parent is the open
+        heading one level up (a chat model cannot know segment ids, so its "parent" was usually wrong and the heading
+        fell back to a paragraph); a level deeper than the open spine allows is pulled up; a non-heading carries no
+        level / parent; nothing before it -> no continuation."""
+        if dec.tag == StructuralTag.HEADING:
+            deepest = max(outline_state.active_spine.keys(), default=0)
+            level = max(1, min(int(dec.level or 1), deepest + 1))
+            parent = outline_state.active_spine[level - 1].segment_id if level > 1 else None
+            return dec.model_copy(update={"level": level, "parent_id": parent})
+        if dec.tag == StructuralTag.CONTINUATION and outline_state.last_segment_tag is None:
+            dec = dec.model_copy(update={"tag": StructuralTag.PARAGRAPH})
+        if dec.level is not None or dec.parent_id is not None:
+            dec = dec.model_copy(update={"level": None, "parent_id": None})
+        return dec
+
+    def _record(self, seg: TranscriptSegment, outline_state: OutlineState, dec: StructuralDecision) -> None:
+        outline_state.record_decision(seg.id, seg.original_text, dec)
+        self._finalized.add(seg.id)
+        tag = dec.tag.value if hasattr(dec.tag, "value") else str(dec.tag)
+        tags = self._stats.setdefault("tags", {})
+        tags[tag] = tags.get(tag, 0) + 1
+        self._stats["last_tag"] = tag
+
+    def get_active_adapter(self) -> BaseAdapter:
+        candidate = self.config.model_candidate
+        if candidate == "jev_hybrid":
+            return self.adapters["jev"]
+        elif candidate == "laya_hybrid":
+            return self.adapters["laya"]
+        return self.adapters["gemini"]
+
+    def run(self, *args: Any, **kwargs: Any) -> PipelineResult:
+        return self._run_locked(*args, **kwargs)
+
+    def _run_locked(
+        self,
+        raw_text: str | None = None,
+        initial_segments: list[TranscriptSegment] | None = None,
+        asr_words: list[dict[str, Any]] | None = None,
+        detection_spans: list[dict[str, Any]] | None = None,
+        target_range: tuple[int, int] | None = None,
+    ) -> PipelineResult:
+        """target_range = (start, end) sentence indices (end exclusive): only those are classified; their
+        neighbours outside the range are still shown to the model as read-only context."""
+        started_at = time.time()
+        request_logs: list[dict[str, Any]] = []
+        self._fail_streak = 0
+
+        # Stage 1: Segmentation
+        if initial_segments is not None:
+            segments = initial_segments
+        elif raw_text is not None:
+            segments = segment_transcript(
+                raw_text=raw_text,
+                asr_words=asr_words,
+                detection_spans=detection_spans,
+                use_detection_boundaries=self.config.use_detection_boundaries,
+                config=self.segmentation_config,
+            )
+        else:
+            raise ValueError("Either raw_text or initial_segments must be provided.")
+
+        self._finalized = set()
+        self._fail_streak = 0
+        self._cancelled = False
+        self._paused_sec = 0.0
+        self._started = started_at
+        self._stats = {}
+        start, end = 0, len(segments)
+        if target_range:
+            start = max(0, min(len(segments), int(target_range[0])))
+            end = max(start, min(len(segments), int(target_range[1])))
+        self._stop_id = segments[end].id if end < len(segments) else None
+        self._total_initial = end - start
+
+        # Stage 2: Matn Alignment
+        matn_aligner = SequentialMatnAligner(self.matn_config)
+        for seg in segments:
+            matn_aligner.align_segment(seg)
+
+        # Stage 3, 4, 5: Classification, Splitting, and Typo Correction
+        outline_state = OutlineState()
+        # segments is mutated in place by both processing modes, so a stop (TafrighStop) still finds what is done
+        try:
+            if self._windowed():
+                segments = self._process_windowed(segments, outline_state, request_logs, start_index=start)
+            else:
+                segments = self._process_per_sentence(segments, outline_state, request_logs, start_index=start)
+        except TafrighStop:
+            self._cancelled = True   # `segments` is edited in place, so it holds everything finished so far
+        self._inflight = 0
+        self._report("اكتملت {done} جملة — جاري تجهيز النتيجة")
+        # only what was actually classified is returned (range runs, cancelled runs)
+        segments = [s for s in segments if s.id in self._finalized]
+        return self._build_result(segments, outline_state, request_logs, start, end, started_at)
+
+    def _build_result(
+        self,
+        segments: list[TranscriptSegment],
+        outline_state: OutlineState,
+        request_logs: list[dict[str, Any]],
+        start: int,
+        end: int,
+        started_at: float,
+    ) -> PipelineResult:
+        # Build lecture spans
+        lecture_spans = self._build_lecture_spans(segments)
+
+        run_manifest = {
+            "run_id": f"run_{uuid.uuid4().hex[:12]}",
+            "processing_mode": self.config.processing_mode,
+            "window_size": self.config.window_size,
+            "model_candidate": self.config.model_candidate,
+            "jev_layout": self.config.jev_layout,
+            "jev_execution_order": self.config.jev_execution_order,
+            "typo_strategy": self.config.typo_strategy,
+            "use_detection_boundaries": self.config.use_detection_boundaries,
+            "num_segments": len(segments),
+            "target_range": [start, end],
+            "cancelled": self._cancelled,
+            "adapter_mode": "live" if (getattr(self.get_active_adapter(), "is_live", None)
+                                       or getattr(self.get_active_adapter(), "api_key", None)) else "offline_heuristic",
+            "model_name": getattr(self.adapters.get("gemini"), "model_name", None),
+            "gemini_route": getattr(self.adapters.get("gemini"), "provider_label", None),
+            "wall_clock_seconds": round(time.time() - started_at, 2),
+            # what the run really cost, per purpose and model (provider-reported cost; tokens for direct Gemini)
+            "cost_breakdown": self._cost_breakdown(),
+            "requests_sent": self._stats.get("requests", 0),
+            "total_cost_usd": round(sum(r["cost_usd"] for r in self._cost_breakdown()), 8),
+            "total_input_tokens": sum(r["input_tokens"] for r in self._cost_breakdown()),
+            "total_output_tokens": sum(r["output_tokens"] for r in self._cost_breakdown()),
+        }
+
+        return PipelineResult(
+            segments=segments,
+            outline_state=outline_state,
+            lecture_spans=lecture_spans,
+            run_manifest=run_manifest,
+            request_logs=request_logs,
+        )
+
+    _UNSET = object()
+
+    def _process_per_sentence(
+        self,
+        segments: list[TranscriptSegment],
+        outline_state: OutlineState,
+        request_logs: list[dict[str, Any]],
+        start_index: int = 0,
+        stop_id: Any = _UNSET,
+        presets: dict[str, GeminiWindowItemSchema] | None = None,
+    ) -> list[TranscriptSegment]:
+        """Classify segments[start_index:] one by one until the segment `stop_id` (default: the end of the run's range).
+        `segments` is the whole lecture, edited in place (splits): neighbours are always available as context.
+        `presets` = decisions already answered by a window request; a sentence without one gets its own request."""
+        adapter = self.get_active_adapter()
+        gemini_adapter: GeminiAdapter = self.adapters["gemini"]  # for dedicated splits/edits if hybrid
+        if stop_id is TafrighPipeline._UNSET:
+            stop_id = self._stop_id
+
+        i = start_index
+        while i < len(segments) and segments[i].id != stop_id:
+            if not self._checkpoint():
+                break
+            seg = segments[i]
+            self._set_current(seg, "classify")
+            c_before = segments[max(0, i - self.config.context_before) : i]
+            c_after = segments[i + 1 : min(len(segments), i + 1 + self.config.context_after)]
+
+            uow = UnitOfWork(
+                uow_id=f"uow_{seg.id}",
+                target_segments=[seg],
+                context_before=c_before,
+                context_after=c_after,
+                partial_toc=outline_state.get_partial_toc(),
+                current_position_index=i,
+                last_confirmed_heading=(
+                    outline_state.headings[-1] if outline_state.headings else None
+                ),
+                allowed_choices=self._allowed_choices(
+                    outline_state, include_split_option=(self.config.jev_layout == "split_as_tag_option")
+                ),
+                previous_tag=outline_state.last_segment_tag.value if outline_state.last_segment_tag else None,
+                in_list=outline_state.in_list_context,
+            )
+
+            preset = presets.pop(seg.id, None) if presets else None
+            self._inflight = 0 if preset is not None else 1
+            self._report("جملة {done} من {total}")
+            if preset is not None:
+                decisions = [preset]
+                latency = float((preset.trace or {}).get("latency_ms", 0.0))
+            else:
+                t0 = time.perf_counter()
+                calls0, cost0 = getattr(adapter, "request_count", 0), getattr(adapter, "total_cost_usd", 0.0)
+                decisions = self._model_call([seg.id], "classify", lambda: adapter.classify_uow(uow), request_logs)
+                latency = (time.perf_counter() - t0) * 1000
+                if decisions is None:
+                    seg.review_flags.append("MODEL_ERROR")
+                    decisions = []
+                request_logs.append({
+                    "request_id": f"req_{uuid.uuid4().hex[:8]}",
+                    "purpose": "classify",
+                    "unit_of_work_ids": [seg.id],
+                    "latency_ms": round(latency, 2),
+                    "fallback_triggered": False,
+                    "model_calls": getattr(adapter, "request_count", 0) - calls0,
+                    "cost_estimate_usd": round(getattr(adapter, "total_cost_usd", 0.0) - cost0, 8),
+                })
+            self._inflight = 0
+
+            decision = decisions[0] if decisions else GeminiWindowItemSchema(id=seg.id, tag=StructuralTag.PARAGRAPH)
+            seg.trace["decision"] = dict(decision.trace or {}, latency_ms=round(latency, 1))
+            seg.trace["input"] = self._model_input(seg, uow, c_before, c_after)
+
+            # A piece that came out of a split is never split again (this used to recurse until single words),
+            # and very short sentences have nothing to split.
+            if decision.needsSplitting and ("FROM_SPLIT" in seg.review_flags or len(seg.tokens) < 6):
+                seg.trace["split_outcome"] = {"status": "ignored",
+                                              "why": "from_split" if "FROM_SPLIT" in seg.review_flags else "too_short"}
+                decision.needsSplitting = False
+                decision.tag = decision.tag or StructuralTag.PARAGRAPH
+
+            # Handle Splitting
+            if decision.needsSplitting:
+                split_points = decision.splitPoints
+                points_by = "model_decision"
+                if not split_points:
+                    points_by = getattr(gemini_adapter, "provider_label", "gemini")
+                    split_points = self._model_call([seg.id], "split", lambda: gemini_adapter.get_split_points(seg, uow), request_logs) or []
+
+                # never cut inside a detected quotation
+                q = self._quote_ranges(seg)
+                proposed = list(split_points)
+                split_points = [p for p in split_points
+                                if 0 < p < len(seg.tokens) and not any(a < seg.tokens[p].char_start < b for a, b in q)]
+                seg.trace["split"] = {"proposed": proposed, "used": split_points,
+                                      "source": "model_decision" if decision.splitPoints else "gemini_split_request",
+                                      "points_by": points_by}
+                val_split = validate_and_apply_splits(seg, split_points) if split_points else None
+                if val_split is not None and val_split.is_valid and val_split.subsegments:
+                    # Replace seg with subsegments and re-process subsegments in place
+                    seg.trace["split_outcome"] = {"status": "applied", "pieces": len(val_split.subsegments)}
+                    for j, sub in enumerate(val_split.subsegments):
+                        sub.review_flags.append("FROM_SPLIT")
+                        a, b = sub.source_pos.char_start, sub.source_pos.char_end
+                        sub.detection_signals = [d for d in seg.detection_signals if int(d.get("start", 0)) < b and a < int(d.get("end", 0))]
+                        sub.trace["split_from"] = {"id": seg.id, "text": seg.original_text.strip(), "split": seg.trace["split"],
+                                                   "decision": seg.trace.get("decision"), "input": seg.trace.get("input"),
+                                                   "piece": j + 1, "pieces": len(val_split.subsegments)}
+                    segments[i : i + 1] = val_split.subsegments
+                    self._total_initial += len(val_split.subsegments) - 1
+                    self._stats["splits"] = self._stats.get("splits", 0) + 1
+                    continue  # Do not advance i; next iteration processes first subsegment
+                else:
+                    seg.trace["split_outcome"] = {
+                        "status": "failed",
+                        # no cut points at all / every cut fell inside a detected quotation / cuts rejected by validation
+                        "why": "no_points" if not proposed else ("inside_quote" if not split_points else "invalid"),
+                        "proposed": proposed,
+                    }
+                    if val_split is None:
+                        seg.review_flags.append("SPLIT_VALIDATION_FAILED")
+                    # validate_and_apply_splits already added SPLIT_VALIDATION_FAILED
+                    # Splitting failed: keep the classifier's own tag for the whole sentence (paragraph if it gave none)
+                    decision.tag = decision.tag or StructuralTag.PARAGRAPH
+                    decision.needsSplitting = False
+
+            struct_dec = self._repair_decision(StructuralDecision(
+                tag=decision.tag or StructuralTag.PARAGRAPH,
+                level=decision.level,
+                parent_id=decision.parent,
+                comment_kind=decision.commentKind,
+                confidence=decision.confidence,
+            ), outline_state)
+
+            val_trans = validate_structural_transition(struct_dec, outline_state)
+            if not val_trans.is_valid:
+                # Retry fallback to paragraph
+                struct_dec = StructuralDecision(tag=StructuralTag.PARAGRAPH)
+                seg.review_flags.append("INVALID_TRANSITION_FALLBACK")
+
+            seg.proposed_decision = struct_dec
+            seg.final_decision = struct_dec
+            self._record(seg, outline_state, struct_dec)
+
+            # Handle Typo Correction
+            if self.config.typo_strategy != "off" and (decision.hasTypo or self.config.typo_strategy == "always_correct"):
+                edits, source = decision.edits, "model_decision"
+                if not edits and decision.hasTypo:
+                    edits, source = self._model_call([seg.id], "correct", lambda: gemini_adapter.get_typo_edits(seg, uow), request_logs) or [], "gemini_correction_request"
+                if edits:
+                    self._apply_typos(seg, edits, source)
+
+            i += 1
+
+        return segments
+
+    @staticmethod
+    def _match_window_decisions(decisions: list[GeminiWindowItemSchema],
+                                target_ids: list[str]) -> dict[str, GeminiWindowItemSchema]:
+        """Window answers by sentence id. The order does not matter; a reply with exactly one decision per target but
+        other ids (some models renumber them "1", "2"…) is matched by position."""
+        wanted = set(target_ids)
+        by_id: dict[str, GeminiWindowItemSchema] = {}
+        for d in decisions:
+            if d.id in wanted and d.id not in by_id:
+                by_id[d.id] = d
+        if not by_id and len(decisions) == len(target_ids):
+            for tid, d in zip(target_ids, decisions, strict=False):
+                d.id = tid
+                by_id[tid] = d
+        return by_id
+
+    def _process_windowed(
+        self,
+        segments: list[TranscriptSegment],
+        outline_state: OutlineState,
+        request_logs: list[dict[str, Any]],
+        start_index: int = 0,
+    ) -> list[TranscriptSegment]:
+        """One request classifies a window of sentences; then the sentence-by-sentence loop applies those answers in
+        order (validation, splits, typo fixes, context for any extra request all work exactly as in per-sentence mode).
+        A sentence the reply left out gets its own request; a window whose reply is unusable is redone sentence by
+        sentence. (Before: any missing id, a different order or one invalid field re-sent the whole window and then
+        re-did all of it one by one, and a sentence to split was re-asked without any context.)"""
+        gemini_adapter: GeminiAdapter = self.adapters["gemini"]
+        w_size = max(1, self.config.window_size)
+
+        def index_of(seg_id: str | None) -> int:
+            if seg_id is None:
+                return len(segments)
+            ids = [x.id for x in segments]
+            return ids.index(seg_id) if seg_id in ids else len(segments)
+
+        i = start_index
+        self._window_no = 0
+        while i < index_of(self._stop_id):
+            if not self._checkpoint():
+                break
+            window_slice = segments[i : min(index_of(self._stop_id), i + w_size)]
+            next_id = segments[i + len(window_slice)].id if i + len(window_slice) < len(segments) else None
+            self._window_no += 1
+            self._set_current(window_slice[0], "classify_window")
+            c_before = segments[max(0, i - self.config.context_before) : i]
+            c_after = segments[i + len(window_slice) : min(len(segments), i + len(window_slice) + self.config.context_after)]
+
+            uow = UnitOfWork(
+                uow_id=f"uow_win_{i:04d}",
+                target_segments=window_slice,
+                context_before=c_before,
+                context_after=c_after,
+                partial_toc=outline_state.get_partial_toc(),
+                current_position_index=i,
+                last_confirmed_heading=(
+                    outline_state.headings[-1] if outline_state.headings else None
+                ),
+                allowed_choices=self._allowed_choices(outline_state),
+                previous_tag=outline_state.last_segment_tag.value if outline_state.last_segment_tag else None,
+                in_list=outline_state.in_list_context,
+            )
+
+            target_ids = [s.id for s in window_slice]
+            first, last = len(self._finalized) + 1, len(self._finalized) + len(window_slice)
+            self._inflight = len(window_slice)
+            self._report(f"النافذة {self._window_no}: الجمل {first}–{last} في طلب واحد")
+            t0 = time.perf_counter()
+            decisions = self._model_call(target_ids, "classify_window", lambda: gemini_adapter.classify_uow(uow), request_logs)
+            if decisions is None:
+                # the adapter already retried transport errors; this is an unreadable reply: ask once more
+                decisions = self._model_call(target_ids, "classify_window_retry", lambda: gemini_adapter.classify_uow(uow), request_logs)
+            latency = (time.perf_counter() - t0) * 1000
+            self._inflight = 0
+
+            by_id = self._match_window_decisions(decisions or [], target_ids)
+            missing = [sid for sid in target_ids if sid not in by_id]
+            request_logs.append({
+                "request_id": f"req_{uuid.uuid4().hex[:8]}",
+                "purpose": "classify_window",
+                "unit_of_work_ids": target_ids,
+                "latency_ms": round(latency, 2),
+                "answered": len(by_id),
+                "missing_ids": missing,
+                "fallback_triggered": bool(missing),
+            })
+            for s in window_slice:
+                if s.id in by_id:
+                    by_id[s.id].trace = dict(by_id[s.id].trace or {}, window=uow.uow_id,
+                                             window_size=len(window_slice), latency_ms=round(latency / len(window_slice), 1))
+                else:
+                    s.review_flags.append("WINDOW_FALLBACK_USED")
+
+            self._process_per_sentence(segments, outline_state, request_logs, start_index=i, stop_id=next_id, presets=by_id)
+            if self._cancelled:
+                break
+            i = index_of(next_id)
+
+        return segments
+
+
+    def _build_lecture_spans(self, segments: list[TranscriptSegment]) -> list[LectureSpan]:
+        """Groups contiguous segments into matn vs sharh lecture spans."""
+        spans: list[LectureSpan] = []
+        if not segments:
+            return spans
+
+        current_type: str | None = None
+        current_ids: list[str] = []
+        current_texts: list[str] = []
+        current_canonical: str | None = None
+        has_variant: bool = False
+
+        for seg in segments:
+            tag = seg.final_decision.tag if seg.final_decision else StructuralTag.PARAGRAPH
+            stype = "matn" if tag == StructuralTag.MATN_SECTION else "sharh"
+
+            if stype != current_type and current_ids:
+                spans.append(
+                    LectureSpan(
+                        span_id=f"span_{len(spans):04d}",
+                        span_type=current_type,  # type: ignore
+                        segment_ids=current_ids,
+                        spoken_text=" ".join(current_texts),
+                        canonical_matn_text=current_canonical,
+                        has_variant_wording=has_variant,
+                    )
+                )
+                current_ids = []
+                current_texts = []
+                current_canonical = None
+                has_variant = False
+
+            current_type = stype
+            current_ids.append(seg.id)
+            current_texts.append(seg.active_text)
+            if seg.matn_evidence and seg.matn_evidence.canonical_text:
+                current_canonical = seg.matn_evidence.canonical_text
+                if seg.matn_evidence.has_variant_wording:
+                    has_variant = True
+
+        if current_ids and current_type:
+            spans.append(
+                LectureSpan(
+                    span_id=f"span_{len(spans):04d}",
+                    span_type=current_type,  # type: ignore
+                    segment_ids=current_ids,
+                    spoken_text=" ".join(current_texts),
+                    canonical_matn_text=current_canonical,
+                    has_variant_wording=has_variant,
+                )
+            )
+
+        return spans
