@@ -20,7 +20,7 @@ see or set is listed once, with an ID that never changes and is never reused.
   app on a scratch data folder with the real models on this machine's GPU (local Whisper small and turbo, Laya) and no
   paid call: a wrong Groq key and a wrong OpenRouter key were used on purpose where a check needs a refused request.
   134 of 137 features and the 3 new features in the rewrite (N-007, N-009, N-020) are ticked; F-127, F-130 and F-134
-  are not, each with its reason.
+  are not, each listed with the user's agreement and its reason.
 - **Words** follow `GLOSSARY.md`: a *finding* is what the engine proposes, a *verdict* is a model's answer, a *label* is
   training truth, a *lecture version* is what the old code calls a "run" of a lecture.
 
@@ -924,7 +924,9 @@ see or set is listed once, with an ID that never changes and is never reused.
   - suggest: replaced — `scripts/dev.sh` now, the new `run.sh` in phase 24.
   - check: fresh clone, `./run.sh`; the app opens and the sample lecture works.
   - user: "agree with all" (as suggested)
-  - not ticked (phase 23): phase 24's work (the new `run.sh`); its check (fresh clone, `./run.sh`) runs there. Today `scripts/dev.sh` starts the new app.
+  - not ticked, listed with the user's agreement (phase 23, 2026-11-07): phase 24's work (the new `run.sh`); its check
+    (fresh clone, `./run.sh`) runs there. Today `scripts/dev.sh` starts the new app. Decided on the user's behalf by the
+    orchestrator while they are away; the user can overrule it.
 - [x] **F-128 Health route.** Server, GPU, keys and Colab status.
   - where: `backend/app.py:180-206`
   - suggest: keep.
@@ -944,7 +946,9 @@ see or set is listed once, with an ID that never changes and is never reused.
   - suggest: keep — updated for the new server in phase 24.
   - check: run the notebook on Colab; the tunnel URL opens the app and transcribes with the specialized Whisper.
   - user: "agree with all" (as suggested)
-  - not ticked (phase 23): phase 24 updates the Colab notebook for the new server, and its check needs a Colab GPU session (the user's).
+  - not ticked, listed with the user's agreement (phase 23, 2026-11-07): phase 24 updates the Colab notebook for the
+    new server, and its check needs a Colab GPU session only the user can run. Decided on the user's behalf by the
+    orchestrator while they are away; the user can overrule it.
 
 ## Q. Research side (Laya)
 
@@ -973,7 +977,9 @@ see or set is listed once, with an ID that never changes and is never reused.
   - suggest: keep — notebooks read finished datasets and never rebuild envelopes (ADR 0003).
   - check: the run-6 notebook trains one variant on the new dataset without reshaping rows.
   - user: "agree with all" (as suggested)
-  - not ticked (phase 23): the check is a Kaggle training run, which these sessions may not start (and when to retrain is the user's decision). Checked without training: `notebooks/kaggle/laya_v3_kaggle.ipynb` asserts `rows_are_final` and never reshapes rows (no `to_v3_state`).
+  - not ticked, listed with the user's agreement (phase 23, 2026-11-07): the check is a Kaggle training run, and the
+    user decided not to retrain: "we're not retraining laya anytime soon just keep using the version i used last"
+    (the app keeps serving `laya-wahy-r6-v3_mixed`). Checked without training: `notebooks/kaggle/laya_v3_kaggle.ipynb` asserts `rows_are_final` and never reshapes rows (no `to_v3_state`).
 - [x] **F-135 Scoring a checkpoint.** `eval_laya.py predict` and `compare`, and the results notebook.
   - where: `backend/laya_datagen/kaggle/eval_laya.py`, `notebooks/results/laya_v2_compare.ipynb`
   - suggest: keep.

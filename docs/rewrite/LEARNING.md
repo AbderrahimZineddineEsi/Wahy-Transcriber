@@ -1726,7 +1726,8 @@ uv run pytest -q tests/laya                                                 # th
 **What was done.** Every feature in `features.md` was checked against its `check:` line in the new app, and each one got
 an `accepted` line saying how it passed. 134 of the 137 features and the three new features in the rewrite (N-007,
 N-009, N-020) are ticked. Three are not: F-127 and F-130 are phase 24's work (the new `run.sh`, the Colab runner), and
-F-134's check is a Kaggle training run, which sessions may not start. The walk found five small gaps, fixed here:
+F-134's check is a Kaggle training run, which sessions may not start (and you chose not to retrain). All three
+are listed with your agreement. The walk found five small gaps, fixed here:
 - **F-001**: the rail had no count badges. It now shows the open lecture's quotes, the adhkar, the training rows and
   the logged requests, as in the mockup (`web/src/shell/badges.ts`).
 - **F-044**: a lecture could only be detected again from the Tafrigh tab. The lecture header now has "Detect the

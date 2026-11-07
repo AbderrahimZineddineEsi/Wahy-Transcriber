@@ -140,3 +140,5 @@ Queue: phase 17 running -> 16b (bracket embedded Quran verses) -> 18 -> ... -> 2
 - After 23: phase 24 (retire the old app) WAITS for the user's say-so. Then phase 25 (explanation document) may run.
 
 ## 2026-11-07 06:50: user decided option (c) on Laya: no retraining anytime soon; keep serving laya-wahy-r6-v3_mixed. laya_v3 is only a base for later. Do not retrain, do not start Kaggle. Phase 23 child is not affected.
+
+## 2026-11-07 07:30: phase 23 child asked (F-127, F-130, F-134 unticked). Answered by the orchestrator, no decider session: F-134 follows from the user's own answer "we're not retraining laya anytime soon"; F-127 and F-130 are phase 24 work. Option (a). Marked in the record as "decided on the user's behalf, to confirm". Resuming child to record, tick 23, commit and push (log step-23b.json). Then STOP: phase 24 waits for the user.
