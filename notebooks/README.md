@@ -32,7 +32,7 @@ ones only run on Kaggle.
 
 | notebook | what it does |
 |---|---|
-| [wahy_colab_runner.ipynb](wahy_colab_runner.ipynb) | Task 2: runs full Wahy app with `Abu-Dju/whisper-large-v3-ar` + `laya-wahy-r6-v3_mixed` + Cloudflare tunnel |
+| [colab/wahy_colab_runner.ipynb](colab/wahy_colab_runner.ipynb) | runs the full app (`./run.sh` on Colab) with `Abu-Dju/whisper-large-v3-ar` + `laya-wahy-r6-v3_mixed` + Cloudflare tunnel |
 
 ## `results/` — reading a run's results locally
 

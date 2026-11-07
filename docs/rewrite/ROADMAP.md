@@ -381,12 +381,19 @@ decisions and why). The problems being fixed are in the friction map: https://cl
     Colab session) and F-134 (no retraining: the app keeps r6 `v3_mixed`). `scripts/test.sh` all green.
   - Notes: see the 2026-11-07 phase 23 entry under **Changes**.
 
-- [ ] **24. Retire the old app**: Sonnet 5.5, medium. Only after the user says so.
+- [x] **24. Retire the old app**: Sonnet 5.5, medium. Only after the user says so.
   - Delete `backend/`, `js/`, `css/`, `index.html`, `run.bat`, and replace `run.sh` with the new launcher. Rewrite
     `README.md` with new screenshots. Move outdated docs to `docs/archive/`.
   - Done when: `scripts/test.sh` is green with only the new suites.
   - Feature check: fresh clone, run `./run.sh`, then the sample lecture end to end (transcribe, detect, verify, export).
     Features: F-127, F-130.
+  - Done-when result (2026-11-08): old app deleted; `scripts/test.sh` has only the new suites (server pytest and ruff
+    green, engine 133+ tests and typecheck green, web unit tests, typecheck, lint and 40 Playwright tests green; one
+    Playwright run timed out a 90 s detection while the machine was loaded and passed on its own).
+  - Feature check result: F-127 ticked (fresh clone, `./run.sh`, upload transcribed, sample lecture detected, verified
+    with the fake verifier and exported). F-130 not ticked: the Colab notebook is rebuilt, but its check needs a Colab
+    GPU session.
+  - Notes: see the 2026-11-08 phase 24 entry under **Changes**.
 
 - [ ] **25. Explanation document**: Opus 5.5, high.
   - Write `docs/rewrite/EXPLAINED.md` for the user, built from `LEARNING.md`: the architecture before and after, every
@@ -638,3 +645,11 @@ Each entry: date, what changed, the user's words.
     - F-127 (one-command launch) and F-130 (Colab runner) are listed as not ticked, handled by phase 24 (F-130 also
       needs a Colab GPU session only the user can run). Decided on the user's behalf by the orchestrator while they
       are away; the user can overrule it when back.
+- **2026-11-08**: Phase 24 (done, F-130 open): the old app (`backend/`, `js/`, `css/`, `index.html`, `run.bat`,
+  `pytest.ini`) is deleted, as the user approved ("go for phase 24, it should be safe since i pushed everything to
+  github already"). `server/wahy/main.py` now serves `web/dist`, so `./run.sh` is one process on port 8000.
+  The corpus (`data/corpus.json`, 90 MB) is only in the **private** Wahy-Finder repo, so a plain download is a 404:
+  `run.sh` falls back to `gh api` (after `gh auth login`) or `GITHUB_TOKEN`, and warns if both fail. A true fresh
+  clone on a machine with no access to that repo still needs the file copied in by hand; making the corpus public or
+  building it from public sources is a choice for the user, not made here. `docs/HANDOFF.md` and `docs/plans/` moved to
+  `docs/archive/`; the README has new screenshots (`web/scripts/screenshots.mjs`). F-130 (Colab) is left for the user.

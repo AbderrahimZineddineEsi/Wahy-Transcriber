@@ -1,3 +1,0 @@
-"""
-Tafrigh test suite.
-"""

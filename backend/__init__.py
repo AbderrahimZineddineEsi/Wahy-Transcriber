@@ -1,3 +1,0 @@
-"""
-Wahy-Transcriber Backend.
-"""

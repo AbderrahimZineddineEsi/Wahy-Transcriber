@@ -1772,3 +1772,48 @@ grep -c "^- \[x\]" docs/rewrite/features.md                     # how many featu
 (cd web && npx playwright test e2e/acceptance.spec.ts)          # the acceptance walk, offline (about 2 minutes)
 (cd server && uv run python -m wahy.laya teacher-eval report)   # one of the research checks
 ```
+
+## Phase 24: Retire the old app
+
+**What was built.**
+- The old app is gone: `backend/`, `js/`, `css/`, `index.html`, `run.bat` and `pytest.ini` were deleted (it stays in git
+  history at `b28eeda`). `scripts/test.sh` runs only the new suites.
+- `server/wahy/main.py` now serves the built web app (`web/dist`) from the same port as the API (`mount_web`), so the
+  app is one process.
+- `run.sh` is the new launcher: it checks node, npm, uv and ffmpeg, installs the Node packages, builds the web app
+  when its sources changed, runs `uv sync`, downloads the corpus the first time, and starts the server on port 8000.
+  `scripts/dev.sh` stays for development with hot reload.
+- The Colab notebook (`scripts/make_colab_notebook.py` → `notebooks/colab/wahy_colab_runner.ipynb`) now clones the
+  repo, runs that same `./run.sh` with the `local-asr` and `laya` extras, loads Laya through `/api/settings/laya/load`
+  and opens a Cloudflare tunnel to port 8000.
+- `README.md` was rewritten, with new screenshots made by `web/scripts/screenshots.mjs`. `docs/HANDOFF.md` and
+  `docs/plans/` moved to `docs/archive/`.
+
+**New concepts.**
+- **Serving a single-page app from the API server.** A React app is only static files after `vite build`. FastAPI can
+  return them, with one rule: any path that is not `/api/...` and not a real file returns `index.html`, because the
+  browser's router (`/lectures/12/verify`) owns those paths. In Express it is `app.use(express.static("dist"))` plus a
+  catch-all `app.get("*", sendIndex)`. The safety check is `target.is_relative_to(root)`: without it `/../.env` would
+  read files outside the folder (path traversal).
+- **A launcher is a contract.** `./run.sh` promises "fresh clone, one command, working app". Each step must be safe to
+  repeat (`npm ci` only when the lock file changed, a build only when sources are newer than `dist/index.html`, a
+  download only when `data/corpus.json` is missing), so the second run takes seconds.
+- **Same path everywhere.** Colab runs `./run.sh` instead of its own start-up code, so the laptop and Colab can't drift
+  apart. When you find two ways to start the app, keep one.
+- **Deleting with a safety net.** Before removing `backend/`, its untracked leftovers (`runs/`, `data/`) were compared
+  with their copies under `data/`; the one file that differed was copied aside first.
+
+**Tested.**
+- `server/tests/test_web_mount.py`: the page, an asset, a browser-side route and the API all answer correctly;
+  unknown `/api/...` stays 404; `..` cannot leave the folder; with no build there is no page.
+- `scripts/test.sh` with only the new suites.
+- Fresh clone, `./run.sh`, then the sample lecture through detection and export (see the phase 24 entry under
+  **Changes** in the roadmap).
+
+**Try:**
+
+```bash
+./run.sh                                  # then open http://127.0.0.1:8000
+python scripts/make_colab_notebook.py     # regenerate the Colab notebook
+node web/scripts/screenshots.mjs http://127.0.0.1:8000   # retake the README screenshots (needs a running server)
+```

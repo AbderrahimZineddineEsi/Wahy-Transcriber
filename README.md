@@ -4,13 +4,14 @@
 
 **Transcribe Islamic lectures and lessons, find every Quranic verse, hadith and dhikr in them, check each quote with AI, and export synchronized captions.**
 
-![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)
-![FastAPI](https://img.shields.io/badge/FastAPI-backend-009688?logo=fastapi&logoColor=white)
-![JavaScript](https://img.shields.io/badge/Vanilla_JS-frontend-F7DF1E?logo=javascript&logoColor=black)
+![Python](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-server-009688?logo=fastapi&logoColor=white)
+![React](https://img.shields.io/badge/React-web_app-61DAFB?logo=react&logoColor=black)
+![TypeScript](https://img.shields.io/badge/TypeScript-engine-3178C6?logo=typescript&logoColor=white)
 ![Whisper](https://img.shields.io/badge/faster--whisper%20%7C%20Groq-ASR-555)
 ![GPU](https://img.shields.io/badge/runs%20on-GTX%201050%20(3GB)-76B900?logo=nvidia&logoColor=white)
 
-<img src="docs/screenshots/02-display-dark.png" alt="Wahy Studio display view: a lecture transcript with detected verses and hadiths highlighted, next to a synchronized caption player" width="100%">
+<img src="docs/screenshots/02-lecture-dark.png" alt="Wahy Studio lecture view: a transcript with detected verses and hadiths highlighted, next to the caption player" width="100%">
 
 </div>
 
@@ -26,6 +27,7 @@
 - [Fine-tuning Laya](#fine-tuning-laya)
 - [Project structure](#project-structure)
 - [API overview](#api-overview)
+- [Running on Colab](#running-on-colab)
 - [Running the tests](#running-the-tests)
 - [Credits](#credits)
 
@@ -33,155 +35,133 @@
 
 | | |
 |---|---|
-| 🎙️ **Transcription** | Paste text or `.txt/.srt/.vtt`, give a YouTube link, or upload audio/video. Speech goes through local **faster-whisper** or **Groq** (`whisper-large-v3-turbo`). Downloads are cached in `data/media_cache/`. |
-| 🔎 **Quote detection** | Matches the transcript against a corpus of **6,236 verses**, **~39,700 hadiths** and an editable **adhkar** list. Handles Uthmani script and the ten Qira'at. |
-| 🤖 **AI verification** | Asks a model whether each detected quote is a real quotation or just the sheikh's own words, and whether its boundaries were cut off (`MISSING_START` / `MISSING_END`). Truncated quotes can be auto-expanded with one click. |
-| ✍️ **Editorial studio** | Click a word to jump the video to it. Add missed quotes with two clicks (FN Studio), swap in words from the canonical text, and pick between candidate references. |
+| 🎙️ **Transcription** | Paste text or `.txt/.srt/.vtt`, give a YouTube link, or upload audio/video. Speech goes through local **faster-whisper**, the specialized Arabic Whisper (`Abu-Dju/whisper-large-v3-ar`) or **Groq** (`whisper-large-v3-turbo`). Downloads are cached in `data/media_cache/`. |
+| 🔎 **Quote detection** | Matches the transcript against a corpus of **6,236 verses**, **~39,700 hadiths** and an editable **adhkar** list. Handles Uthmani script and the ten Qira'at. The engine (TypeScript, `engine/`) is the same code that builds the training data. |
+| 🤖 **AI verification** | Asks a model whether each detected quote is a real quotation or just the sheikh's own words, and whether its boundaries were cut off. Truncated quotes can be auto-expanded with one click. |
+| ✍️ **Editing** | Click a word to jump the video to it. Add missed quotes with two clicks, swap in words from the canonical text, move a quote's edges, undo and redo. Every change is kept in an edit log. |
 | 🎬 **Atomic captions** | Exports `SRT`, `VTT` and `ASS` subtitles. A verse or hadith is never split across two captions. Word timings are aligned with LCS. |
 | 📑 **AI Tafrigh** | Splits the transcript into sentences, classifies them, fixes typos and builds a structured outline (headings, matn, commentary). Runs `per_sentence` or `windowed`. |
-| 📊 **Telemetry and training data** | Logs every AI request with its tokens, cost, latency and raw payload. Your corrections are saved as gold labels and exported as Laya JSONL. |
-| 💾 **Local-first** | Lectures and training data are stored in IndexedDB. The app works in light and dark themes, with the UI in Arabic and English. |
+| 📊 **Request log and training data** | Logs every AI request with its tokens, cost, latency and raw payload. Your corrections are saved as gold labels and exported as Laya JSONL. |
+| 💾 **Local-first** | Everything is stored in SQLite (`data/wahy.db`) and plain files under `data/`. Light and dark themes, UI in Arabic and English. |
 
 ## Screenshots
 
 <table>
   <tr>
-    <td width="50%"><img src="docs/screenshots/01-input.png" alt="Input tab"><br><sub><b>Input:</b> text or subtitle file, YouTube link, or audio/video upload</sub></td>
-    <td width="50%"><img src="docs/screenshots/07-display-light.png" alt="Display tab, light theme"><br><sub><b>Display (light):</b> annotated transcript with a live caption preview</sub></td>
+    <td width="50%"><img src="docs/screenshots/01-lectures.png" alt="Lectures"><br><sub><b>Lectures:</b> text or subtitle file, YouTube link, audio/video upload, or the sample lecture</sub></td>
+    <td width="50%"><img src="docs/screenshots/03-lecture-light.png" alt="Lecture view, light theme"><br><sub><b>Lecture (light):</b> annotated transcript with a live caption preview</sub></td>
   </tr>
   <tr>
-    <td><img src="docs/screenshots/03-editor.png" alt="Editor tab"><br><sub><b>Editor:</b> FN Studio for adding missed quotes, with reference word chips</sub></td>
-    <td><img src="docs/screenshots/05-ai-logs.png" alt="AI and logs tab"><br><sub><b>AI & Logs:</b> Gemini, OpenRouter and local Laya, plus the request inspector</sub></td>
+    <td><img src="docs/screenshots/04-editor.png" alt="Editor"><br><sub><b>Edit:</b> the word board; select words to add a missed quote</sub></td>
+    <td><img src="docs/screenshots/05-export.png" alt="Export"><br><sub><b>Export:</b> SRT, VTT and ASS captions</sub></td>
   </tr>
   <tr>
-    <td colspan="2"><img src="docs/screenshots/04-datasets.png" alt="Datasets tab"><br><sub><b>Corpora & Adhkar:</b> browse and edit the adhkar, Quran, hadith and custom-quote databases</sub></td>
+    <td colspan="2"><img src="docs/screenshots/06-corpora.png" alt="Corpora"><br><sub><b>Corpora:</b> the Quran, hadith, adhkar and custom-quote databases</sub></td>
   </tr>
 </table>
 
 ## Quick start
 
-### Option 1: browser only
-
-Open `index.html` in Chrome, Firefox or Edge. Without a server you can still:
-
-- paste text or load `.txt / .srt / .vtt` files,
-- detect verses, hadiths and adhkar in the browser,
-- verify quotes with Gemini or OpenRouter using your own API keys,
-- export captions and training data.
-
-Click **«تجربة محاضرة نموذجية»** (try a sample lecture) on the Input tab to see it working right away.
-
-### Option 2: full stack (YouTube, audio upload, local GPU models)
-
-Requirements: Python 3.10+, `ffmpeg` on your `PATH`, and an NVIDIA GPU if you want local inference (3 GB VRAM is enough).
+Requirements: **Node 20+**, **[uv](https://docs.astral.sh/uv/)** (it installs Python 3.12 for you) and `ffmpeg` on your `PATH`. An NVIDIA GPU is only needed for local models (3 GB VRAM is enough).
 
 ```bash
-# Linux / macOS
-chmod +x run.sh
+git clone https://github.com/AbderrahimZineddineEsi/Wahy-Transcriber.git
+cd Wahy-Transcriber
 ./run.sh
 ```
 
-```bat
-:: Windows
-run.bat
-```
+The first run installs the Node and Python packages, builds the web app, downloads the ~90 MB corpus into `data/corpus.json` from [Wahy-Finder](https://github.com/AbderrahimZineddineEsi/Wahy-Finder), and serves everything at **http://127.0.0.1:8000** (one process, one port). Later runs start in seconds.
 
-The script creates `.venv`, installs `backend/requirements.txt`, downloads the ~90 MB corpus into `data/corpus.json` from [Wahy-Finder](https://github.com/AbderrahimZineddineEsi/Wahy-Finder) the first time, and serves the app at **http://127.0.0.1:8000**.
+| Want | Do |
+|---|---|
+| another port or reachable from the network | `PORT=9000 HOST=0.0.0.0 ./run.sh` |
+| local Whisper and local Laya | `WAHY_EXTRAS="local-asr laya" ./run.sh` |
+| hot reload while developing | `scripts/dev.sh` (server on 8120, web on 5173) |
+| cloud transcription and verification | paste your keys in **Settings** (they are saved to the gitignored `.env`), or put `GROQ_API_KEY`, `GEMINI_API_KEY`, `OPENROUTER_API_KEY` in `.env` |
 
-To transcribe with Groq instead of local Whisper, set `GROQ_API_KEY` in your environment or paste the key in Settings.
+Click **Sample lecture** on the Lectures screen to see detection working right away.
 
 ## AI providers
 
-Configure these on the **الذكاء الاصطناعي** (AI & Logs) tab:
+Configure the keys on the **Settings** screen; every call is listed on the **Requests** screen.
 
 | Provider | Use it for | Notes |
 |---|---|---|
-| **Google Gemini** (`gemini-3.5-flash-lite` and others) | Cheap batched verification | Has a free-tier pacer (12–15 RPM), `Retry-After` backoff, and 5–10 quotes per request |
+| **Google Gemini** (`gemini-3.5-flash-lite` and others) | Cheap batched verification | Free-tier pacer, `Retry-After` backoff, several quotes per request |
 | **OpenRouter · JEV Decisions** (`typesafe/jev-1.14`) | Calibrated `CORRECT / FALSE / NOT_SURE` probabilities | Uses `/api/alpha/decisions`, about $0.042 per 1M tokens |
 | **OpenRouter · Chat LLMs** | Any of 500+ models (DeepSeek, Qwen, Claude, `:free`…) | Shows live prices and has model search |
-| **Laya (local)** | Offline verification | Default: `ZenoAbderrahim/laya-wahy-soft_asis` (laya-multilingual fine-tuned on Wahy data, private), about 1.5 GB VRAM and under 1 s per decision on a GTX 1050. It unloads Whisper to free memory and falls back to CPU when VRAM is low. The checkpoint's config says which input it was trained on: run-3 models (envelope v2) get consecutive verses as one passage, the nearest findings, and a yes/no "start / end cut off" boundary — see [docs/laya-finetune/envelope-v2.md](docs/laya-finetune/envelope-v2.md) |
+| **Laya (local)** | Offline verification | Default: `ZenoAbderrahim/laya-wahy-r6-v3_mixed` (laya-multilingual fine-tuned on Wahy data), about 1.2 GB VRAM and under 1 s per decision on a GTX 1050. One GPU owner loads and frees models so Whisper and Laya never fight for memory. The checkpoint's config says which input it was trained on: consecutive verses go as one passage, with the nearest findings and a yes/no "start / end cut off" boundary — see [docs/laya-finetune/envelope-v2.md](docs/laya-finetune/envelope-v2.md) |
 
-Before a verification run starts, the app shows how many quotes it will check, the estimated tokens, cost and time, and lets you untick quotes. Use the verdict filter (✓ accepted · ? unsure · ✕ ordinary speech · ⏳ unverified) to choose what appears in the transcript and captions. Quotes marked as ordinary speech are hidden, but their words are kept as normal text.
+Before a verification run starts, the app shows how many quotes it will check and the estimated tokens, cost and time, and lets you untick quotes. Use the verdict filter to choose what appears in the transcript and captions. Quotes marked as ordinary speech are hidden, but their words are kept as normal text.
 
 ## AI Tafrigh pipeline
 
-The `backend/tafrigh/` package turns a raw transcript into a structured lesson in seven stages. It never changes the original text: every edit is checked by validators and recorded with its source.
+`server/wahy/features/tafrigh/` turns a raw transcript into a structured lesson in stages. It never changes the original text: every edit is checked by validators and recorded with its source.
 
 ```
-transcript ─► segment ─► units of work ─► model adapter (Gemini | JEV | Laya)
+transcript ─► segment ─► units of work ─► model (Gemini | JEV | Laya)
           ─► validate edits & splits ─► matn alignment ─► outline repair ─► render / export
 ```
 
 - **Modes:** `per_sentence` (fast, each sentence on its own) or `windowed` (sliding context window).
 - **Typo strategy:** `gated` (fix only flagged typos) or `always_correct`, plus a 20-sentence test slice so you can try settings without spending much.
-- **Run tracking:** each run is saved under `runs/`. Compare runs with `/api/tafrigh/compare` or `backend/tafrigh/compare_runs.py`.
+- **Run tracking:** each run is saved under `data/tafrigh_runs/`, survives a restart, and can be compared with another run.
 
 ## Fine-tuning Laya
 
 The Wahy models are trained on Kaggle (2× T4) from labelled lecture findings: how the data is made, every run step by step,
 and how to read the results are in [docs/laya-finetune/](docs/laya-finetune/) (start with
 [kaggle-guide.md](docs/laya-finetune/kaggle-guide.md)); the notebooks are indexed in [notebooks/README.md](notebooks/README.md).
-The data code is `server/wahy/laya/` (moved from `backend/laya_datagen/` in rewrite phase 22; `laya_v3.py` builds the
-current dataset of final envelopes, `kaggle/` holds the training and evaluation scripts, `python -m wahy.laya` is its
-command line).
-
-The older in-app route still works: your corrections and the models' verdicts are saved together, so negative examples (normal speech the model mistook for a quote) are kept for training. Export them from the **بيانات التدريب** (Training Data) tab, then run:
-
-```bash
-# Train only the decision head on a GTX 1050 (< 1.3 GB VRAM)
-python backend/finetune_laya.py --data wahy_laya_train.jsonl --head-only --epochs 5
-
-# Full fine-tune on Colab / Kaggle (T4 16 GB)
-python backend/finetune_laya.py --data wahy_laya_train.jsonl --full-finetune --epochs 3
-```
+The data code is `server/wahy/laya/` (`laya_v3.py` builds the current dataset of final envelopes, `kaggle/` holds the
+training and evaluation scripts, `python -m wahy.laya` is its command line). Your corrections and the models' verdicts
+are saved together in the app, so negative examples (normal speech the model mistook for a quote) are kept for training:
+export them from the **Training data** screen.
 
 ## Project structure
 
 ```
 Wahy-Transcriber/
-├── index.html               # Single-page app: Input, Display, Editor, Corpora, AI, Training tabs
-├── css/styles.css           # Light/dark themes, Amiri + Readex Pro typography
-├── js/
-│   ├── engine.js / engine_v4.js / engine_v5.js   # Quote detection and matching (v5 = default)
-│   ├── corpus-loader.js           # Loads the Quran, hadith and adhkar corpora
-│   ├── ai-verifier.js             # Gemini, OpenRouter, Laya clients and Laya converter
-│   ├── caption-builder.js         # Atomic SRT/VTT/ASS captions
-│   ├── editor.js                  # Editorial studio and FN Studio
-│   ├── render.js / events.js      # Rendering and UI wiring
-│   ├── state.js                   # App state and IndexedDB stores
-│   └── i18n.js / i18n-en.js       # Arabic and English strings
-├── backend/
-│   ├── app.py               # FastAPI server; also serves the frontend
-│   ├── transcriber.py       # faster-whisper and Groq transcription
-│   ├── media_processor.py   # yt-dlp and ffmpeg
-│   ├── corpus_sources.py    # Corpus download and cache
-│   ├── laya_engine.py       # Local Laya inference that respects VRAM limits
-│   ├── laya_converter.py    # Audit logs to Laya JSONL
-│   ├── finetune_laya.py     # Head-only and full fine-tuning
-│   ├── tafrigh/             # AI Tafrigh pipeline (adapters, validators, aligner, exporters)
-│   └── tests/               # pytest suite
-├── notebooks/               # data/ (build + label), kaggle/ (fine-tuning runs), results/ (read a run)
-├── docs/                    # laya-finetune/ (current guides), reports/, plans/, screenshots/
-├── run.sh / run.bat         # One-command launchers
-└── pytest.ini
+├── run.sh                   # One-command launcher (installs, builds, serves on :8000)
+├── server/                  # FastAPI app (Python 3.12, uv)
+│   ├── wahy/main.py         #   builds the app, mounts every feature, serves web/dist
+│   ├── wahy/core/           #   db (SQLite), jobs, gpu owner, engine client, ai provider layer, settings
+│   ├── wahy/features/       #   lectures, transcription, corpora, detection, verification, editing,
+│   │                        #   export, tafrigh, training, telemetry, settings, jobs
+│   ├── wahy/laya/           #   research side: datasets, labelling, Kaggle training scripts
+│   └── tests/
+├── engine/                  # Quote detection and caption building (TypeScript, runs as a Node worker)
+├── web/                     # React app (Vite, Tailwind), Playwright end-to-end tests in web/e2e
+├── scripts/                 # test.sh, dev.sh, make_colab_notebook.py, ...
+├── notebooks/               # data/ (build + label), kaggle/ (fine-tuning runs), colab/ (run the app on Colab)
+├── docs/                    # laya-finetune/, reports/, rewrite/ (roadmap, ADRs, learning log), archive/
+└── data/                    # your lectures, corpus, media cache, database (git-ignored)
 ```
+
+Why it is built this way: [docs/adr/](docs/adr/) and [docs/rewrite/ARCHITECTURE.md](docs/rewrite/ARCHITECTURE.md).
 
 ## API overview
 
-| Endpoint | Purpose |
+The server documents itself: with `./run.sh` running, open **http://127.0.0.1:8000/docs**.
+
+| Area | Endpoints |
 |---|---|
-| `GET /api/health` | Server, GPU and key status |
-| `POST /api/transcribe` · `GET /api/transcribe/progress/{job_id}` | Transcribe a YouTube link or uploaded file, with progress polling |
-| `GET/POST/DELETE /api/corpus/...` | Corpus sources and cache |
-| `GET /api/laya/status` · `POST /api/laya/{load,unload,predict,convert-dataset}` | Local Laya model |
-| `POST /api/openrouter/decisions` | Proxy to the JEV Decisions API |
-| `POST /api/tafrigh/{models,segment,run,control,review-action,save-run,compare}` · `GET /api/tafrigh/runs` | AI Tafrigh pipeline |
+| Health and settings | `GET /api/health`, `PUT /api/settings/keys/{provider}`, `/api/settings/laya` (+ `load`, `unload`) |
+| Lectures | `/api/lectures` (text, file, sample), `/api/transcriptions/youtube`, `/api/transcriptions/upload` |
+| Transcription and jobs | `POST /api/lectures/{id}/transcribe`, `GET /api/transcription/models`, `GET /api/jobs/{id}` |
+| Corpora | `/api/corpora/...` (sources, prepare, activate, adhkar, custom quotes, browse) |
+| Detection, editing, verification | `POST /api/lectures/{id}/detect`, `.../findings`, edit log with undo and redo, verify |
+| Export | `/api/export/style`, per-lecture `.../export` (SRT, VTT, ASS) |
+| Tafrigh | `/api/tafrigh/runs`, `.../review`, `.../clone`, `.../export` |
+| Training data and requests | `/api/training/...`, `/api/requests` |
+
+## Running on Colab
+
+`notebooks/colab/wahy_colab_runner.ipynb` runs the whole app on a free Colab T4 GPU (the specialized Whisper and local Laya) behind a Cloudflare tunnel, using the same `run.sh`. Open it in Colab, choose a GPU runtime, add your keys as Colab Secrets (`HF_TOKEN`, optionally `GROQ_API_KEY`, `GEMINI_API_KEY`, `OPENROUTER_API_KEY`) and run the cells. The notebook is generated by `python scripts/make_colab_notebook.py`.
 
 ## Running the tests
 
 ```bash
-source .venv/bin/activate
-pytest
+scripts/test.sh       # server (pytest + ruff), engine (vitest + tsc), web (vitest, tsc, eslint, Playwright)
 ```
 
 ## Credits

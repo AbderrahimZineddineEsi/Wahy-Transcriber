@@ -21,15 +21,17 @@ from __future__ import annotations
 import logging
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
+from pathlib import Path
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
+from fastapi.responses import FileResponse
 
 from wahy.core.ai.layer import AiLayer
 from wahy.core.db import Database
 from wahy.core.engine import EngineClient
 from wahy.core.gpu import GpuOwner
 from wahy.core.jobs import JobRunner
-from wahy.core.settings import Settings, get_settings
+from wahy.core.settings import REPO_ROOT, Settings, get_settings
 from wahy.features.corpora.router import router as corpora_router
 from wahy.features.corpora.service import CorporaService
 from wahy.features.detection.router import router as detection_router
@@ -57,8 +59,28 @@ from wahy.features.verification.service import VerificationService
 log = logging.getLogger("wahy")
 
 
-def create_app(settings: Settings | None = None) -> FastAPI:
-    """The app. Tests pass their own settings (a temporary data folder)."""
+def mount_web(app: FastAPI, web_dir: Path) -> None:
+    """Serve the built web app (`npm run build --workspace web` → web/dist) from the same port as the API, so
+    `./run.sh` is one process. Any path that is not `/api/...` and not a real file gets `index.html`, because
+    the web app does its own routing in the browser. Does nothing when the folder has no `index.html`."""
+    index = web_dir / "index.html"
+    if not index.is_file():
+        return
+    root = web_dir.resolve()
+
+    @app.get("/{path:path}", include_in_schema=False)
+    def web_app(path: str) -> FileResponse:
+        if path == "api" or path.startswith("api/"):
+            raise HTTPException(404, "no such API route")
+        target = (root / path).resolve()
+        if path and target.is_file() and target.is_relative_to(root):
+            return FileResponse(target)
+        return FileResponse(index)
+
+
+def create_app(settings: Settings | None = None, web_dir: Path | None = None) -> FastAPI:
+    """The app. Tests pass their own settings (a temporary data folder). `web_dir` is the built web app to
+    serve (default: web/dist at the repo root, when it has been built)."""
 
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
@@ -112,6 +134,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(tafrigh_router)
     app.include_router(telemetry_router)
     app.include_router(training_router)
+    mount_web(app, web_dir if web_dir is not None else REPO_ROOT / "web" / "dist")
     return app
 
 

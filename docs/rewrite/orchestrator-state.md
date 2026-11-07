@@ -142,3 +142,10 @@ Queue: phase 17 running -> 16b (bracket embedded Quran verses) -> 18 -> ... -> 2
 ## 2026-11-07 06:50: user decided option (c) on Laya: no retraining anytime soon; keep serving laya-wahy-r6-v3_mixed. laya_v3 is only a base for later. Do not retrain, do not start Kaggle. Phase 23 child is not affected.
 
 ## 2026-11-07 07:30: phase 23 child asked (F-127, F-130, F-134 unticked). Answered by the orchestrator, no decider session: F-134 follows from the user's own answer "we're not retraining laya anytime soon"; F-127 and F-130 are phase 24 work. Option (a). Marked in the record as "decided on the user's behalf, to confirm". Resuming child to record, tick 23, commit and push (log step-23b.json). Then STOP: phase 24 waits for the user.
+
+## 2026-11-07 07:35: STOPPED after phase 23 (b28eeda). Waiting for the user: "go" for phase 24 (retire the old app) and whether phase 25 runs before it.
+
+## 2026-11-08: user said "go for phase 24, it should be safe since i pushed everything to github already". Phase 24 approved.
+- Child: refactoring-step-24 (Sonnet 5.5, medium), session ID f7bb9f2b-4f54-4bce-93d4-cfc01a9259c3, log: /tmp/claude-1000/-home-zeno-Documents-work-new-projects-Wahy-Transcriber/428c450a-c0e2-4fc7-86dc-884ec1da7570/scratchpad/step-24.json.
+- Resume if it dies: claude -p --resume f7bb9f2b-4f54-4bce-93d4-cfc01a9259c3 "continue, verify, commit and push". The old app is in git history at b28eeda (pushed), so deletions are recoverable.
+- After 24: phase 25 (explanation document, Opus 5.5, high) runs next unless the user says otherwise (no answer given on running it first).
