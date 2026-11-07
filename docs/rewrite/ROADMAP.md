@@ -329,12 +329,23 @@ decisions and why). The problems being fixed are in the friction map: https://cl
   - Notes: see the 2026-11-07 phase 20 entry under **Changes**.
   - Learn: data lineage (where a training row came from).
 
-- [ ] **21. Corpora screens and status**: Sonnet 5.5, medium.
+- [x] **21. Corpora screens and status**: Sonnet 5.5, medium.
   - The adhkar editor, Quran and hadith browsing, custom quotes, corpus sources, engine version and profile settings,
     and Laya status (load, unload, envelope version, VRAM).
   - Done when: Vitest and Playwright pass.
   - Feature check: add a dhikr; the next detection finds it in the sample lecture.
     Features: F-011, F-014, F-015, F-046, F-072 to F-079, F-097, F-098.
+  - Done-when result (2026-11-07): web Vitest 147 pass (21 files), Playwright 17 pass, server 410 pass,
+    engine 268 pass.
+  - Feature check result (2026-11-07, offline, `e2e/corpora.spec.ts`): on engine v3 the sample lecture has one dhikr
+    (the closing «لا إله إلا الله»); adding «نحمده ونستعينه ونستغفره» in the corpora screen made the next detection return
+    two, the new one at words 3 to 5; the "Detect adhkar" switch off left none. Engine v4 and v5 find no adhkar at all
+    (the golden files pin that), so the check runs on v3 and the screen says so.
+  - Notes: new engine command `browse` (read-only paging of the Quran and hadith, no matcher); new server routes
+    `GET /api/corpora/browse`, `POST /api/corpora/adhkar/import`, `POST /api/corpora/adhkar/reset`; a dhikr must have two
+    words (F-073). Laya load/unload (F-097, F-098) are in Settings, on the existing routes. F-011's display-toolbar copy
+    of the engine choice belongs to the lecture view and is not added here (settings has it). F-015's upload is the
+    sources tab's per-source upload; no custom corpus URLs (the server owns the sources).
   - Learn: CRUD screens done once and reused.
 
 - [ ] **22. Datagen on the new core**: Opus 5.5, high. ADRs 0003, 0004.
@@ -556,3 +567,6 @@ Each entry: date, what changed, the user's words.
     decide: kept as they are, not wired to any route. The training rows now live in the labels table, so the first two
     are superseded (deleting them is the user's call); `pilot_tools.py` is research tooling for phase 22.
   - No rail count badge for the training screen yet (F-001's badges are not in this phase's feature list).
+- **2026-11-07**: Phase 21 done as written. Two facts for the user: only engine v3 detects adhkar (v4/v5, the default,
+  find none), so the adhkar tab says which engine finds them and the Feature check runs on v3; and the engine choice
+  in the lecture toolbar (second copy of F-011) was left to the lecture view. No change of scope.

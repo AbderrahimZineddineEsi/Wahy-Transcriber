@@ -124,3 +124,6 @@ Queue: phase 17 running -> 16b (bracket embedded Quran verses) -> 18 -> ... -> 2
 
 ## Running now: phase 20 Training data (Opus 5.5, high)
 - Child: refactoring-step-20, session ID 74858cc0-87ad-4bc6-b69f-838d77db290d, log: /tmp/claude-1000/-home-zeno-Documents-work-new-projects-Wahy-Transcriber/428c450a-c0e2-4fc7-86dc-884ec1da7570/scratchpad/step-20.json. Phase 19 done (c762cf1). New OpenRouter key is in .env (limit $0.20: minimal live calls).
+
+## Running now: phase 21 Corpora screens and status (Sonnet 5.5, medium)
+- Child: refactoring-step-21, session ID 99001feb-798b-495c-acad-04f0cb2c39a5, log: /tmp/claude-1000/-home-zeno-Documents-work-new-projects-Wahy-Transcriber/428c450a-c0e2-4fc7-86dc-884ec1da7570/scratchpad/step-21.json. Phase 20 done (2a690de).

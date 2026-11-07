@@ -4,6 +4,7 @@ import { RequestsPage } from "./features/telemetry/RequestsPage";
 import { LecturesPage } from "./features/lectures/LecturesPage";
 import { readStored } from "./shell/storage";
 import { ComingSoon } from "./features/placeholders/ComingSoon";
+import { CorporaPage } from "./features/corpora/CorporaPage";
 import { SettingsPage } from "./features/settings/SettingsPage";
 import { TrainingPage } from "./features/training/TrainingPage";
 import { Layout } from "./shell/Layout";
@@ -23,7 +24,8 @@ export function App() {
         <Route path="lectures" element={<LecturesPage />} />
         <Route path="lectures/:id" element={<LecturePage />} />
         <Route path="lectures/:id/:tab" element={<LecturePage />} />
-        <Route path="corpora" element={<ComingSoon title="page.corpora" />} />
+        <Route path="corpora" element={<CorporaPage />} />
+        <Route path="corpora/:tab" element={<CorporaPage />} />
         <Route path="training" element={<TrainingPage />} />
         <Route path="requests" element={<RequestsPage />} />
         <Route path="settings" element={<SettingsPage />} />

@@ -7,11 +7,14 @@ from collections.abc import Iterator
 from contextlib import contextmanager
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, File, HTTPException, Request, UploadFile
+from fastapi import APIRouter, Depends, File, HTTPException, Query, Request, UploadFile
 
 from wahy.core.engine import EngineError
 from wahy.features.corpora.schemas import (
     ActivateRequest,
+    AdhkarImport,
+    AdhkarImported,
+    BrowsePage,
     CorpusInfo,
     DhikrIn,
     DhikrOut,
@@ -59,6 +62,16 @@ def corpus_info(corpora: Corpora) -> CorpusInfo:
     starts the engine worker, which takes a few seconds."""
     with corpora_errors():
         return corpora.info()
+
+
+@router.get("/browse")
+def browse(corpora: Corpora, kind: Annotated[str, Query(pattern="^(QURAN|HADITH)$")], surah: int | None = None,
+           book: str | None = None, q: str = "", offset: Annotated[int, Query(ge=0)] = 0,
+           limit: Annotated[int, Query(ge=1, le=200)] = 25) -> BrowsePage:
+    """Read the Quran (filter: surah) or the hadith in use (filter: book), with a text or reference search and
+    pages. Straight from the corpus: the first call starts the engine worker (seconds)."""
+    with corpora_errors():
+        return corpora.browse(kind, surah=surah, book=book, q=q, offset=offset, limit=limit)
 
 
 # ---- hadith sources --------------------------------------------------------------------------
@@ -109,6 +122,18 @@ def list_adhkar(corpora: Corpora) -> list[DhikrOut]:
 @router.post("/adhkar", status_code=201)
 def add_dhikr(body: DhikrIn, corpora: Corpora) -> DhikrOut:
     return corpora.add_dhikr(body)
+
+
+@router.post("/adhkar/import")
+def import_adhkar(body: AdhkarImport, corpora: Corpora) -> AdhkarImported:
+    """Add the items of an exported list that are not in the list already."""
+    return corpora.import_adhkar(body.items)
+
+
+@router.post("/adhkar/reset")
+def reset_adhkar(corpora: Corpora) -> list[DhikrOut]:
+    """Back to the 18 initial adhkar; every other row (added or edited) is removed."""
+    return corpora.reset_adhkar()
 
 
 @router.put("/adhkar/{dhikr_id}")

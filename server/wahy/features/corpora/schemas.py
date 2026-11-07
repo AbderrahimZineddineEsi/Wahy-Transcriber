@@ -61,6 +61,25 @@ class DhikrIn(BaseModel):
             raise ValueError("must not be empty")
         return v
 
+    @field_validator("t")
+    @classmethod
+    def _two_words(cls, v: str) -> str:
+        if len(v.split()) < 2:
+            raise ValueError("a dhikr needs at least two words")
+        return v
+
+
+class AdhkarImport(BaseModel):
+    """A JSON list of adhkar (the export of GET /adhkar, or just `{category?, ref?, t}` items)."""
+
+    items: list[dict[str, Any]]
+
+
+class AdhkarImported(BaseModel):
+    added: int
+    skipped: int = Field(description="empty, under two words, or already in the list (ignoring marks)")
+    adhkar: list["DhikrOut"]
+
 
 class DhikrOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -94,3 +113,19 @@ class QuoteOut(BaseModel):
 
 class Started(BaseModel):
     job: JobSnapshot
+
+
+class BrowseItem(BaseModel):
+    id: str
+    ref: str
+    text: str
+    group: str
+
+
+class BrowsePage(BaseModel):
+    """One page of the Quran or a hadith book. `groups` are the filter choices: surah number → [name, ayat],
+    or book id → [book id, hadiths]."""
+
+    total: int
+    items: list[BrowseItem]
+    groups: dict[str, tuple[str, int]]

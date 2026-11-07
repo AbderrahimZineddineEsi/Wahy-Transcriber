@@ -5,6 +5,29 @@ State for recovery (session IDs, what to do if a child died) is in `orchestrator
 
 <!-- NEW REPORTS GO BELOW THIS LINE -->
 
+## 2026-11-07 01:50 — Phase 20 (Training data) done; phase 21 started
+
+Gate passed. Commit `2a690de` "rewrite phase 20: Training data" pushed, phase ticked, `scripts/test.sh` all green (old backend 152,
+server 406 +6 skipped, engine 264, web unit 140, Playwright 13 with 3 new). No live API calls, nothing spent.
+- **Done-when**: `data/legacy/` is empty (you said on 2026-11-03 there was no old bank), so the golden `laya_export.jsonl`
+  stood in for the old bank's export. Imported and exported again it is byte-identical, counters match the old app's (6 rows,
+  3 correct, 2 false, 1 not sure, 3 gold, 3 from models). A second test makes the same six records in the new app on the full
+  corpus; the export equals the golden file except the ids (the old app made them at random).
+- **Feature check passed** (Playwright on the real server, offline): setting الأحزاب: 70 to "ordinary speech" over the fake
+  verifier's "Correct" shows one row in the training screen ("Ordinary speech (gold)", origin "You (verdict)", the model's
+  earlier "Correct" kept beside it); the gold-only export holds exactly that row as a human-verified FALSE.
+- Built: gold labels record how they were given (verdict button, approve all, delete as ordinary speech); a missed quote
+  you add is also a gold label and undo removes it; "reference wrong" (N-007) appears in the exported row; the old row
+  converter lives in the engine so the file is written exactly as before (Python would write `5e-05` for `0.00005`); import
+  from an uploaded file or every file in `data/legacy/` (the same row twice replaces, no duplicate); training screen
+  (counters, filters by origin, exact JSON per row, export all or gold only, clear with a second click); a "Save for Laya"
+  button on the Tafrigh tab (F-120); migration `0006` adds two columns to the labels table.
+- Choices recorded under Changes: clearing the training data deletes every label and hides the models' earlier verdicts
+  from the training data (the verdicts stay on their lectures); `training_store.py`, `exporters.py`, `pilot_tools.py`
+  from phase 18 are kept connected to nothing; **whether to delete the first two is your call**; a user boundary "extra at
+  the start/end" goes into the Laya row as is, although the v1 boundary question only offers four complete/missing choices.
+- **Phase 21 (Corpora screens and status, Sonnet 5.5, medium)** is running as `refactoring-step-21`.
+
 ## 2026-11-07 01:20 — Phase 19 (Web: Tafrigh) done; phase 20 started
 
 Gate passed. Commit `c762cf1` "rewrite phase 19: Web: Tafrigh" pushed, phase ticked, full `scripts/test.sh` "ALL GREEN"

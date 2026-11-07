@@ -1617,3 +1617,50 @@ cd server && uv run pytest -q tests/test_training.py                 # import �
 cd web && npx playwright test e2e/training.spec.ts                   # the feature check in the real app
 curl -s localhost:8120/api/training | python3 -m json.tool | head -30 # the counters and rows (with scripts/dev.sh)
 ```
+
+## Phase 21: Corpora screens and status
+
+**Built.** The «المصادر / Sources» place (`/corpora`) is a real screen with five tabs: adhkar, custom quotes, Quran,
+hadith, and hadith sources. Settings gained two panels: the detection engine (v5, v5:loose, v4, v3, the Qira'ah and the
+adhkar switch) and Laya (loaded or not, device, GPU memory, checkpoint, envelope version, load and unload).
+
+**New concepts.**
+- **CRUD screen, written once.** Create/read/update/delete is the same four calls for adhkar and for custom quotes. Each
+  tab has a `useXxx()` query hook (read) and a `useXxxActions()` hook (one mutation per verb) in `api.ts`; after every
+  write the mutation *invalidates* the query key, so TanStack Query re-reads the list and the screen updates by itself.
+  Compare Flutter: a repository that returns a `Future`, and a provider you `ref.invalidate(...)` after a write.
+- **Rows are ordinary rows.** The 18 initial adhkar are only the first rows of the table: edit or delete any of them
+  (`DELETE /api/corpora/adhkar/Adhkar:tahlil` works), and "restore the initial list" is an explicit button that asks
+  twice (the first click turns it red, the second does it). Nothing is restored at start-up.
+- **Paging on the server.** The Quran has 6,236 ayat and the hadith ~40,000; the browser must never receive them all.
+  The web asks for `offset` and `limit`, the server asks the engine worker's new `browse` command, which counts the
+  matches and returns one page. It reads the raw corpus arrays, so it needs no matcher (hundreds of MB, seconds to build).
+- **Polling while something runs.** A hadith source being prepared is a job. `useSources` sets `refetchInterval` to 1.5 s
+  only while some source says `preparing`, so the status chip moves on its own and the polling stops by itself.
+- **Controlled switch.** The adhkar switch shows the *server's* value (`checked={settings.adhkar}`) and changes it with a
+  PATCH; it flips when the answer arrives. A test must therefore click and then wait, not "uncheck" and expect it at once.
+
+**A finding worth knowing.** Only engine **v3** detects adhkar; v4 and v5 (the default) find none, and the golden files pin
+that. So the Feature check runs on v3, and the adhkar tab shows a note when another engine is chosen. (N-001 in
+`features.md` plans "dhikr as a check after detection", which is where this goes.)
+
+**Tested.**
+- Engine: `browse.test.ts` (paging, the surah and book filters, diacritic-free search, unknown kind refused).
+- Server: a dhikr needs two words; export → reset → import gives the list back and importing twice adds nothing;
+  `/api/corpora/browse` with the fake engine and with the real worker on the small corpus.
+- Web (Vitest, `CorporaPage.test.tsx`): add and delete a dhikr (an initial one too), the filter and the double-click
+  reset, the adhkar switch, Quran surah 18 page 2, a source going from missing to preparing, the engine choice, and
+  Laya loading and unloading with the device and memory shown.
+- Feature check (Playwright, `e2e/corpora.spec.ts`, offline, real server and engine): on engine v3 the sample lecture has
+  one dhikr (the closing «لا إله إلا الله»); adding «نحمده ونستعينه ونستغفره» in the screen makes the next detection
+  return two, the new one at words 3 to 5; switching "Detect adhkar" off leaves none. Also: surah 18, page 2 shows ayat
+  26 to 50; the sources tab shows the built-in source ready; the engine choice survives a reload.
+
+**Try:**
+
+```bash
+cd engine && npx vitest run src/browse.test.ts                         # the new browse command
+cd server && uv run pytest -q tests/test_corpora.py                    # adhkar import/reset, browse
+cd web && npx playwright test e2e/corpora.spec.ts                      # the feature check in the real app
+curl -s 'localhost:8120/api/corpora/browse?kind=QURAN&surah=18&offset=25&limit=3' | python3 -m json.tool
+```

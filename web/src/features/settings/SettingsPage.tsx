@@ -5,6 +5,8 @@ import { useHealth, type Health } from "../../api/health";
 import { useI18n } from "../../shell/i18n";
 import { useTheme, type ThemeChoice } from "../../shell/theme";
 import { useToasts } from "../../shell/toasts";
+import { EnginePanel } from "./EnginePanel";
+import { LayaPanel } from "./LayaPanel";
 
 // The provider names are brand names: they are never translated.
 const PROVIDERS = [
@@ -22,6 +24,8 @@ export function SettingsPage() {
       <div className="grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] items-start gap-3">
         <KeysPanel />
         <StatusPanel />
+        <EnginePanel />
+        <LayaPanel />
         <InterfacePanel />
       </div>
     </>

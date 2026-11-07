@@ -13,6 +13,7 @@
 //   detect     {words, options}          findings; words are [{word, start, end}]
 //   envelopes  {findings, words, version, options}   options also: passages, neighbours, targets, contextWords
 //   search     {text, options}           corpus units; options also: kind, limit
+//   browse     {options}                 a page of the Quran or hadith: {total, items, groups}; options: kind, surah, book, q, offset, limit
 //   suggest    {words, options}          the closest units for a missed quote's words; options also: kind, query, limit
 //   expand     {finding, words, boundary, options}   the finding grown over its missing start or end (expand.ts)
 //   rule_boundary {states}               the no-model boundary {start, end} of each v2 / v3 state (envelopes.ts)
@@ -35,6 +36,7 @@ import fs from "node:fs";
 import path from "node:path";
 import readline from "node:readline";
 import { fileURLToPath } from "node:url";
+import { browse } from "./browse.ts";
 import { detect, matcherFor } from "./detect.ts";
 import { envelopes, ruleBoundary } from "./envelopes.ts";
 import { edit, referenceWords } from "./edit.ts";
@@ -85,6 +87,7 @@ const handlers: Record<string, (req: any) => unknown> = {
   envelopes: ({ findings, words, version, options }) => envelopes(findings, words, version, withCorpus(options)),
   search: ({ text, options }) => search(text, withCorpus(options)),
   suggest: ({ words, options }) => suggest(words, withCorpus(options)),
+  browse: ({ options }) => browse(corpus, options),
   expand: ({ finding, words, boundary, options }) => expand(finding, words, boundary, withCorpus(options)),
   edit: ({ request, words, options }) => edit(request, words, withCorpus(options)),
   captions: (req) => lectureCaptions(req),

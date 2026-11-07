@@ -28,7 +28,16 @@ from wahy.core.engine import EngineClient
 from wahy.core.jobs import JobContext, JobRunner, JobSnapshot
 from wahy.core.settings import Settings
 from wahy.features.corpora.models import CustomQuote, Dhikr
-from wahy.features.corpora.schemas import CorpusInfo, DhikrIn, DhikrOut, QuoteIn, QuoteOut, SourceOut
+from wahy.features.corpora.schemas import (
+    AdhkarImported,
+    BrowsePage,
+    CorpusInfo,
+    DhikrIn,
+    DhikrOut,
+    QuoteIn,
+    QuoteOut,
+    SourceOut,
+)
 from wahy.features.corpora.sources import BUILTIN, AlreadyPreparing, SourceStore, UnknownSource
 from wahy.features.settings.store import SettingsStore
 
@@ -182,6 +191,46 @@ class CorporaService:
         if row is None:
             raise NotFound(dhikr_id)
         return row
+
+    def import_adhkar(self, items: list[dict[str, Any]]) -> AdhkarImported:
+        """Add the items of an exported list (F-074). An item needs a `t` of two words or more; one already in
+        the list (ignoring marks and letter forms) is skipped, so importing an export twice adds nothing."""
+        known = {normalise(d.t) for d in self.list_adhkar()}
+        added = skipped = 0
+        for item in items:
+            t = str(item.get("t") or "").strip() if isinstance(item, dict) else ""
+            if len(t.split()) < 2 or normalise(t) in known:
+                skipped += 1
+                continue
+            known.add(normalise(t))
+            self.add_dhikr(DhikrIn(category=str(item.get("category") or "").strip() or "أذكار متفرقة",
+                                   ref=str(item.get("ref") or "").strip() or "ذكر", t=t))
+            added += 1
+        return AdhkarImported(added=added, skipped=skipped, adhkar=self.list_adhkar())
+
+    def reset_adhkar(self) -> list[DhikrOut]:
+        """Back to the 18 initial adhkar: every row now in the table, edited or added, is replaced (F-074; the
+        screen asks first)."""
+        with self.db.session() as s:
+            for row in s.scalars(select(Dhikr)).all():
+                s.delete(row)
+            s.flush()
+            for position, item in enumerate(BUILTIN_ADHKAR):
+                s.add(Dhikr(id=item["id"], category=item["category"], ref=item["ref"], t=item["t"],
+                            is_custom=False, position=position))
+        self.store.set(SEEDED_KEY, True)
+        return self.list_adhkar()
+
+    def browse(self, kind: str, *, surah: int | None = None, book: str | None = None, q: str = "",
+               offset: int = 0, limit: int = 25) -> BrowsePage:
+        """A page of the Quran (optionally one surah) or the active hadith source (optionally one book), for
+        reading and searching (F-076). Read straight from the corpus, so it needs no matcher."""
+        options: dict[str, Any] = {"kind": kind, "q": q, "offset": offset, "limit": limit}
+        if surah is not None:
+            options["surah"] = surah
+        if book:
+            options["book"] = book
+        return BrowsePage(**self.engine.browse(options))
 
     def engine_adhkar(self) -> list[dict[str, Any]]:
         """The rows as the engine takes them, in list order (additions first, then the initial ones)."""

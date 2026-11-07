@@ -135,6 +135,11 @@ class EngineClient:
         limit."""
         return self.call("search", text=text, options=options or {})
 
+    def browse(self, options: dict[str, Any]) -> dict[str, Any]:
+        """A page of the raw Quran or hadith corpus (no matcher is built): {total, items, groups}. Options:
+        kind (QURAN, HADITH), surah, book, q, offset, limit."""
+        return self.call("browse", options=options)
+
     def suggest(self, words: list[str], options: dict[str, Any] | None = None) -> list[dict[str, Any]]:
         """The closest corpus units for a missed quote's words, best first, each with its words and the
         positions the given words match. Options also: kind (QURAN, HADITH, ADHKAR), query, limit."""

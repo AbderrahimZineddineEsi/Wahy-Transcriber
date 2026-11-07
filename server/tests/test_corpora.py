@@ -334,3 +334,48 @@ def test_the_real_worker_switches_to_a_prepared_hadith_source(tmp_path):
         assert engine.info()["hadiths"] == 2
     finally:
         engine.close()
+
+
+# ---- adhkar import, export, reset and browsing ------------------------------------------------------------------
+
+def test_a_dhikr_needs_two_words(api):
+    assert api.post("/api/corpora/adhkar", json={"ref": "دعاء", "t": "اللهم"}).status_code == 422
+    assert api.post("/api/corpora/adhkar", json={"ref": "دعاء", "t": "اللهم اغفر"}).status_code == 201
+
+
+def test_export_reset_import_brings_the_list_back(api):
+    mine = api.post("/api/corpora/adhkar", json={"ref": "دعاء", "t": "اللهم اغفر لي"}).json()
+    api.put("/api/corpora/adhkar/Adhkar:tahlil", json={"category": "التهليل", "ref": "مختصر", "t": "لا إله إلا الله وحده"})
+    api.delete("/api/corpora/adhkar/Adhkar:tahlil_full")
+    exported = api.get("/api/corpora/adhkar").json()
+    assert len(exported) == 18
+
+    reset = api.post("/api/corpora/adhkar/reset").json()
+    assert [d["id"] for d in reset] == [i["id"] for i in BUILTIN_ADHKAR]          # exactly the 18 initial rows
+    assert reset[0]["t"] == BUILTIN_ADHKAR[0]["t"] and not any(d["is_custom"] for d in reset)
+
+    # importing the export: the user's own row comes back, the edited text is added (the original is "known")
+    r = api.post("/api/corpora/adhkar/import", json={"items": exported + [{"t": "كلمة"}, {"t": "  "}, {}]}).json()
+    assert r["added"] == 2 and r["skipped"] == 16 + 3                 # 16 initial rows already there, 3 unusable items
+    texts = [d["t"] for d in r["adhkar"]]
+    assert "اللهم اغفر لي" in texts and "لا إله إلا الله وحده" in texts
+    assert api.post("/api/corpora/adhkar/import", json={"items": exported}).json()["added"] == 0   # twice adds nothing
+    assert mine["id"] not in [d["id"] for d in r["adhkar"]]                       # imported rows get fresh ids
+
+
+def test_browse_reads_the_corpus_without_a_matcher(api):
+    page = api.get("/api/corpora/browse", params={"kind": "QURAN", "surah": 18, "offset": 25, "limit": 25}).json()
+    assert page["total"] == 1 and page["items"][0]["ref"] == "الكهف: 26" and page["groups"]["18"] == ["الكهف", 110]
+    assert api.app.state.corpora.engine.browse_calls[-1] == {"kind": "QURAN", "q": "", "offset": 25, "limit": 25, "surah": 18}
+    assert api.get("/api/corpora/browse", params={"kind": "ADHKAR"}).status_code == 422
+    assert api.get("/api/corpora/browse", params={"kind": "QURAN", "limit": 500}).status_code == 422
+
+
+def test_the_real_worker_browses_the_small_corpus(tmp_path):
+    engine = EngineClient(SMALL_CORPUS, max_heap_mb=1024, timeout_s=60)
+    try:
+        page = engine.browse({"kind": "QURAN", "surah": 112, "limit": 2})
+        assert page["total"] == 4 and [i["id"] for i in page["items"]] == ["112:1", "112:2"]
+        assert engine.browse({"kind": "HADITH", "q": "بالنيات"})["total"] == 1
+    finally:
+        engine.close()

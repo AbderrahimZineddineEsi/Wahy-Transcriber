@@ -100,6 +100,11 @@ class FakeEngine:
         self.search_calls.append((text, options or {}))
         return [{"unitId": "112:1", "sourceType": "QURAN", "displayRef": "الإخلاص: 1", "fullText": "قل هو الله أحد"}]
 
+    def browse(self, options):
+        self.browse_calls = [*getattr(self, "browse_calls", []), options]
+        return {"total": 1, "items": [{"id": "18:26", "ref": "الكهف: 26", "text": "قل الله أعلم", "group": "الكهف"}],
+                "groups": {"18": ["الكهف", 110]}}
+
     def info(self):
         return {"quran": 6236, "hadiths": 39737, "fingerprint": {"files": {}, "corpus": {}}}
 

@@ -97,6 +97,51 @@
         "title": "AddQuote",
         "type": "object"
       },
+      "AdhkarImport": {
+        "description": "A JSON list of adhkar (the export of GET /adhkar, or just `{category?, ref?, t}` items).",
+        "properties": {
+          "items": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "title": "AdhkarImport",
+        "type": "object"
+      },
+      "AdhkarImported": {
+        "properties": {
+          "added": {
+            "title": "Added",
+            "type": "integer"
+          },
+          "adhkar": {
+            "items": {
+              "$ref": "#/components/schemas/DhikrOut"
+            },
+            "title": "Adhkar",
+            "type": "array"
+          },
+          "skipped": {
+            "description": "empty, under two words, or already in the list (ignoring marks)",
+            "title": "Skipped",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "added",
+          "skipped",
+          "adhkar"
+        ],
+        "title": "AdhkarImported",
+        "type": "object"
+      },
       "Approved": {
         "properties": {
           "approved": {
@@ -222,6 +267,74 @@
           "file"
         ],
         "title": "Body_upload_source_api_corpora_sources__source_id__upload_post",
+        "type": "object"
+      },
+      "BrowseItem": {
+        "properties": {
+          "group": {
+            "title": "Group",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "ref": {
+            "title": "Ref",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "ref",
+          "text",
+          "group"
+        ],
+        "title": "BrowseItem",
+        "type": "object"
+      },
+      "BrowsePage": {
+        "description": "One page of the Quran or a hadith book. `groups` are the filter choices: surah number → [name, ayat],\nor book id → [book id, hadiths].",
+        "properties": {
+          "groups": {
+            "additionalProperties": {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ],
+              "type": "array"
+            },
+            "title": "Groups",
+            "type": "object"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/BrowseItem"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "total",
+          "items",
+          "groups"
+        ],
+        "title": "BrowsePage",
         "type": "object"
       },
       "CanonicalWords": {
@@ -6117,6 +6230,74 @@
         ]
       }
     },
+    "/api/corpora/adhkar/import": {
+      "post": {
+        "description": "Add the items of an exported list that are not in the list already.",
+        "operationId": "import_adhkar_api_corpora_adhkar_import_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdhkarImport"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdhkarImported"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Import Adhkar",
+        "tags": [
+          "corpora"
+        ]
+      }
+    },
+    "/api/corpora/adhkar/reset": {
+      "post": {
+        "description": "Back to the 18 initial adhkar; every other row (added or edited) is removed.",
+        "operationId": "reset_adhkar_api_corpora_adhkar_reset_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/DhikrOut"
+                  },
+                  "title": "Response Reset Adhkar Api Corpora Adhkar Reset Post",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Reset Adhkar",
+        "tags": [
+          "corpora"
+        ]
+      }
+    },
     "/api/corpora/adhkar/{dhikr_id}": {
       "delete": {
         "operationId": "delete_dhikr_api_corpora_adhkar__dhikr_id__delete",
@@ -6197,6 +6378,115 @@
           }
         },
         "summary": "Update Dhikr",
+        "tags": [
+          "corpora"
+        ]
+      }
+    },
+    "/api/corpora/browse": {
+      "get": {
+        "description": "Read the Quran (filter: surah) or the hadith in use (filter: book), with a text or reference search and\npages. Straight from the corpus: the first call starts the engine worker (seconds).",
+        "operationId": "browse_api_corpora_browse_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "kind",
+            "required": true,
+            "schema": {
+              "pattern": "^(QURAN|HADITH)$",
+              "title": "Kind",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "surah",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Surah"
+            }
+          },
+          {
+            "in": "query",
+            "name": "book",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Book"
+            }
+          },
+          {
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "default": "",
+              "title": "Q",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 25,
+              "maximum": 200,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BrowsePage"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Browse",
         "tags": [
           "corpora"
         ]

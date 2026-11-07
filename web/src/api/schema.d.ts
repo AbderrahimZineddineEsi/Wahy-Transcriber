@@ -42,6 +42,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/corpora/adhkar/import": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Import Adhkar
+         * @description Add the items of an exported list that are not in the list already.
+         */
+        post: operations["import_adhkar_api_corpora_adhkar_import_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/corpora/adhkar/reset": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Reset Adhkar
+         * @description Back to the 18 initial adhkar; every other row (added or edited) is removed.
+         */
+        post: operations["reset_adhkar_api_corpora_adhkar_reset_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/corpora/adhkar/{dhikr_id}": {
         parameters: {
             query?: never;
@@ -55,6 +95,27 @@ export interface paths {
         post?: never;
         /** Delete Dhikr */
         delete: operations["delete_dhikr_api_corpora_adhkar__dhikr_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/corpora/browse": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Browse
+         * @description Read the Quran (filter: surah) or the hadith in use (filter: book), with a text or reference search and
+         *     pages. Straight from the corpus: the first call starts the engine worker (seconds).
+         */
+        get: operations["browse_api_corpora_browse_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -1658,6 +1719,28 @@ export interface components {
             /** Unit Id */
             unit_id?: string | null;
         };
+        /**
+         * AdhkarImport
+         * @description A JSON list of adhkar (the export of GET /adhkar, or just `{category?, ref?, t}` items).
+         */
+        AdhkarImport: {
+            /** Items */
+            items: {
+                [key: string]: unknown;
+            }[];
+        };
+        /** AdhkarImported */
+        AdhkarImported: {
+            /** Added */
+            added: number;
+            /** Adhkar */
+            adhkar: components["schemas"]["DhikrOut"][];
+            /**
+             * Skipped
+             * @description empty, under two words, or already in the list (ignoring marks)
+             */
+            skipped: number;
+        };
         /** Approved */
         Approved: {
             /**
@@ -1703,6 +1786,35 @@ export interface components {
         Body_upload_source_api_corpora_sources__source_id__upload_post: {
             /** File */
             file: string;
+        };
+        /** BrowseItem */
+        BrowseItem: {
+            /** Group */
+            group: string;
+            /** Id */
+            id: string;
+            /** Ref */
+            ref: string;
+            /** Text */
+            text: string;
+        };
+        /**
+         * BrowsePage
+         * @description One page of the Quran or a hadith book. `groups` are the filter choices: surah number → [name, ayat],
+         *     or book id → [book id, hadiths].
+         */
+        BrowsePage: {
+            /** Groups */
+            groups: {
+                [key: string]: [
+                    string,
+                    number
+                ];
+            };
+            /** Items */
+            items: components["schemas"]["BrowseItem"][];
+            /** Total */
+            total: number;
         };
         /** CanonicalWords */
         CanonicalWords: {
@@ -4230,6 +4342,59 @@ export interface operations {
             };
         };
     };
+    import_adhkar_api_corpora_adhkar_import_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AdhkarImport"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdhkarImported"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reset_adhkar_api_corpora_adhkar_reset_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DhikrOut"][];
+                };
+            };
+        };
+    };
     update_dhikr_api_corpora_adhkar__dhikr_id__put: {
         parameters: {
             query?: never;
@@ -4282,6 +4447,42 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    browse_api_corpora_browse_get: {
+        parameters: {
+            query: {
+                kind: string;
+                surah?: number | null;
+                book?: string | null;
+                q?: string;
+                offset?: number;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BrowsePage"];
+                };
             };
             /** @description Validation Error */
             422: {
