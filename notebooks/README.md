@@ -1,6 +1,9 @@
 # Notebooks
 
-Run local notebooks from anywhere inside the repo (they look for `backend/` upward); the Kaggle ones only run on Kaggle.
+Run local notebooks from anywhere inside the repo (they look for `server/wahy/` upward) in the **Wahy server
+(server/.venv)** kernel: `cd server && uv sync --extra local-asr --extra laya --extra research`, then
+`.venv/bin/python -m ipykernel install --user --name wahy-server --display-name "Wahy server (server/.venv)"`. The Kaggle
+ones only run on Kaggle.
 
 ## `data/` — building and labelling the Laya data (local, in this order)
 
@@ -11,7 +14,7 @@ Run local notebooks from anywhere inside the repo (they look for `backend/` upwa
 | [laya_autolabel.ipynb](data/laya_autolabel.ipynb) | Sonnet labels on the YouTube / Bin Baz lecture batches |
 | [laya_lectures.ipynb](data/laya_lectures.ipynb) | lecture batch 2 (download, transcribe, detect) |
 | [laya_engine_v5.ipynb](data/laya_engine_v5.ipynb) | engine v5 vs v3 / v4 on the labelled findings |
-| [laya_dataset.ipynb](data/laya_dataset.ipynb) | builds `laya_v1` (runs 1–2) — `laya_v2` is built by `backend/laya_datagen/laya_v2.py` (see `docs/laya-finetune/kaggle-guide.md` §8) |
+| [laya_dataset.ipynb](data/laya_dataset.ipynb) | builds `laya_v1` (runs 1–2) — `laya_v2` and `laya_v3` are built by `python -m wahy.laya build-v2 / build-v3` (from `server/`) |
 
 ## `kaggle/` — fine-tuning runs (upload to Kaggle, GPU T4 ×2)
 
@@ -23,6 +26,7 @@ Run local notebooks from anywhere inside the repo (they look for `backend/` upwa
 | 4 | [laya_run4_kaggle.ipynb](kaggle/laya_run4_kaggle.ipynb) — verdict-only / boundary-only / repeat | `laya_v2` (new version) | [finished/wahy-laya-finetuning-run4.ipynb](kaggle/finished/wahy-laya-finetuning-run4.ipynb) |
 | 5 | [laya_run5_kaggle.ipynb](kaggle/laya_run5_kaggle.ipynb) — passages on v1 envelope (verdict only) | `laya_v2` | [finished/wahy-laya-finetuning-run5.ipynb](kaggle/finished/wahy-laya-finetuning-run5.ipynb) |
 | 6 | [laya_run6_kaggle.ipynb](kaggle/laya_run6_kaggle.ipynb) — envelope v3: clean boundary cues + mixed single & passages | `laya_v2` | [finished/wahy-laya-finetuning-run6-finished.ipynb](kaggle/finished/wahy-laya-finetuning-run6-finished.ipynb) |
+| next | [laya_v3_kaggle.ipynb](kaggle/laya_v3_kaggle.ipynb) — run 6's recipe on final envelopes (reads rows as they are, ADR 0003); not run yet | `laya_v3` | — |
 
 ## `colab/` — running full app with specialized Whisper + Laya (Google Colab, GPU T4)
 

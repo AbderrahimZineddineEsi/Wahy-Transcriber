@@ -19,13 +19,13 @@ Lectures, transcripts and results are kept in `data/laya_datagen/`: `lectures/<i
 import sys, os, importlib
 from pathlib import Path
 ROOT = Path.cwd().resolve()
-while not (ROOT / "backend").exists(): ROOT = ROOT.parent
-sys.path.insert(0, str(ROOT)); os.chdir(ROOT)
+while not (ROOT / "server" / "wahy").exists(): ROOT = ROOT.parent
+sys.path.insert(0, str(ROOT / "server")); os.chdir(ROOT)
 import pandas as pd
 from IPython.display import display
-from backend.laya_datagen import config, asr as asr_mod, pipeline, cards, lectures, autolabel, agent_eval
-from backend.laya_datagen.engine_bridge import EngineBridge
-from backend.laya_datagen.sources import binbaz, youtube
+from wahy.laya import config, asr as asr_mod, pipeline, cards, lectures, autolabel, agent_eval
+from wahy.laya.engine_bridge import EngineBridge
+from wahy.laya.sources import binbaz, youtube
 for _m in (cards, agent_eval, autolabel, lectures): importlib.reload(_m)   # picks up code edits without restarting the kernel
 
 ENGINE = "v4"
@@ -34,7 +34,7 @@ RUN_MODELS = True       # True: Sonnet labels new cards (uses your Claude allowa
 ```
 
 ## Lectures
-The list is in `backend/laya_datagen/lectures.py` (add video ids or Bin Baz lessons there). Downloads and transcription (Groq) happen once; everything is cached.
+The list is in `server/wahy/laya/lectures.py` (add video ids or Bin Baz lessons there). Downloads and transcription (Groq) happen once; everything is cached.
 
 ```python
 bridge = EngineBridge(hadith_path=HADITH_CORPUS); bridge.start()

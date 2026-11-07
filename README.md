@@ -121,8 +121,9 @@ transcript ─► segment ─► units of work ─► model adapter (Gemini | JE
 The Wahy models are trained on Kaggle (2× T4) from labelled lecture findings: how the data is made, every run step by step,
 and how to read the results are in [docs/laya-finetune/](docs/laya-finetune/) (start with
 [kaggle-guide.md](docs/laya-finetune/kaggle-guide.md)); the notebooks are indexed in [notebooks/README.md](notebooks/README.md).
-The data code is `backend/laya_datagen/` (`laya_v2.py` builds the current dataset, `kaggle/` holds the training and
-evaluation scripts).
+The data code is `server/wahy/laya/` (moved from `backend/laya_datagen/` in rewrite phase 22; `laya_v3.py` builds the
+current dataset of final envelopes, `kaggle/` holds the training and evaluation scripts, `python -m wahy.laya` is its
+command line).
 
 The older in-app route still works: your corrections and the models' verdicts are saved together, so negative examples (normal speech the model mistook for a quote) are kept for training. Export them from the **بيانات التدريب** (Training Data) tab, then run:
 
@@ -157,7 +158,6 @@ Wahy-Transcriber/
 │   ├── laya_engine.py       # Local Laya inference that respects VRAM limits
 │   ├── laya_converter.py    # Audit logs to Laya JSONL
 │   ├── finetune_laya.py     # Head-only and full fine-tuning
-│   ├── laya_datagen/        # Laya training data: lectures, labels, datasets, Kaggle train/eval scripts
 │   ├── tafrigh/             # AI Tafrigh pipeline (adapters, validators, aligner, exporters)
 │   └── tests/               # pytest suite
 ├── notebooks/               # data/ (build + label), kaggle/ (fine-tuning runs), results/ (read a run)

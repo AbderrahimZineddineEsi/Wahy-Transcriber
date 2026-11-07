@@ -29,17 +29,17 @@ Answers save on every click to `data/laya_datagen/labels/`. **↶ Undo** reverts
 import sys, os
 from pathlib import Path
 ROOT = Path.cwd().resolve()
-while not (ROOT / "backend").exists(): ROOT = ROOT.parent
-sys.path.insert(0, str(ROOT)); os.chdir(ROOT)
+while not (ROOT / "server" / "wahy").exists(): ROOT = ROOT.parent
+sys.path.insert(0, str(ROOT / "server")); os.chdir(ROOT)
 import pandas as pd
 from IPython.display import display
 from tqdm.auto import tqdm
 import importlib
-from backend.laya_datagen import config, asr as asr_mod, pipeline, stages, cards, benchmark, export, sprint, agent_eval
-from backend.laya_datagen.teachers import base as teachers
+from wahy.laya import config, asr as asr_mod, pipeline, stages, cards, benchmark, export, sprint, agent_eval
+from wahy.laya.teachers import base as teachers
 for _m in (teachers, cards, sprint, agent_eval): importlib.reload(_m)   # picks up code edits without restarting the kernel
-from backend.laya_datagen.engine_bridge import EngineBridge
-from backend.laya_datagen.sources import binbaz
+from wahy.laya.engine_bridge import EngineBridge
+from wahy.laya.sources import binbaz
 
 ENGINE  = "v4"                  # the engine you are judging
 ENGINES = ["v3", "v4"]          # all engines run (to see which one caught a missed quote); add "v5" once it exists
@@ -173,10 +173,10 @@ Base Laya (no fine-tuning) is the baseline any fine-tuned Laya must beat. Answer
 Run the setup cell, then **any model cell on its own**; each one adds its row to the score table. Re-running the setup cell (e.g. after labelling more cards) clears the table: re-run the model cells, cached answers cost nothing.
 
 ```python
-from backend.laya_datagen.teachers.jev import JevTeacher
-from backend.laya_datagen.teachers.gemini import GeminiTeacher
-from backend.laya_datagen.teachers.openrouter_chat import OpenRouterChatTeacher
-from backend.laya_datagen.teachers.laya_local import LayaLocal
+from wahy.laya.teachers.jev import JevTeacher
+from wahy.laya.teachers.gemini import GeminiTeacher
+from wahy.laya.teachers.openrouter_chat import OpenRouterChatTeacher
+from wahy.laya.teachers.laya_local import LayaLocal
 
 fa = cards.load_answers("findings")
 # models can only answer real / not / unsure: "ayah inside a hadith" counts as real; "quoted by meaning" and "unsure" are left out
@@ -269,8 +269,8 @@ Goal: many more ✘ *Not a quote* cards for far fewer clicks. Only stage-4 findi
 Answers go to `labels/sprint.json`, kept out of the engine report (these queues are not random samples). Model answers are not shown on the cards, so they don't sway you.
 
 ```python
-from backend.laya_datagen.teachers.jev import JevTeacher
-from backend.laya_datagen.teachers.gemini import GeminiTeacher
+from wahy.laya.teachers.jev import JevTeacher
+from wahy.laya.teachers.gemini import GeminiTeacher
 ```
 
 ```python

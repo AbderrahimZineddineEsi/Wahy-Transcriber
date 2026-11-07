@@ -19,14 +19,14 @@ Gates: **G1** (cell 9) audit precision ≥ 97 % before scaling · **G2** `laya.t
 import sys, os, json, collections
 from pathlib import Path
 ROOT = Path.cwd().resolve()
-while not (ROOT / "backend").exists(): ROOT = ROOT.parent
-sys.path.insert(0, str(ROOT)); os.chdir(ROOT)
+while not (ROOT / "server" / "wahy").exists(): ROOT = ROOT.parent
+sys.path.insert(0, str(ROOT / "server")); os.chdir(ROOT)
 import pandas as pd
 pd.set_option("display.max_colwidth", 80); pd.set_option("display.width", 200)
-from backend.laya_datagen import config, cache
-from backend.laya_datagen.engine_bridge import EngineBridge
-from backend.laya_datagen.sources import binbaz
-from backend.laya_datagen import asr as asr_mod, pipeline, review, reconcile, export, validate, benchmark
+from wahy.laya import config, cache
+from wahy.laya.engine_bridge import EngineBridge
+from wahy.laya.sources import binbaz
+from wahy.laya import asr as asr_mod, pipeline, review, reconcile, export, validate, benchmark
 
 ENGINES        = ["v3", "v4"]            # engines to run on every lesson (add "v5" once it is registered in harness.js)
 PRIMARY_ENGINE = "v4"                    # the engine whose envelopes are exported as training data
@@ -162,10 +162,10 @@ Cost estimate first; set `RUN_TEACHERS = True` to spend. Teacher answers are cac
 Teachers see the **original** envelope (with engine fields), exactly as in the app.
 
 ```python
-from backend.laya_datagen.teachers.jev import JevTeacher
-from backend.laya_datagen.teachers.gemini import GeminiTeacher
-from backend.laya_datagen.teachers.openrouter_chat import OpenRouterChatTeacher
-from backend.laya_datagen.teachers.laya_local import LayaLocal
+from wahy.laya.teachers.jev import JevTeacher
+from wahy.laya.teachers.gemini import GeminiTeacher
+from wahy.laya.teachers.openrouter_chat import OpenRouterChatTeacher
+from wahy.laya.teachers.laya_local import LayaLocal
 
 TEACHERS = {"jev": JevTeacher(), "gemini": GeminiTeacher("gemini-3.5-flash-lite")}   # add OpenRouterChatTeacher("deepseek/deepseek-chat") etc.
 RUN_TEACHERS = False

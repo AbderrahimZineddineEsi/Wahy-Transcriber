@@ -139,7 +139,9 @@ A label given by the user, the most trusted kind.
 A model that labels cards for training data, such as Sonnet or Gemini.
 
 **Dataset**:
-A versioned set of training rows built from labelled cards and split into train, validation and test (laya_v1, laya_v2).
+A versioned set of training rows built from labelled cards and split into train, validation and test (laya_v1, laya_v2,
+laya_v3). Since laya_v3 each row holds its final envelope, built by the engine as the app builds it; training reads
+the rows as they are.
 _Avoid_: data, corpus
 
 **Run**:

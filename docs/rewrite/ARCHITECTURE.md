@@ -27,7 +27,8 @@ server/                Python 3.12, FastAPI, managed with uv
     features/          one folder per feature: router.py, service.py, schemas.py, models.py
       lectures/  transcription/  detection/  verification/  editing/  export/
       tafrigh/   corpora/        telemetry/  training/      jobs/     settings/
-  laya/                the research side (was backend/laya_datagen): datagen CLI, teachers, dataset build, evals
+    laya/              the research side (was backend/laya_datagen): datagen CLI, teachers, dataset build, evals
+                       (inside wahy/: a top-level `laya` package would hide the installed `laya` library)
   tests/
 engine/                TypeScript: engines v3/v4/v5, envelope builders v1/v2/v3, worker entry, golden tests
 web/                   React + TypeScript + Vite + Tailwind

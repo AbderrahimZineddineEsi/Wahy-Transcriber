@@ -127,3 +127,9 @@ Queue: phase 17 running -> 16b (bracket embedded Quran verses) -> 18 -> ... -> 2
 
 ## Running now: phase 21 Corpora screens and status (Sonnet 5.5, medium)
 - Child: refactoring-step-21, session ID 99001feb-798b-495c-acad-04f0cb2c39a5, log: /tmp/claude-1000/-home-zeno-Documents-work-new-projects-Wahy-Transcriber/428c450a-c0e2-4fc7-86dc-884ec1da7570/scratchpad/step-21.json. Phase 20 done (2a690de).
+
+## Running now: phase 22 Datagen on the new core (Opus 5.5, high)
+- Child: refactoring-step-22, session ID bb69718d-fbfb-41df-a9b9-eeafb5fcd283, log: /tmp/claude-1000/-home-zeno-Documents-work-new-projects-Wahy-Transcriber/428c450a-c0e2-4fc7-86dc-884ec1da7570/scratchpad/step-22.json. Phase 21 done (551f429).
+- A QUESTION about the live teacher or retraining goes to the decider session. "User decides when to retrain" = user-only decision: never retrain.
+
+## 2026-11-07 06:35: phase 22 child hit the usage limit with all work uncommitted in the tree (roadmap already ticked). Resuming session to verify, commit and push (log step-22b.json). User: no adhkar detection fix wanted; no custom corpus URLs.

@@ -5,7 +5,7 @@ Training side: the run-6 notebook (notebooks/kaggle/laya_run6_kaggle.ipynb) resh
 (js/ai-verifier.js) from the same findings and words. Laya reads `json.dumps(state)` and the question text, so any
 difference in keys, key order, values or instructions is a different input.
 
-Run from the repo root (about 5 minutes):  .venv/bin/python engine/golden/measure_skew.py
+Run from the repo root (about 5 minutes):  server/.venv/bin/python engine/golden/measure_skew.py
 Prints the report; nothing is written to the repo.
 """
 from __future__ import annotations
@@ -18,10 +18,10 @@ from collections import Counter
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(ROOT))
+sys.path.insert(0, str(ROOT / "server"))
 
-from backend.laya_datagen import laya_v2 as L  # noqa: E402
-from backend.laya_datagen.engine_bridge import EngineBridge  # noqa: E402
+from wahy.laya import laya_v2 as L  # noqa: E402
+from wahy.laya.engine_bridge import EngineBridge  # noqa: E402
 
 NOTEBOOK = ROOT / "notebooks/kaggle/laya_run6_kaggle.ipynb"
 DATA = L.OUT

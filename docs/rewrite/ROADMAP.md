@@ -348,7 +348,7 @@ decisions and why). The problems being fixed are in the friction map: https://cl
     sources tab's per-source upload; no custom corpus URLs (the server owns the sources).
   - Learn: CRUD screens done once and reused.
 
-- [ ] **22. Datagen on the new core**: Opus 5.5, high. ADRs 0003, 0004.
+- [x] **22. Datagen on the new core**: Opus 5.5, high. ADRs 0003, 0004.
   - Move `backend/laya_datagen/` to `server/laya/`, so teachers are `core/ai` providers and the engine is `core/engine`.
     Add CLI entry points, and port the tests.
   - The dataset builder stores final envelopes, and the Kaggle scripts and notebooks stop reshaping them. Use the skew
@@ -356,6 +356,15 @@ decisions and why). The problems being fixed are in the friction map: https://cl
   - Done when: a rebuild of `laya_v2` gives identical hashes; the ported tests pass.
   - Feature check: label 5 cards with the fake teacher and one live teacher (with the user's permission).
     Features: F-131 to F-135, F-137.
+  - Done-when result (2026-11-07): `laya_v2` rebuilt by the moved code equals a rebuild by the old code made the same
+    day, 27 of 27 files byte-identical (manifest apart from its date). Against the folder stored on 2026-10-27, 11 files
+    differ, the same for the old code: the 16 passages regrouped by commit `4147cb7` (and the synth rows and verse flags
+    that follow from them), and the stored `v1_passages`, whose instructions lack their backticked field names (that
+    file was not written by this code). `server/tests/laya/`: 74 pass (62 ported, 12 new).
+  - Feature check result (2026-11-07): 5 cards of `laya_v3/v3_mixed/test.jsonl` (your labels, seed 22) labelled with
+    `python -m wahy.laya label`: the fake teacher (5/5 agree with your label, $0), then Gemini `gemini-3.5-flash-lite` on
+    the free tier (one request, 2.8 s, $0, 5/5 agree); both saved in the app's request log as purpose "teacher".
+  - Notes: see the 2026-11-07 phase 22 entry under **Changes**.
   - Learn: keeping research code and product code on one path.
 
 ### Finish
@@ -570,3 +579,35 @@ Each entry: date, what changed, the user's words.
 - **2026-11-07**: Phase 21 done as written. Two facts for the user: only engine v3 detects adhkar (v4/v5, the default,
   find none), so the adhkar tab says which engine finds them and the Feature check runs on v3; and the engine choice
   in the lecture toolbar (second copy of F-011) was left to the lecture view. No change of scope.
+- **2026-11-07**: Phase 22 (done). Choices made inside the phase:
+  - The research side is `server/wahy/laya/` (package `wahy.laya`), not `server/laya/`: a top-level package named `laya`
+    would hide the installed `laya` library that local Laya imports. ARCHITECTURE.md says so. `backend/laya_datagen/`
+    and its tests were removed (moved); the old app never used them.
+  - Teachers are adapters over `core/ai` (fake, gemini, jev, openrouter, laya) and keep their answer cache. The request
+    differs a little from the old datagen's (the app's batch instruction, reply schema and boundary clean-up), so new
+    answers are cached as prompt version `v2`; the 1,335 old `v1` answers stay readable and are never mixed with them.
+    The guided labelling (agent_eval) and `teacher_eval` JEV and chat calls also go through core/ai; `core/ai`'s chat
+    options gained `top_logprobs` for `teacher_eval chat`. `teacher_eval laya` still scores a checkpoint with the laya
+    package in batches, as `kaggle/eval_laya.py` does: that is scoring a checkpoint, not asking a teacher. The datagen's
+    ASR uses `features/transcription` (Groq through core/ai, local Whisper through the GPU owner); every lecture so far is
+    in the ASR cache, so nothing was re-transcribed.
+  - Teacher requests go to the app's request log (`data/wahy.db`, purpose "teacher").
+  - Dataset builders (laya_v1, laya_v2, laya_v3) refuse to write over an existing folder unless asked (`--force`);
+    `laya_dataset.ipynb` now writes `laya_v1_rebuild` unless `REBUILD_IN_PLACE = True`.
+  - New dataset version **`laya_v3`** (`data/laya_datagen/datasets/laya_v3/`): run 6's two variants, `v3_single` and
+    `v3_mixed`, with every row the engine's own envelope 3 (the app's builder), the same labels, split and gold as
+    laya_v2, and the three envelope questions kept (verdict-only training picks the verdict items). `skew-run6` against
+    the rows run 6 trained on: the verdict question differs on all rows, the state on 2,019 (hadith and adhkar:
+    `quran_neighboring_context` null in run 6, absent in the app), and 16 passages are grouped differently. Not zipped
+    nor uploaded; no training was started: when to retrain is the user's decision (QUESTION in the phase 22 report).
+  - `notebooks/kaggle/laya_v3_kaggle.ipynb` is run 6's recipe reading `laya_v3` as it is (no `to_v3_state`); the run-6
+    notebooks are left as the record of run 6. The Kaggle scripts (`train_ddp.py`, `eval_laya.py`) did not reshape
+    rows (they only choose questions, as the app does) and are unchanged, so laya_v2's copies stay identical.
+  - The datagen notebooks import `wahy.laya` and run in a new kernel "Wahy server (server/.venv)" (`wahy-server`);
+    the server has a new extra `research` (beautifulsoup4, pandas, tqdm, ipykernel, ipywidgets, matplotlib), and the
+    dev group gained beautifulsoup4, pandas and tqdm for the tests. The moved code keeps its old style (per-folder ruff
+    ignores, as Tafrigh in phase 18).
+  - Two lint errors left by phase 21 (`features/corpora/schemas.py` UP037, `features/corpora/router.py` E501) were fixed
+    so `scripts/test.sh` passes ruff.
+  - Comments in `engine/src/` still name `backend/laya_datagen`: editing an engine file changes the engine fingerprint
+    and so every datagen cache key (a full re-detection), so they were left for a phase that changes the engine anyway.

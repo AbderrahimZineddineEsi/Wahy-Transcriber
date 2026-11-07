@@ -15,7 +15,7 @@ The model is borrowed from the GPU owner under the name `laya:<checkpoint>`, so 
 and the other way round. The device: "cuda" when asked and the installed torch has kernels for this card,
 "auto" also needs 850 MB free, otherwise the CPU; running out of memory while loading falls back to the CPU.
 The engine's own score and band are taken out of the state first, as in training
-(backend/laya_datagen/export.py ENGINE_STATE_KEYS).
+(wahy/laya/export.py ENGINE_STATE_KEYS).
 """
 
 from __future__ import annotations

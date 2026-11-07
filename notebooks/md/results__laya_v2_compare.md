@@ -18,8 +18,8 @@ import pandas as pd
 from IPython.display import Markdown, Image, display
 
 ROOT = Path.cwd().resolve()
-while not (ROOT / "backend").exists(): ROOT = ROOT.parent
-sys.path.insert(0, str(ROOT / "backend" / "laya_datagen" / "kaggle"))
+while not (ROOT / "server" / "wahy").exists(): ROOT = ROOT.parent
+sys.path.insert(0, str(ROOT / "server" / "wahy" / "laya" / "kaggle"))
 import eval_laya
 
 RUN = "run4"            # which downloaded run to read: "run3" or "run4"

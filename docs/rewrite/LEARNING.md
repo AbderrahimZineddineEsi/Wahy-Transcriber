@@ -1664,3 +1664,59 @@ cd server && uv run pytest -q tests/test_corpora.py                    # adhkar 
 cd web && npx playwright test e2e/corpora.spec.ts                      # the feature check in the real app
 curl -s 'localhost:8120/api/corpora/browse?kind=QURAN&surah=18&offset=25&limit=3' | python3 -m json.tool
 ```
+
+## Phase 22: Datagen on the new core
+
+**Built.** The research side moved from `backend/laya_datagen/` to `server/wahy/laya/` and now runs on the server's own
+machinery: the engine through `core/engine.py`, every teacher (Gemini, JEV, OpenRouter chat models, local Laya, and a
+new fake one) through `core/ai`, speech recognition through `features/transcription`. It has a command line,
+`python -m wahy.laya` (build, compare hashes, label cards with a teacher, the run-6 skew report, validate, zip). A new
+dataset version, `laya_v3`, stores the **final** envelope-v3 rows, and a new Kaggle notebook
+(`notebooks/kaggle/laya_v3_kaggle.ipynb`) reads them as they are. Nothing was trained.
+
+Why `server/wahy/laya/` and not `server/laya/`: a top-level package called `laya` would hide the installed `laya`
+library (the model code). `import laya` searches the folders on `sys.path` in order, and `server/` comes first, so
+local Laya would have imported our folder instead of the library.
+
+**New concepts.**
+- **One path for research and product.** Before, the datagen had its own HTTP code for Gemini and JEV, with its own
+  retries and no request log, so a teacher evaluation didn't necessarily describe what the app does. Now a teacher is a
+  thin adapter: it builds `Item`s, calls `ai.verify("gemini", items, call=Call(purpose="teacher"))`, and adds a cache.
+  Compare NestJS: two controllers (the app's verification and the datagen) injecting the same provider service.
+- **A cache key holds everything that changes the answer.** A teacher's answers are cached under
+  `sha(teacher, model, prompt_version, state, questions)`. Going through core/ai changes the request a little (the app's
+  batch instruction and reply schema), so the prompt version went from `v1` to `v2`. The 1,335 old answers stay
+  readable under `v1` and are never mixed with new ones.
+- **"Identical hashes" needs two references.** The rebuild was compared with a rebuild by the *old* code today
+  (27 of 27 files byte-identical: the move changed nothing), and separately with the dataset stored on 2026-10-27. That
+  one differs in the passage files, and the old code gives the same differences: they come from earlier changes (the
+  16 passages regrouped by commit `4147cb7`, and a stored `v1_passages` whose instructions lost their backticked field
+  names). A rebuild never writes over a dataset now: `build()` refuses an existing folder unless told to.
+- **Final rows, measured.** `skew-run6` rebuilds the rows run 6 trained on (with the notebook's own `to_v3_state`,
+  read from its source) and compares them with `laya_v3`: the verdict question differs on every row, and 2,019 hadith
+  and dhikr states differ (run 6 has `"quran_neighboring_context": null`, the app leaves the key out). Example:
+  `json.dumps({"a": 1, "q": None})` and `json.dumps({"a": 1})` are different strings, so they are different tokens for
+  Laya. Different rows means a new dataset version: you decide when to train on it.
+
+**Tested.**
+- `server/tests/laya/`: 74 tests (the 62 old datagen tests ported unchanged apart from their imports, plus 12 new):
+  teachers through core/ai (fake verifier, recorded Gemini and JEV replies), saved in the request log as purpose
+  "teacher" and cached; a failed card caches nothing; the CLI's hash comparison and labelling; `laya_v3` rows equal the
+  engine's envelopes byte for byte; builds refuse to overwrite; the run-6 comparison.
+- Rebuilds: `laya_v2` by the new code = by the old code (27/27); `laya_v3` built twice = identical (12/12); every
+  `laya_v3` file through Laya's own reader (all items, nothing skipped); the new notebook's data cells and
+  `--questions verdict` on the stored rows (one verdict item per row).
+- The `laya_review.ipynb` "Setup" and "Load lessons" cells in the server environment: the recall table prints as before
+  (v4 recall 0.736 on 16 lessons).
+- Feature check: 5 cards of `laya_v3/v3_mixed/test` (your own labels) labelled by the fake teacher (5/5, $0), then by
+  Gemini `gemini-3.5-flash-lite` on the free tier: one request, 2.8 s, $0, agreeing with your label on 5/5; both in
+  the app's request log as "teacher".
+
+**Try:**
+
+```bash
+cd server
+uv run python -m wahy.laya label --teacher fake --n 5                       # a teacher labels 5 of your cards
+uv run python -m wahy.laya skew-run6 ../data/laya_datagen/datasets/laya_v3  # how laya_v3 differs from run 6's rows
+uv run pytest -q tests/laya                                                 # the research side's tests
+```

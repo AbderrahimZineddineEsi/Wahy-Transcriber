@@ -22,11 +22,11 @@ Engine runs are cached per engine file: editing `engine_v5.js` re-runs v5 only, 
 import sys, os, importlib
 from pathlib import Path
 ROOT = Path.cwd().resolve()
-while not (ROOT / "backend").exists(): ROOT = ROOT.parent
-sys.path.insert(0, str(ROOT)); os.chdir(ROOT)
+while not (ROOT / "server" / "wahy").exists(): ROOT = ROOT.parent
+sys.path.insert(0, str(ROOT / "server")); os.chdir(ROOT)
 import pandas as pd
 from IPython.display import display
-from backend.laya_datagen import engine_eval, autolabel, lectures, stages
+from wahy.laya import engine_eval, autolabel, lectures, stages
 for _m in (engine_eval, autolabel, lectures): importlib.reload(_m)   # picks up code edits without restarting the kernel
 pd.set_option("display.max_colwidth", 200)
 
@@ -129,7 +129,7 @@ base Laya, DeepSeek, Sonnet per effort (model answers are matched to findings th
 per finding (you > written text > Sonnet high > Sonnet medium); *places* merges near-duplicate spans of the same quote.
 
 ```python
-from backend.laya_datagen import inventory
+from wahy.laya import inventory
 importlib.reload(inventory)
 recs, where = inventory.collect()
 ans = inventory.answers(recs)

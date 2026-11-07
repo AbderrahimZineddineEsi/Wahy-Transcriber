@@ -5,6 +5,49 @@ State for recovery (session IDs, what to do if a child died) is in `orchestrator
 
 <!-- NEW REPORTS GO BELOW THIS LINE -->
 
+## 2026-11-07 06:35 — Your answers on adhkar detection and custom corpus URLs; phase 22 cut off by the usage limit
+
+**Your answers (recorded):** adhkar detection on the default engine is not needed now and will not be added; you can add it
+later since the adhkar database is ready. Custom corpus URLs (F-015) are not needed, as long as there is a better way: the
+per-source upload on the Corpora screen (upload a file by hand for any hadith source) and the download/prepare buttons are
+that way.
+
+**Phase 22 (Datagen on the new core):** the child finished the work and ticked the roadmap in the working tree, then the 5-hour
+usage limit (reset 4:50am) cut it off before the commit, so nothing is committed yet. I resumed the same session to verify,
+commit and push. From the roadmap notes already written:
+- `backend/laya_datagen/` was moved (git mv) to `server/wahy/laya/` with tests in `server/tests/laya/`: **74 pass (62 ported,
+  12 new)**. Kaggle and notebook scripts no longer reshape envelopes (notebooks updated, new `notebooks/kaggle/laya_v3_kaggle.ipynb`).
+- **Done-when**: `laya_v2` rebuilt by the moved code equals a rebuild by the old code the same day: 27 of 27 files
+  byte-identical (manifest apart from its date). Against the folder stored on 2026-10-27, 11 files differ, the same for the old code:
+  the 16 passages regrouped by commit `4147cb7` (plus the synth rows and verse flags that follow) and the stored `v1_passages`
+  (its instructions lack their backticked field names; that file was not written by this code).
+- **Feature check**: 5 cards of `laya_v3/v3_mixed/test.jsonl` (your labels, seed 22) labelled with `python -m wahy.laya label`:
+  fake teacher 5/5 agree with your label ($0); Gemini `gemini-3.5-flash-lite` free tier, one request, 2.8 s, $0, 5/5 agree.
+  Both are in the app's request log with purpose "teacher". No retraining, no Kaggle run.
+
+## 2026-11-07 02:05 — Phase 21 (Corpora screens and status) done; phase 22 started
+
+Gate passed. Commit `551f429` "rewrite phase 21: Corpora screens and status" pushed, phase ticked. Tests: engine 268, server 410
+(+6 skipped), web Vitest 147, Playwright 17. No live OpenRouter calls; `.env` and `data/` untouched.
+- Built: the Corpora screen (`/corpora`, five tabs). Adhkar are ordinary rows (add with two words minimum, edit or delete any,
+  including the 18 initial ones; initial/mine filter; "detect adhkar" switch; JSON export and import; a restore-initial list
+  that asks twice before removing your rows). Custom quotes fully editable. Quran and hadith browsing (surah or book filter,
+  search, 25 per page). Hadith sources tab (status, prepare, prepare again, download again, upload by hand, use this one,
+  forget). Settings got an engine panel (version v5, v5:loose, v4, v3; Qira'ah; adhkar switch) and a Laya panel (loaded or not,
+  device, GPU memory, checkpoint, envelope version, load and unload buttons F-097/F-098). New engine command `browse`; routes
+  `GET /api/corpora/browse`, `POST /api/corpora/adhkar/import`, `POST /api/corpora/adhkar/reset`. Arabic and English texts.
+- Feature check passed offline **on engine v3**: the sample lecture has one dhikr (the closing «لا إله إلا الله»); after adding
+  «نحمده ونستعينه ونستغفره» in the screen, the next detection found two; switch off left none. Also checked: surah 18 page 2
+  shows ayat 26 to 50; the engine choice survives a reload.
+- **Needs your attention (not blocking): only engine v3 detects adhkar.** v4 and v5, the default, find none, and the golden
+  files pin that (same as the old app). The adhkar tab shows a note when another engine is chosen. It looks related to N-001
+  (dhikr as a check after detection). So with the default engine, the adhkar list has no effect yet. Say if you want it fixed
+  in a correction session or left for the engine work you plan.
+- Left out: a second engine choice in the lecture toolbar (F-011; Settings has it); custom corpus URLs (F-015; the server
+  owns the sources, per-source upload covers the file case).
+- **Phase 22 (Datagen on the new core, Opus 5.5, high)** is running as `refactoring-step-22`. Its Feature check wants one live
+  teacher; if the child asks, the decider session answers (small cost, Gemini free tier preferred).
+
 ## 2026-11-07 01:50 — Phase 20 (Training data) done; phase 21 started
 
 Gate passed. Commit `2a690de` "rewrite phase 20: Training data" pushed, phase ticked, `scripts/test.sh` all green (old backend 152,

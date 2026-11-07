@@ -78,7 +78,7 @@ class AdhkarImport(BaseModel):
 class AdhkarImported(BaseModel):
     added: int
     skipped: int = Field(description="empty, under two words, or already in the list (ignoring marks)")
-    adhkar: list["DhikrOut"]
+    adhkar: list[DhikrOut]
 
 
 class DhikrOut(BaseModel):

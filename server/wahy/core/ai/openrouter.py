@@ -378,6 +378,7 @@ class ChatOptions:
     reason_detail: str = "brief"
     max_tokens: int = CHAT_MAX_TOKENS
     max_tokens_retry: int = CHAT_MAX_TOKENS_RETRY
+    top_logprobs: int | None = None  # ask for the reply's token logprobs (a teacher reads its odds there)
 
 
 @dataclass
@@ -497,6 +498,8 @@ class OpenRouterChatProvider:
                 p["response_format"] = {"type": "json_object"}
             if o.no_thinking and meta is not None and meta.can_disable_reasoning:
                 p["reasoning"] = {"enabled": False}
+            if o.top_logprobs:
+                p["logprobs"], p["top_logprobs"] = True, o.top_logprobs
             return p
 
         headers = {"Authorization": f"Bearer {key}", **HEADERS}
@@ -604,5 +607,5 @@ class OpenRouterChatProvider:
                 tokens_out + wasted_out,
                 cost + wasted_cost,
                 reply.latency_ms,
-                {"finish_reason": finish},
+                {"finish_reason": finish, "logprobs": ((choice or {}).get("logprobs") or {}).get("content")},
             )

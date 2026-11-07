@@ -65,8 +65,9 @@ def corpus_info(corpora: Corpora) -> CorpusInfo:
 
 
 @router.get("/browse")
-def browse(corpora: Corpora, kind: Annotated[str, Query(pattern="^(QURAN|HADITH)$")], surah: int | None = None,
-           book: str | None = None, q: str = "", offset: Annotated[int, Query(ge=0)] = 0,
+def browse(corpora: Corpora, kind: Annotated[str, Query(pattern="^(QURAN|HADITH)$")],
+           surah: int | None = None, book: str | None = None, q: str = "",
+           offset: Annotated[int, Query(ge=0)] = 0,
            limit: Annotated[int, Query(ge=1, le=200)] = 25) -> BrowsePage:
     """Read the Quran (filter: surah) or the hadith in use (filter: book), with a text or reference search and
     pages. Straight from the corpus: the first call starts the engine worker (seconds)."""

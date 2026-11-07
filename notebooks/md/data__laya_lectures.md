@@ -11,7 +11,7 @@ This notebook fetches audio, transcribes it, and runs **engine v4** on it (engin
 | **YouTube**, 12 sheikhs (the 10 from batch 1 + صالح سندي and محمد سعيد رسلان), 3–4 videos each, 10–35 min | mostly hadith and text commentaries: full of quotes, narrator chains and partial echoes, which is where the "not a quote" cards come from |
 | **Bin Baz**, 8 new short radio/phone talks | they have a written transcript (ground truth), so the loose profile's precision can be measured |
 
-The list is in `backend/laya_datagen/lectures.py` (`YOUTUBE_2`, `BINBAZ_2`). Everything is cached: a re-run only fetches what is missing. **No labelling here** (no Sonnet calls).
+The list is in `server/wahy/laya/lectures.py` (`YOUTUBE_2`, `BINBAZ_2`). Everything is cached: a re-run only fetches what is missing. **No labelling here** (no Sonnet calls).
 
 ## Setup
 
@@ -19,12 +19,12 @@ The list is in `backend/laya_datagen/lectures.py` (`YOUTUBE_2`, `BINBAZ_2`). Eve
 import sys, os, json, importlib
 from pathlib import Path
 ROOT = Path.cwd().resolve()
-while not (ROOT / "backend").exists(): ROOT = ROOT.parent
-sys.path.insert(0, str(ROOT)); os.chdir(ROOT)
+while not (ROOT / "server" / "wahy").exists(): ROOT = ROOT.parent
+sys.path.insert(0, str(ROOT / "server")); os.chdir(ROOT)
 import pandas as pd
 from IPython.display import display
-from backend.laya_datagen import config, asr as asr_mod, lectures   # config loads GROQ_API_KEY from .env
-from backend.laya_datagen.sources import binbaz, youtube
+from wahy.laya import config, asr as asr_mod, lectures   # keys come from .env through the app's settings
+from wahy.laya.sources import binbaz, youtube
 importlib.reload(lectures)          # picks up list edits without restarting the kernel
 
 RUN_DOWNLOADS = True    # True: download + transcribe what is missing (uses Groq) · False: inventory from what is already on disk
@@ -137,9 +137,9 @@ Engine v4 runs on every transcribed lecture (same calls as batch 1 in `laya_auto
 ```python
 bundles = {}
 if RUN_ENGINE:
-    from backend.laya_datagen import pipeline, autolabel
-    from backend.laya_datagen.engine_bridge import EngineBridge
-    from backend.laya_datagen.cache import JsonCache
+    from wahy.laya import pipeline, autolabel
+    from wahy.laya.engine_bridge import EngineBridge
+    from wahy.laya.cache import JsonCache
     bridge = EngineBridge(hadith_path=HADITH_CORPUS); bridge.start()
     asr_cache = JsonCache("asr")
 
