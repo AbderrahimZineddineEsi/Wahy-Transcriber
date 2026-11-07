@@ -155,6 +155,20 @@
         "title": "Body_import_text_file_api_lectures_import_post",
         "type": "object"
       },
+      "Body_import_training_api_training_import_post": {
+        "properties": {
+          "file": {
+            "contentMediaType": "application/octet-stream",
+            "title": "File",
+            "type": "string"
+          }
+        },
+        "required": [
+          "file"
+        ],
+        "title": "Body_import_training_api_training_import_post",
+        "type": "object"
+      },
       "Body_transcribe_upload_api_transcriptions_upload_post": {
         "properties": {
           "auto_fallback": {
@@ -1467,6 +1481,40 @@
           "boundary"
         ],
         "title": "HumanVerdict",
+        "type": "object"
+      },
+      "Imported": {
+        "properties": {
+          "files": {
+            "description": "the files read (import from data/legacy/)",
+            "items": {
+              "type": "string"
+            },
+            "title": "Files",
+            "type": "array"
+          },
+          "imported": {
+            "description": "rows added",
+            "title": "Imported",
+            "type": "integer"
+          },
+          "replaced": {
+            "description": "rows that were already there (same id), saved again",
+            "title": "Replaced",
+            "type": "integer"
+          },
+          "skipped": {
+            "description": "lines that are not training rows",
+            "title": "Skipped",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "imported",
+          "replaced",
+          "skipped"
+        ],
+        "title": "Imported",
         "type": "object"
       },
       "JobSnapshot": {
@@ -4973,6 +5021,98 @@
         "title": "TafrighRunSummary",
         "type": "object"
       },
+      "TafrighSaveIn": {
+        "properties": {
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "segment_ids": {
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1,
+            "title": "Segment Ids",
+            "type": "array"
+          }
+        },
+        "required": [
+          "segment_ids"
+        ],
+        "title": "TafrighSaveIn",
+        "type": "object"
+      },
+      "TafrighSaved": {
+        "description": "A Tafrigh run's sentences saved for Laya (F-120). Saving the run again replaces them.",
+        "properties": {
+          "by_source": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "By Source",
+            "type": "object"
+          },
+          "count": {
+            "description": "examples (a sentence that was split also gives its parent's example)",
+            "title": "Count",
+            "type": "integer"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "run_id": {
+            "title": "Run Id",
+            "type": "string"
+          },
+          "saved_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Saved At"
+          },
+          "segment_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Segment Ids",
+            "type": "array"
+          },
+          "sentences": {
+            "title": "Sentences",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "run_id",
+          "segment_ids",
+          "sentences",
+          "count",
+          "by_source"
+        ],
+        "title": "TafrighSaved",
+        "type": "object"
+      },
       "TafrighSegConfigIn": {
         "description": "How the text is cut into sentences (F-107).",
         "properties": {
@@ -5094,6 +5234,314 @@
           "job"
         ],
         "title": "TafrighStarted",
+        "type": "object"
+      },
+      "TrainingCounts": {
+        "description": "F-100 and F-104's counters, over every row.",
+        "properties": {
+          "ai": {
+            "title": "Ai",
+            "type": "integer"
+          },
+          "clipped": {
+            "description": "verification rows whose boundary is not complete",
+            "title": "Clipped",
+            "type": "integer"
+          },
+          "correct": {
+            "title": "Correct",
+            "type": "integer"
+          },
+          "false": {
+            "title": "False",
+            "type": "integer"
+          },
+          "gold": {
+            "title": "Gold",
+            "type": "integer"
+          },
+          "missed": {
+            "description": "missed quotes added by hand",
+            "title": "Missed",
+            "type": "integer"
+          },
+          "not_sure": {
+            "title": "Not Sure",
+            "type": "integer"
+          },
+          "segmentation": {
+            "description": "Tafrigh sentence examples",
+            "title": "Segmentation",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          },
+          "typo": {
+            "description": "Tafrigh examples with a typo fix",
+            "title": "Typo",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "total",
+          "correct",
+          "false",
+          "not_sure",
+          "clipped",
+          "gold",
+          "ai",
+          "missed",
+          "segmentation",
+          "typo"
+        ],
+        "title": "TrainingCounts",
+        "type": "object"
+      },
+      "TrainingPage": {
+        "properties": {
+          "counts": {
+            "$ref": "#/components/schemas/TrainingCounts"
+          },
+          "matching": {
+            "description": "rows that match the filters (more than `rows` when over the limit)",
+            "title": "Matching",
+            "type": "integer"
+          },
+          "rows": {
+            "items": {
+              "$ref": "#/components/schemas/TrainingRow"
+            },
+            "title": "Rows",
+            "type": "array"
+          }
+        },
+        "required": [
+          "counts",
+          "rows",
+          "matching"
+        ],
+        "title": "TrainingPage",
+        "type": "object"
+      },
+      "TrainingRow": {
+        "description": "One row of the training data: a label (the user's, an imported one, a Tafrigh example) or a verifier's\nnewest verdict on a finding that has no label of the user's.",
+        "properties": {
+          "action": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "for the user's labels, how it was given: SET (verdict buttons), VALIDATE_ALL (approve all), ORDINARY_SPEECH (a finding deleted as ordinary speech), MISSED_QUOTE (a quote added by hand)",
+            "title": "Action"
+          },
+          "ai_verdict": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "what a verifier said before the user's label, if anything",
+            "title": "Ai Verdict"
+          },
+          "boundary": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Boundary"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "finding_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finding Id"
+          },
+          "gold": {
+            "description": "a label given by a person (the user, a reviewed legacy or Tafrigh row)",
+            "title": "Gold",
+            "type": "boolean"
+          },
+          "id": {
+            "description": "\"label:<id>\" or \"verdict:<id>\"",
+            "title": "Id",
+            "type": "string"
+          },
+          "lecture_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lecture Id"
+          },
+          "lecture_title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lecture Title"
+          },
+          "origin": {
+            "enum": [
+              "user",
+              "legacy",
+              "tafrigh",
+              "ai"
+            ],
+            "title": "Origin",
+            "type": "string"
+          },
+          "provider": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "the verifier or model the row came from",
+            "title": "Provider"
+          },
+          "ref_issue": {
+            "default": false,
+            "description": "N-007: the user said the reference is wrong or incomplete",
+            "title": "Ref Issue",
+            "type": "boolean"
+          },
+          "reference": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reference"
+          },
+          "run_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Run Id"
+          },
+          "source_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Type"
+          },
+          "task": {
+            "enum": [
+              "verification",
+              "tafrigh_structure",
+              "tafrigh_split"
+            ],
+            "title": "Task",
+            "type": "string"
+          },
+          "text": {
+            "description": "the spoken words (a Tafrigh row: the sentence)",
+            "title": "Text",
+            "type": "string"
+          },
+          "typo": {
+            "default": false,
+            "description": "a Tafrigh example whose sentence got a typo fix",
+            "title": "Typo",
+            "type": "boolean"
+          },
+          "verdict": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "the row's answer: a verdict, or a Tafrigh row's tag",
+            "title": "Verdict"
+          }
+        },
+        "required": [
+          "id",
+          "origin",
+          "gold",
+          "task",
+          "reference",
+          "source_type",
+          "text",
+          "verdict",
+          "ai_verdict",
+          "boundary",
+          "lecture_id",
+          "lecture_title",
+          "finding_id",
+          "created_at"
+        ],
+        "title": "TrainingRow",
+        "type": "object"
+      },
+      "TrainingRowJson": {
+        "description": "What the row writes to its JSONL file (the inspector).",
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "row": {
+            "additionalProperties": true,
+            "title": "Row",
+            "type": "object"
+          }
+        },
+        "required": [
+          "id",
+          "row"
+        ],
+        "title": "TrainingRowJson",
         "type": "object"
       },
       "TranscribeOptions": {
@@ -9748,6 +10196,415 @@
         "summary": "Get Request",
         "tags": [
           "telemetry"
+        ]
+      }
+    },
+    "/api/training": {
+      "delete": {
+        "description": "F-103: delete every label. The verifiers' verdicts stay on their lectures but leave the training\ndata.",
+        "operationId": "clear_training_api_training_delete",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cleared"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Clear Training",
+        "tags": [
+          "training"
+        ]
+      },
+      "get": {
+        "description": "The training data (F-100, F-104): counters over every row, and the rows matching the filters, newest\nfirst. Each row says where it came from: the user's label (and how it was given), the old app's imported\nbank, a Tafrigh run, or a verifier's verdict.",
+        "operationId": "training_page_api_training_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "origin",
+            "required": false,
+            "schema": {
+              "default": "all",
+              "enum": [
+                "all",
+                "gold",
+                "user",
+                "approval",
+                "legacy",
+                "tafrigh",
+                "ai"
+              ],
+              "title": "Origin",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "task",
+            "required": false,
+            "schema": {
+              "default": "all",
+              "enum": [
+                "all",
+                "verification",
+                "tafrigh"
+              ],
+              "title": "Task",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "label",
+            "required": false,
+            "schema": {
+              "default": "ALL",
+              "enum": [
+                "ALL",
+                "CORRECT",
+                "FALSE",
+                "NOT_SURE",
+                "CLIPPED"
+              ],
+              "title": "Label",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Q"
+            }
+          },
+          {
+            "in": "query",
+            "name": "lecture_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Lecture Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 500,
+              "maximum": 5000,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrainingPage"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Training Page",
+        "tags": [
+          "training"
+        ]
+      }
+    },
+    "/api/training/export": {
+      "get": {
+        "description": "F-101: the Laya JSONL file (verification), written as the old app wrote it; or the Tafrigh examples.",
+        "operationId": "export_training_api_training_export_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "task",
+            "required": false,
+            "schema": {
+              "default": "verification",
+              "enum": [
+                "verification",
+                "tafrigh"
+              ],
+              "title": "Task",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "gold_only",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Gold Only",
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Export Training",
+        "tags": [
+          "training"
+        ]
+      }
+    },
+    "/api/training/import": {
+      "post": {
+        "description": "Import the old app's exported training bank (its Laya JSONL export) or a Tafrigh \"save run\" file. Rows\nalready imported (same id) are replaced, not added twice.",
+        "operationId": "import_training_api_training_import_post",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_import_training_api_training_import_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Imported"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Import Training",
+        "tags": [
+          "training"
+        ]
+      }
+    },
+    "/api/training/import/legacy": {
+      "post": {
+        "description": "Import every .jsonl / .json file in data/legacy/ (the old app's exports).",
+        "operationId": "import_legacy_api_training_import_legacy_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Imported"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Import Legacy",
+        "tags": [
+          "training"
+        ]
+      }
+    },
+    "/api/training/rows/{row_id}": {
+      "get": {
+        "description": "The JSONL line one row writes (the inspector).",
+        "operationId": "training_row_api_training_rows__row_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "row_id",
+            "required": true,
+            "schema": {
+              "title": "Row Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrainingRowJson"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Training Row",
+        "tags": [
+          "training"
+        ]
+      }
+    },
+    "/api/training/tafrigh/{run_id}": {
+      "get": {
+        "description": "What a Tafrigh run has saved for Laya (null when nothing).",
+        "operationId": "tafrigh_saved_api_training_tafrigh__run_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "run_id",
+            "required": true,
+            "schema": {
+              "title": "Run Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/TafrighSaved"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "Response Tafrigh Saved Api Training Tafrigh  Run Id  Get"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Tafrigh Saved",
+        "tags": [
+          "training"
+        ]
+      },
+      "post": {
+        "description": "F-120: save the chosen sentences of a Tafrigh run as Laya examples (saving again replaces them).",
+        "operationId": "save_tafrigh_api_training_tafrigh__run_id__post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "run_id",
+            "required": true,
+            "schema": {
+              "title": "Run Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TafrighSaveIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TafrighSaved"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Save Tafrigh",
+        "tags": [
+          "training"
         ]
       }
     },

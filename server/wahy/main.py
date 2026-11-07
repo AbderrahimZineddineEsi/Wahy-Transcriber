@@ -9,7 +9,7 @@ unfinished as interrupted, and create the shared machinery that routes reach thr
     engine  core/engine.py   the engine worker client (the worker itself starts on the first call)
     ai      core/ai/         the provider layer: every model call (Gemini, OpenRouter, Groq, Laya, fake)
     lectures, transcription, corpora, detection, verification, editing, export, tafrigh, telemetry,
-    settings_service
+    training, settings_service
             the feature services (features/*/service.py)
 
 Shutdown: running jobs stop at their next check (they show as interrupted), the GPU is freed and the engine
@@ -47,6 +47,8 @@ from wahy.features.tafrigh.router import router as tafrigh_router
 from wahy.features.tafrigh.service import TafrighService
 from wahy.features.telemetry.router import router as telemetry_router
 from wahy.features.telemetry.service import TelemetryService
+from wahy.features.training.router import router as training_router
+from wahy.features.training.service import TrainingService
 from wahy.features.transcription.router import router as transcription_router
 from wahy.features.transcription.service import TranscriptionService
 from wahy.features.verification.router import router as verification_router
@@ -84,6 +86,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         app.state.tafrigh = TafrighService(db, s, jobs, app.state.ai, app.state.lectures, app.state.detection,
                                            style=app.state.export.style)
         app.state.telemetry = TelemetryService(db)
+        app.state.training = TrainingService(db, s, app.state.engine, app.state.verification,
+                                             app.state.tafrigh)
         app.state.settings_service = SettingsService(s, app.state.gpu, app.state.engine, jobs,
                                                      app.state.corpora)
         try:
@@ -107,6 +111,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(export_router)
     app.include_router(tafrigh_router)
     app.include_router(telemetry_router)
+    app.include_router(training_router)
     return app
 
 

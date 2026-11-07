@@ -1353,6 +1353,138 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/training": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Training Page
+         * @description The training data (F-100, F-104): counters over every row, and the rows matching the filters, newest
+         *     first. Each row says where it came from: the user's label (and how it was given), the old app's imported
+         *     bank, a Tafrigh run, or a verifier's verdict.
+         */
+        get: operations["training_page_api_training_get"];
+        put?: never;
+        post?: never;
+        /**
+         * Clear Training
+         * @description F-103: delete every label. The verifiers' verdicts stay on their lectures but leave the training
+         *     data.
+         */
+        delete: operations["clear_training_api_training_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/training/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Export Training
+         * @description F-101: the Laya JSONL file (verification), written as the old app wrote it; or the Tafrigh examples.
+         */
+        get: operations["export_training_api_training_export_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/training/import": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Import Training
+         * @description Import the old app's exported training bank (its Laya JSONL export) or a Tafrigh "save run" file. Rows
+         *     already imported (same id) are replaced, not added twice.
+         */
+        post: operations["import_training_api_training_import_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/training/import/legacy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Import Legacy
+         * @description Import every .jsonl / .json file in data/legacy/ (the old app's exports).
+         */
+        post: operations["import_legacy_api_training_import_legacy_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/training/rows/{row_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Training Row
+         * @description The JSONL line one row writes (the inspector).
+         */
+        get: operations["training_row_api_training_rows__row_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/training/tafrigh/{run_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Tafrigh Saved
+         * @description What a Tafrigh run has saved for Laya (null when nothing).
+         */
+        get: operations["tafrigh_saved_api_training_tafrigh__run_id__get"];
+        put?: never;
+        /**
+         * Save Tafrigh
+         * @description F-120: save the chosen sentences of a Tafrigh run as Laya examples (saving again replaces them).
+         */
+        post: operations["save_tafrigh_api_training_tafrigh__run_id__post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/transcription/models": {
         parameters: {
             query?: never;
@@ -1547,6 +1679,11 @@ export interface components {
             file: string;
             /** Title */
             title?: string | null;
+        };
+        /** Body_import_training_api_training_import_post */
+        Body_import_training_api_training_import_post: {
+            /** File */
+            file: string;
         };
         /** Body_transcribe_upload_api_transcriptions_upload_post */
         Body_transcribe_upload_api_transcriptions_upload_post: {
@@ -2121,6 +2258,29 @@ export interface components {
             boundary: string | null;
             /** Verdict */
             verdict: string;
+        };
+        /** Imported */
+        Imported: {
+            /**
+             * Files
+             * @description the files read (import from data/legacy/)
+             */
+            files?: string[];
+            /**
+             * Imported
+             * @description rows added
+             */
+            imported: number;
+            /**
+             * Replaced
+             * @description rows that were already there (same id), saved again
+             */
+            replaced: number;
+            /**
+             * Skipped
+             * @description lines that are not training rows
+             */
+            skipped: number;
         };
         /**
          * JobSnapshot
@@ -3552,6 +3712,38 @@ export interface components {
             /** Window Size */
             window_size: number | null;
         };
+        /** TafrighSaveIn */
+        TafrighSaveIn: {
+            /** Note */
+            note?: string | null;
+            /** Segment Ids */
+            segment_ids: string[];
+        };
+        /**
+         * TafrighSaved
+         * @description A Tafrigh run's sentences saved for Laya (F-120). Saving the run again replaces them.
+         */
+        TafrighSaved: {
+            /** By Source */
+            by_source: {
+                [key: string]: number;
+            };
+            /**
+             * Count
+             * @description examples (a sentence that was split also gives its parent's example)
+             */
+            count: number;
+            /** Note */
+            note?: string | null;
+            /** Run Id */
+            run_id: string;
+            /** Saved At */
+            saved_at?: string | null;
+            /** Segment Ids */
+            segment_ids: string[];
+            /** Sentences */
+            sentences: number;
+        };
         /**
          * TafrighSegConfigIn
          * @description How the text is cut into sentences (F-107).
@@ -3603,6 +3795,150 @@ export interface components {
         /** TafrighStarted */
         TafrighStarted: {
             job: components["schemas"]["JobSnapshot"];
+        };
+        /**
+         * TrainingCounts
+         * @description F-100 and F-104's counters, over every row.
+         */
+        TrainingCounts: {
+            /** Ai */
+            ai: number;
+            /**
+             * Clipped
+             * @description verification rows whose boundary is not complete
+             */
+            clipped: number;
+            /** Correct */
+            correct: number;
+            /** False */
+            false: number;
+            /** Gold */
+            gold: number;
+            /**
+             * Missed
+             * @description missed quotes added by hand
+             */
+            missed: number;
+            /** Not Sure */
+            not_sure: number;
+            /**
+             * Segmentation
+             * @description Tafrigh sentence examples
+             */
+            segmentation: number;
+            /** Total */
+            total: number;
+            /**
+             * Typo
+             * @description Tafrigh examples with a typo fix
+             */
+            typo: number;
+        };
+        /** TrainingPage */
+        TrainingPage: {
+            counts: components["schemas"]["TrainingCounts"];
+            /**
+             * Matching
+             * @description rows that match the filters (more than `rows` when over the limit)
+             */
+            matching: number;
+            /** Rows */
+            rows: components["schemas"]["TrainingRow"][];
+        };
+        /**
+         * TrainingRow
+         * @description One row of the training data: a label (the user's, an imported one, a Tafrigh example) or a verifier's
+         *     newest verdict on a finding that has no label of the user's.
+         */
+        TrainingRow: {
+            /**
+             * Action
+             * @description for the user's labels, how it was given: SET (verdict buttons), VALIDATE_ALL (approve all), ORDINARY_SPEECH (a finding deleted as ordinary speech), MISSED_QUOTE (a quote added by hand)
+             */
+            action?: string | null;
+            /**
+             * Ai Verdict
+             * @description what a verifier said before the user's label, if anything
+             */
+            ai_verdict: string | null;
+            /** Boundary */
+            boundary: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Finding Id */
+            finding_id: number | null;
+            /**
+             * Gold
+             * @description a label given by a person (the user, a reviewed legacy or Tafrigh row)
+             */
+            gold: boolean;
+            /**
+             * Id
+             * @description "label:<id>" or "verdict:<id>"
+             */
+            id: string;
+            /** Lecture Id */
+            lecture_id: number | null;
+            /** Lecture Title */
+            lecture_title: string | null;
+            /**
+             * Origin
+             * @enum {string}
+             */
+            origin: "user" | "legacy" | "tafrigh" | "ai";
+            /**
+             * Provider
+             * @description the verifier or model the row came from
+             */
+            provider?: string | null;
+            /**
+             * Ref Issue
+             * @description N-007: the user said the reference is wrong or incomplete
+             * @default false
+             */
+            ref_issue: boolean;
+            /** Reference */
+            reference: string | null;
+            /** Run Id */
+            run_id?: string | null;
+            /** Source Type */
+            source_type: string | null;
+            /**
+             * Task
+             * @enum {string}
+             */
+            task: "verification" | "tafrigh_structure" | "tafrigh_split";
+            /**
+             * Text
+             * @description the spoken words (a Tafrigh row: the sentence)
+             */
+            text: string;
+            /**
+             * Typo
+             * @description a Tafrigh example whose sentence got a typo fix
+             * @default false
+             */
+            typo: boolean;
+            /**
+             * Verdict
+             * @description the row's answer: a verdict, or a Tafrigh row's tag
+             */
+            verdict: string | null;
+        };
+        /**
+         * TrainingRowJson
+         * @description What the row writes to its JSONL file (the inspector).
+         */
+        TrainingRowJson: {
+            /** Id */
+            id: string;
+            /** Row */
+            row: {
+                [key: string]: unknown;
+            };
         };
         /** TranscribeOptions */
         TranscribeOptions: {
@@ -6480,6 +6816,242 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["RequestDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    training_page_api_training_get: {
+        parameters: {
+            query?: {
+                origin?: "all" | "gold" | "user" | "approval" | "legacy" | "tafrigh" | "ai";
+                task?: "all" | "verification" | "tafrigh";
+                label?: "ALL" | "CORRECT" | "FALSE" | "NOT_SURE" | "CLIPPED";
+                q?: string | null;
+                lecture_id?: number | null;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TrainingPage"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    clear_training_api_training_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Cleared"];
+                };
+            };
+        };
+    };
+    export_training_api_training_export_get: {
+        parameters: {
+            query?: {
+                task?: "verification" | "tafrigh";
+                gold_only?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    import_training_api_training_import_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_import_training_api_training_import_post"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Imported"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    import_legacy_api_training_import_legacy_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Imported"];
+                };
+            };
+        };
+    };
+    training_row_api_training_rows__row_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                row_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TrainingRowJson"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    tafrigh_saved_api_training_tafrigh__run_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                run_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TafrighSaved"] | null;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    save_tafrigh_api_training_tafrigh__run_id__post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                run_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TafrighSaveIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TafrighSaved"];
                 };
             };
             /** @description Validation Error */

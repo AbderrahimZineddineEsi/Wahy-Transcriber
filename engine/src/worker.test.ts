@@ -68,6 +68,17 @@ describe("worker", () => {
     expect((await call("surah_names")).result["112"]).toBe("الإخلاص");
   });
 
+  test("laya_jsonl: rows pass through byte for byte, records are converted", async () => {
+    const stored = { id: "a", state: { x: 0.00005, y: 1e-7 }, questions: {}, answers: { verdict: { choice: "FALSE" } }, meta: { human_verified: true } };
+    const record = { aiVerification: { verdict: "CORRECT", humanOverride: true }, envelope: { state: { s: 1 }, questions: { q: 1 } }, id: "b", lectureTitle: "درس" };
+    const { ok, result } = await call("laya_jsonl", { records: [stored, record], now: 100 });
+    expect(ok).toBe(true);
+    const [first, second] = result.jsonl.trim().split("\n");
+    expect(first).toBe(JSON.stringify(stored));
+    expect(JSON.parse(second)).toMatchObject({ id: "b", meta: { human_verified: true, lecture_title: "درس", converted_at: 101 } });
+    expect(result.stats).toMatchObject({ total_converted: 2, human_verified_count: 2, by_verdict: { CORRECT: 1, FALSE: 1 } });
+  });
+
   test("edit, captions and export", async () => {
     const options = { engine: "v3" };
     const found = (await call("detect", { words, options })).result;

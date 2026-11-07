@@ -309,13 +309,24 @@ decisions and why). The problems being fixed are in the friction map: https://cl
 
 ### Training data and the research side
 
-- [ ] **20. Training data**: Opus 5.5, high. ADRs 0003, 0005.
+- [x] **20. Training data**: Opus 5.5, high. ADRs 0003, 0005.
   - Gold labels from corrections and overrides, saved in the database. A Laya JSONL export that matches the golden
     export for the same records. An import for the legacy export in `data/legacy/`. The training data screen in the
     web app.
   - Done when: importing the legacy bank and exporting it again gives the old app's export.
   - Feature check: correct one verdict in the new app; it appears as a gold label in the export.
     Features: F-064, F-065, F-091, F-100, F-101, F-103, F-104, F-120, N-007.
+  - Done-when result (2026-11-07): `data/legacy/` is empty (2026-11-03 entry below), so the old bank's export is the
+    golden `laya_export.jsonl` (the old app's Laya JSONL export, its only export of the bank): imported through the API
+    and exported again, byte-identical; counters as the old app's (6 rows: 3 correct, 2 false, 1 not sure; 3 gold, 3 AI).
+    With the same records made in the new app (sample, v5, full corpus) the export equals the golden file except the
+    ids, which the old app made at random (`test_training_golden.py`).
+  - Feature check result (2026-11-07, offline, `e2e/training.spec.ts`): the sample lecture with the fake verifier's
+    verdicts; in the lecture view الأحزاب: 70 set to "ordinary speech"; the training screen showed one gold row
+    ("Ordinary speech (gold)", "You (verdict)", the verifier had said "Correct"); the gold-only export held that row as
+    human-verified `FALSE`. Also checked in the real app: the golden bank imported from a file exports as the same
+    bytes; 5 reviewed Tafrigh sentences saved for Laya show as 5 segmentation rows.
+  - Notes: see the 2026-11-07 phase 20 entry under **Changes**.
   - Learn: data lineage (where a training row came from).
 
 - [ ] **21. Corpora screens and status**: Sonnet 5.5, medium.
@@ -516,3 +527,32 @@ Each entry: date, what changed, the user's words.
   verse (the segmenter protects atomic Quran ranges): with the quotes as found a long verse stays one sentence, and the
   preview counts it as "over the limit". Typo strategy offers the three choices of F-112 (when suspicious, always,
   never); the server's fourth value (`asr_confidence_gated`) has no button.
+- **2026-11-07**: Phase 20 (done). Choices made inside the phase:
+  - The legacy import reads what the old app exported: its Laya JSONL file (the bank had no other export), as a file
+    upload or every `.jsonl` / `.json` in `data/legacy/`; it also reads a Tafrigh "save run" file. A row already
+    imported (same id) is replaced. Nothing was imported from `data/` (no legacy files exist), and the old Tafrigh
+    decision log `data/training_store/canonical_decisions.jsonl` (39 records, another schema) is left as it is.
+  - The old app's row converter moved into the engine (`engine/src/training.ts`, worker command `laya_jsonl`), so
+    numbers are written by `JSON.stringify` as before (Python writes `5e-05` where JavaScript writes `0.00005`).
+  - Migration `0006`: labels get `task` (verification, tafrigh_structure, tafrigh_split) and a unique `key`
+    (`legacy:<row id>`, `tafrigh:<run>:<task>:<sentence>`); `verdict` may be empty (a Tafrigh example). Tafrigh
+    examples (F-120) are label rows, no longer files in `data/training_store/tafrigh_runs/`; "Export Tafrigh examples"
+    writes the old "save run" lines.
+  - A missed quote added by hand saves a gold label (correct, complete; as in the approved mockup's "missed quote"
+    counter); undo removes it with the quote. Every user label records how it was given (`SET`, `VALIDATE_ALL`,
+    `ORDINARY_SPEECH`, `MISSED_QUOTE`).
+  - As in the old bank, a verifier's newest verdict on a live finding is a (non-gold) training row until the user
+    labels that finding; then the user's row replaces it and keeps the verifier's verdict as "model said". Row ids are
+    `wahy_dec_<time>_<label id>` and `wahy_verdict_<verdict id>` (the old ids were random, or a request id shared by a
+    whole batch, so rows overwrote each other). An approve-all row carries the old `human_gold_resolution` key.
+  - N-007: the "reference wrong" flag is read from the finding when the row is written, so undoing the flag changes
+    the row; it is written as `meta.ref_issue: true` only when set (so other rows stay byte-equal to the old app's).
+    A flag on a finding without a label makes no row.
+  - Clear (F-103) deletes every label and hides the verifiers' verdicts given before it (settings key
+    `training.cleared_at`); the verdicts, including the user's own, stay on their lectures.
+  - Open point for the user: a user boundary `EXTRA_START` / `EXTRA_END` is written to the Laya row as it is, though
+    the v1 boundary question only offers the four `COMPLETE_SPAN` / `MISSING_*` choices.
+  - Phase 18 left `training_store.py`, `exporters.py` and `pilot_tools.py` in `features/tafrigh/` for this phase to
+    decide: kept as they are, not wired to any route. The training rows now live in the labels table, so the first two
+    are superseded (deleting them is the user's call); `pilot_tools.py` is research tooling for phase 22.
+  - No rail count badge for the training screen yet (F-001's badges are not in this phase's feature list).

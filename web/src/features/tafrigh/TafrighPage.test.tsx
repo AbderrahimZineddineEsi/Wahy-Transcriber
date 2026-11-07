@@ -327,3 +327,28 @@ test("with JEV or Laya as the classifier, the Gemini model and route are the hel
   expect(screen.queryByText("Helper Gemini model (splits and typo fixes)")).not.toBeInTheDocument();
   expect(screen.getByLabelText("Chat model")).toBeInTheDocument();
 });
+
+test("save for Laya: leaves out what needs review, quick picks, and sends the chosen sentences with the note (F-120)", async () => {
+  const reviewed = detail("run_aaaaaaaaaaaa", "تفريغ", [seg(0, { trace: { review: { action: "confirm" } } }), seg(1), seg(2)], [item(1), item(2)]);
+  const calls = server({ runs: [summary("run_aaaaaaaaaaaa", "تفريغ")], details: { run_aaaaaaaaaaaa: reviewed } }, (call) => {
+    if (call.path === "/api/training/tafrigh/run_aaaaaaaaaaaa" && call.method === "GET") return json(null);
+    if (call.path === "/api/training/tafrigh/run_aaaaaaaaaaaa" && call.method === "POST")
+      return json({ run_id: "run_aaaaaaaaaaaa", segment_ids: ["seg_0001", "seg_0002"], sentences: 2, count: 2, by_source: { human_confirmed: 1, model: 1 }, note: "أول حفظ", saved_at: now });
+  });
+  renderApp("/lectures/1/tafrigh");
+  await screen.findByTestId("tfg-lesson");
+  await userEvent.click(screen.getByTestId("tfg-laya"));
+  const dialog = await screen.findByRole("dialog");
+  // two sentences wait for review, so only the first is chosen at first
+  expect(within(dialog).getByTestId("tfg-laya-count")).toHaveTextContent("1 of 3 chosen");
+  expect(within(dialog).getByTestId("tfg-laya-count")).toHaveTextContent("Confirmed 1");
+  await userEvent.click(within(dialog).getByTestId("tfg-laya-pick-all"));
+  expect(within(dialog).getByTestId("tfg-laya-count")).toHaveTextContent("3 of 3 chosen");
+  await userEvent.click(within(dialog).getAllByTestId("tfg-laya-seg")[2]);
+  await userEvent.type(within(dialog).getByLabelText("A note on this save (optional)"), "أول حفظ");
+  await userEvent.click(within(dialog).getByTestId("tfg-laya-confirm"));
+  await waitFor(() => expect(calls.some((c) => c.method === "POST" && c.path === "/api/training/tafrigh/run_aaaaaaaaaaaa")).toBe(true));
+  expect(calls.find((c) => c.method === "POST" && c.path.startsWith("/api/training/tafrigh/"))!.body).toEqual({ segment_ids: ["seg_0001", "seg_0002"], note: "أول حفظ" });
+  expect(await screen.findByText("2 training examples saved from 2 sentences")).toBeInTheDocument();
+  expect(screen.getByTestId("tfg-laya-saved")).toHaveTextContent("✓ 2");
+});

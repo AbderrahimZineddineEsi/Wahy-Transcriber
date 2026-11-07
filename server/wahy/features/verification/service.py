@@ -743,8 +743,10 @@ class VerificationService:
         )
         return {v.finding_id: v for v in s.scalars(select(Verdict).where(Verdict.id.in_(newest)))}
 
-    def set_verdict(self, finding_id: int, body: VerdictIn) -> VerdictSaved:
-        """F-065: the user's verdict, saved as the finding's newest verdict and as its gold label."""
+    def set_verdict(self, finding_id: int, body: VerdictIn, *, action: str = "SET") -> VerdictSaved:
+        """F-065: the user's verdict, saved as the finding's newest verdict and as its gold label. `action`
+        says where it came from, for the label's lineage: SET (the verdict buttons), ORDINARY_SPEECH (a
+        finding deleted as ordinary speech, F-064) or MISSED_QUOTE (a quote added by hand)."""
         finding = self._finding(finding_id)
         with self.db.session() as s:
             prev = self._newest(s, [finding_id]).get(finding_id)
@@ -754,7 +756,7 @@ class VerificationService:
                 k: HUMAN_CONFIDENCE if k == body.verdict else 0.01 for k in ("CORRECT", "FALSE", "NOT_SURE")
             },
             "based_on": prev.id if prev else None,
-            "user_action": "SET",
+            "user_action": action,
         }
         saved = self._save_human(finding.lecture_id, [(finding, body.verdict, boundary, details, prev)])
         return saved[0]
@@ -778,27 +780,30 @@ class VerificationService:
         saved = self._save_human(lecture_id, todo) if todo else []
         return Approved(approved=len(saved), labels=len({x.label_id for x in saved}))
 
+    def v1_envelopes(self, lecture_id: int, finding_ids: list[int]) -> dict[int, dict[str, Any]]:
+        """The v1 envelope of some of a lecture's live findings ({finding id: {members, state, questions,
+        merge}}), 25 words of context on each side: what a gold label's card keeps and the Laya training
+        export writes (as the old app's training bank did)."""
+        rows = self._rows(lecture_id)
+        index_of = {r.id: i for i, r in enumerate(rows)}
+        targets = [index_of[f] for f in finding_ids if f in index_of]
+        if not targets:
+            return {}
+        envs = self.engine.envelopes(
+            [r.data for r in rows],
+            self.detection._words(lecture_id),
+            1,
+            {**self._engine_options(rows), "targets": targets, "passages": False, "contextWords": 25},
+        )
+        return {rows[e["members"][0]].id: e for e in envs}
+
     def _save_human(
         self, lecture_id: int, todo: list[tuple[Finding, str, str | None, dict[str, Any], Verdict | None]]
     ) -> list[VerdictSaved]:
         """Save the user's verdicts and their gold labels (one per finding, updated when it exists). Each
         label's
         card keeps the finding and its v1 envelope as they are now, so it outlives a re-detection."""
-        rows = self._rows(lecture_id)
-        index_of = {r.id: i for i, r in enumerate(rows)}
-        words = self.detection._words(lecture_id)
-        envs = self.engine.envelopes(
-            [r.data for r in rows],
-            words,
-            1,
-            {
-                **self._engine_options(rows),
-                "targets": [index_of[f.id] for f, *_ in todo],
-                "passages": False,
-                "contextWords": 25,
-            },
-        )
-        env_of = {rows[e["members"][0]].id: e for e in envs}
+        env_of = self.v1_envelopes(lecture_id, [f.id for f, *_ in todo])
         out = []
         with self.db.session() as s:
             lecture = s.get(Lecture, lecture_id)

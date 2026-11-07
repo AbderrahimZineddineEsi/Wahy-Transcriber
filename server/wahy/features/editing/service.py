@@ -390,7 +390,20 @@ class EditingService:
             ch.remove = [f.id for f in st.findings if not (f.end < body.start or f.start > body.end)]
             return ch
 
-        return self._apply(lecture_id, "add_quote", "Add a missed quote", body.model_dump(), build)
+        def gold(added: list[int]) -> list[tuple[int, int, dict[str, Any] | None]]:
+            # the user says these words are a quote of this reference: a gold label (correct, complete), which
+            # undo removes with the quote (phase 20)
+            out = []
+            for fid in added:
+                saved = self.verification.set_verdict(
+                    fid, VerdictIn(verdict="CORRECT", boundary="COMPLETE"), action="MISSED_QUOTE"
+                )
+                out.append((saved.verdict_id, saved.label_id, None))
+            return out
+
+        return self._apply(
+            lecture_id, "add_quote", "Add a missed quote", body.model_dump(), build, after=gold
+        )
 
     def edit_finding(self, finding_id: int, body: FindingEdit) -> EditDone:
         """One change to a finding (F-058, F-059, F-061, F-062, F-063)."""
@@ -469,7 +482,9 @@ class EditingService:
                         if lab is None
                         else {"verdict": lab.verdict, "boundary": lab.boundary, "card": lab.card}
                     )
-                saved = self.verification.set_verdict(f.id, VerdictIn(verdict="FALSE"))
+                saved = self.verification.set_verdict(
+                    f.id, VerdictIn(verdict="FALSE"), action="ORDINARY_SPEECH"
+                )
                 ch.saved.append((saved.verdict_id, saved.label_id, before))
             return ch
 
@@ -641,77 +656,104 @@ class EditingService:
         build: Callable[[State], Change],
         *,
         state: State | None = None,
+        after: Callable[[list[int]], list[tuple[int, int, dict[str, Any] | None]]] | None = None,
     ) -> EditDone:
+        """Make one edit and log it. `after`, if given, runs once the new findings are saved (it gets their
+        ids) and returns the verdicts and labels it saved, which undo then removes with the edit."""
         with self._lock(lecture_id):
-            st = state if state is not None else self._state(lecture_id)
-            ch = build(st)
-            if ch.empty():
-                raise NothingChanged("nothing to change")
-            undo: dict[str, Any] = {}
-            with self.db.session() as s:
-                if ch.words:
-                    a, b, new = ch.words
-                    undo["words"] = {
-                        "start": a,
-                        "count": len(new),
-                        "old": [{"word": w.text, "start": w.start, "end": w.end} for w in st.words[a:b]],
-                    }
-                    self._write_words(s, lecture_id, a, b, new)
-                touched = [*ch.update, *ch.remove]
-                rows = (
-                    {r.id: r for r in s.scalars(select(Finding).where(Finding.id.in_(touched)))}
-                    if touched
-                    else {}
-                )
-                undo["findings"] = [
-                    {"id": r.id, "before": {**_finding_columns(r.data), "deleted": r.deleted}}
-                    for r in rows.values()
-                ]
-                for fid, data in ch.update.items():
-                    for k, v in _finding_columns(data).items():
-                        setattr(rows[fid], k, v)
-                for fid in ch.remove:
-                    rows[fid].deleted = True
-                added: list[int] = []
-                if ch.add:
-                    top = s.scalar(select(func.max(Finding.idx)).where(Finding.lecture_id == lecture_id))
-                    top = -1 if top is None else top
-                    for k, data in enumerate(ch.add):
-                        row = Finding(
-                            lecture_id=lecture_id, idx=top + 1 + k, engine=st.engine, **_finding_columns(data)
-                        )
-                        s.add(row)
-                        s.flush()
-                        added.append(row.id)
-                    undo["added"] = added
-                if ch.captions is not None:
-                    undo["captions"] = st.caption_edits
-                    self._write_captions(s, lecture_id, ch.captions)
-                verdict_ids = []
-                for v in ch.verdicts:
-                    row_v = Verdict(**v)
-                    s.add(row_v)
+            done = self._apply_locked(lecture_id, kind, label, params, build, state)
+            if after is not None and done.added:
+                saved = after(done.added)
+                if saved:
+                    with self.db.session() as s:
+                        op = s.get(EditOp, done.op.id)
+                        undo = dict(op.undo)  # type: ignore[union-attr]
+                        undo["verdicts"] = [*undo.get("verdicts", []), *(v for v, _, _ in saved)]
+                        undo["labels"] = [
+                            *undo.get("labels", []),
+                            *({"id": lid, "before": b} for _, lid, b in saved),
+                        ]
+                        op.undo = undo  # type: ignore[union-attr]
+            return done
+
+    def _apply_locked(
+        self,
+        lecture_id: int,
+        kind: str,
+        label: str,
+        params: dict[str, Any],
+        build: Callable[[State], Change],
+        state: State | None,
+    ) -> EditDone:
+        st = state if state is not None else self._state(lecture_id)
+        ch = build(st)
+        if ch.empty():
+            raise NothingChanged("nothing to change")
+        undo: dict[str, Any] = {}
+        with self.db.session() as s:
+            if ch.words:
+                a, b, new = ch.words
+                undo["words"] = {
+                    "start": a,
+                    "count": len(new),
+                    "old": [{"word": w.text, "start": w.start, "end": w.end} for w in st.words[a:b]],
+                }
+                self._write_words(s, lecture_id, a, b, new)
+            touched = [*ch.update, *ch.remove]
+            rows = (
+                {r.id: r for r in s.scalars(select(Finding).where(Finding.id.in_(touched)))}
+                if touched
+                else {}
+            )
+            undo["findings"] = [
+                {"id": r.id, "before": {**_finding_columns(r.data), "deleted": r.deleted}}
+                for r in rows.values()
+            ]
+            for fid, data in ch.update.items():
+                for k, v in _finding_columns(data).items():
+                    setattr(rows[fid], k, v)
+            for fid in ch.remove:
+                rows[fid].deleted = True
+            added: list[int] = []
+            if ch.add:
+                top = s.scalar(select(func.max(Finding.idx)).where(Finding.lecture_id == lecture_id))
+                top = -1 if top is None else top
+                for k, data in enumerate(ch.add):
+                    row = Finding(
+                        lecture_id=lecture_id, idx=top + 1 + k, engine=st.engine, **_finding_columns(data)
+                    )
+                    s.add(row)
                     s.flush()
-                    verdict_ids.append(row_v.id)
-                verdict_ids += [vid for vid, _, _ in ch.saved]
-                if verdict_ids:
-                    undo["verdicts"] = verdict_ids
-                if ch.saved:
-                    undo["labels"] = [{"id": lid, "before": before} for _, lid, before in ch.saved]
-                lecture = s.get(Lecture, lecture_id)
-                if lecture is not None:
-                    lecture.updated_at = utcnow()
-                op = EditOp(lecture_id=lecture_id, kind=kind, label=label, params=params, undo=undo)
-                s.add(op)
+                    added.append(row.id)
+                undo["added"] = added
+            if ch.captions is not None:
+                undo["captions"] = st.caption_edits
+                self._write_captions(s, lecture_id, ch.captions)
+            verdict_ids = []
+            for v in ch.verdicts:
+                row_v = Verdict(**v)
+                s.add(row_v)
                 s.flush()
-                return EditDone(
-                    op=self._op_out(op),
-                    finding_id=ch.finding_id or (added[0] if added else None),
-                    words_changed=ch.words is not None,
-                    findings_changed=len(ch.update) + len(ch.remove) + len(added),
-                    removed=list(ch.remove),
-                    added=added,
-                )
+                verdict_ids.append(row_v.id)
+            verdict_ids += [vid for vid, _, _ in ch.saved]
+            if verdict_ids:
+                undo["verdicts"] = verdict_ids
+            if ch.saved:
+                undo["labels"] = [{"id": lid, "before": before} for _, lid, before in ch.saved]
+            lecture = s.get(Lecture, lecture_id)
+            if lecture is not None:
+                lecture.updated_at = utcnow()
+            op = EditOp(lecture_id=lecture_id, kind=kind, label=label, params=params, undo=undo)
+            s.add(op)
+            s.flush()
+            return EditDone(
+                op=self._op_out(op),
+                finding_id=ch.finding_id or (added[0] if added else None),
+                words_changed=ch.words is not None,
+                findings_changed=len(ch.update) + len(ch.remove) + len(added),
+                removed=list(ch.remove),
+                added=added,
+            )
 
     @staticmethod
     def _write_words(s: Any, lecture_id: int, a: int, b: int, new: list[TimedWord]) -> None:

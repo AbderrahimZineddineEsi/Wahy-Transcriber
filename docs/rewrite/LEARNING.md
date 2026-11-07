@@ -1524,3 +1524,96 @@ cd web && npx playwright test e2e/tafrigh.spec.ts                    # real serv
 cd web && WAHY_E2E_LIVE=1 npx playwright test e2e/live-tafrigh.spec.ts   # a real Gemini run (uses .env)
 cd server && uv run python ../scripts/seed_tafrigh_run.py /tmp/x 1 8     # make a finished run without a model
 ```
+
+## Phase 20 — Training data
+
+### What was built
+
+Where Laya's training rows come from, kept on the server, with a screen to look at them and the files Kaggle reads.
+
+- **Gold labels from your corrections** (F-064, F-065, F-091, N-007). Phase 14 already saved a label when you pressed a
+  verdict button or "approve all", and phase 16 when you deleted a quote "as ordinary speech". Now each label also
+  says *how* it was given (`SET`, `VALIDATE_ALL`, `ORDINARY_SPEECH`), and **a missed quote you add by hand is a gold
+  label too** (`MISSED_QUOTE`, correct and complete); undo removes it with the quote. The "reference wrong" flag on a
+  quote (N-007) reaches its label's row as `meta.ref_issue`.
+- **The Laya JSONL export** (F-101): `GET /api/training/export`. The rows are written by the old app's own converter,
+  moved into the engine as `engine/src/training.ts` (worker command `laya_jsonl`), so the bytes are the old app's.
+- **The legacy import** (F-100): `POST /api/training/import` (a file) and `/import/legacy` (every file in
+  `data/legacy/`). The old app's only export of its bank was that same Laya JSONL file, so that is what is read.
+  Importing the same row twice replaces it.
+- **The training data screen** (F-104, F-103): counters, filters (gold, approval, models, old app, Tafrigh; task;
+  label; search), a table that says where each row came from, the exact JSON line a row exports, import, export (all
+  or gold only) and clear (two clicks).
+- **Tafrigh sentences for Laya** (F-120): a "Save for Laya" button on the Tafrigh tab with the old quick picks
+  (reviewed by you, corrected, confidence ≥ 85 %, leave out what needs review). The examples are rows in the database;
+  saving the run again replaces them.
+
+### New ideas, plainly
+
+**Data lineage** means every training row can answer "where did you come from?". It matters because Laya can only be
+as good as its labels: if a bad batch of rows shows up, you want to find its source and remove all of it. Here each
+row has an *origin* (you, the old app, a Tafrigh run, a verifier) and, for your labels, the *action*:
+
+```text
+label:12   origin=user     action=ORDINARY_SPEECH   lecture="درس الجمعة"   ai_verdict=CORRECT
+verdict:9  origin=ai       provider=laya-wahy-r6-v3_mixed
+label:40   origin=legacy   key="legacy:wahy_dec_1793707200_0"
+label:51   origin=tafrigh  key="tafrigh:run_ab12…:tafrigh_structure:seg_0004"
+```
+
+The `key` column is lineage you can act on: importing a file again, or saving a Tafrigh run again, finds the old rows
+by their key and **replaces** them instead of adding duplicates (an *idempotent* import: doing it twice is the same as
+doing it once).
+
+**A card is a snapshot.** A label stores its finding and its v1 envelope as they were when you labelled them (the
+`card` column). If the lecture is re-detected or deleted later, the label still exports the same row. One thing is
+read *live* on purpose: the "reference wrong" flag, so undoing the flag also changes the row.
+
+**Porting a function byte for byte.** The old converter used `Date.now()` and `Math.random()` for ids, and a global for
+the lecture title. The port takes them as arguments, so the golden test can pass in the same seeded random sequence
+`make_golden.mjs` used, and the output is the old file exactly:
+
+```ts
+const random = seeded();                       // make_golden.mjs's Math.random
+const { jsonl } = layaJsonl(records, NOW, { lectureTitle: TITLE, random });
+expect(jsonl).toBe(fs.readFileSync("engine/golden/expected/laya_export.jsonl", "utf8"));
+```
+
+**Why the JSON is written by Node, not Python.** `json.dumps(0.00005)` in Python gives `5e-05`; JavaScript's
+`JSON.stringify` gives `0.00005`. A Kaggle script would read both as the same number, but a byte-for-byte test would
+fail, and so would the hash of a dataset. Sending the rows through the engine worker means the server never formats a
+number itself: the stored row goes in, the worker's `JSON.stringify` comes out, exactly as the old app wrote it.
+
+**Model verdicts are rows until you decide.** As in the old bank, a verifier's newest verdict on a finding is a
+(non-gold) row. When you give your own verdict on that finding, your gold label takes its place, and the model's
+verdict is kept inside your row as `ai_verdict` (what the model said before you corrected it). *Clear* deletes the
+labels and hides the verdicts given so far; the verdicts themselves stay on their lectures.
+
+### How it was tested
+
+- **Done when** (`server/tests/test_training.py`): the golden `laya_export.jsonl` (the old app's export of a bank with
+  three user verdicts and three AI verdicts) is imported through the API and exported again: **identical bytes**, and
+  the counters equal the old app's (6 rows: 3 correct, 2 false, 1 not sure; 3 gold, 3 AI). Importing it twice replaces
+  the 6 rows instead of adding 6 more.
+- **Same records, new app** (`server/tests/test_training_golden.py`, full corpus): the sample lecture detected with v5,
+  your verdict on findings 0 to 2 and three verifier verdicts on findings 3 to 5, as `make_golden.mjs` did. The export
+  equals the golden file byte for byte except the ids (the old ones were random).
+- **Engine** (`engine/src/training.test.ts`): the port rebuilds the golden file from the golden envelopes; stored rows
+  pass through unchanged; a worker test checks small numbers (`0.00005`, `1e-7`) survive the trip.
+- **Server**: corrections become gold labels with their action; undoing a missed quote removes its label; the
+  reference flag reaches the row; approve all replaces the model rows; clear empties the screen; Tafrigh saves replace
+  each other and round-trip through the import.
+- **Web**: Vitest for the screen (counters, lineage text, filters sent to the server, export links, clear asking twice)
+  and for the Tafrigh quick picks; Playwright (`e2e/training.spec.ts`) on the real server.
+- **Feature check** (Playwright, offline): the sample lecture gets the fake verifier's verdicts; in the lecture view
+  the quote الأحزاب: 70 is set to "ordinary speech"; the training screen shows one gold row "Ordinary speech (gold)",
+  "You (verdict)", the model had said "Correct"; the gold-only export holds that one row as human-verified `FALSE`.
+
+**Try:**
+
+```bash
+cd engine && npx vitest run src/training.test.ts                    # the old converter, byte for byte
+cd server && uv run pytest -q tests/test_training.py                 # import → export, corrections, Tafrigh
+cd web && npx playwright test e2e/training.spec.ts                   # the feature check in the real app
+curl -s localhost:8120/api/training | python3 -m json.tool | head -30 # the counters and rows (with scripts/dev.sh)
+```

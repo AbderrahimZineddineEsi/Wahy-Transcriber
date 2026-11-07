@@ -6,6 +6,7 @@ import { duration, usd } from "../verification/format";
 import { downloadRun, segmentsOf, useReview, type ExportFormat, type RunDetail } from "./api";
 import { num } from "./format";
 import { TAG_KEYS, labelSource, modelConfidence, nextToReview, percent, type Segment } from "./labels";
+import { SaveForLayaButton } from "./SaveForLaya";
 import { SentenceCard } from "./SentenceCard";
 
 type Props = { lectureId: number; run: RunDetail };
@@ -37,6 +38,8 @@ export function Lesson({ lectureId, run }: Props) {
             {t(`tfg.export.${f}` as never)}
           </button>
         ))}
+        <span className="flex-1" />
+        <SaveForLayaButton run={run} />
       </div>
 
       {run.warnings.length > 0 && (

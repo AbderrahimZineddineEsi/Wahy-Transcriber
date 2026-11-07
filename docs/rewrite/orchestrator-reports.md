@@ -5,6 +5,27 @@ State for recovery (session IDs, what to do if a child died) is in `orchestrator
 
 <!-- NEW REPORTS GO BELOW THIS LINE -->
 
+## 2026-11-07 01:20 — Phase 19 (Web: Tafrigh) done; phase 20 started
+
+Gate passed. Commit `c762cf1` "rewrite phase 19: Web: Tafrigh" pushed, phase ticked, full `scripts/test.sh` "ALL GREEN"
+(its pre-check found no regression from phase 18: old backend 152, server 397, engine 259, web unit 105).
+- Built in `web/src/features/tafrigh/` (the lecture's Tafrigh tab): preview and settings (sentences with statistics before
+  any model call, cutting settings, text source and matn, classifier with the Gemini helper model, mode and window size, typo
+  strategy, sentence range with first 10/25/50 slices, per-mode estimate); "re-run the engine first" (F-109, asks a second
+  click because it replaces the quotes); a run with live bar, requests, tags, pause, resume, stop (keeps finished sentences),
+  cancel, error and Retry; the lesson (outline bar, warnings, cost breakdown, sentence cards with who labelled it, model odds,
+  what a split did, fixes applied or turned down); review queue (confirm, relabel, undo typo fix, next); saved runs (rename,
+  save as new, delete); compare 2 to 6 runs; export Markdown, HTML, JSON. `scripts/seed_tafrigh_run.py` makes a finished run
+  offline with the server tests' fake model.
+- Tests: Vitest 127 (22 new); Playwright 10 (2 new: offline preview and estimate; a seeded run reviewed, saved as new,
+  relabelled in the copy, compared, exported; starting a run is not covered offline).
+- **Feature check passed live** (Gemini free tier, direct route, $0): from the new app, 10 sentences in 1 request, one
+  sentence confirmed; the server's run says `reviewed: 1`.
+- Choices recorded under Changes: F-120 (save a run for Laya) has no screen yet, it waits for phase 20's training tables;
+  "max words" never cuts a verse (a long verse stays one sentence even at "max 10"; the preview shows "n over the limit");
+  typo strategy offers the three choices from F-112, the server's fourth value `asr_confidence_gated` has no button.
+- **Phase 20 (Training data, Opus 5.5, high)** is running as `refactoring-step-20`.
+
 ## 2026-11-07 01:10 — New OpenRouter key saved
 
 You pasted a new OpenRouter key. I checked it with OpenRouter's key-info endpoint (free): valid, **spending limit $0.20 in

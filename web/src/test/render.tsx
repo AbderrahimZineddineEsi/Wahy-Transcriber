@@ -14,7 +14,7 @@ export const healthy: Health = {
   running_jobs: 0,
 };
 
-export type Call = { method: string; path: string; body: unknown };
+export type Call = { method: string; path: string; body: unknown; search?: string };
 export type Handler = (call: Call) => Response | Promise<Response> | undefined;
 
 export const json = (body: unknown, status = 200) =>
@@ -31,7 +31,7 @@ export function fakeServer(handler: Handler = () => undefined, health: () => Hea
   vi.stubGlobal("fetch", async (request: Request) => {
     const url = new URL(request.url);
     const text = request.method === "GET" ? "" : await request.clone().text();
-    const call: Call = { method: request.method, path: url.pathname, body: parseBody(text, request.headers.get("content-type") ?? "") };
+    const call: Call = { method: request.method, path: url.pathname, body: parseBody(text, request.headers.get("content-type") ?? ""), search: url.search };
     calls.push(call);
     const answer = await handler(call);
     if (answer) return answer;

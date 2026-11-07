@@ -121,3 +121,6 @@ Queue: phase 17 running -> 16b (bracket embedded Quran verses) -> 18 -> ... -> 2
 - Told to run the full scripts/test.sh first (phase 18 skipped Playwright after a rename). OpenRouter key in .env expired; user not yet asked.
 
 ## 2026-11-07 01:10: the user pasted an OpenRouter key and said "here is a new key". Checked with OpenRouter's key-info endpoint (no cost): valid, limit $0.20, usage $0, expires 2027-02-04. Saved into the gitignored .env as OPENROUTER_API_KEY (replacing the expired one). The key value is NOT written in any tracked file. Note its total limit is $0.20: no more live OpenRouter calls than needed.
+
+## Running now: phase 20 Training data (Opus 5.5, high)
+- Child: refactoring-step-20, session ID 74858cc0-87ad-4bc6-b69f-838d77db290d, log: /tmp/claude-1000/-home-zeno-Documents-work-new-projects-Wahy-Transcriber/428c450a-c0e2-4fc7-86dc-884ec1da7570/scratchpad/step-20.json. Phase 19 done (c762cf1). New OpenRouter key is in .env (limit $0.20: minimal live calls).

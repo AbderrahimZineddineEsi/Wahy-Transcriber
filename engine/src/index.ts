@@ -5,6 +5,7 @@ export { search, suggest } from "./search.ts";
 export { expand } from "./expand.ts";
 export { edit, EditError, referenceWords } from "./edit.ts";
 export { exportLecture, lectureCaptions, formattedText, toSrt, toVtt, toAss, EXPORT_FORMATS } from "./export.ts";
+export { layaJsonl, layaRow } from "./training.ts";
 export { synthesizeWordsFromRawText, parseSubtitleFileToWords } from "./v3.js";
 export { BUILTIN_ADHKAR_DATA } from "./shared.js";
 export type * from "./types.ts";
@@ -12,4 +13,5 @@ export type { Envelope, EnvelopeOptions, EnvelopeVersion } from "./envelopes.ts"
 export type { SearchHit, SearchOptions, Suggestion, SuggestOptions } from "./search.ts";
 export type { ClippedBoundary, ExpandResult } from "./expand.ts";
 export type { EditRequest, EditResult } from "./edit.ts";
+export type { LayaRow, TrainingRecord, VerdictInfo, JsonlStats } from "./training.ts";
 export type { ExportFormat, ExportInput, ExportFile } from "./export.ts";

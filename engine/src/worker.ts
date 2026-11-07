@@ -22,6 +22,8 @@
 //                                        one export file {filename, mime, content} (export.ts)
 //   units      {ids, options}            {id: {ref, words, norms, full}}: a unit's vocalised words, the engine's
 //                                        norms, and for a hadith its whole text {words, matnStart, matnEnd} or null
+//   laya_jsonl {records, now, lectureTitle}   the Laya JSONL training file {jsonl, stats} (training.ts): records are
+//                                        stored rows (passed through) or {aiVerification, envelope, id?, ...}
 //   tokenize   {text}                    the engine's normalised tokens
 //   tokenize_words {words}               the same per word (a word can give 0, 1 or more tokens)
 //   surah_names                          {"1": "الفاتحة", ...}
@@ -39,6 +41,7 @@ import { edit, referenceWords } from "./edit.ts";
 import { expand } from "./expand.ts";
 import { exportLecture, lectureCaptions } from "./export.ts";
 import { search, suggest } from "./search.ts";
+import { layaJsonl } from "./training.ts";
 import { SURAH_NAMES_AR } from "./shared.js";
 import { tokenizeText } from "./v3.js";
 import type { Corpus } from "./types.ts";
@@ -96,6 +99,7 @@ const handlers: Record<string, (req: any) => unknown> = {
     }
     return out;
   },
+  laya_jsonl: ({ records, now, lectureTitle }) => layaJsonl(records, now, { lectureTitle }),
   tokenize: ({ text }) => norms(text),
   tokenize_words: ({ words }) => words.map(norms),
   surah_names: () => SURAH_NAMES_AR,
