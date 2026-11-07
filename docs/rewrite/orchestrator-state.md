@@ -133,3 +133,10 @@ Queue: phase 17 running -> 16b (bracket embedded Quran verses) -> 18 -> ... -> 2
 - A QUESTION about the live teacher or retraining goes to the decider session. "User decides when to retrain" = user-only decision: never retrain.
 
 ## 2026-11-07 06:35: phase 22 child hit the usage limit with all work uncommitted in the tree (roadmap already ticked). Resuming session to verify, commit and push (log step-22b.json). User: no adhkar detection fix wanted; no custom corpus URLs.
+
+## Running now: phase 23 Acceptance (Opus 5.5, high)
+- Child: refactoring-step-23, session ID 7a3b75bb-422c-4ca8-a98c-1b5741e618d7, log: /tmp/claude-1000/-home-zeno-Documents-work-new-projects-Wahy-Transcriber/428c450a-c0e2-4fc7-86dc-884ec1da7570/scratchpad/step-23.json. Phase 22 done (1dc38b2).
+- Open for the user: when to retrain Laya on laya_v3 (a/b/c). Nothing depends on it. Never retrain ourselves.
+- After 23: phase 24 (retire the old app) WAITS for the user's say-so. Then phase 25 (explanation document) may run.
+
+## 2026-11-07 06:50: user decided option (c) on Laya: no retraining anytime soon; keep serving laya-wahy-r6-v3_mixed. laya_v3 is only a base for later. Do not retrain, do not start Kaggle. Phase 23 child is not affected.

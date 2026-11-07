@@ -1,10 +1,12 @@
-import { useI18n } from "../../shell/i18n";
+import { useI18n, type MessageKey } from "../../shell/i18n";
 import { useDetectionSettings, useUpdateDetectionSettings } from "../corpora/api";
 
 // Brand-free technical names, never translated: the engine versions the old app offered (F-011).
 const ENGINES = ["v5", "v5:loose", "v4", "v3"];
+// F-012: the old app's four choices (its values, which the engine reads)
+const QIRAAT = ["AUTO", "hafs", "warsh", "qaloon"];
 
-/** F-011, F-046: which engine the next detection uses, and whether it looks for adhkar too. */
+/** F-011, F-012, F-046: which engine the next detection uses, and whether it looks for adhkar too. */
 export function EnginePanel() {
   const { t } = useI18n();
   const settings = useDetectionSettings();
@@ -29,14 +31,20 @@ export function EnginePanel() {
         </div>
         <div className="field">
           <span className="label">{t("settings.qiraat")}</span>
-          <input
-            className="input !h-8 w-[160px] font-mono"
-            dir="ltr"
-            key={s?.qiraat}
-            defaultValue={s?.qiraat ?? ""}
+          <select
+            className="input !h-8 w-auto"
+            value={s?.qiraat ?? "AUTO"}
+            disabled={!s}
             aria-label={t("settings.qiraat")}
-            onBlur={(e) => s && /^[A-Za-z_]{1,32}$/.test(e.target.value) && e.target.value !== s.qiraat && update.mutate({ qiraat: e.target.value })}
-          />
+            data-testid="qiraat"
+            onChange={(e) => update.mutate({ qiraat: e.target.value })}
+          >
+            {QIRAAT.map((q) => (
+              <option key={q} value={q}>
+                {t(`settings.qiraat.${q}` as MessageKey)}
+              </option>
+            ))}
+          </select>
         </div>
         <label className="switch">
           <input type="checkbox" checked={s?.adhkar ?? true} disabled={!s} onChange={(e) => update.mutate({ adhkar: e.target.checked })} />

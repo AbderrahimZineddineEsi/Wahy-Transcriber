@@ -125,6 +125,7 @@ test("a saved version shows its own findings, read only; the current ones can be
   const calls = server();
   renderApp("/lectures/1");
   await screen.findByTestId("transcript");
+  await screen.findByRole("option", { name: /before re-detect/ });
   await userEvent.selectOptions(screen.getByLabelText("النسخة"), "7");
   expect(await screen.findByText(/تعرض نسخة محفوظة «before re-detect \(v4\)»/)).toBeInTheDocument();
   await waitFor(() => expect(quote("hadith")).toBeNull());
@@ -177,9 +178,33 @@ test("on a long lecture, the paragraphs before the spoken word are marked done, 
   expect(word(95)).not.toHaveClass("now");
 });
 
-test("the rail shows the open lecture as a place, even on the first visit", async () => {
+test("the rail shows the open lecture as a place, even on the first visit, with its count of quotes (F-001)", async () => {
   server();
   renderApp("/lectures/1");
   await screen.findByTestId("transcript");
-  expect(screen.getByRole("link", { name: "المحاضرة المفتوحة" })).toHaveAttribute("href", "/lectures/1");
+  expect(screen.getByRole("link", { name: /^المحاضرة المفتوحة/ })).toHaveAttribute("href", "/lectures/1");
+  expect(await screen.findByTestId("rail-badge-lecture")).toHaveTextContent("2");
+});
+
+test("detecting again asks a second click, then runs the engine of the settings and reads the versions again (F-044)", async () => {
+  let versionsAsked = 0;
+  const calls = fakeServer((call: Call) => {
+    if (call.method === "GET" && call.path === "/api/lectures/1") return json(lecture);
+    if (call.path === "/api/lectures/1/findings") return json({ lecture_id: 1, count: findings.length, findings });
+    if (call.path === "/api/lectures/1/versions") {
+      versionsAsked++;
+      return json(versionsAsked > 1 ? [version] : []);
+    }
+    if (call.path === "/api/detection/settings") return json({ engine: "v4", qiraat: "auto", adhkar: true, engines: ["v5", "v5:loose", "v4", "v3"] });
+    if (call.path === "/api/lectures/1/detect") return json({ job: { id: "j1", kind: "detect", lecture_id: 1, status: "done", progress: {}, result: { count: 2 }, error: null, created_at: now, updated_at: now } }, 202);
+    if (call.path === "/api/jobs") return json([]);
+  });
+  renderApp("/lectures/1");
+  const button = await screen.findByRole("button", { name: "إعادة كشف الاقتباسات (v4)" });
+  await userEvent.click(button);
+  expect(calls.some((c) => c.path.endsWith("/detect"))).toBe(false);
+  await userEvent.click(screen.getByRole("button", { name: "تأكيد: تُحفظ الاقتباسات الحالية نسخةً" }));
+  expect(await screen.findByText("وُجد 2 اقتباس؛ حُفظت السابقة نسخةً")).toBeInTheDocument();
+  expect(calls.find((c) => c.path.endsWith("/detect"))).toMatchObject({ method: "POST" });
+  expect(await screen.findByRole("option", { name: /before re-detect/ })).toBeInTheDocument();
 });

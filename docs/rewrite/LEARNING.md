@@ -1720,3 +1720,54 @@ uv run python -m wahy.laya label --teacher fake --n 5                       # a 
 uv run python -m wahy.laya skew-run6 ../data/laya_datagen/datasets/laya_v3  # how laya_v3 differs from run 6's rows
 uv run pytest -q tests/laya                                                 # the research side's tests
 ```
+
+## Phase 23: Acceptance
+
+**What was done.** Every feature in `features.md` was checked against its `check:` line in the new app, and each one got
+an `accepted` line saying how it passed. 134 of the 137 features and the three new features in the rewrite (N-007,
+N-009, N-020) are ticked. Three are not: F-127 and F-130 are phase 24's work (the new `run.sh`, the Colab runner), and
+F-134's check is a Kaggle training run, which sessions may not start. The walk found five small gaps, fixed here:
+- **F-001**: the rail had no count badges. It now shows the open lecture's quotes, the adhkar, the training rows and
+  the logged requests, as in the mockup (`web/src/shell/badges.ts`).
+- **F-044**: a lecture could only be detected again from the Tafrigh tab. The lecture header now has "Detect the
+  quotes again (v5)", which uses the engine chosen in Settings and asks for a second click.
+- **F-012**: the Qira'ah setting was a free-text box. It is now the old app's four choices.
+- **N-009**: the server found the transcript-quality warnings, but no screen showed them. The finished transcription
+  card now lists them.
+- **F-112**: nothing tested that "typos off" really applies no fix. A server test now does.
+
+**New concepts.**
+- **Acceptance test vs unit test.** A unit test asks "does this function do what I meant?". An acceptance test asks
+  "can the user do what was promised?", in the real app with the real server. Example: `EditPage.test.tsx` showed that
+  "Save as a dhikr" sends the add-quote request with a fake server. The acceptance test ran it on the real server, and
+  the quote only appeared after more than 5 seconds, because the first engine call after the adhkar list changes is slow.
+  A unit test cannot see that.
+- **Evidence, not opinion.** Each tick names its evidence: a test name, or a measured result from the live walk ("16
+  minutes of audio, 1,766 words in about 3.5 minutes, 28 quotes"). Anyone can rerun it, and a reviewer can disagree
+  with the evidence instead of with a feeling.
+- **Testing a failure for free.** Some checks need a request that fails, such as "a wrong Groq key falls back to local
+  Whisper" or "the next pass uses JEV". A deliberately wrong key makes the provider refuse with a 401, which costs
+  nothing but still runs the real code path (the fallback, the request log).
+- **One query key, two places.** The rail badges read the same TanStack Query keys as their screens (`["adhkar"]`,
+  `["findings", id]`). When a screen changes something and refreshes its key, the badge updates with it, with no extra
+  code. In NestJS terms, it is like two controllers reading through one cached provider.
+
+**Tested.**
+- `web/e2e/acceptance.spec.ts`: 23 Playwright tests on the real server and engine, offline, each named after its
+  feature IDs (badges, theme, the version picker after a v5:loose and a v4 run, Warsh, VTT timings, attaching media,
+  standard script in the SRT, adhkar export/reset/import, the inspector's edits, picking quotes by hand, approve all,
+  passages and neighbours in the request preview, the error report, the editor's mini player and switches, full matn,
+  edit words, the reference search, source words, the full-text editor).
+- The live walk on a scratch data folder with this machine's GPU and no paid call: Laya loaded and then pushed off the
+  GPU by Whisper, and loaded again for a pass; a 30-second upload and the 16-minute Meziane khutba with local Whisper
+  small (the second time from the cache); a wrong Groq key falling back to Whisper turbo; Open Hadith Data;
+  adhkar changes surviving a restart; the research CLIs and the datagen notebook's first cells.
+- `scripts/test.sh`: every suite, including the new spec.
+
+**Try:**
+
+```bash
+grep -c "^- \[x\]" docs/rewrite/features.md                     # how many features are ticked
+(cd web && npx playwright test e2e/acceptance.spec.ts)          # the acceptance walk, offline (about 2 minutes)
+(cd server && uv run python -m wahy.laya teacher-eval report)   # one of the research checks
+```

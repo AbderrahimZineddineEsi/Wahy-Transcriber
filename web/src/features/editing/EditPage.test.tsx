@@ -44,6 +44,7 @@ function server() {
       return json(done("add_quote"), 201);
     }
     if (path === "/api/corpus/suggest") return json([suggestion]);
+    if (path === "/api/corpora/adhkar" && method === "POST") return json({ id: "Adhkar:custom_1", category: "أذكار متفرقة", ref: "ثم قال", t: "ثم قال", is_custom: true, created_at: now }, 201);
     if (path === "/api/corpus/units") return json({ "112:1": { ref: "الإخلاص: 1", words: ["قُلْ", "هُوَ", "اللَّهُ", "أَحَدٌ"], full: null } });
     if (path.startsWith("/api/findings/") && method === "POST") return json(done("edit", 1));
     if (path.startsWith("/api/findings/") && method === "DELETE") return json(done("delete", 1));
@@ -90,6 +91,19 @@ test("a missed quote with two clicks: the studio ranks the references, inserts i
   await userEvent.click(undo);
   await waitFor(() => expect(calls.some((c) => c.path === "/api/lectures/1/edits/undo")).toBe(true));
   await waitFor(() => expect(screen.getByTestId("undo")).toHaveAccessibleName("لا شيء للتراجع"));
+});
+
+test("save as a dhikr: the words go into the adhkar list and are marked with it at once (F-054)", async () => {
+  const calls = server();
+  renderApp("/lectures/1/edit");
+  await board();
+  await userEvent.click(boardWord(7));
+  await userEvent.click(boardWord(8));
+  await userEvent.click(within(screen.getByTestId("seltool")).getByRole("button", { name: "حفظ كذكر" }));
+  await userEvent.click(within(screen.getByRole("dialog")).getByRole("button", { name: "حفظ" }));
+  await waitFor(() => expect(calls.some((c) => c.path === "/api/corpora/adhkar" && c.method === "POST")).toBe(true));
+  await waitFor(() => expect(calls.find((c) => c.path === "/api/lectures/1/edits/quote")?.body).toEqual({ start: 7, end: 8, unit_id: "Adhkar:custom_1", source_type: "ADHKAR", ref: "ثم قال", qiraah: "hafs" }));
+  expect(await screen.findByText(/في قائمة الأذكار/)).toBeInTheDocument();
 });
 
 test("outside the sources: nothing matched, so the typed reference is sent", async () => {

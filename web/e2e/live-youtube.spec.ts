@@ -27,5 +27,5 @@ test("a pasted YouTube link ends with a transcript and findings", async ({ page 
   const words = ((await page.getByTestId("transcript").textContent()) ?? "").trim().split(/\s+/).length;
   console.log(`words: ${words}`);
   expect(words).toBeGreaterThan(500);
-  await expect(page.getByTestId("findings").locator("li").first()).toBeVisible();
+  await expect(page.getByTestId("transcript").locator(".ref").first()).toBeVisible();
 });

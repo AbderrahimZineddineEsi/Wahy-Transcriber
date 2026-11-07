@@ -6,17 +6,18 @@ import { LAST_LECTURE_KEY } from "../features/lectures/LecturePage";
 import { UndoButton } from "../features/editing/UndoButton";
 import { CorporaIcon, LectureIcon, LecturesIcon, RequestsIcon, SettingsIcon, ThemeIcon, TrainingIcon } from "./icons";
 import { useI18n, type MessageKey } from "./i18n";
+import { useRailBadges } from "./badges";
 import { readStored } from "./storage";
 import { useTheme } from "./theme";
 
 type Place = { to: string; label: MessageKey; icon: ComponentType; badge?: number };
 
-// The app's places (docs/rewrite/mockups). "The open lecture" is the last lecture opened (phase 12); the count
-// badges (F-001) arrive with the screens that own the counts.
-const PLACES: Place[] = [
-  { to: "/corpora", label: "nav.corpora", icon: CorporaIcon },
-  { to: "/training", label: "nav.training", icon: TrainingIcon },
-  { to: "/requests", label: "nav.requests", icon: RequestsIcon },
+// The app's places (docs/rewrite/mockups). "The open lecture" is the last lecture opened (phase 12). Each place
+// with a count shows it as a badge (F-001).
+const PLACES: (Omit<Place, "badge"> & { count: "corpora" | "training" | "requests" })[] = [
+  { to: "/corpora", label: "nav.corpora", icon: CorporaIcon, count: "corpora" },
+  { to: "/training", label: "nav.training", icon: TrainingIcon, count: "training" },
+  { to: "/requests", label: "nav.requests", icon: RequestsIcon, count: "requests" },
 ];
 
 export function Layout() {
@@ -96,13 +97,15 @@ function Rail() {
   // the lecture on screen, or else the last one opened (read again on every navigation, since useMatch re-renders)
   const open = useMatch("/lectures/:id/*")?.params.id;
   const last = Number(open ?? readStored(LAST_LECTURE_KEY));
+  const hasLast = Number.isInteger(last) && last > 0;
+  const badges = useRailBadges(hasLast ? last : null);
   return (
     <nav aria-label={t("nav.label")} className="flex flex-col gap-0.5 border-line bg-surface px-2 py-3 max-[720px]:flex-row max-[720px]:overflow-x-auto max-[720px]:border-b max-[720px]:p-1 min-[721px]:border-e">
       <RailLink place={{ to: "/lectures", label: "nav.lectures", icon: LecturesIcon }} end />
-      {Number.isInteger(last) && last > 0 && <RailLink place={{ to: `/lectures/${last}`, label: "nav.lecture", icon: LectureIcon }} />}
+      {hasLast && <RailLink place={{ to: `/lectures/${last}`, label: "nav.lecture", icon: LectureIcon, badge: badges.lecture }} />}
       <span className="mx-1.5 my-2 h-px bg-line max-[720px]:hidden" />
       {PLACES.map((place) => (
-        <RailLink key={place.to} place={place} />
+        <RailLink key={place.to} place={{ ...place, badge: badges[place.count] }} />
       ))}
       <span className="flex-1" />
       <RailLink place={{ to: "/settings", label: "nav.settings", icon: SettingsIcon }} />
@@ -124,8 +127,8 @@ function RailLink({ place, end }: { place: Place; end?: boolean }) {
       <Icon />
       <span className="text-center leading-tight">{t(place.label)}</span>
       {place.badge !== undefined && (
-        <span className="absolute top-1 ms-5 start-1/2 inline-grid h-[18px] min-w-[18px] place-items-center rounded-full bg-ink px-1 font-mono text-[10.5px] text-surface">
-          {place.badge}
+        <span data-testid={`rail-badge-${place.label.slice(4)}`} className="absolute top-1 ms-5 start-1/2 inline-grid h-[18px] min-w-[18px] place-items-center rounded-full bg-ink px-1 font-mono text-[10.5px] text-surface">
+          {place.badge.toLocaleString("en")}
         </span>
       )}
     </NavLink>

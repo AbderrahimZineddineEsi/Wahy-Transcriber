@@ -283,3 +283,23 @@ def test_helper_requests_do_not_get_the_classifier_prompt_and_survive_its_reply_
     assert adapter.get_typo_edits(seg) == [edit]
     assert adapter.get_split_points(seg) == [3]
     assert all('"decisions"' not in s for s in seen)
+
+
+def test_with_typo_fixing_off_no_sentence_gets_a_correction():
+    """F-112: the same reply with a typo fix: applied when fixing is on, never applied when it is off."""
+    text = "ثم الزكاة همود أحد أركان الإسلام"
+    edit = {"wordStart": 2, "wordEnd": 2, "original": "همود", "replacement": "عمود"}
+
+    def mock(payload):
+        return {"decisions": [{"id": "s1", "tag": "paragraph", "hasTypo": True, "edits": [edit]}]}
+
+    def run(strategy: str) -> TranscriptSegment:
+        seg = TranscriptSegment(id="s1", original_text=text, source_pos=SourcePosition(char_start=0, char_end=len(text)))
+        pipe = TafrighPipeline(pipeline_config=PipelineConfig(model_candidate="gemini_all", typo_strategy=strategy),
+                               adapters={"gemini": GeminiAdapter(mock_response_fn=mock)})
+        return pipe.run(initial_segments=[seg]).segments[0]
+
+    fixed = run("gated")
+    assert fixed.trace["edits"]["accepted"] and "عمود" in fixed.active_text
+    kept = run("off")
+    assert "edits" not in kept.trace and kept.active_text == text and not kept.versions

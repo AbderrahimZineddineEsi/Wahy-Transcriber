@@ -2,6 +2,9 @@ import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useI18n, type MessageKey } from "../../shell/i18n";
 import { isUnfinished, useJobAction, useJobStream, useJobs, useLectures, type Job } from "./api";
+import { clockText } from "./view/sync";
+
+type TranscriptWarning = { kind: string; start_s: number; sample: string; repeats?: number | null };
 
 const STAGES: Record<string, string[]> = {
   transcribe: ["download", "audio", "transcribe", "save"],
@@ -94,6 +97,7 @@ function Result({ job }: { job: Job }) {
   const { t } = useI18n();
   const result = (job.result ?? {}) as Record<string, unknown>;
   const fallback = result.fallback as { reason?: string } | null | undefined;
+  const warnings = Array.isArray(result.warnings) ? (result.warnings as TranscriptWarning[]) : [];
   const text =
     job.kind === "transcribe"
       ? t("job.resultTranscribe", { model: String(result.model_used ?? ""), words: Number(result.word_count ?? 0) })
@@ -105,6 +109,28 @@ function Result({ job }: { job: Job }) {
         {job.lecture_id !== null && <Link className="font-semibold text-accent underline" to={`/lectures/${job.lecture_id}`}>{t("job.openLecture")}</Link>}
       </span>
       {fallback && <span className="text-unsure">{t("job.fallback", { reason: fallback.reason ?? "" })}</span>}
+      {warnings.length > 0 && <Warnings warnings={warnings} />}
     </div>
+  );
+}
+
+/** N-009: stretches of the transcript that look like ASR trouble (Latin script, a repetition loop). */
+function Warnings({ warnings }: { warnings: TranscriptWarning[] }) {
+  const { t } = useI18n();
+  return (
+    <details className="text-unsure" data-testid="asr-warnings">
+      <summary>{t("job.warnings", { n: warnings.length })}</summary>
+      <ul className="m-0 ps-5">
+        {warnings.slice(0, 20).map((w, i) => (
+          <li key={i}>
+            {t(w.kind === "repetition" ? "job.warning.repetition" : "job.warning.latin_run", {
+              time: clockText(w.start_s),
+              sample: w.sample,
+              n: w.repeats ?? 0,
+            })}
+          </li>
+        ))}
+      </ul>
+    </details>
   );
 }

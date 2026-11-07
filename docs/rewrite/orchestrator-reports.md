@@ -5,6 +5,51 @@ State for recovery (session IDs, what to do if a child died) is in `orchestrator
 
 <!-- NEW REPORTS GO BELOW THIS LINE -->
 
+## 2026-11-07 06:50 — Your answer on retraining Laya
+
+You said: "we're not retraining laya anytime soon just keep using the version i used last". That is option (c): the app keeps
+serving `laya-wahy-r6-v3_mixed`; `laya_v3` stays built in `data/laya_datagen/datasets/laya_v3/` as the base for a later run, not
+zipped, not uploaded. No retraining, no Kaggle run. The input skew between r6's training rows and what the app sends stays as
+recorded in the phase 22 notes.
+
+## 2026-11-07 06:45 — Phase 22 (Datagen on the new core) done; one decision waits for you; phase 23 started
+
+Gate passed. Commit `1dc38b2` "rewrite phase 22: Datagen on the new core" pushed, phase ticked. `scripts/test.sh` ALL GREEN: old
+backend 90 (was 152; the 62 datagen tests moved to the server), server 484 (+6 skipped, ruff clean), engine 268, web Vitest 147,
+Playwright 17.
+- The package is `server/wahy/laya/` (tests `server/tests/laya/`), not `server/laya/` as the roadmap says, because a package
+  named `laya` there would hide the installed `laya` library that local Laya needs (recorded in ARCHITECTURE.md and Changes).
+  Nothing in `backend/` or `js/` imported the datagen, so the old app is unaffected.
+- Teachers (fake, Gemini, JEV, OpenRouter chat, local Laya) go through `core/ai` with their answer cache; their requests appear
+  in the request log as "teacher". New answers are cached under a new prompt version (the request wording changed slightly);
+  the 1,335 old answers stay readable and are never mixed with new ones. The engine goes through `core/engine`, speech
+  recognition through `features/transcription`.
+- `python -m wahy.laya` builds datasets, compares two dataset folders file by file, has a teacher label cards, shows how a
+  dataset differs from run 6's rows, validates and zips. Dataset builders refuse to overwrite an existing folder without `--force`.
+- New dataset `laya_v3` in `data/laya_datagen/datasets/laya_v3/` (run 6's two variants with every row the envelope the engine
+  builds for the app). Not zipped, not uploaded, nothing trained. New notebook `notebooks/kaggle/laya_v3_kaggle.ipynb`. The
+  datagen notebooks now run in a new Jupyter kernel "Wahy server (server/.venv)"; the server has a new `research` extra.
+- Done-when: `laya_v2` rebuilt = rebuild by the old code, 27 of 27 files identical. Against the 2026-10-27 folder 11 files differ,
+  the same for the old code (16 passages regrouped by commit `4147cb7`; stored `v1_passages` lacks backticked field names).
+  74 laya tests pass (62 ported, 12 new).
+- Feature check: 5 of your labelled cards: fake teacher 5/5 agree ($0), Gemini `gemini-3.5-flash-lite` free tier 5/5 agree (one
+  request, 2.8 s, $0). All 5 were cards you marked correct, so this does not show how Gemini does on "not a quote" cards.
+- Small extras: two lint errors from phase 21 fixed in `features/corpora`; an optional `top_logprobs` setting added to the
+  OpenRouter chat options; some comments in `engine/src/` still name the old path (editing engine files would invalidate every
+  datagen cache and force a full re-detection).
+
+**Needs you (not blocking, I took no action): when should Laya be retrained on `laya_v3`?** The skew report shows `laya_v3`
+differs from the rows run 6 trained on: the verdict question differs on every row; the state differs on 2,019 hadith and dhikr
+rows (run 6 has `quran_neighboring_context: null`, the app leaves the key out); 16 passages are grouped differently. So the
+production `laya-wahy-r6-v3_mixed` is served slightly different inputs than it was trained on. Options:
+(a) now: zip `laya_v3`, upload to Kaggle, run `laya_v3_kaggle.ipynb` yourself (about 25-30 min on 2xT4);
+(b) after phase 23 (Acceptance), keeping r6 in the app until then;
+(c) not for now: keep r6, treat `laya_v3` as the base for a later run.
+The roadmap says you decide when to retrain, so this stays open until you answer; nothing depends on it.
+
+**Phase 23 (Acceptance, Opus 5.5, high)** is running as `refactoring-step-23`. I told it which gaps you already agreed to
+(no adhkar detection on the default engine, no custom corpus URLs F-015, no second engine choice in the lecture toolbar F-011).
+
 ## 2026-11-07 06:35 — Your answers on adhkar detection and custom corpus URLs; phase 22 cut off by the usage limit
 
 **Your answers (recorded):** adhkar detection on the default engine is not needed now and will not be added; you can add it

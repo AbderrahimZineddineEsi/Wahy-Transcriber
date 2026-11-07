@@ -127,10 +127,14 @@ test("a YouTube link sends the chosen model, shows the stages with a percentage,
   expect(states).toEqual(["done", "done", "on", "todo"]);
 
   // the transcription ends: the watcher starts detection (the lecture has no findings and no detect job)
-  state.jobs = [tjob({ status: "done", result: { model_used: "Whisper small", word_count: 900, fallback: { reason: "bad key" } } })];
+  const warning = { kind: "latin_run", start_idx: 40, end_idx: 45, start_s: 75, end_s: 79, sample: "Thank you for watching", repeats: null };
+  state.jobs = [tjob({ status: "done", result: { model_used: "Whisper small", word_count: 900, fallback: { reason: "bad key" }, warnings: [warning] } })];
   stream.push(state.jobs[0]);
   expect(await within(card).findByText("Whisper small · 900 كلمة")).toBeInTheDocument();
   expect(within(card).getByText(/bad key/)).toBeInTheDocument();
+  // N-009: the transcript-quality warnings come with the result
+  expect(within(card).getByTestId("asr-warnings")).toHaveTextContent("راجع النص: 1 مقطع مريب");
+  expect(within(card).getByText("حروف لاتينية عند 1:15: «Thank you for watching»")).toBeInTheDocument();
   await waitFor(() => expect(calls.some((c) => c.path === "/api/lectures/1/detect")).toBe(true), { timeout: 4000 });
 });
 

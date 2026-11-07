@@ -375,6 +375,11 @@ decisions and why). The problems being fixed are in the friction map: https://cl
   - Done when: every kept feature is ticked, or listed with the user's agreement.
   - Feature check: all of `features.md`.
     Features: every F- and N- ID marked keep, merge or replaced, or marked to be in the rewrite.
+  - Draft result (2026-11-07): 134 of 137 features and N-007, N-009, N-020 ticked, each with an `accepted` line in
+    `features.md` (new `web/e2e/acceptance.spec.ts`, 23 tests, plus a live walk on this machine's GPU with no paid
+    call). Not ticked, waiting for the user's agreement to list them: F-127 and F-130 (phase 24's work; F-130's check
+    also needs a Colab session) and F-134 (its check is a Kaggle training run). Left unticked until the user answers.
+  - Notes: see the 2026-11-07 phase 23 entry under **Changes**.
 
 - [ ] **24. Retire the old app**: Sonnet 5.5, medium. Only after the user says so.
   - Delete `backend/`, `js/`, `css/`, `index.html`, `run.bat`, and replace `run.sh` with the new launcher. Rewrite
@@ -611,3 +616,19 @@ Each entry: date, what changed, the user's words.
     so `scripts/test.sh` passes ruff.
   - Comments in `engine/src/` still name `backend/laya_datagen`: editing an engine file changes the engine fingerprint
     and so every datagen cache key (a full re-detection), so they were left for a phase that changes the engine anyway.
+- **2026-11-07**: Phase 23 (draft). Small gaps fixed inside the phase (no scope change):
+  - F-001: the rail's count badges (open lecture: its quotes; sources: the adhkar; training: the rows; request log: the
+    requests), as in the approved mockup, read from the screens' own query keys (`web/src/shell/badges.ts`).
+  - F-044 (and F-028's "re-run with v4"): "Detect the quotes again (engine)" in the lecture header, with the engine
+    chosen in Settings (user-agreed: no second engine picker in the lecture toolbar) and a second click to confirm;
+    the server keeps the replaced quotes as a lecture version, as before.
+  - F-012: the Qira'ah setting is the old app's four choices (automatic, Hafs, Warsh, Qalun), not a free-text field.
+  - N-009: the finished transcription card lists the server's transcript-quality warnings.
+  - F-112: a server test that "typos off" applies no fix. `web/e2e/live-youtube.spec.ts` pointed at a test id that no
+    longer exists (`findings`); it now checks the transcript's reference tags.
+  - Gaps the user already agreed to, not built: adhkar detection on engines v4/v5 (only v3 detects adhkar), custom
+    corpus URLs (F-015; the per-source upload replaces them), the second engine choice in the lecture toolbar (F-011).
+    Already recorded as not built: making a saved lecture version current again (F-028), a direct jump from "Verify
+    this quote" to its request-log entry (F-066).
+  - No big gap was found. Open for the user (QUESTION in the phase 23 report): agree to list F-127, F-130 (phase 24)
+    and F-134 (a Kaggle training run on `laya_v3`, the user's call) so the phase can be ticked.

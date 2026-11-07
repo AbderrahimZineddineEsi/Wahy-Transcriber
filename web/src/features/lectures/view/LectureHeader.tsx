@@ -4,6 +4,7 @@ import { useI18n, type MessageKey } from "../../../shell/i18n";
 import { useToasts } from "../../../shell/toasts";
 import { formatDate } from "../format";
 import { useDeleteVersion, useRenameVersion, useSaveVersion, useVersions, type LectureDetail } from "../api";
+import { DetectAgain } from "./DetectAgain";
 import type { ViewFinding } from "./model";
 
 export const TABS = ["view", "edit", "verify", "tafrigh", "export"] as const;
@@ -89,6 +90,7 @@ function VersionPicker({ lectureId, snapshot, versionId, onVersion }: { lectureI
 
   return (
     <div className="row ms-auto gap-2 pb-2">
+      {!open && <DetectAgain lectureId={lectureId} />}
       <label className="label" htmlFor="version-select">
         {t("version.label")}
       </label>
