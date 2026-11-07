@@ -294,12 +294,17 @@ decisions and why). The problems being fixed are in the friction map: https://cl
   - Notes: see the 2026-11-07 phase 18 entry under **Changes**.
   - Learn: moving a well-tested package without breaking it.
 
-- [ ] **19. Web: Tafrigh**: Sonnet 5.5, high.
+- [x] **19. Web: Tafrigh**: Sonnet 5.5, high.
   - Sentence preview, settings, a run with progress, pause and stop, the review queue, saved Tafrigh runs and the
     compare view, the outline view, export.
   - Done when: Vitest and Playwright pass.
   - Feature check: do a Tafrigh run from the new app and review one sentence.
     Features: F-106 to F-122.
+  - Feature check result (2026-11-07): live, from the new app, on the sample lecture: Tafrigh tab → Gemini route
+    "directly through Google" (OpenRouter's key is expired) → "first 10" → Start; `gemini-3.5-flash-lite` on the free
+    tier ($0), 10 sentences in 1 windowed request (3.6 s), saved in `data/tafrigh_runs/`; one sentence opened and
+    confirmed, and the server's run says `reviewed: 1` (`web/e2e/live-tafrigh.spec.ts`, `WAHY_E2E_LIVE=1`).
+  - Notes: see the 2026-11-07 phase 19 entry under **Changes**.
   - Learn: long-running UIs.
 
 ### Training data and the research side
@@ -499,3 +504,15 @@ Each entry: date, what changed, the user's words.
   Re-detecting with a chosen engine before a run (F-109) is the existing detection job, started by the web app
   (phase 19). The default processing mode is `windowed` (size 15), as the previous Tafrigh cost measurements
   recommended. The OpenRouter key in `.env` is expired.
+- **2026-11-07**: Phase 19 (done): the lecture's Tafrigh tab (`web/src/features/tafrigh/`). Choices made inside the
+  phase: (1) **F-120** (save a run for Laya) has no screen here: it needs the training tables and the endpoint of phase
+  20, which already lists F-120; nothing is dropped, it moves with its server half. (2) F-109's "re-detect with a chosen
+  engine" is a button that starts the existing detection job (`POST /api/lectures/{id}/detect {engine}`) after a second
+  click, because it replaces the lecture's current quotes. (3) For JEV and Laya the Gemini model and route fields are
+  shown as the *helper model* (splits and typo fixes). (4) The run settings are remembered in this browser
+  (`wahy.tafrigh.settings`), like the old app; the runs and every review action are on the server. (5) The offline
+  Playwright test gets its saved run from `scripts/seed_tafrigh_run.py`, which runs the real Tafrigh service on a
+  throw-away app with the server tests' fake model; no server code was added for it. (6) *Max words* never cuts a
+  verse (the segmenter protects atomic Quran ranges): with the quotes as found a long verse stays one sentence, and the
+  preview counts it as "over the limit". Typo strategy offers the three choices of F-112 (when suspicious, always,
+  never); the server's fourth value (`asr_confidence_gated`) has no button.

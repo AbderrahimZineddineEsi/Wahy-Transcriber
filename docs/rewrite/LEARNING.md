@@ -1441,3 +1441,86 @@ cd server && uv run pytest tests/tafrigh -q                      # 89 tests, off
 cd server && uv run pytest tests/tafrigh/test_tafrigh_service.py -k restart -v
 scripts/dev.sh   # then: curl -XPOST localhost:8120/api/lectures/sample; curl -XPOST localhost:8120/api/lectures/1/tafrigh/runs -H 'content-type: application/json' -d '{"first_n":20,"gemini_route":"direct"}'
 ```
+
+## Phase 19 — Web: Tafrigh
+
+### What was built
+
+The lecture's **Tafrigh tab** (`web/src/features/tafrigh/`), all of it a client of the phase-18 server:
+
+- **Sentences** (F-106, F-107, F-109): the sentences a run would classify, with their statistics, before any model is
+  called; the cutting settings, the text source and "re-run the engine first" (the ordinary detection job with a chosen
+  engine) beside it.
+- **Settings and estimate** (F-108, F-110 to F-114): the matn, the classifier, the Gemini model and route, window or
+  sentence mode, typo strategy and the sentence range with the "first 10 / 25 / 50" test slices. The estimate is asked
+  again after every change and shows each mode's requests and tokens.
+- **A run with progress** (F-115, F-116): a bar with the finished sentences and the sentences waited on, requests, tags
+  so far, pause, resume, **stop** (keep what is finished) and cancel; a failed run shows its error and *Retry*.
+- **The lesson** (F-117, F-118): the outline as a bar of headings, warnings, the run summary with its cost breakdown,
+  every sentence with its label; a sentence opens a card with who labelled it, the model's odds, what a split did,
+  which fixes were applied or turned down and why.
+- **Review** (F-119): the queue, one sentence at a time: confirm, relabel, undo a typo fix, next.
+- **Saved runs and compare** (F-121, F-122): picker, rename, *Save as new*, delete; a comparison of two to six runs
+  (settings, cost, tags, and the sentences labelled differently).
+- Not here: **F-120** (save a run for Laya as training rows). It needs phase 20's training tables; phase 20 already
+  lists it.
+
+### New ideas, plainly
+
+**A long-running UI is a job you *follow*, not a request you *wait for*.** Pressing *Start* does not wait for the run.
+`POST …/tafrigh/runs` answers at once with a job (`202`), and `RunProgress` follows it over a server-sent-events
+stream (`EventSource`), the same `useJobStream` hook the verification pass uses. Because the job lives on the server,
+closing the tab changes nothing: the page asks `GET /api/jobs` on load, finds a running `tafrigh` job of this lecture
+and follows it again.
+
+```tsx
+const going = jobs.data?.find((j) => j.kind === "tafrigh" && j.lecture_id === lecture.id && isUnfinished(j));
+useEffect(() => { if (!watching && going) setWatching(going); }, [going, watching]);
+```
+
+**Server state and screen state are different things.** The run, its sentences and its review queue are *server
+state*: TanStack Query fetches them and caches them under a key (`["tafrigh-run", runId]`). Which sentence is open and
+which view is shown are *screen state*: plain `useState`. A review action (`POST …/review`) returns the whole run
+drawn again, and `setQueryData` puts that straight into the cache, so the queue shrinks without a second request.
+
+**A debounced query.** Typing "10" in *max words* must not send a request per key. The preview's `queryFn` first waits
+300 ms and checks `signal.aborted`; when the key changes, TanStack Query aborts the old call, which therefore never
+reaches the server. `placeholderData: keepPreviousData` keeps the old sentences on screen meanwhile, so the list does
+not flash empty.
+
+**A form field with a half-typed value.** `NumberBox` keeps what the user typed in its own `useState` and only
+reports a number when the text is one (an empty box or `1.` is not). On blur it shows the saved value again. Without
+this, clearing a box would snap back to the default at once and you could never type a new number.
+
+**Pure logic gets pure tests.** `settings.ts` (range `1–10` → server `[0, 10)`), and `labels.ts` (who labelled a
+sentence, what a split did, which sentence is "next to review") are plain functions, tested without a screen.
+
+### Something the screen taught
+
+*Max words* is a cap with one exception: **a verse is never cut**. The segmenter protects atomic Quran ranges, so with
+the quotes as found, a 69-word verse stays one sentence even at "max 10". The preview now shows "n over the limit" so
+this is visible, and the Playwright check proves the strict case on the raw text.
+
+### How it was tested
+
+- **Vitest** (`TafrighPage.test.tsx`, `settings.test.ts`, `labels.test.ts`): a fake server behind the real screens.
+  The preview and its settings; the estimate following the mode; a run sending the exact request (first-10 slice,
+  mode), the progress from a pushed job snapshot, *stop*, the saved run opening; a failed run and *Retry*; a refused
+  start; the lesson (warning, cost breakdown, outline scroll); a split sentence's details; relabel and confirm sent to
+  the server with the next sentence opening; *Save as new*; the comparison; re-detect asking twice.
+- **Playwright** (`e2e/tafrigh.spec.ts`), real server and engine, offline: the preview and estimate; then a saved run
+  made by `scripts/seed_tafrigh_run.py` (the server's test double as the model) is reviewed, cloned, relabelled in the
+  copy (the first run is unchanged, checked on the server), compared and exported (the downloaded file equals the
+  server's).
+- **Feature check, live** (`e2e/live-tafrigh.spec.ts`, Gemini free tier, called directly, $0): from the new app, a
+  run on the sample's test slice (10 sentences, 1 windowed request), then one sentence confirmed; the run on the server
+  says `reviewed: 1`.
+
+**Try:**
+
+```bash
+cd web && npx vitest run src/features/tafrigh                       # screens and logic, offline
+cd web && npx playwright test e2e/tafrigh.spec.ts                    # real server, offline
+cd web && WAHY_E2E_LIVE=1 npx playwright test e2e/live-tafrigh.spec.ts   # a real Gemini run (uses .env)
+cd server && uv run python ../scripts/seed_tafrigh_run.py /tmp/x 1 8     # make a finished run without a model
+```

@@ -1122,3 +1122,97 @@
     }
   }
 }
+
+/* Tafrigh (phase 19), after the mockup's "tafrigh" screen: the outline bar and the sentence rows. */
+@layer components {
+  .outline {
+    display: flex;
+    gap: 4px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+  .outline button {
+    flex: none;
+    padding: 4px 10px;
+    border: 0;
+    border-radius: var(--radius-s);
+    background: var(--wahy-surface-2);
+    color: inherit;
+    font: inherit;
+    font-size: var(--text-s);
+    cursor: pointer;
+  }
+  .outline button.h1 {
+    background: var(--wahy-accent-soft);
+    color: var(--wahy-accent);
+    font-weight: 600;
+  }
+  .sent {
+    display: grid;
+    grid-template-columns: 5.5rem minmax(0, 1fr) auto;
+    gap: calc(var(--spacing) * 3);
+    align-items: baseline;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--wahy-line);
+  }
+  button.sent {
+    width: 100%;
+    background: none;
+    border-inline: 0;
+    border-top: 0;
+    color: inherit;
+    font: inherit;
+    text-align: start;
+    cursor: pointer;
+    content-visibility: auto;
+    contain-intrinsic-size: auto 56px;
+  }
+  .sent .t {
+    font-family: var(--font-read);
+    font-size: 1.02rem;
+    line-height: 1.9;
+  }
+  .sent.matn .t {
+    font-weight: 600;
+  }
+  .sent .t.tfg-heading {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--wahy-accent);
+  }
+  .tfg-seg.open > .sent {
+    background: var(--wahy-surface-2);
+  }
+  .tfg-seg[data-needs-review] > .sent {
+    box-shadow: inset 3px 0 0 var(--wahy-unsure);
+  }
+  .tfg-card {
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--spacing) * 2);
+    padding: calc(var(--spacing) * 3);
+    margin-block: calc(var(--spacing) * 2);
+    border: 1px solid var(--wahy-line);
+    border-radius: var(--radius-m);
+    background: var(--wahy-surface);
+  }
+  .tfg-note {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: calc(var(--spacing) * 2);
+    border-radius: var(--radius-s);
+    background: var(--wahy-accent-soft);
+    font-size: var(--text-s);
+  }
+  .ar {
+    font-family: var(--font-read);
+    line-height: 1.9;
+  }
+  .scroll-x {
+    overflow-x: auto;
+  }
+  .vgrid > aside.tall {
+    position: static;
+  }
+}

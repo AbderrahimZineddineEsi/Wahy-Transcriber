@@ -5,6 +5,38 @@ State for recovery (session IDs, what to do if a child died) is in `orchestrator
 
 <!-- NEW REPORTS GO BELOW THIS LINE -->
 
+## 2026-11-07 01:10 — New OpenRouter key saved
+
+You pasted a new OpenRouter key. I checked it with OpenRouter's key-info endpoint (free): valid, **spending limit $0.20 in
+total**, $0 used, expires 2027-02-04. I replaced the expired `OPENROUTER_API_KEY` in your gitignored `.env` with it. The key
+value is in no tracked file and not in these reports. Because of the $0.20 cap, children should keep OpenRouter live calls
+to the minimum (the earlier live check cost under $0.001). Tafrigh's default OpenRouter route works again.
+
+## 2026-11-07 01:00 — Phase 18 (Tafrigh, server) done; phase 19 started
+
+Gate passed. Commit `0448dd3` "rewrite phase 18: Tafrigh (server)" pushed, phase ticked. Along the way the child crashed on a
+network error (API unreachable), then hung for ~17 minutes; I killed it and resumed it twice (nothing lost).
+- Built: `backend/tafrigh/` was **copied** to `server/wahy/features/tafrigh/` (the old copy stays until phase 24); adapters go
+  through `core/ai`; a run is a job and a folder in `data/tafrigh_runs/<run_id>/`, so review actions survive a restart.
+  "Stop" ends a run and keeps the finished sentences, "cancel" keeps nothing. API: preview, estimate, start, stop, list,
+  read, rename, delete, clone, review, export, compare. Default mode is windowed with a window of 15.
+- Tests: server 397 passed (+6 skipped), ruff clean, 89 Tafrigh tests incl. the restart test (relabel a sentence, start a
+  second app on the same data folder, relabel and outline still there); web typecheck/lint clean, Vitest 105; old backend 152.
+  **Playwright was not re-run after the last change** (the child renamed two API models with a `Tafrigh` prefix after a
+  clash with the verification feature, then skipped e2e). I told the phase 19 child to run the full `scripts/test.sh` first.
+- Feature check passed live on the sample lecture with Gemini free tier ($0): a windowed run (2 requests) and a per-sentence
+  run (12 requests) over all 12 sentences; compare listed the 2 sentences the runs label differently.
+- Decisions recorded under Changes: `master_verification.py` dropped ("no run changes the original words" is now a test);
+  `training_store.py`, `exporters.py`, `pilot_tools.py` carried across with tests for phase 20 to decide; saving sentences
+  as Laya training examples (F-120) has no endpoint yet (phase 20); a Tafrigh job is **not resumable** after a server
+  restart, it shows as interrupted.
+- **Needs you when you are back (not blocking):** the OpenRouter key in `.env` is **expired (401)**. The default route
+  prefers OpenRouter when that key is set, so default runs fail with a clear message until the key is replaced (passing
+  `gemini_route: "direct"` works). The key you pasted in chat earlier may be the replacement, but I did not put any key
+  into `.env` (secrets are on my wait-for-you list). Say "use it" and I will save it through the app's key route, or put
+  it in `.env` yourself.
+- **Phase 19 (Web: Tafrigh, Sonnet 5.5, high)** is running as `refactoring-step-19`.
+
 ## 2026-11-07 00:05 — Correction 16b (bracket embedded Quran verses) done; phase 18 started
 
 Gate passed. Commit `8ae75a1` "rewrite phase 16: bracket embedded Quran verses" pushed. Per your choice, a Quran verse inside a

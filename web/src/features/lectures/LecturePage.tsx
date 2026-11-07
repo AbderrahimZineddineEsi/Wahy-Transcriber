@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { ApiError } from "../../api/client";
-import { useI18n, type MessageKey } from "../../shell/i18n";
+import { useI18n } from "../../shell/i18n";
 import { writeStored } from "../../shell/storage";
 import { useFindings, useLecture, useVersion, useVersions, type LectureDetail } from "./api";
 import { LectureHeader, TABS, type Tab } from "./view/LectureHeader";
@@ -9,11 +9,12 @@ import { LectureView } from "./view/LectureView";
 import { VerifyPage } from "../verification/VerifyPage";
 import { EditPage } from "../editing/EditPage";
 import { ExportPage } from "../export/ExportPage";
+import { TafrighPage } from "../tafrigh/TafrighPage";
 import { fromRow, fromSnapshot, type EngineFinding, type FindingRow } from "./view/model";
 
 export const LAST_LECTURE_KEY = "wahy.last-lecture";
 
-/** One open lecture: its header (title, tabs, version) and the open tab. Tafrigh arrives in phase 19. */
+/** One open lecture: its header (title, tabs, version) and the open tab.  */
 export function LecturePage() {
   const params = useParams();
   const id = Number(params.id);
@@ -90,17 +91,8 @@ function Body({ lecture, tab }: { lecture: LectureDetail; tab: Tab }) {
         ) : (
           <p className="text-ink-2">{t("lecture.loadingFindings")}</p>
         )
-      ) : tab !== "view" ? (
-        <section className="panel">
-          <div className="panel-h">
-            <h2 className="text-xl font-semibold">{t(`tab.${tab}` as MessageKey)}</h2>
-          </div>
-          <p className="panel-b m-0 text-ink-2">
-            <span>
-              <b>{t("page.comingTitle")}</b> — {t("lecture.comingTab")}
-            </span>
-          </p>
-        </section>
+      ) : tab === "tafrigh" ? (
+        <TafrighPage lecture={lecture} />
       ) : findings ? (
         <LectureView lecture={lecture} findings={findings} readOnly={versionId !== null} />
       ) : (
