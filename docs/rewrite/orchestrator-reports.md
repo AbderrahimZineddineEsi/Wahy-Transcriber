@@ -5,6 +5,13 @@ State for recovery (session IDs, what to do if a child died) is in `orchestrator
 
 <!-- NEW REPORTS GO BELOW THIS LINE -->
 
+## 2026-11-08 23:15 — Phase 25 done: all 25 phases ticked; the run is finished
+
+Commit `53b9f65` "rewrite phase 25: Explanation document" pushed. `scripts/test.sh` ALL GREEN on the final state: server 517 (+6 skipped, ruff clean), engine 268, web 149, Playwright 40.
+- `docs/rewrite/EXPLAINED.md` (about 6,600 words, 12 sections): old app and its problems, the new layout, one lecture end to end, the 8 ADRs in plain words, each technology next to its NestJS/Flutter counterpart, where Laya stands (r6 v3_mixed served, laya_v3 built not trained), the launcher, public corpus release and Colab runner, lessons, what to learn next, how it was made, what is open.
+- **NotebookLM:** the child decided a second file is needed and wrote `docs/rewrite/EXPLAINED-notebooklm.md` (about 8,800 words, one file): no tables, code blocks or diagrams, each section names its subject so a chunk reads alone, two glossaries for the Arabic/Islamic and project words. Reason: NotebookLM answers from a few matching chunks, so a table row loses its headers and "see ADR 0003 above" means nothing. Use this file as the source.
+- **Still open:** F-130 until you run the Colab checklist (section 12 of EXPLAINED.md and the 06:40 report); the README quick start says "Node 20+" but `run.sh` needs 22.18+.
+
 ## 2026-11-08 06:40 — Colab runner built (draft, F-130 waits for your Colab check); phase 25 started
 
 Sorry: the Colab session finished at 01:20 and I only looked at 06:37; no notification reached me while you were idle.
