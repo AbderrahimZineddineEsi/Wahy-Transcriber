@@ -43,6 +43,9 @@ class Settings(BaseSettings):
     engine_max_heap_mb: int = Field(3584, validation_alias="WAHY_ENGINE_MAX_HEAP_MB")
     engine_timeout_s: float = Field(900.0, validation_alias="WAHY_ENGINE_TIMEOUT_S")
 
+    # a public link (Colab) sets this: every request must carry it (core/access.py); unset: no guard
+    access_token: SecretStr | None = Field(None, validation_alias="WAHY_ACCESS_TOKEN")
+
     groq_api_key: SecretStr | None = Field(None, validation_alias="GROQ_API_KEY")
     gemini_api_key: SecretStr | None = Field(None, validation_alias="GEMINI_API_KEY")
     openrouter_api_key: SecretStr | None = Field(None, validation_alias="OPENROUTER_API_KEY")

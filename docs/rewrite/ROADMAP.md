@@ -645,11 +645,19 @@ Each entry: date, what changed, the user's words.
     - F-127 (one-command launch) and F-130 (Colab runner) are listed as not ticked, handled by phase 24 (F-130 also
       needs a Colab GPU session only the user can run). Decided on the user's behalf by the orchestrator while they
       are away; the user can overrule it when back.
+- **2026-11-08**: Task 24b, "Colab runner" (extra task after phase 24, not phase 25). The corpus is now a **public**
+  release asset of this repo (`corpus-v1`, sha256 `ffe22b80...b69f67`, 90,256,830 bytes); the Wahy-Finder repo stays
+  private and untouched. `run.sh` downloads it through `scripts/fetch_corpus.sh`: the release URL first, then the old
+  `gh` and `GITHUB_TOKEN` fallbacks for the private repo, and every download is checked against the sha256 before it is
+  kept. `run.sh` also needs node 22.18+ (the engine worker is TypeScript that node runs directly; the old notebook
+  installed Node 20, which cannot run it) and skips `npm ci` when `web/dist` is up to date. F-130: the notebook is
+  rebuilt as one Run-all flow (options + Google Drive, parallel install, run), data kept on the user's Drive by
+  default, a backup zip when Drive is off, and an access token (`WAHY_ACCESS_TOKEN`, `core/access.py`) on the public
+  link. See `docs/rewrite/LEARNING.md` and `features.md` F-130 for what is verified and what needs a Colab session.
 - **2026-11-08**: Phase 24 (done, F-130 open): the old app (`backend/`, `js/`, `css/`, `index.html`, `run.bat`,
   `pytest.ini`) is deleted, as the user approved ("go for phase 24, it should be safe since i pushed everything to
   github already"). `server/wahy/main.py` now serves `web/dist`, so `./run.sh` is one process on port 8000.
-  The corpus (`data/corpus.json`, 90 MB) is only in the **private** Wahy-Finder repo, so a plain download is a 404:
-  `run.sh` falls back to `gh api` (after `gh auth login`) or `GITHUB_TOKEN`, and warns if both fail. A true fresh
-  clone on a machine with no access to that repo still needs the file copied in by hand; making the corpus public or
-  building it from public sources is a choice for the user, not made here. `docs/HANDOFF.md` and `docs/plans/` moved to
+  The corpus (`data/corpus.json`, 90 MB) was then only in the private Wahy-Finder repo, so `run.sh` fell back to
+  `gh api` or `GITHUB_TOKEN`; since task 24b it is a public release asset of this repo (see the 24b entry above), so a
+  plain download works on a fresh clone. `docs/HANDOFF.md` and `docs/plans/` moved to
   `docs/archive/`; the README has new screenshots (`web/scripts/screenshots.mjs`). F-130 (Colab) is left for the user.

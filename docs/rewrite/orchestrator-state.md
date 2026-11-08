@@ -149,3 +149,8 @@ Queue: phase 17 running -> 16b (bracket embedded Quran verses) -> 18 -> ... -> 2
 - Child: refactoring-step-24 (Sonnet 5.5, medium), session ID f7bb9f2b-4f54-4bce-93d4-cfc01a9259c3, log: /tmp/claude-1000/-home-zeno-Documents-work-new-projects-Wahy-Transcriber/428c450a-c0e2-4fc7-86dc-884ec1da7570/scratchpad/step-24.json.
 - Resume if it dies: claude -p --resume f7bb9f2b-4f54-4bce-93d4-cfc01a9259c3 "continue, verify, commit and push". The old app is in git history at b28eeda (pushed), so deletions are recoverable.
 - After 24: phase 25 (explanation document, Opus 5.5, high) runs next unless the user says otherwise (no answer given on running it first).
+
+## 2026-11-08 ~01:10: phase 24 done (79d5d87), scripts/test.sh re-run by the orchestrator: ALL GREEN (Playwright 40). User then said: make the corpus public, and make a session for the Colab runner.
+- Corpus published (not the private repo: Wahy-Finder holds old lectures.js/hadith_corpus.json too) as release asset corpus-v1 on the public Wahy-Transcriber repo, sha256 checked, no-login download verified.
+- Child: refactoring-step-24b (extra task, NOT phase 25: finish F-130 Colab runner + point run.sh at the public corpus URL), Sonnet 5.5 high, session ID e7d3f6c1-0b4d-443a-bf5e-1bf6e7d15a47, log: /tmp/claude-1000/-home-zeno-Documents-work-new-projects-Wahy-Transcriber/428c450a-c0e2-4fc7-86dc-884ec1da7570/scratchpad/step-24b.json, prompt: /tmp/claude-1000/-home-zeno-Documents-work-new-projects-Wahy-Transcriber/428c450a-c0e2-4fc7-86dc-884ec1da7570/scratchpad/prompt-24b.txt. Resume: claude -p --resume e7d3f6c1-0b4d-443a-bf5e-1bf6e7d15a47 "continue, verify, commit and push".
+- After 24b: phase 25 (explanation document, Opus 5.5, high); add the user's NotebookLM question to its prompt.

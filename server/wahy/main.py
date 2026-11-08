@@ -26,6 +26,7 @@ from pathlib import Path
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 
+from wahy.core.access import AccessGuard
 from wahy.core.ai.layer import AiLayer
 from wahy.core.db import Database
 from wahy.core.engine import EngineClient
@@ -135,6 +136,9 @@ def create_app(settings: Settings | None = None, web_dir: Path | None = None) ->
     app.include_router(telemetry_router)
     app.include_router(training_router)
     mount_web(app, web_dir if web_dir is not None else REPO_ROOT / "web" / "dist")
+    token = (settings or get_settings()).access_token
+    if token and token.get_secret_value().strip():
+        app.add_middleware(AccessGuard, token=token.get_secret_value().strip())   # a public link (F-130)
     return app
 
 

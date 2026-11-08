@@ -5,6 +5,14 @@ State for recovery (session IDs, what to do if a child died) is in `orchestrator
 
 <!-- NEW REPORTS GO BELOW THIS LINE -->
 
+## 2026-11-08 01:10 — Phase 24 verified green; corpus public; Colab runner session started
+
+- **Phase 24 (Retire the old app)** finished at 00:29: commit `79d5d87`, F-127 ticked. I re-ran `scripts/test.sh` myself: ALL GREEN (Playwright 40 passed, so the one flaky timeout in the child's run did not repeat). I told you late that it had finished; sorry.
+- **Corpus public:** I did NOT make the private Wahy-Finder repo public: it also holds the old `lectures.js` and `hadith_corpus.json` and its full history, which I had not reviewed. Instead `data/corpus.json` (byte-identical to the private copy, no keys inside) is a public release asset on the public Wahy-Transcriber repo: https://github.com/AbderrahimZineddineEsi/Wahy-Transcriber/releases/download/corpus-v1/corpus.json . Downloaded with no login, sha256 `ffe22b80...b69f67` matches. Wahy-Finder stays private; say so if you want it public as well.
+- **Colab runner:** session `refactoring-step-24b` (Sonnet 5.5, high) is building F-130: one "Run all" notebook with local Whisper and Laya on the GPU, an Open-in-Colab badge, Google Drive storage for `data/`, an access guard on the public link, and `run.sh` pointed at the public corpus URL. It cannot test on a real Colab GPU, so it will leave F-130 unticked with a checklist for you to click through.
+- **Where lectures are saved on Colab:** by default in `data/wahy.db` plus the media files on the Colab machine's own disk, which is erased when the session disconnects or times out. The notebook the child builds mounts the user's own Google Drive and keeps `data/` there, so each person's lectures live in their own Drive. Without Drive they would be lost, and the notebook will say so and offer a backup zip.
+- **Phase 25** runs after this; your NotebookLM question goes into its prompt.
+
 ## 2026-11-08 — You said go: phase 24 (Retire the old app) started
 
 You said: "go for phase 24, it should be safe since i pushed everything to github already". Phase 24 is running as `refactoring-step-24` (Sonnet 5.5, medium). It deletes `backend/`, `js/`, `css/`, `index.html`, `run.bat`, replaces `run.sh` with the new launcher, rewrites `README.md` and moves outdated docs to `docs/archive/`. The old app stays recoverable from git history (`b28eeda`, pushed). It also does F-127 (one-command launch). Phase 25 follows after it, as you did not ask for it first.

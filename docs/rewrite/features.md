@@ -948,10 +948,11 @@ see or set is listed once, with an ID that never changes and is never reused.
   - suggest: keep — updated for the new server in phase 24.
   - check: run the notebook on Colab; the tunnel URL opens the app and transcribes with the specialized Whisper.
   - user: "agree with all" (as suggested)
-  - not ticked (phase 24, 2026-11-08): the notebook is rebuilt for the new server (`scripts/make_colab_notebook.py`:
-    clone, `./run.sh` with the `local-asr` and `laya` extras, load Laya, Cloudflare tunnel; its cells parse), but its
-    check needs a Colab GPU session that a headless session cannot run. The user ticks it after running the
-    notebook once.
+  - not ticked (task 24b, 2026-11-08): rebuilt as one Run-all notebook: clone, Google Drive (default ON) or a backup
+    zip, parallel install, `./run.sh` with `local-asr` and `laya`, Laya loaded on the GPU, Cloudflare tunnel, and an
+    access token in the link (`core/access.py`). Verified without Colab: the guard, the Drive copy and restore, the
+    backup zip, the cell syntax and no secrets, the corpus download with its sha256. Still needs one Colab T4 session
+    (the check above); the user ticks it after running it.
 
 ## Q. Research side (Laya)
 
