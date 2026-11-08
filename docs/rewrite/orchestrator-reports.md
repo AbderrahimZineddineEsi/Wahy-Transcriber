@@ -5,6 +5,21 @@ State for recovery (session IDs, what to do if a child died) is in `orchestrator
 
 <!-- NEW REPORTS GO BELOW THIS LINE -->
 
+## 2026-11-08 06:40 — Colab runner built (draft, F-130 waits for your Colab check); phase 25 started
+
+Sorry: the Colab session finished at 01:20 and I only looked at 06:37; no notification reached me while you were idle.
+Commit `2364b5e` "rewrite phase 24b (draft): Colab runner" pushed. `scripts/test.sh` green: server 517 (+6 skipped), engine and web unit tests, Playwright 40.
+- **Corpus:** `run.sh` uses `scripts/fetch_corpus.sh`: the public release URL first, then the `gh` / `GITHUB_TOKEN` fallbacks, every download checked against the sha256 (real 90 MB download matched, about 7 s). Docs no longer say the corpus is private.
+- **Old notebook bug fixed:** it installed Node 20 but the engine needs 22.18+, so it could not have started. `run.sh` now checks the Node version.
+- **Notebook** `notebooks/colab/wahy_colab_runner.ipynb`: three cells, Run all; installs in parallel; Laya on the GPU; Cloudflare tunnel; printed private link; README has the Open-in-Colab badge.
+- **Where lectures are saved:** Drive ON by default; the app runs on the VM disk and `data/` plus the keys file are copied to My Drive/Wahy-Studio every minute (the database through SQLite's backup API, never deleting on Drive). Drive OFF: everything is lost when the session ends, the notebook says so, and refreshes `/content/wahy-backup.zip` (no keys) every 2 minutes.
+- **Keys:** none in the notebook or repo. Laya's Hugging Face repo is private, so it needs `HF_TOKEN` (Colab secret or hidden prompt).
+- **Access guard:** new `WAHY_ACCESS_TOKEN`; the link carries the token, the server swaps it for a cookie; without it every request is refused (checked: 401 / 200 / 303).
+- **Your Colab checklist (to tick F-130):** 1. open the badge, T4 GPU. 2. Run all, approve Drive. 3. HF_TOKEN, check "Laya: loaded ... cuda". 4. open the link, remove `?token=...` (still works), plain tunnel address in a private window says "Access link needed". 5. transcribe a short file with the specialized Whisper and verify with local Laya. 6. after about 1 minute `My Drive/Wahy-Studio/data/wahy.db` exists. 7. stop, Run all again: lecture still there, faster start. 8. optional: Drive off, `/content/wahy-backup.zip` appears.
+- **Not tested here:** the T4 GPU, `cloudflared` and the Drive pop-up on a real session.
+
+**Phase 25 (explanation document, Opus 5.5, high)** is running as `refactoring-step-25`. It was also asked whether `EXPLAINED.md` is good enough as a NotebookLM / Gemini notebook source or whether it should write a second file for that.
+
 ## 2026-11-08 01:10 — Phase 24 verified green; corpus public; Colab runner session started
 
 - **Phase 24 (Retire the old app)** finished at 00:29: commit `79d5d87`, F-127 ticked. I re-ran `scripts/test.sh` myself: ALL GREEN (Playwright 40 passed, so the one flaky timeout in the child's run did not repeat). I told you late that it had finished; sorry.

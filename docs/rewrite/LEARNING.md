@@ -1878,3 +1878,36 @@ python scripts/make_colab_notebook.py                          # regenerate the 
 cd server && uv run pytest -q tests/test_colab.py tests/test_access.py
 WAHY_ACCESS_TOKEN=abc PORT=8199 ./run.sh                       # then open http://127.0.0.1:8199/?token=abc
 ```
+
+## Phase 25: Explanation document
+
+**What was built.** No code. `docs/rewrite/EXPLAINED.md` is the whole rewrite in one place: the old app and the friction
+map, the new shape, one lecture through it, the eight ADRs in plain words, each technology (with its NestJS or Flutter
+counterpart), Laya's final state, the launcher, the public corpus and the Colab runner, the ideas worth keeping, what
+to learn next, and how it was made. `docs/rewrite/EXPLAINED-notebooklm.md` says the same in a form made for NotebookLM.
+
+**New concept: writing for retrieval.** NotebookLM is a retrieval-augmented generation (RAG) system: it cuts your
+sources into chunks, finds the chunks closest to your question, and has Gemini answer from them. That changes what a
+"good" document is:
+- **A chunk is read alone.** A paragraph that says "as above, ADR 0003 fixes this" is useless when retrieved without
+  "above". So each section of the NotebookLM file starts by naming its subject ("The third decision is about the
+  envelope..."), even if that repeats.
+- **Tables and code blocks retrieve badly.** A table row like `| core/gpu.py | with gpu.use(...) | unloading |` loses
+  its column headers when it is cut out, and the audio overview cannot read it aloud. The NotebookLM file uses only
+  sentences and lists (a check: `grep -c '|'` on it gives 0).
+- **Define the rare words where they are used.** "matn", "takhrij" or "envelope" mean nothing to a general model, so
+  they are defined in two glossary sections and again briefly in place.
+It is the same lesson as training/serving skew, applied to a reader: the input the model sees at answer time (one
+chunk) is not the input you wrote (the whole file).
+
+**How it was checked.** Every number in both files was taken from `LEARNING.md`, the roadmap, the ADRs, the friction
+map or a fresh count (`wc -l` over the old app at `b28eeda` and the new folders). `scripts/test.sh` was run on the
+final state: all green (numbers in `EXPLAINED.md`, section 11).
+
+**Try:**
+
+```bash
+grep -n "^## " docs/rewrite/EXPLAINED.md                 # the twelve sections
+grep -c '|' docs/rewrite/EXPLAINED-notebooklm.md         # 0: no tables for NotebookLM
+wc -w docs/rewrite/EXPLAINED*.md                         # far under NotebookLM's 500,000 words per source
+```

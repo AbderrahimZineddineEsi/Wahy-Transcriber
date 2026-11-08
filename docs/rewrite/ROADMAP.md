@@ -395,10 +395,13 @@ decisions and why). The problems being fixed are in the friction map: https://cl
     GPU session.
   - Notes: see the 2026-11-08 phase 24 entry under **Changes**.
 
-- [ ] **25. Explanation document**: Opus 5.5, high.
+- [x] **25. Explanation document**: Opus 5.5, high.
   - Write `docs/rewrite/EXPLAINED.md` for the user, built from `LEARNING.md`: the architecture before and after, every
     ADR in plain words, each technology and what it does, things to learn next (mapped to NestJS and Flutter where it
     helps), and a short "how it was made" section (phases, tests, prompts).
+  - Result (2026-11-08): `EXPLAINED.md` written (12 sections, including task 24b's Colab runner and public corpus), plus
+    `EXPLAINED-notebooklm.md` for NotebookLM (see the 2026-11-08 phase 25 entry under **Changes**). `scripts/test.sh`
+    green on the final state. F-130 stays unticked until the user's Colab check.
 
 ## Changes
 
@@ -661,3 +664,10 @@ Each entry: date, what changed, the user's words.
   `gh api` or `GITHUB_TOKEN`; since task 24b it is a public release asset of this repo (see the 24b entry above), so a
   plain download works on a fresh clone. `docs/HANDOFF.md` and `docs/plans/` moved to
   `docs/archive/`; the README has new screenshots (`web/scripts/screenshots.mjs`). F-130 (Colab) is left for the user.
+- **2026-11-08**: Phase 25 (done). At the user's request the session also decided whether `EXPLAINED.md` is good
+  enough as a NotebookLM source, and wrote a second file, `docs/rewrite/EXPLAINED-notebooklm.md`: plain sentences and
+  lists (no tables, code blocks or diagrams, which lose their headers when NotebookLM cuts a source into chunks), every
+  section naming its own subject so it can be retrieved alone, and two glossary sections for the Arabic, Islamic and
+  project words. One file is enough (about 8,800 words; NotebookLM takes up to 500,000 words per source). User: "Decide
+  whether EXPLAINED.md is good enough to use as a source in NotebookLM ... or whether you should also write a second
+  file made for that". Task 24b and the public corpus release are in both files, as asked; F-130 stays unticked.
