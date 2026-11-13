@@ -180,79 +180,84 @@ export function LectureView({ lecture, findings, readOnly }: Props) {
         </span>
       </div>
 
-      <div className="toolbar">
-        <div className="seg" role="group" aria-label={t("layout.label")}>
-          {LAYOUTS.map((l) => (
-            <button key={l} aria-pressed={layout === l} onClick={() => setLayout(l)}>
-              {t(`layout.${l}` as MessageKey)}
-            </button>
-          ))}
-        </div>
-        <div className="seg" role="group" aria-label={t("kind.label")}>
-          {KINDS.map((k) => (
-            <button
-              key={k}
-              aria-pressed={filter.kind === k}
-              onClick={() => {
-                setFilter({ ...filter, kind: k });
-                setCard(null);
+      <div className="viewbar">
+        <div className="viewbar-row">
+          <div className="row gap-1">
+            <input
+              className="input w-64 max-[720px]:w-full"
+              type="search"
+              placeholder={t("view.search")}
+              aria-label={t("view.search")}
+              value={query}
+              onChange={(e) => {
+                setQuery(e.target.value);
+                hitIndex.current = -1;
               }}
-            >
-              {t(`kind.${k}` as MessageKey)}
-            </button>
-          ))}
-        </div>
-        <div className="row gap-1.5" role="group" aria-label={t("verdict.label")}>
-          {VERDICTS.map((v) => (
-            <button key={v} className="chip" aria-pressed={filter.show[v]} style={{ color: `var(--wahy-${v})` }} onClick={() => setVerdict(v)}>
-              <span className="dot" />
-              <span className="text-ink-2">{t(`verdict.${v}` as MessageKey)}</span>
-            </button>
-          ))}
-          <select
-            className="input h-7 w-auto text-s"
-            aria-label={t("preset.label")}
-            value={preset ?? ""}
-            onChange={(e) => e.target.value && setFilter({ ...filter, show: PRESETS[e.target.value as PresetKey] })}
-          >
-            {preset === null && <option value="">{t("preset.label")}</option>}
-            {(Object.keys(PRESETS) as PresetKey[]).map((p) => (
-              <option key={p} value={p}>
-                {t(`preset.${p}` as MessageKey)}
-              </option>
+              onKeyDown={(e) => e.key === "Enter" && nextHit()}
+            />
+            {deferredQuery.trim() && (
+              <button className="btn small ghost" title={t("view.nextHit")} onClick={nextHit} data-testid="hits">
+                {t("view.hits", { n: hits.length })}
+              </button>
+            )}
+          </div>
+          <div className="seg" role="group" aria-label={t("kind.label")}>
+            {KINDS.map((k) => (
+              <button
+                key={k}
+                aria-pressed={filter.kind === k}
+                onClick={() => {
+                  setFilter({ ...filter, kind: k });
+                  setCard(null);
+                }}
+              >
+                {t(`kind.${k}` as MessageKey)}
+              </button>
             ))}
-          </select>
-          <button className={`chip${filter.clipped ? " on" : ""}`} aria-pressed={filter.clipped ? "true" : undefined} onClick={() => setFilter({ ...filter, clipped: !filter.clipped })}>
-            {t("filter.clipped")} <span className="mono">{total.clipped}</span>
-          </button>
+          </div>
+          <span className="flex-1" />
+          <div className="seg" role="group" aria-label={t("layout.label")}>
+            {LAYOUTS.map((l) => (
+              <button key={l} aria-pressed={layout === l} onClick={() => setLayout(l)}>
+                {t(`layout.${l}` as MessageKey)}
+              </button>
+            ))}
+          </div>
         </div>
-        <span className="flex-1" />
-        <label className="switch">
-          <input type="checkbox" checked={script === "standard"} onChange={(e) => setScript(e.target.checked ? "standard" : "spoken")} />
-          {t("view.script")}
-        </label>
-        <label className="switch">
-          <input type="checkbox" checked={follow} onChange={(e) => setFollow(e.target.checked ? "on" : "off")} />
-          {t("view.follow")}
-        </label>
-        <div className="row gap-1">
-          <input
-            className="input w-44 max-[720px]:w-full"
-            type="search"
-            placeholder={t("view.search")}
-            aria-label={t("view.search")}
-            value={query}
-            onChange={(e) => {
-              setQuery(e.target.value);
-              hitIndex.current = -1;
-            }}
-            onKeyDown={(e) => e.key === "Enter" && nextHit()}
-          />
-          {deferredQuery.trim() && (
-            <button className="btn small ghost" title={t("view.nextHit")} onClick={nextHit} data-testid="hits">
-              {t("view.hits", { n: hits.length })}
+        <div className="viewbar-row quiet">
+          <div className="row gap-1.5" role="group" aria-label={t("verdict.label")}>
+            {VERDICTS.map((v) => (
+              <button key={v} className="chip" aria-pressed={filter.show[v]} style={{ color: `var(--wahy-${v})` }} onClick={() => setVerdict(v)}>
+                <span className="dot" />
+                <span className="text-ink-2">{t(`verdict.${v}` as MessageKey)}</span>
+              </button>
+            ))}
+            <select
+              className="input h-7 w-auto text-s"
+              aria-label={t("preset.label")}
+              value={preset ?? ""}
+              onChange={(e) => e.target.value && setFilter({ ...filter, show: PRESETS[e.target.value as PresetKey] })}
+            >
+              {preset === null && <option value="">{t("preset.label")}</option>}
+              {(Object.keys(PRESETS) as PresetKey[]).map((p) => (
+                <option key={p} value={p}>
+                  {t(`preset.${p}` as MessageKey)}
+                </option>
+              ))}
+            </select>
+            <button className={`chip${filter.clipped ? " on" : ""}`} aria-pressed={filter.clipped ? "true" : undefined} onClick={() => setFilter({ ...filter, clipped: !filter.clipped })}>
+              {t("filter.clipped")} <span className="mono">{total.clipped}</span>
             </button>
-          )}
+          </div>
+          <span className="flex-1" />
+          <label className="switch">
+            <input type="checkbox" checked={script === "standard"} onChange={(e) => setScript(e.target.checked ? "standard" : "spoken")} />
+            {t("view.script")}
+          </label>
+          <label className="switch">
+            <input type="checkbox" checked={follow} onChange={(e) => setFollow(e.target.checked ? "on" : "off")} />
+            {t("view.follow")}
+          </label>
         </div>
       </div>
 

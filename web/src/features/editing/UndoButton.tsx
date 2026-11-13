@@ -44,7 +44,7 @@ function Undo({ lectureId }: { lectureId: number }) {
         <path d="M9 14l-4-4 4-4" />
         <path d="M5 10h9a5 5 0 0 1 0 10h-3" />
       </svg>
-      <span className="max-w-56 truncate text-s max-[720px]:hidden">{last ? t("undo.named", { label: name }) : t("undo.nothing")}</span>
+      {last && <span className="max-w-56 truncate text-s max-[720px]:hidden">{t("undo.named", { label: name })}</span>}
     </button>
   );
 }

@@ -27,7 +27,10 @@ export function LectureHeader({ lecture, findings, snapshot, versionId, onVersio
   const badge: Partial<Record<Tab, string>> = findings ? { view: String(findings.length), verify: `${checked}/${findings.length}` } : {};
   return (
     <div className="lechead">
-      <h1>{lecture.title}</h1>
+      <div className="lechead-top">
+        <h1>{lecture.title}</h1>
+        <VersionPicker lectureId={lecture.id} snapshot={snapshot} versionId={versionId} onVersion={onVersion} />
+      </div>
       <nav className="tabs" aria-label={t("tab.label")}>
         {TABS.map((tab) => (
           <NavLink key={tab} to={tab === "view" ? `/lectures/${lecture.id}` : `/lectures/${lecture.id}/${tab}`} end>
@@ -36,7 +39,6 @@ export function LectureHeader({ lecture, findings, snapshot, versionId, onVersio
           </NavLink>
         ))}
       </nav>
-      <VersionPicker lectureId={lecture.id} snapshot={snapshot} versionId={versionId} onVersion={onVersion} />
     </div>
   );
 }
@@ -64,7 +66,7 @@ function VersionPicker({ lectureId, snapshot, versionId, onVersion }: { lectureI
     };
     return (
       <form
-        className="row ms-auto pb-2"
+        className="row versions"
         onSubmit={(e) => {
           e.preventDefault();
           commit();
@@ -89,7 +91,7 @@ function VersionPicker({ lectureId, snapshot, versionId, onVersion }: { lectureI
   }
 
   return (
-    <div className="row ms-auto gap-2 pb-2">
+    <div className="row versions">
       {!open && <DetectAgain lectureId={lectureId} />}
       <label className="label" htmlFor="version-select">
         {t("version.label")}

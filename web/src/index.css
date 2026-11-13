@@ -334,31 +334,161 @@
 
 /* The lecture screen (phase 12), after the mockup's "lecture view". */
 @layer components {
+  /* the header bar: name, places, tools (shell/Layout.tsx) */
+  .appbar {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    gap: calc(var(--spacing) * 6);
+    height: var(--spacing-header);
+    padding: 0 calc(var(--spacing) * 6);
+    border-bottom: 1px solid var(--wahy-line);
+    background: color-mix(in srgb, var(--wahy-surface) 92%, transparent);
+    backdrop-filter: blur(8px);
+  }
+  .brand {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    gap: 10px;
+    min-width: 7rem;
+  }
+  .brand-mark {
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 9px;
+    background: var(--wahy-accent);
+    color: var(--wahy-accent-ink);
+    font: 700 1.15rem/1 var(--font-quran);
+    padding-bottom: 3px;
+  }
+  .brand-name {
+    font: 700 1.45rem/1 var(--font-quran);
+    white-space: nowrap;
+  }
+  .places {
+    display: flex;
+    flex: 1;
+    align-self: stretch;
+    gap: calc(var(--spacing) * 1);
+    min-width: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .place {
+    position: relative;
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    gap: 7px;
+    padding: 0 12px;
+    color: var(--wahy-ink-2);
+    font-size: var(--text-m);
+    white-space: nowrap;
+  }
+  .place svg {
+    width: 17px;
+    height: 17px;
+    opacity: 0.8;
+  }
+  .place:hover {
+    color: var(--wahy-ink);
+  }
+  .place::after {
+    content: "";
+    position: absolute;
+    inset-inline: 10px;
+    bottom: -1px;
+    height: 2px;
+    border-radius: 2px;
+    background: transparent;
+  }
+  .place[aria-current="page"] {
+    color: var(--wahy-ink);
+    font-weight: 600;
+  }
+  .place[aria-current="page"]::after {
+    background: var(--wahy-accent);
+  }
+  .place[aria-current="page"] svg {
+    color: var(--wahy-accent);
+    opacity: 1;
+  }
+  .appbar-tools {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: calc(var(--spacing) * 2);
+  }
+  @media (max-width: 720px) {
+    .appbar {
+      flex-wrap: wrap;
+      height: auto;
+      gap: 0 calc(var(--spacing) * 3);
+      padding: 8px calc(var(--spacing) * 4) 0;
+    }
+    .brand {
+      min-width: 0;
+    }
+    .appbar-tools {
+      margin-inline-start: auto;
+    }
+    .places {
+      order: 3;
+      flex-basis: 100%;
+      height: 44px;
+    }
+  }
+
+  /* the open lecture: its title (the one bold thing on the screen), the version tools, then the tabs */
   .lechead {
     display: flex;
-    flex-wrap: wrap;
-    align-items: end;
-    gap: calc(var(--spacing) * 3) calc(var(--spacing) * 6);
+    flex-direction: column;
+    gap: calc(var(--spacing) * 3);
     border-bottom: 1px solid var(--wahy-line);
   }
+  .lechead-top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: start;
+    justify-content: space-between;
+    gap: calc(var(--spacing) * 3) calc(var(--spacing) * 6);
+  }
   .lechead h1 {
-    padding-bottom: calc(var(--spacing) * 3);
-    font-size: var(--text-xl);
-    font-weight: 600;
+    flex: 1 1 28rem;
+    max-width: 60rem;
+    font: 700 1.85rem/1.5 var(--font-quran);
+    text-wrap: balance;
+  }
+  .versions {
+    flex: none;
+    gap: calc(var(--spacing) * 2);
+    padding-top: 6px;
+    font-size: var(--text-s);
+  }
+  .versions .input {
+    height: 30px;
+    font-size: var(--text-s);
   }
   .tabs {
     display: flex;
-    gap: 2px;
+    gap: calc(var(--spacing) * 1);
     overflow-x: auto;
+    scrollbar-width: none;
   }
   .tabs a {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 7px;
     margin-bottom: -1px;
-    padding: 10px 14px;
+    padding: 10px 16px 12px;
     border-bottom: 2px solid transparent;
     color: var(--wahy-ink-2);
+    font-size: var(--text-l);
     white-space: nowrap;
   }
   .tabs a:hover {
@@ -387,8 +517,8 @@
   .kpis {
     display: flex;
     flex-wrap: wrap;
-    gap: calc(var(--spacing) * 2) calc(var(--spacing) * 6);
-    color: var(--wahy-ink-2);
+    gap: calc(var(--spacing) * 1) calc(var(--spacing) * 5);
+    color: var(--wahy-ink-3);
     font-size: var(--text-s);
   }
   .kpis span {
@@ -400,6 +530,23 @@
     color: var(--wahy-ink);
     font-family: var(--font-mono);
     font-weight: 500;
+  }
+  /* the lecture view's two rows: find and choose what to read, then which verdicts and how to follow along */
+  .viewbar {
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--spacing) * 3);
+    padding-bottom: calc(var(--spacing) * 1);
+  }
+  .viewbar-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: calc(var(--spacing) * 2) calc(var(--spacing) * 3);
+  }
+  .viewbar-row.quiet {
+    color: var(--wahy-ink-2);
+    font-size: var(--text-s);
   }
   .toolbar {
     display: flex;
@@ -768,10 +915,12 @@
   .stat {
     display: flex;
     flex-direction: column;
+    align-items: flex-start; /* a left-to-right number still lines up under its label */
     gap: 2px;
   }
   .stat b {
-    font: 500 var(--text-xl) var(--font-mono);
+    font: 600 var(--text-l) / 1.4 var(--font-ui);
+    font-variant-numeric: tabular-nums;
   }
   /* "10 s" and "0 ms" must read left to right even inside an Arabic page */
   .stat b,
@@ -865,8 +1014,9 @@
   textarea.input {
     height: auto;
     padding-block: 8px;
-    font-family: var(--font-mono);
-    font-size: var(--text-s);
+    font-family: var(--font-ui); /* Arabic text and placeholders: a monospace face pulls the letters apart */
+    font-size: var(--text-m);
+    line-height: 1.7;
   }
   .mrow {
     display: grid;
@@ -1214,5 +1364,16 @@
   }
   .vgrid > aside.tall {
     position: static;
+  }
+}
+
+/* Every screen's title reads like the open lecture's: the one bold line on the page (unlayered, so it wins over the
+   size utilities the screens set). */
+#main h1 {
+  font: 700 1.85rem/1.5 var(--font-quran);
+}
+@media (max-width: 720px) {
+  #main h1 {
+    font-size: 1.4rem;
   }
 }

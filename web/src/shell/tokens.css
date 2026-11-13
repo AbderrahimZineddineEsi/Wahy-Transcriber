@@ -18,10 +18,10 @@
 
 :root {
   /* neutrals, slightly green-grey */
-  --wahy-paper: #f2f4f1;
+  --wahy-paper: #f4f5f2;
   --wahy-surface: #ffffff;
-  --wahy-surface-2: #e9ece8;
-  --wahy-line: #d6dbd5;
+  --wahy-surface-2: #eceeea;
+  --wahy-line: #dfe3dd;
   --wahy-ink: #17201e;
   --wahy-ink-2: #4a5552;
   --wahy-ink-3: #75817d;
@@ -44,7 +44,7 @@
   --wahy-unsure: #9c6c0e;
   --wahy-unsure-soft: #f5ebd2;
   --wahy-none: #75817d;
-  --wahy-none-soft: #e9ece8;
+  --wahy-none-soft: #eceeea;
   /* the spoken word, and the video stage */
   --wahy-now: #ffdf6e;
   --wahy-now-ink: #17201e;
