@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 from collections.abc import Iterator
 
 import pytest
@@ -11,6 +12,12 @@ from wahy.core.db import Database
 from wahy.core.jobs import JobRunner
 from wahy.core.settings import KEY_FIELDS, Settings
 from wahy.main import create_app
+
+
+def pytest_configure(config: pytest.Config) -> None:
+    # every app a test builds is the studio, even in the exported product (its EDITION file says "tadqeeq"), and even
+    # module-scoped ones built before any function fixture; test_editions.py picks its edition itself
+    os.environ["WAHY_EDITION"] = "studio"
 
 
 def pytest_addoption(parser: pytest.Parser) -> None:
@@ -31,7 +38,6 @@ def _no_real_keys(monkeypatch: pytest.MonkeyPatch) -> None:
     """Keys from the shell must not leak into tests."""
     for name in ("GROQ_API_KEY", "GEMINI_API_KEY", "OPENROUTER_API_KEY", "JEV_API_KEY", "WAHY_ACCESS_TOKEN"):
         monkeypatch.delenv(name, raising=False)
-    monkeypatch.setenv("WAHY_EDITION", "studio")   # the exported product says "tadqeeq"; tests pick their edition
     assert len(KEY_FIELDS) == 4
 
 
