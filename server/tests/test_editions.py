@@ -39,7 +39,6 @@ def test_tadqeeq_has_no_training_data_and_no_request_log(tmp_path):
         assert api.get("/api/training").status_code == 404
         assert api.get("/api/telemetry/requests").status_code == 404
         assert api.get("/api/lectures").status_code == 200              # the product itself is all there
-        assert api.app.title == "Tadqeeq"
 
 
 def test_studio_keeps_its_research_screens(tmp_path):

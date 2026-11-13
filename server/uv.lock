@@ -1559,6 +1559,90 @@ wheels = [
 ]
 
 [[package]]
+name = "tadqeeq-server"
+version = "0.1.0"
+source = { editable = "." }
+dependencies = [
+    { name = "alembic" },
+    { name = "fastapi" },
+    { name = "httpx" },
+    { name = "numpy" },
+    { name = "pydantic-settings" },
+    { name = "python-multipart" },
+    { name = "rapidfuzz" },
+    { name = "sqlalchemy" },
+    { name = "uvicorn", extra = ["standard"] },
+    { name = "yt-dlp" },
+]
+
+[package.optional-dependencies]
+laya = [
+    { name = "huggingface-hub" },
+    { name = "laya" },
+    { name = "torch" },
+]
+local-asr = [
+    { name = "faster-whisper" },
+    { name = "nvidia-cublas-cu12" },
+    { name = "nvidia-cudnn-cu12" },
+]
+research = [
+    { name = "beautifulsoup4" },
+    { name = "ipykernel" },
+    { name = "ipywidgets" },
+    { name = "matplotlib" },
+    { name = "pandas" },
+    { name = "tqdm" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "beautifulsoup4" },
+    { name = "httpx" },
+    { name = "pandas" },
+    { name = "pytest" },
+    { name = "ruff" },
+    { name = "tqdm" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "alembic", specifier = ">=1.20.1" },
+    { name = "beautifulsoup4", marker = "extra == 'research'", specifier = ">=4.12" },
+    { name = "fastapi", specifier = ">=0.115" },
+    { name = "faster-whisper", marker = "extra == 'local-asr'", specifier = ">=1.2.1" },
+    { name = "httpx", specifier = ">=0.28.1" },
+    { name = "huggingface-hub", marker = "extra == 'laya'", specifier = ">=0.20" },
+    { name = "ipykernel", marker = "extra == 'research'", specifier = ">=6.29" },
+    { name = "ipywidgets", marker = "extra == 'research'", specifier = ">=8.1" },
+    { name = "laya", marker = "extra == 'laya'", specifier = ">=0.4.12" },
+    { name = "matplotlib", marker = "extra == 'research'", specifier = ">=3.9" },
+    { name = "numpy", specifier = ">=2.5.4" },
+    { name = "nvidia-cublas-cu12", marker = "extra == 'local-asr'", specifier = ">=12.6" },
+    { name = "nvidia-cudnn-cu12", marker = "extra == 'local-asr'", specifier = ">=9,<10" },
+    { name = "pandas", marker = "extra == 'research'", specifier = ">=2.2" },
+    { name = "pydantic-settings", specifier = ">=2.16.2" },
+    { name = "python-multipart", specifier = ">=0.0.33" },
+    { name = "rapidfuzz", specifier = ">=3.14.6" },
+    { name = "sqlalchemy", specifier = ">=2.1.8" },
+    { name = "torch", marker = "extra == 'laya'", specifier = ">=2.14", index = "https://download.pytorch.org/whl/cu126" },
+    { name = "tqdm", marker = "extra == 'research'", specifier = ">=4.66" },
+    { name = "uvicorn", extras = ["standard"], specifier = ">=0.30" },
+    { name = "yt-dlp", specifier = ">=2026.10.26" },
+]
+provides-extras = ["local-asr", "laya", "research"]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "beautifulsoup4", specifier = ">=4.12" },
+    { name = "httpx", specifier = ">=0.27" },
+    { name = "pandas", specifier = ">=2.2" },
+    { name = "pytest", specifier = ">=8" },
+    { name = "ruff", specifier = ">=0.6" },
+    { name = "tqdm", specifier = ">=4.66" },
+]
+
+[[package]]
 name = "tokenizers"
 version = "0.23.3"
 source = { registry = "https://pypi.org/simple" }
@@ -1789,90 +1873,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/8b/9d/ad9368fcda247a452d8232e740caf0c5935aef4dcdfa5fc136bd0071f2ae/vegaml-0.15.0.tar.gz", hash = "sha256:f9f7df11b2cc9a4030af0d993f83331a06d35cbe949d24a045cb357be99b3120", size = 208056, upload-time = "2026-10-31T08:13:49.528Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/ed/65/4c8b788c6655d3e9399f4d3e7a1cd23f902685068f858b9b1a19268978b0/vegaml-0.15.0-py3-none-any.whl", hash = "sha256:5e6159585b58892bcef8eb58c2c6ff0ee9d1d4cb54db561f4883d2809305d0b9", size = 130879, upload-time = "2026-10-31T08:13:47.874Z" },
-]
-
-[[package]]
-name = "wahy-server"
-version = "0.1.0"
-source = { editable = "." }
-dependencies = [
-    { name = "alembic" },
-    { name = "fastapi" },
-    { name = "httpx" },
-    { name = "numpy" },
-    { name = "pydantic-settings" },
-    { name = "python-multipart" },
-    { name = "rapidfuzz" },
-    { name = "sqlalchemy" },
-    { name = "uvicorn", extra = ["standard"] },
-    { name = "yt-dlp" },
-]
-
-[package.optional-dependencies]
-laya = [
-    { name = "huggingface-hub" },
-    { name = "laya" },
-    { name = "torch" },
-]
-local-asr = [
-    { name = "faster-whisper" },
-    { name = "nvidia-cublas-cu12" },
-    { name = "nvidia-cudnn-cu12" },
-]
-research = [
-    { name = "beautifulsoup4" },
-    { name = "ipykernel" },
-    { name = "ipywidgets" },
-    { name = "matplotlib" },
-    { name = "pandas" },
-    { name = "tqdm" },
-]
-
-[package.dev-dependencies]
-dev = [
-    { name = "beautifulsoup4" },
-    { name = "httpx" },
-    { name = "pandas" },
-    { name = "pytest" },
-    { name = "ruff" },
-    { name = "tqdm" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "alembic", specifier = ">=1.20.1" },
-    { name = "beautifulsoup4", marker = "extra == 'research'", specifier = ">=4.12" },
-    { name = "fastapi", specifier = ">=0.115" },
-    { name = "faster-whisper", marker = "extra == 'local-asr'", specifier = ">=1.2.1" },
-    { name = "httpx", specifier = ">=0.28.1" },
-    { name = "huggingface-hub", marker = "extra == 'laya'", specifier = ">=0.20" },
-    { name = "ipykernel", marker = "extra == 'research'", specifier = ">=6.29" },
-    { name = "ipywidgets", marker = "extra == 'research'", specifier = ">=8.1" },
-    { name = "laya", marker = "extra == 'laya'", specifier = ">=0.4.12" },
-    { name = "matplotlib", marker = "extra == 'research'", specifier = ">=3.9" },
-    { name = "numpy", specifier = ">=2.5.4" },
-    { name = "nvidia-cublas-cu12", marker = "extra == 'local-asr'", specifier = ">=12.6" },
-    { name = "nvidia-cudnn-cu12", marker = "extra == 'local-asr'", specifier = ">=9,<10" },
-    { name = "pandas", marker = "extra == 'research'", specifier = ">=2.2" },
-    { name = "pydantic-settings", specifier = ">=2.16.2" },
-    { name = "python-multipart", specifier = ">=0.0.33" },
-    { name = "rapidfuzz", specifier = ">=3.14.6" },
-    { name = "sqlalchemy", specifier = ">=2.1.8" },
-    { name = "torch", marker = "extra == 'laya'", specifier = ">=2.14", index = "https://download.pytorch.org/whl/cu126" },
-    { name = "tqdm", marker = "extra == 'research'", specifier = ">=4.66" },
-    { name = "uvicorn", extras = ["standard"], specifier = ">=0.30" },
-    { name = "yt-dlp", specifier = ">=2026.10.26" },
-]
-provides-extras = ["local-asr", "laya", "research"]
-
-[package.metadata.requires-dev]
-dev = [
-    { name = "beautifulsoup4", specifier = ">=4.12" },
-    { name = "httpx", specifier = ">=0.27" },
-    { name = "pandas", specifier = ">=2.2" },
-    { name = "pytest", specifier = ">=8" },
-    { name = "ruff", specifier = ">=0.6" },
-    { name = "tqdm", specifier = ">=4.66" },
 ]
 
 [[package]]

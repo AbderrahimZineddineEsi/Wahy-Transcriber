@@ -27,9 +27,9 @@ QUERY = "token"
 COOKIE_MAX_AGE_S = 30 * 24 * 3600
 
 _DENIED_HTML = (
-    "<!doctype html><meta charset=utf-8><title>Wahy Studio</title>"
+    "<!doctype html><meta charset=utf-8><title>Tadqeeq</title>"
     "<body style='font-family:sans-serif;max-width:32rem;margin:4rem auto;padding:0 1rem'>"
-    "<h1>Access link needed</h1><p>This Wahy Studio is private. Open the full link printed in the Colab "
+    "<h1>Access link needed</h1><p>This Tadqeeq is private. Open the full link printed in the Colab "
     "notebook (it ends with <code>?token=...</code>).</p>"
 )
 

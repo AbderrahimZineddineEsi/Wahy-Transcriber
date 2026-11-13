@@ -122,8 +122,7 @@ def create_app(settings: Settings | None = None, web_dir: Path | None = None) ->
             db.dispose()
 
     chosen = settings or get_settings()
-    title = "Tadqeeq" if chosen.edition == "tadqeeq" else "Wahy Studio"
-    app = FastAPI(title=title, version="0.1.0", lifespan=lifespan)
+    app = FastAPI(title="Tadqeeq", version="0.1.0", lifespan=lifespan)
 
     app.include_router(settings_router)
     app.include_router(jobs_router)

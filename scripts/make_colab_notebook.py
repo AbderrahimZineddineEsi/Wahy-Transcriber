@@ -2,7 +2,7 @@
 
     python scripts/make_colab_notebook.py
 
-It writes notebooks/colab/wahy_colab_runner.ipynb (the one Colab opens): ONE "Run all" flow in three cells.
+It writes notebooks/colab/tadqeeq_colab_runner.ipynb (the one Colab opens): ONE "Run all" flow in three cells.
 
     1. Options and Google Drive   clone this public repo, mount the user's Drive (default ON), restore saved data
     2. Install                    models, Python packages, Node, the web build and the corpus, all in parallel
@@ -17,13 +17,13 @@ from Colab Secrets, a hidden prompt, or the app's own Settings screen.
 import json
 from pathlib import Path
 
-BRANCH = "factory-reset"
+BRANCH = "tadqeeq"
 REPO = "AbderrahimZineddineEsi/Wahy-Transcriber"
 LAYA = "ZenoAbderrahim/laya-wahy-r6-v3_mixed"
 SPECIALIZED_WHISPER = "Abu-Dju/whisper-large-v3-ar"
 PORT = 8000
 NODE_VERSION = "v24.22.1"      # the engine worker is TypeScript that node runs directly: needs 22.18+
-NOTEBOOK = "notebooks/colab/wahy_colab_runner.ipynb"
+NOTEBOOK = "notebooks/colab/tadqeeq_colab_runner.ipynb"
 SECRET_NAMES = ["HF_TOKEN", "GROQ_API_KEY", "GEMINI_API_KEY", "OPENROUTER_API_KEY"]
 
 
@@ -50,9 +50,9 @@ def fill(text: str) -> str:
 
 
 INTRO = fill("""
-# 🎙️ Wahy Studio on Google Colab (GPU)
+# 🎙️ Tadqeeq on Google Colab (GPU)
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/@@REPO@@/blob/@@BRANCH@@/notebooks/colab/wahy_colab_runner.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/@@REPO@@/blob/@@BRANCH@@/notebooks/colab/tadqeeq_colab_runner.ipynb)
 
 The whole app on a free Colab GPU: every transcription model (Groq, local Whisper, the **specialized Arabic Whisper**),
 detection, verification with the AI providers **and with local Laya on the GPU**, the editor, exports and Tafrigh.
@@ -68,8 +68,8 @@ You get a private link you open in any browser.
 ### Where your lectures are saved
 | Option | What happens |
 |---|---|
-| **Drive ON (default)** | Lectures, settings, the database, uploaded media and the keys file are copied to **My Drive → Wahy-Studio** every minute and when you stop. The next session restores them. It is your own Drive; nobody else sees it. |
-| **Drive OFF** | Everything lives on the Colab machine and is **lost when the session ends**. A backup zip is refreshed every 2 minutes at `/content/wahy-backup.zip` (Files panel on the left → download it) and is also offered for download when you stop the last cell. Put it in `RESTORE_BACKUP_ZIP` next time to get your lectures back. |
+| **Drive ON (default)** | Lectures, settings, the database, uploaded media and the keys file are copied to **My Drive → Tadqeeq** every minute and when you stop. The next session restores them. It is your own Drive; nobody else sees it. |
+| **Drive OFF** | Everything lives on the Colab machine and is **lost when the session ends**. A backup zip is refreshed every 2 minutes at `/content/tadqeeq-backup.zip` (Files panel on the left → download it) and is also offered for download when you stop the last cell. Put it in `RESTORE_BACKUP_ZIP` next time to get your lectures back. |
 
 ### Safety
 The link is public on the internet, so the app is locked with a **random access token** that is part of the link
@@ -81,7 +81,7 @@ A new link and token are made every time you run the last cell.
 OPTIONS = fill('''
 #@title 1 · Options, clone, Google Drive  { display-mode: "form" }
 USE_GOOGLE_DRIVE = True        #@param {type:"boolean"}
-DRIVE_FOLDER = "Wahy-Studio"   #@param {type:"string"}
+DRIVE_FOLDER = "Tadqeeq"   #@param {type:"string"}
 LOAD_LAYA = True               #@param {type:"boolean"}
 RESTORE_BACKUP_ZIP = ""        #@param {type:"string"}
 
@@ -123,14 +123,14 @@ if USE_GOOGLE_DRIVE:
     except ImportError:
         raise SystemExit("Google Drive can only be mounted on Colab. Set USE_GOOGLE_DRIVE = False to run without it.")
     drive.mount("/content/drive")
-    DRIVE_DIR = cs.drive_dir_for("/content/drive", DRIVE_FOLDER)
+    DRIVE_DIR = cs.drive_dir_for("/content/drive", DRIVE_FOLDER, legacy=("Wahy-Studio",))
     restored = cs.restore_from_drive(REPO_DIR, DRIVE_DIR)
     print(f"Google Drive is ON. Your lectures are saved in: My Drive/{DRIVE_FOLDER}  ({DRIVE_DIR})")
     print("  restored from a previous session:", restored if (restored.files or restored.db) else "nothing yet (first run)")
 else:
     print("=" * 78)
     print("Google Drive is OFF: everything (lectures, settings, keys) is LOST when this session ends.")
-    print("A backup zip is refreshed every 2 minutes at /content/wahy-backup.zip (Files panel, left bar),")
+    print("A backup zip is refreshed every 2 minutes at /content/tadqeeq-backup.zip (Files panel, left bar),")
     print("and it is offered for download when you stop the last cell.")
     print("=" * 78)
 if RESTORE_BACKUP_ZIP:
@@ -336,13 +336,13 @@ if DRIVE_DIR:
     keeper = cs.DriveSyncer(REPO_DIR, DRIVE_DIR, interval_s=60).start()
     saved_note = f"Lectures are saved to My Drive/{DRIVE_FOLDER} every minute."
 else:
-    keeper = cs.ZipBackupper(REPO_DIR, "/content/wahy-backup.zip", interval_s=120).start()
-    saved_note = "Drive is OFF: nothing is kept after this session. Backup zip: /content/wahy-backup.zip (Files panel)."
+    keeper = cs.ZipBackupper(REPO_DIR, "/content/tadqeeq-backup.zip", interval_s=120).start()
+    saved_note = "Drive is OFF: nothing is kept after this session. Backup zip: /content/tadqeeq-backup.zip (Files panel)."
 
 if public:
     link = cs.access_url(public, TOKEN)
     display(HTML(f'<div style="font-size:18px;padding:12px;border:2px solid #0a7;border-radius:8px">'
-                 f'<b>Wahy Studio is ready:</b> <a href="{link}" target="_blank">{link}</a><br>'
+                 f'<b>Tadqeeq is ready:</b> <a href="{link}" target="_blank">{link}</a><br>'
                  f'<small>Private link: it contains your access token, so do not share it. {saved_note}<br>'
                  f'Keep this cell running; stop it (square button) to shut the app down and save.</small></div>'))
 else:
@@ -374,7 +374,7 @@ finally:
             from google.colab import files
             files.download(str(final))
         except Exception:
-            print("download it from the Files panel: /content/wahy-backup.zip")
+            print("download it from the Files panel: /content/tadqeeq-backup.zip")
 ''')
 
 notebook = {
@@ -382,7 +382,7 @@ notebook = {
     "nbformat_minor": 5,
     "metadata": {
         "accelerator": "GPU",
-        "colab": {"provenance": [], "gpuType": "T4", "name": "Wahy Studio (Colab GPU)"},
+        "colab": {"provenance": [], "gpuType": "T4", "name": "Tadqeeq (Colab GPU)"},
         "kernelspec": {"display_name": "Python 3", "name": "python3"},
         "language_info": {"name": "python"},
     },

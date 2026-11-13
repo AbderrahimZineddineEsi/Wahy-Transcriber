@@ -1,13 +1,13 @@
 # Two editions, one codebase
 
-This repo holds one app in two editions:
+This repo holds one app, **Tadqeeq (تدقيق)**, in two editions:
 
 | | **Studio** (this repo) | **Tadqeeq** (the product) |
 |---|---|---|
 | For | developing and improving the algorithms, training Laya | everyone: the app people download and use |
 | Has | everything | lectures, transcription, detection, AI checking, editing, captions, Tafrigh, sources, settings |
 | Leaves out | nothing | the Training data and Request log screens and APIs, local Laya, "Save for Laya", the research code, notebooks, datasets and internal docs |
-| Name in the app | وحي ستوديو · Wahy Studio | تدقيق · Tadqeeq |
+| Name in the app | تدقيق · Tadqeeq | تدقيق · Tadqeeq |
 
 ## How the edition is chosen
 
@@ -17,7 +17,7 @@ and without that file it is `studio`. `/api/health` reports the edition and the 
 - `server/wahy/core/settings.py`: `edition`, `default_edition()`
 - `server/wahy/main.py`: the training and request-log routers are mounted only in the studio
 - `web/src/shell/edition.ts`: `useStudio()` hides the research places and options; `useEditionSync()` sets the
-  product's name and wording (`web/src/shell/i18n/tadqeeq.ts`) and the tab title
+  product's wording (`web/src/shell/i18n/tadqeeq.ts`)
 
 Preview the product from this repo: `WAHY_EDITION=tadqeeq ./run.sh` (or `scripts/dev.sh` with the same variable).
 

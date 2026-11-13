@@ -470,8 +470,7 @@ F-127	run.bat
 F-127	backend/app.py:1146-1154
 F-128	backend/app.py:180-206
 F-129	README.md:63-73
-F-130	notebooks/colab/wahy_colab_runner.ipynb
-F-130	notebooks/wahy_colab_runner.ipynb
+F-130	notebooks/colab/tadqeeq_colab_runner.ipynb
 F-130	scripts/make_colab_notebook.py
 
 # ---- Q. Research side

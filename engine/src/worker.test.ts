@@ -89,7 +89,7 @@ describe("worker", () => {
     const caps = (await call("captions", { words, findings: found })).result;
     expect(caps.some((c: any) => c.type === "ayah")).toBe(true);
     const srt = (await call("export", { format: "srt", words, findings: found })).result;
-    expect(srt.filename).toBe("wahy-captions.srt");
+    expect(srt.filename).toBe("tadqeeq-captions.srt");
     expect(srt.content.startsWith("1\n")).toBe(true);
     const bad = await call("edit", { request: { op: "move_edge", finding: verse, edge: "middle", delta: 1 }, words, options });
     expect(bad.ok).toBe(false);

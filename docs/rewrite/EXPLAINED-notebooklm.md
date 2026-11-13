@@ -1,8 +1,8 @@
-# Wahy Studio: the rewrite explained (NotebookLM edition)
+# Tadqeeq: the rewrite explained (NotebookLM edition)
 
 ## About this document
 
-This document explains Wahy Studio, a software project, and the complete rewrite it went through between 3 and 8
+This document explains Tadqeeq, a software project, and the complete rewrite it went through between 3 and 8
 November 2026. It is written for the project's author, a fifth-year computer science student specializing in machine
 learning, with a backend background in Node.js, Express and NestJS and some Flutter. It is made to be loaded as a
 source into NotebookLM, so it uses only plain paragraphs and lists: no tables, no code blocks, no diagrams. Every
@@ -12,10 +12,11 @@ file EXPLAINED.md in the same folder; the day-by-day learning log is LEARNING.md
 
 ## Arabic and Islamic words used in this project
 
-Wahy Studio works on recorded Islamic lectures, so its vocabulary includes many Arabic and Islamic terms. Here they are,
+Tadqeeq works on recorded Islamic lectures, so its vocabulary includes many Arabic and Islamic terms. Here they are,
 each with a plain explanation.
 
-- Wahy (وحي) means revelation. The app's Arabic name, مكتشف الوحيين (Muktashif al-Wahyayn), means "the finder of the two
+- Tadqeeq (تدقيق) means careful checking: the app's name since 13 November 2026. Before that it was called Wahy Studio;
+  Wahy (وحي) means revelation, and its Arabic name, مكتشف الوحيين (Muktashif al-Wahyayn), meant "the finder of the two
   revelations": the Quran and the Sunnah.
 - The Quran is the holy book of Islam. It is divided into 114 chapters called surahs (singular surah, Arabic سورة),
   and each surah into verses called ayat (singular ayah, آية). The whole Quran has 6,236 verses. A verse is referred to by
@@ -51,7 +52,7 @@ each with a plain explanation.
 
 ## Project words used in this document
 
-Wahy Studio has its own precise vocabulary, defined in the project's GLOSSARY.md file. These are the words that appear
+Tadqeeq has its own precise vocabulary, defined in the project's GLOSSARY.md file. These are the words that appear
 throughout this document.
 
 - A lecture is one recorded lesson being processed: its media (video or audio), its transcript and everything found in
@@ -93,9 +94,9 @@ throughout this document.
 - An embedded verse is a Quran verse quoted inside a hadith. Exports write it in its own Quranic brackets inside the
   hadith's brackets.
 
-## What Wahy Studio does
+## What Tadqeeq does
 
-Wahy Studio is a local web application that processes recorded Islamic lectures. Its pipeline has seven steps.
+Tadqeeq is a local web application that processes recorded Islamic lectures. Its pipeline has seven steps.
 
 First, it transcribes a lecture into timed words, using one of four speech recognition models: Groq's cloud Whisper,
 local Whisper turbo, local Whisper small, or a specialized Arabic Whisper model. Second, it detects every Quran verse,
@@ -111,7 +112,7 @@ loop between using the app and improving the model.
 
 ## The old app and what was wrong with it
 
-Before the rewrite, Wahy Studio was a browser application of about 35,000 lines with a Python server on the side. It
+Before the rewrite, Tadqeeq was a browser application of about 35,000 lines with a Python server on the side. It
 was deleted in the rewrite's phase 24 and survives in the git history. A read-only review on 3 November 2026, called the
 friction map, counted 20 problems. The most important ones follow, each explained on its own.
 
@@ -156,7 +157,7 @@ pipeline's caching.
 
 ## The new architecture
 
-After the rewrite, Wahy Studio follows one principle: the server does all the work and stores all the data, and the web
+After the rewrite, Tadqeeq follows one principle: the server does all the work and stores all the data, and the web
 app only shows the data and sends the user's actions.
 
 The server is written in Python 3.12 with the FastAPI framework and runs as one process on port 8000. It has three
@@ -189,7 +190,7 @@ about 7,000 lines, the web app about 12,000 lines, and the server's tests alone 
 
 ## One lecture's journey through the new system
 
-This section follows one lecture through the new Wahy Studio, from a YouTube link to a training row.
+This section follows one lecture through the new Tadqeeq, from a YouTube link to a training row.
 
 The user pastes a YouTube link in the web app. The app sends it to the server, which saves an empty lecture and starts
 a transcription job, answering at once with the job's identifier. The web app follows the job through a progress stream,
@@ -216,12 +217,12 @@ without any manual export.
 ## The architecture decisions (ADRs)
 
 An architecture decision record, or ADR, is a short document stating one decision, the reason for it and the
-alternatives considered. Wahy Studio's rewrite rests on eight ADRs, written on 3 November 2026 from the friction review.
+alternatives considered. Tadqeeq's rewrite rests on eight ADRs, written on 3 November 2026 from the friction review.
 None had to be replaced during the rewrite. Each is explained below in plain words.
 
 ### ADR 0001: rewrite beside the old app, one tested phase per session
 
-The first decision was how to rewrite Wahy Studio safely. The new code was built in new folders next to the old app,
+The first decision was how to rewrite Tadqeeq safely. The new code was built in new folders next to the old app,
 which kept running until the acceptance phase passed and was deleted only after that. Before any code moved, the old
 app's outputs (findings, envelopes, captions, exports) were saved as golden files, and the new code had to reproduce them
 byte for byte. The reason: Laya's results depend on findings and envelopes staying identical, and a rewrite that cannot be
@@ -231,7 +232,7 @@ session, which could not be verified and would teach nothing.
 
 ### ADR 0002: the engine stays TypeScript and runs on the server
 
-The second decision concerns Wahy Studio's quote detection engine, about 4,200 lines of carefully tuned matching logic
+The second decision concerns Tadqeeq's quote detection engine, about 4,200 lines of carefully tuned matching logic
 written in JavaScript. It was moved into one TypeScript package and runs on the server in a long-lived Node.js process
 that the Python server talks to with one JSON message per line. The browser never loads the 90 MB corpus. The reason:
 porting tuned heuristics to Python is long and risky, with only golden tests to prove nothing changed, and keeping one
@@ -240,7 +241,7 @@ port, and keeping the engine in the browser, where every tab would load the corp
 
 ### ADR 0003: one envelope builder, and datasets store the final envelopes
 
-The third decision is the one that matters most for machine learning. In Wahy Studio, the envelope is the structured
+The third decision is the one that matters most for machine learning. In Tadqeeq, the envelope is the structured
 input Laya reads. After the rewrite, envelopes are built only by the engine package, with one function per envelope
 version. The dataset builder stores each training row's envelope in its final form, and the training and evaluation code
 (Kaggle scripts and notebooks) read it as it is and never reshape it. The app builds envelopes with the same function at
@@ -251,7 +252,7 @@ checkpoint, while old checkpoints keep working because each one records the vers
 
 ### ADR 0004: all model calls go through one server-side provider layer
 
-The fourth decision is about calls to AI models in Wahy Studio. Every call to Gemini, OpenRouter (the JEV decision model
+The fourth decision is about calls to AI models in Tadqeeq. Every call to Gemini, OpenRouter (the JEV decision model
 and chat models), Groq and local Laya goes through one provider layer in the server, which owns the API keys, the rate
 limiting, the retries, the cost counting and a log of every request. The app's verification, Tafrigh and the data
 pipeline's teachers all use it, and the browser holds no keys and calls no provider. The reason: the old code called
@@ -260,7 +261,7 @@ evaluation of a teacher model did not necessarily describe the code the app ran.
 
 ### ADR 0005: SQLite for app data, files for media, corpus and datasets
 
-The fifth decision is about storage in Wahy Studio. Lectures, transcripts, findings, verdicts, labels, jobs and the AI
+The fifth decision is about storage in Tadqeeq. Lectures, transcripts, findings, verdicts, labels, jobs and the AI
 request log live in one SQLite database file, accessed through the SQLAlchemy library, with Alembic migrations to evolve
 its tables. Media, the corpus, Tafrigh runs and the Laya datasets stay plain files. The reason: the app has one user on
 one machine, so a database server adds nothing, while the old browser storage hid the user's corrections from the server
@@ -268,7 +269,7 @@ and the data pipeline. Datasets stay files because Kaggle, where Laya is trained
 
 ### ADR 0006: one GPU owner, one model in video memory at a time
 
-The sixth decision is about the GPU in Wahy Studio, a GTX 1050 with only 3 GB of memory. A single GPU owner in the server
+The sixth decision is about the GPU in Tadqeeq, a GTX 1050 with only 3 GB of memory. A single GPU owner in the server
 decides which model (Whisper, the specialized Arabic Whisper, or Laya) is loaded. Jobs ask it for a model and wait until
 it is theirs; it unloads whatever else is loaded first. No other code loads models onto the GPU. The reason: in the old
 code each module loaded its own model, so two jobs at once could run out of memory or silently fall back to the CPU,
@@ -276,7 +277,7 @@ about thirty times slower.
 
 ### ADR 0007: one job runner for all long work, with job state saved
 
-The seventh decision is about long-running work in Wahy Studio. Transcription, detection, verification passes and
+The seventh decision is about long-running work in Tadqeeq. Transcription, detection, verification passes and
 Tafrigh runs are all jobs in one runner inside the server process. It saves each job's progress and status in the
 database, supports pause, resume and cancel, and offers one progress stream to the web app. After a server restart,
 unfinished jobs show as interrupted and can be resumed where the work allows it. The reason: the old code had two
@@ -286,7 +287,7 @@ would only add a second service to run.
 
 ### ADR 0008: a React and TypeScript web app, typed from the server's API, translated by keys
 
-The eighth decision is about Wahy Studio's user interface. It is a React and TypeScript app built with Vite and styled
+The eighth decision is about Tadqeeq's user interface. It is a React and TypeScript app built with Vite and styled
 with Tailwind, organised in feature folders. Server data is fetched and cached with the TanStack Query library. The app's
 types are generated from the server's OpenAPI description, so a server change that breaks the web app fails the type
 check before anything runs. Text is translated through keys (for example the key nav.settings), Arabic first and right to
@@ -296,7 +297,7 @@ less to learn, but the screen-refresh problem would return in an interactive edi
 
 ## The server technologies
 
-This section describes the technologies of Wahy Studio's Python server and what each does, compared with tools from the
+This section describes the technologies of Tadqeeq's Python server and what each does, compared with tools from the
 Node.js world where that helps.
 
 Python 3.12 is managed with uv, a fast package manager. The command "uv sync" creates the server's virtual environment
@@ -330,7 +331,7 @@ because newer builds no longer support the GTX 1050. pytest runs about 520 serve
 
 ## The engine technologies
 
-This section describes the technologies of Wahy Studio's detection engine, the TypeScript package that matches
+This section describes the technologies of Tadqeeq's detection engine, the TypeScript package that matches
 transcripts against the Quran and hadith corpus.
 
 The engine's 4,000 lines of tuned JavaScript were moved as they were and given a typed interface only: the word, the
@@ -348,7 +349,7 @@ seconds and hundreds of megabytes, so the worker does it once and keeps it. Its 
 
 ## The web technologies
 
-This section describes the technologies of Wahy Studio's web app and compares them with Flutter, which the author knows.
+This section describes the technologies of Tadqeeq's web app and compares them with Flutter, which the author knows.
 
 React components are functions that describe the screen for their current data, like Flutter widgets. Hooks give them
 abilities: useState is like Flutter's setState, useReducer is like a Bloc that maps events to states, useRef holds a
@@ -373,7 +374,7 @@ browser against the real server (40 end-to-end tests), comparable to Flutter's w
 
 ## The AI providers
 
-This section lists the AI services Wahy Studio uses, all called through the server's one provider layer.
+This section lists the AI services Tadqeeq uses, all called through the server's one provider layer.
 
 Groq runs Whisper large v3 turbo in the cloud for cheap, fast speech recognition, with long audio cut into 45-minute
 pieces. Google Gemini, mainly the flash-lite model on the free tier, verifies findings in batches of five to ten per
@@ -389,7 +390,7 @@ tokens, cost, latency and the exact payload without keys, and the app's request 
 
 ## Laya and the machine learning side
 
-This section is about Laya, the fine-tuned model at the centre of Wahy Studio's machine learning work, and its state at
+This section is about Laya, the fine-tuned model at the centre of Tadqeeq's machine learning work, and its state at
 the end of the rewrite.
 
 Laya's task is classification. For each finding it answers whether the finding is a real quote (correct), the speaker's
@@ -434,7 +435,7 @@ answers are cached under a key that includes everything that changes the answer,
 
 ## Running the app: the launcher and the public corpus
 
-This section explains how Wahy Studio is started on a laptop after the rewrite, and how it gets its corpus.
+This section explains how Tadqeeq is started on a laptop after the rewrite, and how it gets its corpus.
 
 One command, run.sh in the repository root, promises "fresh clone, one command, working app". It checks for Node.js
 22.18 or later, npm, uv and ffmpeg; installs the Node packages only when their lock file changed; builds the web app
@@ -450,7 +451,7 @@ login-based routes to the private repository remain as fallbacks, and the privat
 
 ## Running the app on Google Colab
 
-This section explains the Colab runner of Wahy Studio, built in task 24b, which runs the whole app on a free Google
+This section explains the Colab runner of Tadqeeq, built in task 24b, which runs the whole app on a free Google
 Colab T4 GPU. It corresponds to feature F-130, which stays unticked until the author runs it once in a real Colab
 session.
 
@@ -465,7 +466,7 @@ link.
 Google Drive is used as a backup, not as the app's data folder. Drive in Colab is a network file system, and SQLite needs
 real file locks and its write-ahead log, which Drive does not provide reliably; a half-written database would be
 corrupt. So the app runs on the Colab machine's own disk, and a background thread copies the data folder and the keys
-file to a folder called Wahy-Studio in My Drive every minute. The database is copied with SQLite's backup function, which
+file to a folder called Tadqeeq in My Drive every minute. The database is copied with SQLite's backup function, which
 makes a consistent snapshot even while the app writes; other files are copied only when their size or time changed; and
 nothing on Drive is ever deleted. With Drive switched off, a backup zip without keys is refreshed every two minutes.
 
@@ -484,7 +485,7 @@ real session: the T4 GPU, the Cloudflare tunnel and the Drive permission pop-up.
 
 ## Key ideas from the rewrite: testing
 
-This section collects the testing ideas that came up again and again in Wahy Studio's rewrite, each with an example.
+This section collects the testing ideas that came up again and again in Tadqeeq's rewrite, each with an example.
 
 Golden tests, also called characterization tests, record what the old code does, right or wrong, and require the new
 code to produce the same bytes. For example, engine v5 labels a phrase from al-Fatiha as Yunus 10, a verse that ends
@@ -511,7 +512,7 @@ rerun.
 
 ## Key ideas from the rewrite: design and backend
 
-This section collects the design and backend ideas from Wahy Studio's rewrite, each with an example.
+This section collects the design and backend ideas from Tadqeeq's rewrite, each with an example.
 
 A deep module offers a small interface over a lot of logic. The engine's detect function has one call and six options
 in front of 4,100 lines of matching and a cache of expensive matchers; callers learn little and get a lot.
@@ -543,7 +544,7 @@ every row has a key saying where it came from.
 
 ## Key ideas from the rewrite: the interface
 
-This section collects the user-interface ideas from Wahy Studio's rewrite.
+This section collects the user-interface ideas from Tadqeeq's rewrite.
 
 Server state and screen state are kept apart. Findings, words and the edit log live on the server and are cached by
 TanStack Query; which words are selected lives only in the browser. An edit changes the server, and the screen follows by
@@ -559,7 +560,7 @@ second to 22 milliseconds.
 
 ## What to learn next
 
-This section suggests what the author could study next, based on what Wahy Studio's rewrite touched, ordered from the
+This section suggests what the author could study next, based on what Tadqeeq's rewrite touched, ordered from the
 machine learning side to the app side.
 
 Evaluation design comes first, because Laya's numbers depend on which cards are used, who labelled them and which input
@@ -589,7 +590,7 @@ Riverpod; and the testing pyramid with Playwright, which maps to Flutter's unit,
 
 ## How the rewrite was made
 
-This section describes the process behind Wahy Studio's rewrite, which ran from 3 to 8 November 2026 on a git branch
+This section describes the process behind Tadqeeq's rewrite, which ran from 3 to 8 November 2026 on a git branch
 called factory-reset.
 
 It began with a read-only review that produced the friction map and the eight ADRs. The author agreed to a full rewrite
@@ -636,14 +637,14 @@ new app, and 135 of the 137 features are ticked. On 8 November 2026 the full tes
 
 ## What is still open
 
-This section lists what remains open in Wahy Studio at the end of the rewrite.
+This section lists what remains open in Tadqeeq at the end of the rewrite.
 
 Feature F-130, the Colab runner, waits for one real Colab session by the author. The checklist: open the notebook from
 the badge and choose a T4 GPU; run all and approve Google Drive; give the Hugging Face token and check that Laya reports
 loaded on CUDA; open the printed link, remove the token from the address and see it still works, then open the plain
 tunnel address in a private window and see that an access link is required; transcribe a short file with the
 specialized Arabic Whisper and verify it with local Laya; after about a minute, check that the database file exists in
-the Wahy-Studio folder on Drive; stop, run all again, and see the lecture is still there and the start is faster;
+the Tadqeeq folder on Drive; stop, run all again, and see the lecture is still there and the start is faster;
 optionally, with Drive off, see that the backup zip appears.
 
 Feature F-134, training Laya on Kaggle, is not ticked by the author's choice: no retraining for now, with laya_v3 kept as

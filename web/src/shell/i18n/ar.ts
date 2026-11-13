@@ -2,7 +2,7 @@
 // (its type is Record<Key, string>, so a missing English text fails the type check).
 // `{name}` marks a value filled in by t("key", { name: ... }).
 export const ar = {
-  "app.name": "وحي ستوديو",
+  "app.name": "تدقيق",
   "app.skip": "تخطَّ إلى المحتوى",
 
   "nav.label": "التنقل",
@@ -568,13 +568,13 @@ export const ar = {
   "export.format.md": "Markdown",
   "export.format.txt": "نص",
   "export.format.json": "JSON",
-  "export.file.srt": "wahy-captions.srt",
-  "export.file.vtt": "wahy-captions.vtt",
-  "export.file.ass": "wahy-captions.ass",
-  "export.file.html": "wahy-lecture-formatted.html",
-  "export.file.md": "wahy-lecture.md",
-  "export.file.txt": "wahy-lecture.txt",
-  "export.file.json": "wahy-lecture-data.json",
+  "export.file.srt": "tadqeeq-captions.srt",
+  "export.file.vtt": "tadqeeq-captions.vtt",
+  "export.file.ass": "tadqeeq-captions.ass",
+  "export.file.html": "tadqeeq-lecture-formatted.html",
+  "export.file.md": "tadqeeq-lecture.md",
+  "export.file.txt": "tadqeeq-lecture.txt",
+  "export.file.json": "tadqeeq-lecture-data.json",
   "export.download": "تنزيل الملف",
   "export.print": "طباعة / PDF",
   "export.popupBlocked": "منع المتصفح فتح نافذة الطباعة.",

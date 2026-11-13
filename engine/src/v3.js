@@ -1676,7 +1676,7 @@ import { SURAH_NAMES_AR, SURAH_NAME_TO_NUM, computeTokenIoU } from "./shared.js"
     }
 
     // =========================================================================
-    // 5. WAHY-FINDER v2.0: WORD-LEVEL TIMESTAMP MAPPING & SUBTITLE PARSERS
+    // 5. WORD-LEVEL TIMESTAMP MAPPING & SUBTITLE PARSERS
     // =========================================================================
 
     function sourceTypeToCategorySlug(sourceType) {

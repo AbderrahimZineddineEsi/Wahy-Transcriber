@@ -1,7 +1,7 @@
 [project]
-name = "wahy-server"
+name = "tadqeeq-server"
 version = "0.1.0"
-description = "Wahy-Finder server (rewrite, ADR 0001)"
+description = "Tadqeeq server"
 requires-python = ">=3.12,<3.13"
 dependencies = [
     "alembic>=1.20.1",

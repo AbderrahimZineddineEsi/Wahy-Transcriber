@@ -1,5 +1,5 @@
 <meta charset="utf-8">
-<title>Wahy Studio screens</title>
+<title>Tadqeeq screens</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -344,7 +344,7 @@ pre.code.ar { font-family: var(--font-mono), var(--font-read); direction: rtl; t
 
 <div class="app" dir="rtl" lang="ar">
   <header class="top">
-    <a class="brand" href="#view" style="color:inherit;text-decoration:none"><span class="brand-mark">و</span>وحي ستوديو</a>
+    <a class="brand" href="#view" style="color:inherit;text-decoration:none"><span class="brand-mark">ت</span>تدقيق</a>
     <div class="crumb hide-s"><span class="faint">/</span><b id="crumbTitle"></b></div>
     <div class="grow"></div>
     <span class="jobpill" title="مهمة تعمل في الخلفية"><i></i><span>تفريغ صوتي: خطبة الجمعة 62٪</span></span>
@@ -803,7 +803,7 @@ SCREENS.export = () => {
   const srt = CAP.slice(0, 9).map((c, i) => `${i + 1}\n${fmt(c[0])} --> ${fmt(c[1])}\n${c[2]}`).join("\n\n");
   return `${lecHead("export")}
   <div class="vgrid">
-    <section class="panel"><div class="panel-h"><h3>معاينة</h3><span class="grow"></span><span class="faint mono" style="font-size:var(--text-s)">wahy-captions.srt</span></div><div class="panel-b"><pre class="code ar">${esc(srt)}</pre></div></section>
+    <section class="panel"><div class="panel-h"><h3>معاينة</h3><span class="grow"></span><span class="faint mono" style="font-size:var(--text-s)">tadqeeq-captions.srt</span></div><div class="panel-b"><pre class="code ar">${esc(srt)}</pre></div></section>
     <aside class="panel"><div class="panel-h"><h3>تصدير</h3></div><div class="panel-b">
       <div class="field"><span class="label">ترجمات</span><div class="seg"><button aria-pressed="true">SRT</button><button aria-pressed="false">VTT</button><button aria-pressed="false">ASS</button></div></div>
       <div class="field"><span class="label">نص منسق</span><div class="seg"><button aria-pressed="false">HTML</button><button aria-pressed="false">Markdown</button><button aria-pressed="false">نص</button><button aria-pressed="false">JSON</button></div></div>
@@ -948,7 +948,7 @@ function route() {
   document.querySelectorAll(".rail a").forEach((a) => a.setAttribute("aria-current", String(a.dataset.nav === k || (a.dataset.nav === "lecture" && LECTURE_TABS.includes(k)))));
   $("#crumbTitle").textContent = LECTURE_TABS.includes(k) ? DATA.title : "";
   ({ view: bindView, edit: bindEdit, verify: bindVerify, lectures: bindLectures })[k]?.();
-  if (k === "export") $("#doExport").onclick = () => toast("صُدّر wahy-captions.srt");
+  if (k === "export") $("#doExport").onclick = () => toast("صُدّر tadqeeq-captions.srt");
   if (k === "prefs") { document.querySelectorAll("[data-theme-set]").forEach((b) => b.onclick = () => setTheme(b.dataset.themeSet)); $("#toEn").onclick = langToast; }
   renderNotes(k);
 }

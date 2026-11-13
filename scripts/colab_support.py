@@ -49,17 +49,28 @@ def access_url(base_url: str, token: str) -> str:
 
 # ---- where on Drive ------------------------------------------------------------------------------------------
 
-def drive_dir_for(mount_root: str | Path, folder: str) -> Path:
+def drive_dir_for(mount_root: str | Path, folder: str, legacy: tuple[str, ...] = ()) -> Path:
     """`<mount_root>/MyDrive/<folder>`, created if needed. `folder` is a name or a short path under My Drive; it
-    can never leave My Drive (no `..`, no absolute path), so a typo cannot write somewhere else."""
+    can never leave My Drive (no `..`, no absolute path), so a typo cannot write somewhere else.
+
+    `legacy`: the folder's old names (the app was called Wahy Studio, its folder Wahy-Studio). When `folder` does not
+    exist yet and an old one does, the old one is renamed to `folder`, so the lectures saved there come along."""
     name = (folder or "").strip().strip("/")
     parts = [p for p in name.replace("\\", "/").split("/") if p]
     if not parts or any(p in (".", "..") for p in parts) or name.startswith("~"):
-        raise ValueError(f"bad Drive folder name {folder!r}: use a plain name such as Wahy-Studio")
+        raise ValueError(f"bad Drive folder name {folder!r}: use a plain name such as Tadqeeq")
     base = Path(mount_root) / "MyDrive"
     if not base.is_dir():
         raise FileNotFoundError(f"{base} not found: is Google Drive mounted?")
     target = base.joinpath(*parts)
+    if not target.exists():
+        for old in legacy:
+            source = base / old
+            if old and "/" not in old and old not in (".", "..") and source.is_dir():
+                target.parent.mkdir(parents=True, exist_ok=True)
+                source.rename(target)
+                print(f"Moved My Drive/{old} to My Drive/{name} (the app's new name); your lectures are kept.")
+                break
     target.mkdir(parents=True, exist_ok=True)
     if not target.resolve().is_relative_to(base.resolve()):
         raise ValueError(f"bad Drive folder name {folder!r}")

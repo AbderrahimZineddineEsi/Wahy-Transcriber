@@ -1,5 +1,5 @@
 /*
- * Wahy Studio design tokens (roadmap phase 9). Same values as the mockup in docs/rewrite/mockups/screens.html.
+ * Tadqeeq design tokens (roadmap phase 9). Same values as the mockup in docs/rewrite/mockups/screens.html.
  *
  * How to use (phase 10): import after Tailwind in src/index.css, `@import "./shell/tokens.css";`, then write
  * `bg-paper text-ink`, `bg-quran-soft text-quran`, `font-read`, `rounded-m` and so on. The raw values live in CSS

@@ -7,7 +7,7 @@ __pycache__/
 !engine/golden/**/*.jsonl
 .DS_Store
 
-# 90 MB corpus, fetched by run.sh from the Wahy-Finder repo
+# 90 MB corpus, fetched by run.sh (scripts/fetch_corpus.sh) from this repo's corpus-v1 release
 data/corpus.json
 data/corpora/
 

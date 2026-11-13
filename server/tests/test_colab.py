@@ -64,14 +64,14 @@ def test_the_notebook_keeps_the_promises_it_makes():
     assert re.search(r"^USE_GOOGLE_DRIVE = True\b", options, re.M)         # Drive ON is the default
     assert "restore_from_drive" in options and "mount" in options
     assert "Google Drive is OFF" in options and "LOST" in options           # said plainly
-    assert "/content/wahy-backup.zip" in options and "ZipBackupper" in run  # the backup for the no-Drive case
+    assert "/content/tadqeeq-backup.zip" in options and "ZipBackupper" in run  # the backup for the no-Drive case
     assert "WAHY_ACCESS_TOKEN=TOKEN" in run and "access_url" in run         # the access guard is switched on
     assert "local-asr laya" in run and "/api/settings/laya/load" in run     # local Whisper and Laya
     assert "fetch_corpus.sh" in install and "snapshot_download" in install
     assert gen.SPECIALIZED_WHISPER in install and gen.LAYA in install
     assert gen.REPO in options                                              # the public repo is cloned, no login
     intro = cells("markdown")[0]
-    assert "random access token" in intro and "lost when the session ends" in intro and "Wahy-Studio" in intro
+    assert "random access token" in intro and "lost when the session ends" in intro and "Tadqeeq" in intro
     assert "colab.research.google.com/github/" + gen.REPO in intro
 
 
@@ -99,8 +99,8 @@ def test_redact_hides_the_token_in_server_logs():
 
 def test_drive_folder_is_inside_my_drive(tmp_path):
     (tmp_path / "MyDrive").mkdir()
-    assert cs.drive_dir_for(tmp_path, "Wahy-Studio") == tmp_path / "MyDrive" / "Wahy-Studio"
-    assert (tmp_path / "MyDrive" / "Wahy-Studio").is_dir()
+    assert cs.drive_dir_for(tmp_path, "Tadqeeq") == tmp_path / "MyDrive" / "Tadqeeq"
+    assert (tmp_path / "MyDrive" / "Tadqeeq").is_dir()
     assert cs.drive_dir_for(tmp_path, "/Work/Wahy/") == tmp_path / "MyDrive" / "Work" / "Wahy"
     for bad in ["", "   ", "..", "../x", "a/../../x", "/", "~/x", "."]:
         with pytest.raises(ValueError):
@@ -109,7 +109,19 @@ def test_drive_folder_is_inside_my_drive(tmp_path):
 
 def test_drive_not_mounted_is_an_error(tmp_path):
     with pytest.raises(FileNotFoundError):
-        cs.drive_dir_for(tmp_path, "Wahy-Studio")
+        cs.drive_dir_for(tmp_path, "Tadqeeq")
+
+
+def test_the_old_wahy_studio_folder_moves_to_the_new_name_with_its_lectures(tmp_path):
+    old = tmp_path / "MyDrive" / "Wahy-Studio" / "data"
+    old.mkdir(parents=True)
+    (old / "wahy.db").write_bytes(b"lectures")
+    new = cs.drive_dir_for(tmp_path, "Tadqeeq", legacy=("Wahy-Studio",))
+    assert (new / "data" / "wahy.db").read_bytes() == b"lectures" and not (tmp_path / "MyDrive" / "Wahy-Studio").exists()
+    # once the new folder exists, an old one is left alone
+    (tmp_path / "MyDrive" / "Wahy-Studio").mkdir()
+    assert cs.drive_dir_for(tmp_path, "Tadqeeq", legacy=("Wahy-Studio",)) == new
+    assert (tmp_path / "MyDrive" / "Wahy-Studio").is_dir()
 
 
 # ---- Drive <-> the VM -----------------------------------------------------------------------------------------
@@ -200,7 +212,7 @@ def test_the_background_syncer_saves_and_stops_with_a_last_sync(tmp_path):
 def test_backup_zip_round_trip_without_keys_by_default(tmp_path):
     repo = tmp_path / "repo"
     make_repo(repo)
-    out = cs.make_backup_zip(repo, tmp_path / "out" / "wahy-backup.zip")
+    out = cs.make_backup_zip(repo, tmp_path / "out" / "tadqeeq-backup.zip")
     names = set(zipfile.ZipFile(out).namelist())
     assert {"data/wahy.db", "data/media/lecture1.mp3", "data/tafrigh_runs/r1/run.json"} <= names
     assert ".env" not in names and "data/corpus.json" not in names     # keys stay out of a downloadable file

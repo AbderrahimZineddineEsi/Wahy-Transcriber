@@ -27,7 +27,7 @@ test("the product's own words cover both languages, keep the same {slots} and wi
   expect(Object.keys(tadqeeq.en).sort()).toEqual(Object.keys(tadqeeq.ar).sort());
   const slots = (text: string) => [...text.matchAll(/\{(\w+)\}/g)].map((m) => m[1]).sort();
   for (const [key, text] of Object.entries(tadqeeq.ar)) expect(slots(text!)).toEqual(slots(ar[key as keyof typeof ar]));
-  expect(translate("en", "app.name", undefined, "tadqeeq")).toBe("Tadqeeq");
-  expect(translate("en", "app.name")).toBe("Wahy Studio");
+  expect(translate("en", "insp.gold", undefined, "tadqeeq")).toBe("(yours)");
+  expect(translate("en", "insp.gold")).toBe("(gold)");
   expect(translate("en", "settings.keySaved", { provider: "Groq" }, "tadqeeq")).toBe("Groq key saved"); // not overridden
 });

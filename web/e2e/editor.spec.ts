@@ -78,7 +78,7 @@ test("the export tab downloads the server's SRT, and a bracket change reaches th
   await page.goto(`/lectures/${id}/export`);
   await expect(page.getByTestId("export-preview")).toContainText("-->");
   const [download] = await Promise.all([page.waitForEvent("download"), page.getByTestId("download").click()]);
-  expect(download.suggestedFilename()).toBe("wahy-captions.srt");
+  expect(download.suggestedFilename()).toBe("tadqeeq-captions.srt");
   const file = readFileSync(await download.path());
   const server = await (await request.get(`/api/lectures/${id}/export/srt?script=spoken&kind=all&show=CORRECT&show=NOT_SURE&show=NONE`)).body();
   expect(file.equals(server)).toBe(true);

@@ -17,13 +17,13 @@ export function useStudio(): boolean {
   return useEdition() === "studio";
 }
 
-/** Hand the edition to the words (the product has its own name and wording) and to the browser tab's title. */
+/** Hand the edition to the words (the product has its own wording) and name the browser tab. */
 export function useEditionSync(): void {
   const edition = useEdition();
   const { setWording } = useI18n();
   useEffect(() => {
     if (!edition) return;
     setWording(edition);
-    document.title = edition === "tadqeeq" ? "تدقيق · Tadqeeq" : "وحي ستوديو · Wahy Studio";
+    document.title = "تدقيق · Tadqeeq";
   }, [edition, setWording]);
 }

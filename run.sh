@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # =============================================================================
-# Start the app with one command (Linux, macOS, Windows through WSL).
-# The same launcher serves both editions (docs/editions.md): this repo is "studio", the exported product
-# (an EDITION file says "tadqeeq") is Tadqeeq.
+# Tadqeeq: start the app with one command (Linux, macOS, Windows through WSL).
+# The same launcher serves both editions (docs/editions.md): this repo is the studio edition (with the research),
+# the exported product (an EDITION file says "tadqeeq") is the one people download.
 #
 #   ./run.sh                              installs what it needs the first time, then opens http://127.0.0.1:8000
 #   PORT=9000 ./run.sh                    use another port
@@ -21,8 +21,8 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 PORT="${PORT:-8000}"
 HOST="${HOST:-127.0.0.1}"
 URL="http://127.0.0.1:$PORT"
-NAME="Wahy Studio"
-[ "${WAHY_EDITION:-$(cat EDITION 2>/dev/null || true)}" = "tadqeeq" ] && NAME="Tadqeeq"
+NAME="Tadqeeq"
+[ "${WAHY_EDITION:-$(cat EDITION 2>/dev/null || true)}" = "tadqeeq" ] || NAME="Tadqeeq (studio edition)"
 
 say()  { printf '\033[1m%s\033[0m\n' "$*"; }
 fail() { printf '\n\033[31m[!] %s\033[0m\n' "$*" >&2; exit 1; }

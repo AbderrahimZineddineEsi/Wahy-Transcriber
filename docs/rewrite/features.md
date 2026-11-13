@@ -944,7 +944,7 @@ see or set is listed once, with an ID that never changes and is never reused.
   - accepted (2026-11-07, phase 23): removed; confirmed absent: the web app needs the server (the header says when it cannot reach it).
 - [ ] **F-130 Colab runner.** A notebook runs the whole app on a Colab GPU with the specialized Whisper and Laya behind a
   Cloudflare tunnel; a script generates it.
-  - where: `notebooks/colab/wahy_colab_runner.ipynb`, `notebooks/wahy_colab_runner.ipynb`, `scripts/make_colab_notebook.py`
+  - where: `notebooks/colab/tadqeeq_colab_runner.ipynb`, `scripts/make_colab_notebook.py`
   - suggest: keep — updated for the new server in phase 24.
   - check: run the notebook on Colab; the tunnel URL opens the app and transcribes with the specialized Whisper.
   - user: "agree with all" (as suggested)

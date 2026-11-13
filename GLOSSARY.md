@@ -1,6 +1,6 @@
-# Wahy Studio
+# Tadqeeq
 
-Wahy Studio turns recorded Islamic lectures into timed transcripts, finds every Quran verse, hadith and dhikr the
+Tadqeeq (تدقيق, "careful checking"; formerly Wahy Studio) turns recorded Islamic lectures into timed transcripts, finds every Quran verse, hadith and dhikr the
 speaker quotes, has models verify each one, and turns the corrections into training data for Laya, a small local model.
 
 ## Lectures and text

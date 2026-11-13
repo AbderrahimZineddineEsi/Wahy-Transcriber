@@ -1,7 +1,7 @@
 import type { MessageKey } from "./ar";
 
 export const en: Record<MessageKey, string> = {
-  "app.name": "Wahy Studio",
+  "app.name": "Tadqeeq",
   "app.skip": "Skip to content",
 
   "nav.label": "Navigation",
@@ -567,13 +567,13 @@ export const en: Record<MessageKey, string> = {
   "export.format.md": "Markdown",
   "export.format.txt": "Text",
   "export.format.json": "JSON",
-  "export.file.srt": "wahy-captions.srt",
-  "export.file.vtt": "wahy-captions.vtt",
-  "export.file.ass": "wahy-captions.ass",
-  "export.file.html": "wahy-lecture-formatted.html",
-  "export.file.md": "wahy-lecture.md",
-  "export.file.txt": "wahy-lecture.txt",
-  "export.file.json": "wahy-lecture-data.json",
+  "export.file.srt": "tadqeeq-captions.srt",
+  "export.file.vtt": "tadqeeq-captions.vtt",
+  "export.file.ass": "tadqeeq-captions.ass",
+  "export.file.html": "tadqeeq-lecture-formatted.html",
+  "export.file.md": "tadqeeq-lecture.md",
+  "export.file.txt": "tadqeeq-lecture.txt",
+  "export.file.json": "tadqeeq-lecture-data.json",
   "export.download": "Download the file",
   "export.print": "Print / PDF",
   "export.popupBlocked": "The browser blocked the print window.",

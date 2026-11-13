@@ -56,7 +56,7 @@ function Header() {
     <header className="appbar">
       <Link to="/lectures" className="brand" aria-label={edition ? t("app.name") : undefined}>
         <span className="brand-mark" aria-hidden="true">
-          {edition === "tadqeeq" ? "ت" : edition ? "و" : ""}
+          {edition ? "ت" : ""}
         </span>
         <span className="brand-name">{edition && t("app.name")}</span>
       </Link>
