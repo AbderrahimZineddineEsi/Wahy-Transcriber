@@ -7,7 +7,8 @@
 #   scripts/export_tadqeeq.sh --push [target]   also commit it there and push to the target's origin
 #
 # Only committed files are exported (git archive HEAD), so commit first. If <target> is a git clone of the product
-# repo, everything in it except .git is replaced, so each export becomes one new commit there.
+# repo, the files the last export committed are replaced (what git ignores there, like data/ and .env, is kept), so
+# each export becomes one new commit there. A target that is neither empty nor a clone is refused.
 set -euo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
 ROOT="$PWD"
@@ -22,7 +23,12 @@ SHA="$(git rev-parse --short HEAD)"
 
 echo "== Tadqeeq export from $(git branch --show-current) @ $SHA into $TARGET =="
 mkdir -p "$TARGET"
-find "$TARGET" -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
+if [ -d "$TARGET/.git" ]; then
+  # replace what the last export committed; keep whatever git ignores there (data/, .env, node_modules, .venv)
+  (cd "$TARGET" && git ls-files -z | xargs -0 -r rm -f && find . -mindepth 1 -type d -empty -not -path './.git*' -delete)
+elif [ -n "$(ls -A "$TARGET")" ]; then
+  echo "[!] $TARGET is not empty and not a git clone: refusing to write into it" >&2; exit 1
+fi
 git archive HEAD | tar -x -C "$TARGET"
 
 while IFS= read -r line; do
