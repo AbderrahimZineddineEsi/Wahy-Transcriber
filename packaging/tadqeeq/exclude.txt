@@ -8,6 +8,7 @@ notebooks
 engine/golden/laya_requests.mjs
 engine/golden/measure_skew.py
 web/e2e/live-laya.spec.ts
+scripts/notebooks_to_md.py
 
 # internal documents (the product README replaces them; screenshots come from packaging/tadqeeq/screenshots)
 docs
