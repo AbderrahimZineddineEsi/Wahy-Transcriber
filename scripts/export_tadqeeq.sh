@@ -46,7 +46,7 @@ sed -i 's|<title>.*</title>|<title>تدقيق · Tadqeeq</title>|' "$TARGET/web/
 leaks="$(cd "$TARGET" && { ls -d server/wahy/laya notebooks graphify-out data/media_cache 2>/dev/null || true; find . -name '*.ipynb' -not -path './.git/*'; })"
 [ -z "$leaks" ] || { echo "[!] research files left in the export:" >&2; echo "$leaks" >&2; exit 1; }
 
-echo "exported $(cd "$TARGET" && find . -type f -not -path './.git/*' | wc -l) files"
+echo "exported $(git archive HEAD | tar -t | grep -v '/$' | grep -cvFf <(grep -v '^#' packaging/tadqeeq/exclude.txt | sed '/^ *$/d') || true) files"
 
 if [ "$PUSH" = "1" ]; then
   cd "$TARGET"

@@ -6,6 +6,7 @@ import type { Lang } from "./index";
 export const tadqeeq: Record<Lang, Partial<Record<MessageKey, string>>> = {
   ar: {
     "app.name": "تدقيق",
+    "lectures.source.sampleHint": "جرّب التطبيق في ثوانٍ",
     "lectures.sampleText": "محاضرة قصيرة فيها آيات وأحاديث وأذكار. جرّبها لترى كيف تُكتشف الاقتباسات.",
     "verify.approveConfirm": "اضغط للتأكيد: تُعتمد كل الأحكام كأنها منك",
     "verify.approved": "اعتُمد {n} حكما",
@@ -17,6 +18,7 @@ export const tadqeeq: Record<Lang, Partial<Record<MessageKey, string>>> = {
   },
   en: {
     "app.name": "Tadqeeq",
+    "lectures.source.sampleHint": "Try the app in seconds",
     "lectures.sampleText": "A short lecture with verses, hadith and adhkar. Try it to see how quotes are found.",
     "verify.approveConfirm": "Click to confirm: marks every verdict as checked by you",
     "verify.approved": "{n} verdicts approved",
