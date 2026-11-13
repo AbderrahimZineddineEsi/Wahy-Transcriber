@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 
@@ -29,6 +29,7 @@ class CorpusHealth(BaseModel):
 
 class Health(BaseModel):
     status: str
+    edition: Literal["studio", "tadqeeq"] = Field(description="studio: research app; tadqeeq: the product")
     keys: dict[str, bool] = Field(description="provider → is its key set")
     gpu: GpuHealth
     engine: EngineHealth

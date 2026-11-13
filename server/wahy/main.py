@@ -121,7 +121,9 @@ def create_app(settings: Settings | None = None, web_dir: Path | None = None) ->
             app.state.engine.close()
             db.dispose()
 
-    app = FastAPI(title="Wahy-Finder", version="0.1.0", lifespan=lifespan)
+    chosen = settings or get_settings()
+    title = "Tadqeeq" if chosen.edition == "tadqeeq" else "Wahy Studio"
+    app = FastAPI(title=title, version="0.1.0", lifespan=lifespan)
 
     app.include_router(settings_router)
     app.include_router(jobs_router)
@@ -133,10 +135,11 @@ def create_app(settings: Settings | None = None, web_dir: Path | None = None) ->
     app.include_router(editing_router)
     app.include_router(export_router)
     app.include_router(tafrigh_router)
-    app.include_router(telemetry_router)
-    app.include_router(training_router)
+    if chosen.edition == "studio":   # the request log and training data are research tools (docs/editions.md)
+        app.include_router(telemetry_router)
+        app.include_router(training_router)
     mount_web(app, web_dir if web_dir is not None else REPO_ROOT / "web" / "dist")
-    token = (settings or get_settings()).access_token
+    token = chosen.access_token
     if token and token.get_secret_value().strip():
         app.add_middleware(AccessGuard, token=token.get_secret_value().strip())   # a public link (F-130)
     return app

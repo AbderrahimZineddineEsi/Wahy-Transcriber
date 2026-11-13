@@ -7,6 +7,7 @@ import { CopyButton } from "../../shell/fields";
 import { useToasts } from "../../shell/toasts";
 import { isUnfinished, useJobAction, useJobStream, type Job } from "../lectures/api";
 import { useApproveAll, usePassMetrics, usePreview, type Estimate, type PassMetrics } from "./api";
+import { useStudio } from "../../shell/edition";
 import { duration, millis, readableJson, tokens, usd } from "./format";
 
 /** F-087: what the pass would send and cost, before it runs. */
@@ -104,6 +105,7 @@ export function PassProgress({ initial, lectureId, onJob }: Props) {
 
 function Metrics({ job, lectureId }: { job: Job; lectureId: number }) {
   const { t } = useI18n();
+  const studio = useStudio();
   const metrics = usePassMetrics(job.id, false).data;
   const toasts = useToasts();
   const approve = useApproveAll(lectureId);
@@ -132,9 +134,11 @@ function Metrics({ job, lectureId }: { job: Job; lectureId: number }) {
         >
           {confirm ? t("verify.approveConfirm") : t("verify.approveAll")}
         </button>
-        <Link className="btn small ghost" to={`/requests?job=${job.id}`}>
-          {t("verify.requestLog")}
-        </Link>
+        {studio && (
+          <Link className="btn small ghost" to={`/requests?job=${job.id}`}>
+            {t("verify.requestLog")}
+          </Link>
+        )}
       </div>
     </div>
   );

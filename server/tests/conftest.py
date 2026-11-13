@@ -31,6 +31,7 @@ def _no_real_keys(monkeypatch: pytest.MonkeyPatch) -> None:
     """Keys from the shell must not leak into tests."""
     for name in ("GROQ_API_KEY", "GEMINI_API_KEY", "OPENROUTER_API_KEY", "JEV_API_KEY", "WAHY_ACCESS_TOKEN"):
         monkeypatch.delenv(name, raising=False)
+    monkeypatch.setenv("WAHY_EDITION", "studio")   # the exported product says "tadqeeq"; tests pick their edition
     assert len(KEY_FIELDS) == 4
 
 

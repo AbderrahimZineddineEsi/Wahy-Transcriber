@@ -1537,6 +1537,15 @@
           "corpus": {
             "$ref": "#/components/schemas/CorpusHealth"
           },
+          "edition": {
+            "description": "studio: research app; tadqeeq: the product",
+            "enum": [
+              "studio",
+              "tadqeeq"
+            ],
+            "title": "Edition",
+            "type": "string"
+          },
           "engine": {
             "$ref": "#/components/schemas/EngineHealth"
           },
@@ -1562,6 +1571,7 @@
         },
         "required": [
           "status",
+          "edition",
           "keys",
           "gpu",
           "engine",
@@ -6119,7 +6129,7 @@
     }
   },
   "info": {
-    "title": "Wahy-Finder",
+    "title": "Wahy Studio",
     "version": "0.1.0"
   },
   "openapi": "3.1.0",

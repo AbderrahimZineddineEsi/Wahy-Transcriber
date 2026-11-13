@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useI18n, type MessageKey } from "../../shell/i18n";
 import { useTafrighModels } from "./api";
+import { useStudio } from "../../shell/edition";
 import type { Candidate, GeminiRoute, JevOrder, Mode, RunSettings, TextSource, TypoStrategy } from "./settings";
 
 type Props = { settings: RunSettings; onChange: (patch: Partial<RunSettings>) => void; disabled: boolean; sentences: number | null };
@@ -53,7 +54,7 @@ function NumberBox({ label, value, onNumber, disabled, min, max, step, testid }:
 const CANDIDATES: [Candidate, MessageKey][] = [
   ["gemini_all", "tfg.model.gemini"],
   ["jev_hybrid", "tfg.model.jev"],
-  ["laya_hybrid", "tfg.model.laya"],
+  ["laya_hybrid", "tfg.model.laya"], // a research model: the studio only
   ["openrouter_chat", "tfg.model.chat"],
 ];
 
@@ -61,6 +62,7 @@ const CANDIDATES: [Candidate, MessageKey][] = [
  *  Every change is remembered in this browser; the preview and the estimate follow it. */
 export function SettingsPanel({ settings: s, onChange, disabled, sentences }: Props) {
   const { t } = useI18n();
+  const studio = useStudio();
   const models = useTafrighModels();
   const jev = s.candidate === "jev_hybrid";
   const helper = s.candidate === "jev_hybrid" || s.candidate === "laya_hybrid"; // Gemini then does the splits and typo fixes
@@ -95,7 +97,7 @@ export function SettingsPanel({ settings: s, onChange, disabled, sentences }: Pr
       <label className="field">
         <span className="label">{t("tfg.set.classifier")}</span>
         <select className="input" aria-label={t("tfg.set.classifier")} value={s.candidate} disabled={disabled} onChange={(e) => onChange({ candidate: e.target.value as Candidate })}>
-          {CANDIDATES.map(([v, key]) => (
+          {CANDIDATES.filter(([v]) => studio || v !== "laya_hybrid").map(([v, key]) => (
             <option key={v} value={v}>{t(key)}</option>
           ))}
         </select>

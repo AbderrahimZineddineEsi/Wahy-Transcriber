@@ -21,6 +21,7 @@ class SettingsService:
         card, gpu, engine = cuda_card(), self.gpu.status(), self.engine.status()
         return Health(
             status="ok",
+            edition=self.settings.edition,
             keys=self.settings.key_status(),
             gpu=GpuHealth(card=card.name if card else None, total_mb=card.total_mb if card else None,
                           free_mb=card.free_mb if card else None, resident=gpu.resident,

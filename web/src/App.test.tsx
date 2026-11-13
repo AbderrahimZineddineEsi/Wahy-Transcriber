@@ -9,10 +9,10 @@ test("opens on the lectures place, in Arabic and right to left", async () => {
   expect(await screen.findByRole("heading", { name: "المحاضرات" })).toBeInTheDocument();
   expect(document.documentElement).toHaveAttribute("dir", "rtl");
   expect(document.documentElement).toHaveAttribute("lang", "ar");
+  expect(await screen.findByText("الخادم متصل")).toBeInTheDocument(); // the studio's research places follow the health answer
   const nav = screen.getByRole("navigation", { name: "التنقل" });
   for (const name of ["المحاضرات", "المصادر", "بيانات التدريب", "سجل الطلبات", "الإعدادات"])
     expect(within(nav).getByRole("link", { name })).toBeInTheDocument();
-  expect(await screen.findByText("الخادم متصل")).toBeInTheDocument();
 });
 
 test("navigation changes the screen", async () => {

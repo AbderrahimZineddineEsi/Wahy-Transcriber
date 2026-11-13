@@ -12,11 +12,26 @@ from __future__ import annotations
 
 from functools import lru_cache
 from pathlib import Path
+from typing import Literal
 
 from pydantic import Field, SecretStr, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
+
+# Two editions of one codebase (docs/editions.md): "studio" is this repo, with the research and training
+# screens; "tadqeeq" is the product people download, without them. The exported product has an EDITION file.
+Edition = Literal["studio", "tadqeeq"]
+EDITIONS: tuple[Edition, ...] = ("studio", "tadqeeq")
+
+
+def default_edition(root: Path = REPO_ROOT) -> Edition:
+    """The edition the EDITION file at the repo root names, or "studio" when there is none (this repo)."""
+    try:
+        name = (root / "EDITION").read_text(encoding="utf-8").strip().lower()
+    except OSError:
+        return "studio"
+    return name if name in EDITIONS else "studio"  # type: ignore[return-value]
 
 # the provider name the web app shows → the settings field that holds its key
 KEY_FIELDS = {"groq": "groq_api_key", "gemini": "gemini_api_key", "openrouter": "openrouter_api_key",
@@ -26,6 +41,9 @@ KEY_FIELDS = {"groq": "groq_api_key", "gemini": "gemini_api_key", "openrouter": 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=REPO_ROOT / ".env", env_file_encoding="utf-8", extra="ignore",
                                       populate_by_name=True)
+
+    # which edition this is: WAHY_EDITION=tadqeeq ./run.sh previews the product from this repo
+    edition: Edition = Field(default_factory=default_edition, validation_alias="WAHY_EDITION")
 
     # where everything the app stores lives (git-ignored, ADR 0005)
     data_dir: Path = Field(REPO_ROOT / "data", validation_alias="WAHY_DATA_DIR")

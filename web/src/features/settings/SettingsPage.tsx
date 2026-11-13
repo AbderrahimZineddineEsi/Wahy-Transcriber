@@ -7,6 +7,7 @@ import { useTheme, type ThemeChoice } from "../../shell/theme";
 import { useToasts } from "../../shell/toasts";
 import { EnginePanel } from "./EnginePanel";
 import { LayaPanel } from "./LayaPanel";
+import { useStudio } from "../../shell/edition";
 
 // The provider names are brand names: they are never translated.
 const PROVIDERS = [
@@ -18,6 +19,7 @@ const PROVIDERS = [
 
 export function SettingsPage() {
   const { t } = useI18n();
+  const studio = useStudio();
   return (
     <>
       <h1 className="text-xl font-semibold">{t("settings.title")}</h1>
@@ -25,7 +27,7 @@ export function SettingsPage() {
         <KeysPanel />
         <StatusPanel />
         <EnginePanel />
-        <LayaPanel />
+        {studio && <LayaPanel />}
         <InterfacePanel />
       </div>
     </>

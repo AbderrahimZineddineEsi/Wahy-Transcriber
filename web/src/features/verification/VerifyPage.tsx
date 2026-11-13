@@ -7,6 +7,7 @@ import { useEstimate, useStartPass, useVerifierSettings } from "./api";
 import { FindingPicker, type RowStatus } from "./FindingPicker";
 import { EstimateStats, PassProgress, PreviewButton } from "./PassRunner";
 import { idsInScope } from "./selection";
+import { useStudio } from "../../shell/edition";
 import { VerifierPanel } from "./VerifierPanel";
 
 type Props = { lecture: LectureDetail; findings: readonly ViewFinding[] };
@@ -16,6 +17,7 @@ type Props = { lecture: LectureDetail; findings: readonly ViewFinding[] };
  *  page is closed, and this tab picks it up again. */
 export function VerifyPage({ lecture, findings }: Props) {
   const { t } = useI18n();
+  const studio = useStudio();
   const [params] = useSearchParams();
   const settings = useVerifierSettings().data;
   const jobs = useJobs();
@@ -83,9 +85,11 @@ export function VerifyPage({ lecture, findings }: Props) {
               {t("verify.start")}
             </button>
             <PreviewButton lectureId={lecture.id} findingId={firstPicked} />
-            <Link className="btn ghost" to={`/requests?lecture=${lecture.id}`}>
-              {t("verify.requestLog")}
-            </Link>
+            {studio && (
+              <Link className="btn ghost" to={`/requests?lecture=${lecture.id}`}>
+                {t("verify.requestLog")}
+              </Link>
+            )}
           </div>
         </div>
       </aside>

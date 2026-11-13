@@ -16,10 +16,12 @@ import {
   type Provider,
 } from "./api";
 import { pricePerM } from "./format";
+import { useStudio } from "../../shell/edition";
 
 // Provider names are brand names: they are never translated.
-const PROVIDERS: { id: Provider; label: string }[] = [
-  { id: "laya", label: "Laya" },
+// Laya (local) is a research model: only the studio offers it.
+const PROVIDERS: { id: Provider; label: string; studio?: true }[] = [
+  { id: "laya", label: "Laya", studio: true },
   { id: "gemini", label: "Gemini" },
   { id: "jev", label: "JEV" },
   { id: "openrouter", label: "OpenRouter" },
@@ -37,6 +39,7 @@ export function VerifierPanel({ settings }: { settings: Settings }) {
   const update = useUpdateSettings();
   const health = useHealth();
   const provider = settings.provider;
+  const studio = useStudio();
   const keyMissing = provider !== "laya" && provider !== "fake" && health.data !== undefined && !health.data.keys[provider];
 
   return (
@@ -44,7 +47,7 @@ export function VerifierPanel({ settings }: { settings: Settings }) {
       <div className="field">
         <span className="label">{t("verify.verifier")}</span>
         <div className="seg flex-wrap" role="group" aria-label={t("verify.verifier")}>
-          {PROVIDERS.map((p) => (
+          {PROVIDERS.filter((p) => studio || !p.studio).map((p) => (
             <button key={p.id} aria-pressed={provider === p.id} onClick={() => update.mutate({ provider: p.id })}>
               {p.label}
             </button>

@@ -4,11 +4,13 @@ import { tokens, usd } from "../verification/format";
 import type { Estimate } from "./api";
 import { modeRow, rowCost, rowOf } from "./format";
 import type { RunSettings } from "./settings";
+import { useStudio } from "../../shell/edition";
 
 /** F-114: requests and tokens of each mode over the chosen sentences, from the real prompts; the mode the run would
  *  use is marked. The cost is shown when the model's price is known (OpenRouter's catalog). */
 export function EstimateBox({ query, settings }: { query: UseQueryResult<Estimate, Error>; settings: RunSettings }) {
   const { t } = useI18n();
+  const studio = useStudio();
   const estimate = query.data;
   if (!estimate) {
     return (
@@ -22,7 +24,7 @@ export function EstimateBox({ query, settings }: { query: UseQueryResult<Estimat
     { id: "windowed", label: t("tfg.est.window", { n: estimate.windowed.window_size as number }), row: rowOf(estimate.windowed), active: (settings.candidate === "gemini_all" || settings.candidate === "openrouter_chat") && settings.mode === "windowed" },
     { id: "jev", label: t("tfg.model.jev"), row: rowOf(estimate.jev), active: settings.candidate === "jev_hybrid" },
     { id: "laya", label: t("tfg.model.laya"), row: rowOf(estimate.laya), active: settings.candidate === "laya_hybrid" },
-  ];
+  ].filter((r) => studio || r.id !== "laya");
   const chosen = modeRow(estimate, settings.mode, settings.candidate);
   const cost = rowCost(chosen, estimate.price);
   return (

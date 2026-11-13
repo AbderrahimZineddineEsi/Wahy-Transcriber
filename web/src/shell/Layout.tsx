@@ -9,18 +9,20 @@ import { useI18n, type MessageKey } from "./i18n";
 import { useRailBadges } from "./badges";
 import { readStored } from "./storage";
 import { useTheme } from "./theme";
+import { useEdition, useEditionSync, useStudio } from "./edition";
 
 type Place = { to: string; label: MessageKey; icon: ComponentType; badge?: number };
 
 // The app's places (docs/rewrite/mockups). "The open lecture" is the last lecture opened (phase 12). Each place
 // with a count shows it as a badge (F-001).
-const PLACES: (Omit<Place, "badge"> & { count: "corpora" | "training" | "requests" })[] = [
+const PLACES: (Omit<Place, "badge"> & { count: "corpora" | "training" | "requests"; studio?: true })[] = [
   { to: "/corpora", label: "nav.corpora", icon: CorporaIcon, count: "corpora" },
-  { to: "/training", label: "nav.training", icon: TrainingIcon, count: "training" },
-  { to: "/requests", label: "nav.requests", icon: RequestsIcon, count: "requests" },
+  { to: "/training", label: "nav.training", icon: TrainingIcon, count: "training", studio: true },
+  { to: "/requests", label: "nav.requests", icon: RequestsIcon, count: "requests", studio: true },
 ];
 
 export function Layout() {
+  useEditionSync();
   return (
     <div className="grid min-h-screen grid-rows-[var(--spacing-header)_1fr]">
       <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:z-30 focus:bg-surface focus:p-2">
@@ -49,14 +51,15 @@ function Header() {
   const { t, lang, setLang } = useI18n();
   const theme = useTheme();
   const health = useHealth();
+  const edition = useEdition();
   const jobs = health.data?.running_jobs ?? 0;
   return (
     <header className="sticky top-0 z-[5] flex items-center gap-3 border-b border-line bg-surface px-4">
       <Link to="/lectures" className="flex items-center gap-2 font-quran text-[1.35rem] font-bold whitespace-nowrap">
         <span className="grid size-[26px] place-items-center rounded-[7px] bg-accent text-base leading-none text-accent-ink">
-          و
+          {edition === "tadqeeq" ? "ت" : edition ? "و" : ""}
         </span>
-        {t("app.name")}
+        {edition && t("app.name")}
       </Link>
       <span className="flex-1" />
       <ServerBadge />
@@ -98,13 +101,14 @@ function Rail() {
   const open = useMatch("/lectures/:id/*")?.params.id;
   const last = Number(open ?? readStored(LAST_LECTURE_KEY));
   const hasLast = Number.isInteger(last) && last > 0;
-  const badges = useRailBadges(hasLast ? last : null);
+  const studio = useStudio();
+  const badges = useRailBadges(hasLast ? last : null, studio);
   return (
     <nav aria-label={t("nav.label")} className="flex flex-col gap-0.5 border-line bg-surface px-2 py-3 max-[720px]:flex-row max-[720px]:overflow-x-auto max-[720px]:border-b max-[720px]:p-1 min-[721px]:border-e">
       <RailLink place={{ to: "/lectures", label: "nav.lectures", icon: LecturesIcon }} end />
       {hasLast && <RailLink place={{ to: `/lectures/${last}`, label: "nav.lecture", icon: LectureIcon, badge: badges.lecture }} />}
       <span className="mx-1.5 my-2 h-px bg-line max-[720px]:hidden" />
-      {PLACES.map((place) => (
+      {PLACES.filter((place) => studio || !place.studio).map((place) => (
         <RailLink key={place.to} place={{ ...place, badge: badges[place.count] }} />
       ))}
       <span className="flex-1" />

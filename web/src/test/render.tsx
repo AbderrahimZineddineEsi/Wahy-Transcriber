@@ -6,6 +6,7 @@ import type { Health } from "../api/health";
 import { Providers } from "../shell/Providers";
 
 export const healthy: Health = {
+  edition: "studio",
   status: "ok",
   keys: { groq: false, gemini: false, openrouter: false, jev: false },
   gpu: { card: null, total_mb: null, free_mb: null, resident: null, in_use: null, waiting: [] },

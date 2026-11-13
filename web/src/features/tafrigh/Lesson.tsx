@@ -7,6 +7,7 @@ import { downloadRun, segmentsOf, useReview, type ExportFormat, type RunDetail }
 import { num } from "./format";
 import { TAG_KEYS, labelSource, modelConfidence, nextToReview, percent, type Segment } from "./labels";
 import { SaveForLayaButton } from "./SaveForLaya";
+import { useStudio } from "../../shell/edition";
 import { SentenceCard } from "./SentenceCard";
 
 type Props = { lectureId: number; run: RunDetail };
@@ -16,6 +17,7 @@ type Props = { lectureId: number; run: RunDetail };
 export function Lesson({ lectureId, run }: Props) {
   const { t } = useI18n();
   const toasts = useToasts();
+  const studio = useStudio();
   const review = useReview(lectureId, run.run.run_id);
   const segments = segmentsOf(run);
   const flagged = new Set(run.review_items.map((i) => i.segment_id));
@@ -39,7 +41,7 @@ export function Lesson({ lectureId, run }: Props) {
           </button>
         ))}
         <span className="flex-1" />
-        <SaveForLayaButton run={run} />
+        {studio && <SaveForLayaButton run={run} />}
       </div>
 
       {run.warnings.length > 0 && (

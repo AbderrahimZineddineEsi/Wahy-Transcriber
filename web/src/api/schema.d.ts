@@ -2350,6 +2350,12 @@ export interface components {
         /** Health */
         Health: {
             corpus: components["schemas"]["CorpusHealth"];
+            /**
+             * Edition
+             * @description studio: research app; tadqeeq: the product
+             * @enum {string}
+             */
+            edition: "studio" | "tadqeeq";
             engine: components["schemas"]["EngineHealth"];
             gpu: components["schemas"]["GpuHealth"];
             /**

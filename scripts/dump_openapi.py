@@ -11,7 +11,11 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "server"))
 
-from wahy.main import app  # noqa: E402
+from wahy.core.settings import Settings  # noqa: E402
+from wahy.main import create_app  # noqa: E402
+
+# always the studio edition: it has every route, and both editions share the web app's types
+app = create_app(Settings(edition="studio", _env_file=None))
 
 OUT = ROOT / "web" / "src" / "api" / "openapi.json"
 
