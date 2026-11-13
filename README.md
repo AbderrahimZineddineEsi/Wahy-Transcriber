@@ -31,6 +31,10 @@
 - [Running the tests](#running-the-tests)
 - [Credits](#credits)
 
+> **Two editions.** This repo is the studio: the full app plus the Laya research. The product people download,
+> **Tadqeeq (تدقيق)**, is the same code without the research, exported by `scripts/export_tadqeeq.sh`.
+> See [docs/editions.md](docs/editions.md).
+
 ## What it does
 
 | | |

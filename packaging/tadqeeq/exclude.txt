@@ -1,0 +1,29 @@
+# Paths of this repo that the Tadqeeq product leaves out (scripts/export_tadqeeq.sh, docs/editions.md).
+# One path per line, relative to the repo root; a folder takes everything under it.
+
+# the Laya research: data building, labelling, Kaggle training and evaluation, notebooks, reports
+server/wahy/laya
+server/tests/laya
+notebooks
+engine/golden/laya_requests.mjs
+engine/golden/measure_skew.py
+web/e2e/live-laya.spec.ts
+
+# internal documents (the product README replaces them; screenshots come from packaging/tadqeeq/screenshots)
+docs
+GLOSSARY.md
+future_work.md
+graphify-out
+.graphifyignore
+
+# downloaded videos kept for the old tests
+data/media_cache
+
+# the Colab runner (it loads the private Laya checkpoint)
+scripts/make_colab_notebook.py
+scripts/colab_support.py
+server/tests/test_colab.py
+
+# the export itself
+packaging
+scripts/export_tadqeeq.sh

@@ -46,6 +46,7 @@ export default defineConfig({
       // keys from the developer's shell must not leak in: an empty value counts as "not set"
       env: {
         WAHY_DATA_DIR: dataDir,
+        WAHY_EDITION: "studio", // the tests also cover the research screens; the product export says "tadqeeq"
         ...(existsSync(corpus) ? { WAHY_CORPUS_PATH: corpus } : {}),
         ...(live
           ? { WAHY_ENV_FILE: join(repo, ".env") }
